@@ -44,18 +44,18 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 *Actualizado: 2026-10-05.*
 
-- **Fase: planificación.** Visión y alcance de la versión 1 confirmados (app personal de tareas y hábitos con hecho/no hecho e historial). No hay código ni plan aprobado.
+- **Fase: planificación.** Visión, alcance y casos de uso de la versión 1 confirmados (app personal de tareas y hábitos con hecho/no hecho, categorías e historial). Falta el stack. No hay código ni plan aprobado. La planificación se guarda en la rama `docs/planificacion`.
 - Estado del plan: ver la cabecera de [05-plan](05-plan.md).
 
 ## Lo siguiente
 
-1. Abrir `/arquitecto` y seguir con la **sesión 2**: usuarios y casos de uso (hábito recurrente, tarea con fecha, marcar hecho/no hecho, consultar historial). La sesión 1 (visión) ya está hecha.
-2. Cerrar las decisiones que quedan abiertas en [decisiones](decisiones.md) (DEC-04 y DEC-07).
+1. `/arquitecto` en modo tandas (DEC-14): sesiones 3 a 7 (funcionalidades, riesgos, arquitectura y stack, defaults y plan). El stack se decide **con el humano** (DEC-16). Las sesiones 1 (visión) y 2 (casos de uso) están hechas.
+2. Cerrar las decisiones que quedan abiertas en [decisiones](decisiones.md) (DEC-04 y DEC-16).
 3. Cuando el plan esté aprobado: `/ejecutar-plan`.
 
 ## Pendiente del humano
 
-- Cerrar DEC-04 (prueba de arranque real de `claude`, `codex` y `copilot` con Orca) y DEC-07 (fecha límite). DEC-01, 02, 03, 05 y 06 ya están cerradas.
+- Cerrar DEC-04 (que `codex` y `copilot` funcionen con Orca) y DEC-16 (stack y plataformas: contar al arquitecto qué lenguajes conoce y qué quiere).
 - El conector de Jira ya está configurado y probado, y el tablero de `ADP` tiene los cuatro estados (ver [agentes/jira](agentes/jira.md)). El ticket `ADP-1` es de prueba y se puede borrar a mano.
 - Configurar en GitHub la protección de `develop` y `main`, si el plan del repositorio lo permite.
 - Comprobar en el equipo de trabajo: Orca, los agentes, y el MCP de Jira
@@ -65,7 +65,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-10**.
+  chat. Siguiente número libre: **DEC-17**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -87,6 +87,18 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Sesión 2 del arquitecto: casos de uso
+
+Se escribieron y revisaron siete casos de uso con una
+[plantilla estándar](plantilla-caso-de-uso.md): crear hábitos (cuatro
+frecuencias, franja u hora, duración), crear tareas, la vista Hoy, la
+Bandeja de entrada, resolver lo pendiente, el historial, modificar o
+archivar, y categorías (DEC-10, 11, 13 y 15). Se decidió no tener fecha
+límite (DEC-07), un orquestador autónomo por niveles con puertas de
+aprobación (DEC-12) y planificar en tandas (DEC-14). El stack queda para
+la sesión 5 con el humano (DEC-16): Google Play cuesta 25 USD y exige una
+prueba con 12 personas.
 
 ### 2026-10-05 — Sesión 1 del arquitecto: visión y alcance
 

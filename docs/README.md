@@ -12,6 +12,7 @@ Toda la documentación del proyecto vive aquí, versionada junto al código. Est
 | [01-vision-y-alcance](01-vision-y-alcance.md) | Qué se construye, para quién, qué NO se construye, cómo se sabe que está terminado |
 | [02-funcionalidades](02-funcionalidades.md) | Registro de funcionalidades y requisitos no funcionales, con prioridad y criterio de aceptación |
 | [03-casos-de-uso](03-casos-de-uso.md) | Interacciones paso a paso, con flujos alternativos y excepciones |
+| [plantilla-caso-de-uso](plantilla-caso-de-uso.md) | Formato estándar de los casos de uso: convenciones y plantilla |
 | [04-arquitectura](04-arquitectura.md) | Forma del sistema, stack, convenciones transversales, estrategia de pruebas, glosario |
 | [05-plan](05-plan.md) | Tareas, dependencias, reparto y estado del plan. Lo que ejecuta `/ejecutar-plan` |
 | [06-riesgos](06-riesgos.md) | Riesgos con mitigación y contingencia |

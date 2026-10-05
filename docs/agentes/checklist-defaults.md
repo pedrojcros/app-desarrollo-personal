@@ -102,4 +102,4 @@ Marcas: **[día 1]** entra en el esqueleto · **[cuando toque]** se añade al ne
 
 - **[día 1]** Lista de **fuera de alcance** con nombre, en [01-vision-y-alcance](../01-vision-y-alcance.md), y una **lista de espera** para lo que llegue después. Esta regla decide si el proyecto se entrega.
 - **[día 1]** Qué hace «terminado» a la primera versión, medible.
-- **[según proyecto]** Si no hay fecha límite, **ponerse una**: sin ella no hay freno natural al alcance.
+- **[según proyecto]** Si no hay fecha límite, **ponerse una**: sin ella no hay freno natural al alcance. *(Descartado en este proyecto, DEC-07: sin fecha límite; el freno es la lista de fuera de alcance.)*

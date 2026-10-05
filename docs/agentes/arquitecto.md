@@ -27,6 +27,17 @@ Las sesiones son largas y se reparten en varios días. El contexto de la convers
 
 Una buena sesión termina con menos incertidumbre, no con más documentos.
 
+### Modo tandas (el de este proyecto, DEC-14)
+
+Para avanzar rápido, el arquitecto no trabaja un tema por sesión ni pregunta punto por punto:
+
+1. Redacta **varias sesiones de la agenda de golpe**, con sus recomendaciones ya aplicadas.
+2. Entrega **una sola lista numerada** con las decisiones que son del humano, cada una con su valor por defecto y su motivo en una línea.
+3. El humano contesta solo lo que cambia; «ok» acepta todos los valores por defecto. Cada respuesta queda en [decisiones](../decisiones.md).
+4. El humano no tiene que leer los documentos enteros durante la planificación: los lee en la **revisión final** (sesión 8), antes de aprobar.
+
+Nada se aplica en silencio: un valor por defecto solo vale después de que el humano conteste, aunque sea con un «ok».
+
 ## Agenda orientativa
 
 No es un guion rígido: se pueden fusionar sesiones o saltar las que no apliquen. Cada tema indica el documento que se rellena.

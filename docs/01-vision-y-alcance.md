@@ -39,17 +39,18 @@ Quién **no** es usuario de esta primera versión: cualquier otra persona. Puede
 
 Las funcionalidades imprescindibles estarán en [02-funcionalidades](02-funcionalidades.md). Perímetro propuesto, a confirmar:
 
-- Crear, editar y borrar tareas (con fecha y sin fecha) y hábitos recurrentes.
+- Crear, editar y borrar tareas (con fecha y sin fecha) y hábitos recurrentes. Frecuencias: todos los días, días de la semana, cada N días y cada mes. Momento del día opcional (hora exacta o franja) y duración opcional.
 - Estado de cada ocurrencia: pendiente, **hecha** o **no hecha**.
-- Vista del día y vista del historial.
+- Categorías mínimas para agrupar hábitos y tareas («Compra», «Universidad»): nombre único, una por elemento, opcional (DEC-13).
+- Vistas: **Hoy** (solo lo de hoy, nunca tareas sin fecha), **Bandeja de entrada** (lo que no tiene categoría), cada categoría, pendientes de días anteriores e historial (DEC-15).
 
-**Plataforma de la versión 1:** solo ordenador. El móvil llega en la versión siguiente (ver abajo), así que la versión 1 se diseña para que añadirlo no obligue a rehacerla.
+**Plataforma de la versión 1:** web en el ordenador (dónde se aloja se decide con el stack, DEC-16). El móvil llega en la versión siguiente (ver abajo), así que la versión 1 se diseña para que añadirlo no obligue a rehacerla.
 
 ## Versión siguiente (confirmada, no se construye ahora)
 
 Estas dos cosas **irán de la mano** en la versión siguiente y condicionan el diseño de la 1:
 
-- **Uso desde el móvil.**
+- **App móvil publicada en Google Play.**
 - **Conexión con Google Calendar**: la aplicación crea eventos en el calendario (por ejemplo, la sesión de natación de los miércoles o la entrega de una práctica).
 
 ## Fuera de alcance
@@ -62,7 +63,7 @@ Estas dos cosas **irán de la mano** en la versión siguiente y condicionan el d
 | Estadísticas e interfaces interactivas del progreso | Valiosas, pero el historial tiene que existir antes | Primera versión posterior a la 1 |
 | Recordatorios y avisos («en 4 días entregas X») | Exigen notificaciones fuera de la aplicación, que es una decisión de arquitectura cara | Después de la 1, con su propia ADR |
 | Integración con Todoist | Dependencia de un tercero que se quiere abandonar | Solo si hace falta migrar datos |
-| Conexión con Google Calendar y uso desde el móvil | Se hacen juntos y exigen cuentas y acceso externos; **sí están previstos para la versión siguiente** | Versión 2 |
+| Conexión con Google Calendar y app móvil (Google Play) | Se hacen juntos y exigen cuentas y acceso externos; **sí están previstos para la versión siguiente** | Versión 2 |
 
 Todo lo que llegue y no esté en el alcance va a una lista de espera, no a tareas.
 
@@ -72,8 +73,8 @@ Lo que no se elige, viene dado: plazo, presupuesto, equipo, tecnología impuesta
 
 | Restricción | Detalle |
 |---|---|
-| Plazo | Sin decidir (ver DEC-07) |
-| Presupuesto | Sin presupuesto: herramientas gratuitas o ya contratadas |
+| Plazo | **Sin fecha límite** (DEC-07): el autor es estudiante y avanza según su tiempo libre. Solo se fijan fechas si él lo pide |
+| Presupuesto | **Coste cero**: solo servicios gratuitos. Publicar en Google Play cuesta 25 USD una vez (DEC-16, abierta) |
 | Equipo | Una persona más agentes de IA coordinados con Orca. El proyecto también sirve para aprender ese flujo y Jira |
 | Normativa y datos personales | Solo datos del propio autor. Sin terceros |
 
@@ -85,4 +86,4 @@ Ideas que han aparecido y quedan para después de la versión 1.
 |---|---|---|
 | Recordatorios con antelación para entregas de la universidad | Humano | 2026-10-05 |
 | Estadísticas e interfaces interactivas del progreso | Humano | 2026-10-05 |
-| Móvil y conexión con Google Calendar (versión siguiente, juntos) | Humano | 2026-10-05 |
+| App móvil en Google Play y conexión con Google Calendar (versión siguiente, juntos) | Humano | 2026-10-05 |
