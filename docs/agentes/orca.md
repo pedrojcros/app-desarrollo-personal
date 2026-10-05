@@ -85,4 +85,8 @@ Para trabajo planificado con dependencias: `task-create --spec ... --deps '<json
 - **En Windows, Smart App Control puede bloquear la CLI de Orca** tras una actualización. Síntoma: la CLI deja de responder o falla al arrancar. Se resolvió desactivándolo (decisión del humano).
 - **Los agentes de pago o gratuitos tienen cuotas.** Una cuenta gratuita se queda sin límite pronto: ten un plan B por encargo.
 - **El nombre con que Orca lanza cada agente hay que descubrirlo**, no adivinarlo. La ayuda de `orca orchestration worker-start --help` da ejemplos de ids (no la lista completa, y no sale en `orca agent-context`). La lista completa de la versión instalada está en [agentes-disponibles](agentes-disponibles.md); en Orca 1.4.217 Copilot es `copilot`.
+- **Codex no pasa `agent_readiness` (P01, 2026-10-06).** Sus animaciones impiden que la terminal quede en calma. Arreglo: `[tui] animations = false` en la configuración de Codex que usa Orca (ver DEC-21, punto 10). Incidencia [stablyai/orca#25007](https://github.com/stablyai/orca/issues/25007).
+- **El sandbox de Codex bloquea el CLI de Orca**, que habla por un socket en `~/.config/orca/`. Sin aprobación previa, cada `orca orchestration ...` del trabajador pide permiso y el trabajador se queda parado.
+- **Copilot pregunta si confía en cada carpeta nueva** (cada worktree lo es) y, en modo manual, pide permiso para cada comando. `--yolo` no evita la pregunta de la carpeta: hace falta `trustedFolders` en `~/.copilot/settings.json`.
+- Los argumentos por defecto de cada agente están en Orca, Settings → Agents (`agentDefaultArgs` en su configuración). En este equipo están vacíos para Codex y Copilot.
 - *(Añade aquí lo que cueste tiempo.)*

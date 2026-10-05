@@ -71,6 +71,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 - **Funcionalidades:** — · **Depende de:** nada; no bloquea ninguna tarea
 - **Tamaño:** S · **Agente sugerido:** el orquestador (investigación, no es código de producción); el humano si hay que tocar la configuración de Orca
 - **Hecho cuando:** los dos agentes superan la prueba de arranque, o queda escrito por qué no y DEC-04 se cierra con «solo Claude».
+- **Avance (2026-10-06):** causas encontradas y verificadas; los dos agentes funcionan con aprobaciones manuales. Falta aplicar los ajustes (DEC-21, punto 10) y repetir la prueba sin aprobar nada a mano.
 - **Puerta:** — · **Ticket:** ADP-
 
 ### T01 — Esqueleto del proyecto

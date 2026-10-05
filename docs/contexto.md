@@ -58,8 +58,8 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 - Contestar DEC-21 y aprobar el plan.
 - H01: que `git push` funcione desde las sesiones de los agentes (o «ok» al punto 7 de DEC-21 y lo hace el arquitecto).
 - H02: crear las cuentas de Vercel y Supabase antes de la ola 4.
-- **Arreglar Codex (P01)**: arranca, pero Orca no le entrega el encargo (falla en `agent_readiness`). Se puede hacer ya, sin esperar al plan. Copilot está sin probar. Cierra DEC-04.
-- Limpiar lo que dejó la prueba de agentes del 2026-10-05: los worktrees `prueba-arranque-claude` y `prueba-arranque-codex` y la terminal de Codex que quedó viva (run de Orca `run_95865c545e0d`). Conviene mirarla antes, porque sirve para investigar P01.
+- **P01 (Codex y Copilot): investigado la noche del 2026-10-06.** Los dos funcionan con Orca, pero necesitan ajustes para trabajar sin que nadie apruebe nada. Aprobar el punto 10 de DEC-21; luego se repite la prueba y se cierra DEC-04.
+- Limpiar lo que dejaron las pruebas de agentes: los worktrees `prueba-arranque-claude`, `prueba-arranque-codex` y `prueba-arranque-copilot` (con un fichero de prueba cada uno y sus ramas locales `pedrojcros/prueba-arranque-*`, sin subir). Las terminales ya están cerradas y no queda ningún trabajador pendiente en Orca.
 - El ticket `ADP-1` es de prueba y se puede borrar a mano.
 
 ## Cómo se trabaja aquí
@@ -72,7 +72,11 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Trampas ya encontradas
 
-*(Cosas que costaron tiempo y no deben costarlo dos veces. Vacío por ahora.)*
+*(Cosas que costaron tiempo y no deben costarlo dos veces.)*
+
+- **Codex lanzado por Orca no recibía encargos**: sus animaciones impiden que Orca lo vea «listo». Arreglo: `tui.animations = false`. Ver [agentes/orca](agentes/orca.md#trampas-conocidas).
+- **El sandbox de Codex bloquea el CLI de Orca** y **Copilot pregunta por cada carpeta y cada comando**: sin ajustes, se quedan esperando a alguien que apruebe. Ver DEC-21, punto 10.
+- **`git push` por SSH falla** en las sesiones de los agentes (no pueden pedir la frase de la clave). Ver H01.
 
 ## Lo que no viaja con el repositorio
 
@@ -88,6 +92,18 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — P01: por qué Codex no recibía encargos (de noche, con permiso del humano)
+
+Codex sí arrancaba, pero sus animaciones repintan la terminal sin parar y
+Orca nunca le daba por listo (incidencia conocida de Orca, #25007). Se
+comprobó en este equipo: con las animaciones apagadas, listo al instante y
+el trabajador termina. Además, el sandbox de Codex le obliga a pedir permiso
+para hablar con Orca. Copilot funciona a la primera, pero pregunta por la
+confianza de cada carpeta y pide permiso por comando. Las dos pruebas
+terminaron con éxito aprobando a mano solo comandos de Orca. No se cambió
+ninguna configuración: los ajustes esperan el «ok» del humano (DEC-21,
+punto 10). Detalle en [agentes-disponibles](agentes/agentes-disponibles.md).
 
 ### 2026-10-06 — Tanda de las sesiones 3 a 7 del arquitecto
 

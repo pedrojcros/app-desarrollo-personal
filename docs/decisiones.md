@@ -26,6 +26,8 @@ Cuando una decisión se cierra:
 
 **Propuesta (2026-10-06, DEC-21):** Codex y Copilot quedan **deshabilitados** hasta la tarea P01 del plan; todo el trabajo va a trabajadores Claude.
 
+**Investigación P01 (2026-10-06):** los dos funcionan con Orca, pero no sin supervisión. Codex necesita apagar sus animaciones y no pedir permiso para usar Orca; Copilot necesita confiar en `~/orca/workspaces` y no pedir permiso por comando. Detalle en [agentes-disponibles](agentes/agentes-disponibles.md#prueba-de-arranque-una-vez-por-agente-y-equipo); los ajustes, en DEC-21, punto 10.
+
 *Dónde acaba:* `agentes/agentes-disponibles.md`.
 
 ### DEC-21 — Propuestas de la tanda de sesiones 3 a 7 (esperan un «ok»)
@@ -41,6 +43,11 @@ Ya están escritas en los documentos como valor por defecto (DEC-14). Valen cuan
 7. **Push a GitHub:** cambiar el remoto a HTTPS con la sesión de `gh`, porque por SSH falla en las sesiones de los agentes.
 8. **Comando `/idea`** para apuntar ideas en el [buzón](buzon.md) desde cualquier sesión.
 9. **Copia de seguridad:** exportación semanal automática de los datos (GitHub Actions, repositorio privado).
+10. **Ajustes para que Codex y Copilot trabajen solos** (resultado de P01; los aplica el arquitecto con tu «ok»):
+    - Codex: `[tui] animations = false` en `~/.codex/config.toml` y en `~/.config/orca/codex-runtime-home/home/config.toml`.
+    - Codex, argumentos por defecto en Orca: `--dangerously-bypass-approvals-and-sandbox`. Sin pedir permisos y sin sandbox, que es como Orca los lanza normalmente. Alternativa más estricta, sin probar: sandbox de escritura en la carpeta de trabajo con red local permitida.
+    - Copilot, argumentos por defecto en Orca: `--allow-all-tools`; y `~/orca/workspaces` en `trustedFolders` de `~/.copilot/settings.json`.
+    - Después, una prueba de arranque sin aprobar nada a mano. Si pasa, Codex y Copilot se habilitan y DEC-04 se cierra.
 
 **Respuesta:**
 
