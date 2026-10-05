@@ -22,11 +22,11 @@ Jira sirve para ver el avance de un vistazo y para que el humano mueva prioridad
 
 | En el plan | En Jira |
 |---|---|
-| Funcionalidad (`RF-nn`) | Epic |
-| Tarea (`Tnn`) | Story o Task (según cómo esté configurado el proyecto) |
-| Encargo | Sub-task |
-| Decisión abierta que bloquea | Task con etiqueta `decision` |
-| Bug encontrado | Bug |
+| Funcionalidad (`RF-nn`) | Epic (`Epic`) |
+| Tarea (`Tnn`) | `Historia` (algo que ve el usuario) o `Tarea` (trabajo técnico) |
+| Encargo | `Subtask` |
+| Decisión abierta que bloquea | `Tarea` con etiqueta `decision` |
+| Bug encontrado | `Error` |
 
 Cada ticket lleva en la descripción el identificador del plan (`RF-03`, `T07`) y un enlace al documento. **Los tipos de incidencia y flujos varían** entre proyectos *company-managed* y *team-managed*: la primera vez, el orquestador lee los tipos y transiciones reales del proyecto y los anota abajo.
 
@@ -40,10 +40,23 @@ Cada ticket lleva en la descripción el identificador del plan (`RF-03`, `T07`) 
 | El PR está fusionado | Listo |
 | Está bloqueada por una decisión | Bloqueada (o etiqueta `bloqueada`) y comentario con el enlace a la DEC |
 
-Estados del tablero: Por hacer, En curso, En revisión, Listo. Transiciones reales (rellenar la primera vez con el MCP): RELLENAR
+Tipos de incidencia reales de `ADP` (leídos con el MCP el 2026-10-05, nombres en español): `Epic`, `Historia`, `Tarea`, `Error` y `Subtask`. Conexión: MCP `atlassian` (`https://mcp.atlassian.com/v1/mcp/authv2`), sitio `pedrojcros.atlassian.net`, permisos solo de Jira.
+
+Comprobado el 2026-10-05 con el MCP (ticket de prueba `ADP-1`: crear, comentar y mover funcionan). Identificador del sitio (`cloudId`): `490863fe-a6c1-4134-913e-c2470cb7c508`.
+
+Transiciones reales de `ADP` (son globales: desde cualquier estado se puede ir a cualquiera):
+
+| Transición | Id | Estado al que lleva |
+|---|---|---|
+| Por hacer | 11 | Por hacer |
+| En curso | 21 | En curso |
+| Listo | 31 | Listo |
+
+**Falta «En revisión»**: el tablero solo tiene Por hacer, En curso y Listo. Mientras no se añada, el orquestador no puede marcar «En revisión»: deja la tarea en «En curso» y lo anota en un comentario del ticket.
 
 ## Convenciones
 
+- **Idioma de Jira: español** (decisión del humano, 2026-10-05): títulos, descripciones, comentarios, tipos y estados. Los nombres reales de tipos y estados se dejan como están.
 - Clave del ticket en la **rama** (`ADP-123-descripcion`), en el **título del PR** y en el **encargo**.
 - Al cerrar un encargo, un comentario del orquestador con: el resumen de tres líneas, el enlace al PR y el resultado de los tests.
 - Si el trabajador anota dudas, el orquestador las convierte en comentario o en una DEC; no se quedan en el informe.

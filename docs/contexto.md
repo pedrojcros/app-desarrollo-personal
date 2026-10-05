@@ -57,7 +57,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Pendiente del humano
 
 - Cerrar DEC-04 (prueba de arranque real de `claude`, `codex` y `copilot` con Orca) y DEC-07 (fecha límite). DEC-01, 02, 03, 05 y 06 ya están cerradas.
-- Configurar el conector (MCP) de Jira y comprobarlo con las pruebas de [agentes/jira](agentes/jira.md), y añadir la columna «En revisión» al tablero de `ADP` si falta.
+- Añadir la columna/estado **«En revisión»** al tablero de `ADP` (comprobado el 2026-10-05: no existe). El conector de Jira ya está configurado y probado (ver [agentes/jira](agentes/jira.md)); el ticket `ADP-1` es de prueba y se puede borrar a mano.
 - Configurar en GitHub la protección de `develop` y `main`, si el plan del repositorio lo permite.
 - Comprobar en el equipo de trabajo: Orca, los agentes, y el MCP de Jira
   (ver [agentes/jira](agentes/jira.md)).
