@@ -51,8 +51,9 @@ Transiciones reales de `ADP` (son globales: desde cualquier estado se puede ir a
 | Por hacer | 11 | Por hacer |
 | En curso | 21 | En curso |
 | Listo | 31 | Listo |
+| En revisión | 2 | En revisión (categoría En curso) |
 
-**Falta «En revisión»**: el tablero solo tiene Por hacer, En curso y Listo. Mientras no se añada, el orquestador no puede marcar «En revisión»: deja la tarea en «En curso» y lo anota en un comentario del ticket.
+«En revisión» se añadió el 2026-10-05 (estado `10007`, categoría En curso) y Jira ya ofrece su transición. Está comprobado que existe en la lista de transiciones; todavía no se ha movido un ticket a ese estado.
 
 ## Convenciones
 
