@@ -44,13 +44,12 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 *Actualizado: 2026-10-05.*
 
-- **Fase: planificación.** El proyecto está recién creado desde el kit. No hay
-  código ni plan aprobado.
+- **Fase: planificación.** Visión y alcance de la versión 1 confirmados (app personal de tareas y hábitos con hecho/no hecho e historial). No hay código ni plan aprobado.
 - Estado del plan: ver la cabecera de [05-plan](05-plan.md).
 
 ## Lo siguiente
 
-1. Abrir `/arquitecto` y empezar por la sesión 1 de su agenda: visión y alcance.
+1. Abrir `/arquitecto` y seguir con la **sesión 2**: usuarios y casos de uso (hábito recurrente, tarea con fecha, marcar hecho/no hecho, consultar historial). La sesión 1 (visión) ya está hecha.
 2. Cerrar las decisiones que quedan abiertas en [decisiones](decisiones.md) (DEC-04 y DEC-07).
 3. Cuando el plan esté aprobado: `/ejecutar-plan`.
 
@@ -66,7 +65,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-08**.
+  chat. Siguiente número libre: **DEC-10**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -88,6 +87,17 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-05 — Sesión 1 del arquitecto: visión y alcance
+
+Se definió qué se construye: una aplicación **personal** de tareas y hábitos
+donde todo se marca como hecho o no hecho y queda un historial, porque Todoist
+no lo permite. Versión 1: solo ordenador, tareas, hábitos recurrentes e
+historial (DEC-08, DEC-09). Móvil y conexión con Google Calendar quedan
+confirmados para la versión siguiente, juntos; estadísticas y recordatorios,
+para después. Además se probaron los agentes con Orca: Claude funciona y ve
+Jira, Codex falla en la fase de readiness, Copilot sin probar (ver
+[agentes-disponibles](agentes/agentes-disponibles.md)).
 
 ### 2026-10-05 — Revisión de la documentación del kit y primeras decisiones
 

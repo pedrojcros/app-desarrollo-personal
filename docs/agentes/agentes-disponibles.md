@@ -6,8 +6,8 @@ Actualizado: 2026-10-05 · Equipo: portátil de Pedro (Linux CachyOS), Orca 1.4.
 
 | Agente | Id en Orca (`--agent`) | Estado | Úsalo para | Límites y notas |
 |---|---|---|---|---|
-| Claude Code (trabajador) | `claude` | Instalado (2.1.289), sin probar | Encargos transversales, con razonamiento sobre el dominio, o que otro agente ya ha hecho mal | Modelo por defecto del equipo. Opus solo si el humano lo aprueba |
-| Codex | `codex` | Instalado (0.160.0), sin probar | Encargos acotados y mecánicos; segunda opinión en revisiones | Cuenta gratuita = límite bajo |
+| Claude Code (trabajador) | `claude` | **Probado 2026-10-05: funciona** | Encargos transversales, con razonamiento sobre el dominio, o que otro agente ya ha hecho mal | Modelo por defecto del equipo. Opus solo si el humano lo aprueba |
+| Codex | `codex` | **Probado 2026-10-05: no funciona todavía** (ver abajo) | Encargos acotados y mecánicos; segunda opinión en revisiones | Cuenta gratuita = límite bajo |
 | GitHub Copilot CLI | `copilot` | Instalado (1.0.91), sin probar | Encargos acotados con instrucciones muy claras: CRUD, DTO, componentes, tests a partir de casos dados | El id `copilot` está en la lista interna de agentes de Orca 1.4.217 (aunque la ayuda de `worker-start` no lo nombre). **Falta confirmarlo lanzando uno** en la prueba de arranque |
 | opencode | `opencode` | No instalado | Lo que el humano decida | Usa el modelo de su propia configuración; no admite `--model` |
 
@@ -25,4 +25,8 @@ Antes de repartir trabajo real, lanza con cada agente habilitado un encargo triv
 
 | Agente | Probado el | Resultado |
 |---|---|---|
-| | | |
+| `claude` | 2026-10-05 | Bien. Arrancó en un worktree `new-child` desde `develop`, recibió el encargo por `--spec`, creó el fichero, terminó con `worker_done` (`succeeded`) en menos de un minuto y **vio el conector de Jira** (listó `ADP` y `SCRUM`). Liberado con `worker-release` |
+| `codex` | 2026-10-05 | **Falla en `agent_readiness`** (timeout de 60 s y, en un reintento con la terminal reutilizada, de 180 s). Codex 0.160.0 arranca y muestra su prompt, pero Orca no lo da por listo y **no le entrega el encargo**. Pendiente de investigar; no se repite a ciegas. Queda un worktree y una terminal viva de la prueba |
+| `copilot` | — | Sin probar |
+
+Los nombres de rama los crea Orca con tu usuario por delante: `pedrojcros/<nombre>`.

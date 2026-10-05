@@ -2,35 +2,55 @@
 
 Qué se construye, para quién y por qué. También, y sobre todo, **qué no**.
 
-*Estado: sin rellenar. Lo rellena el arquitecto con el humano (sesión 1).*
+*Estado: **alcance confirmado por el humano el 2026-10-05** (DEC-08 y DEC-09). Falta su lectura final antes de aprobar el plan.*
 
 ## El problema
 
-RELLENAR: qué duele hoy, a quién y con qué frecuencia. Dos o tres frases, sin mencionar la solución.
+Hoy se usa Todoist con su calendario, y no sirve para el seguimiento personal por tres motivos: una tarea o hábito no se puede marcar como **no completado** (solo se queda pendiente, acumulando días de retraso), no hay **estadísticas** del progreso propio, y no hay nada **interactivo** que ayude a ver la evolución. Pasa a diario con los hábitos y cada vez que una tarea se queda sin hacer.
 
 ## La propuesta
 
-RELLENAR: qué es este proyecto, en una frase que entienda alguien ajeno.
+Una aplicación personal de tareas y hábitos en la que todo se puede marcar como **hecho o no hecho**, y donde ese historial queda guardado para consultarlo y, más adelante, analizarlo.
 
 ## Para quién
 
 | Usuario | Qué necesita | Qué hace con esto |
 |---|---|---|
-| RELLENAR | | |
+| El propio autor (único usuario) | Registrar hábitos que se repiten, tareas con y sin fecha, y cerrar cada una como hecha o no hecha | Planificar el día, anotar lo que cumple y lo que no, y revisar su historial |
 
-Quién **no** es usuario de esta primera versión: RELLENAR.
+Quién **no** es usuario de esta primera versión: cualquier otra persona. Puede que más adelante guste a más gente y se comparta, pero no se diseña para ello ahora.
+
+## Qué tipos de cosas se registran
+
+- **Hábitos recurrentes**, con su frecuencia: «todos los días por la noche me lavo los dientes», «los miércoles a las 17:00 voy a nadar».
+- **Tareas con fecha**, por ejemplo entregas de la universidad: «el día X entrego la práctica».
+- **Tareas sin fecha**, por ejemplo una lista de la compra.
 
 ## Cómo se sabe que está terminado (versión 1)
 
-Medible, no subjetivo. Tres o cuatro criterios como máximo.
+- [ ] Se pueden crear tareas y hábitos, y marcar cada uno como **hecho** o **no hecho** (no solo hecho).
+- [ ] Un hábito recurrente genera su ocurrencia en cada día o semana que toca, sin crearla a mano.
+- [ ] El historial de lo hecho y lo no hecho se puede consultar en alguna pantalla.
+- [ ] Funciona en el ordenador. La versión 1 **no** exige móvil.
 
-- [ ] RELLENAR
+*(Criterios iniciales del humano. Se irán añadiendo casos de uso según se use la aplicación.)*
 
 ## Alcance de la versión 1
 
-Las funcionalidades imprescindibles están en [02-funcionalidades](02-funcionalidades.md). Aquí solo el perímetro en una línea por bloque:
+Las funcionalidades imprescindibles estarán en [02-funcionalidades](02-funcionalidades.md). Perímetro propuesto, a confirmar:
 
-- RELLENAR
+- Crear, editar y borrar tareas (con fecha y sin fecha) y hábitos recurrentes.
+- Estado de cada ocurrencia: pendiente, **hecha** o **no hecha**.
+- Vista del día y vista del historial.
+
+**Plataforma de la versión 1:** solo ordenador. El móvil llega en la versión siguiente (ver abajo), así que la versión 1 se diseña para que añadirlo no obligue a rehacerla.
+
+## Versión siguiente (confirmada, no se construye ahora)
+
+Estas dos cosas **irán de la mano** en la versión siguiente y condicionan el diseño de la 1:
+
+- **Uso desde el móvil.**
+- **Conexión con Google Calendar**: la aplicación crea eventos en el calendario (por ejemplo, la sesión de natación de los miércoles o la entrega de una práctica).
 
 ## Fuera de alcance
 
@@ -38,7 +58,11 @@ Las funcionalidades imprescindibles están en [02-funcionalidades](02-funcionali
 
 | Fuera de alcance | Por qué | ¿Cuándo se reconsidera? |
 |---|---|---|
-| RELLENAR | | |
+| Otros usuarios, cuentas, compartir | Es una herramienta personal; evita autenticación y privacidad ajena | Cuando el autor quiera compartirla |
+| Estadísticas e interfaces interactivas del progreso | Valiosas, pero el historial tiene que existir antes | Primera versión posterior a la 1 |
+| Recordatorios y avisos («en 4 días entregas X») | Exigen notificaciones fuera de la aplicación, que es una decisión de arquitectura cara | Después de la 1, con su propia ADR |
+| Integración con Todoist | Dependencia de un tercero que se quiere abandonar | Solo si hace falta migrar datos |
+| Conexión con Google Calendar y uso desde el móvil | Se hacen juntos y exigen cuentas y acceso externos; **sí están previstos para la versión siguiente** | Versión 2 |
 
 Todo lo que llegue y no esté en el alcance va a una lista de espera, no a tareas.
 
@@ -48,10 +72,10 @@ Lo que no se elige, viene dado: plazo, presupuesto, equipo, tecnología impuesta
 
 | Restricción | Detalle |
 |---|---|
-| Plazo | RELLENAR (si no hay, decidir uno: ver DEC-07) |
-| Presupuesto | RELLENAR |
-| Equipo | RELLENAR |
-| Normativa y datos personales | RELLENAR |
+| Plazo | Sin decidir (ver DEC-07) |
+| Presupuesto | Sin presupuesto: herramientas gratuitas o ya contratadas |
+| Equipo | Una persona más agentes de IA coordinados con Orca. El proyecto también sirve para aprender ese flujo y Jira |
+| Normativa y datos personales | Solo datos del propio autor. Sin terceros |
 
 ## Lista de espera
 
@@ -59,4 +83,6 @@ Ideas que han aparecido y quedan para después de la versión 1.
 
 | Idea | Quién la propuso | Fecha |
 |---|---|---|
-| | | |
+| Recordatorios con antelación para entregas de la universidad | Humano | 2026-10-05 |
+| Estadísticas e interfaces interactivas del progreso | Humano | 2026-10-05 |
+| Móvil y conexión con Google Calendar (versión siguiente, juntos) | Humano | 2026-10-05 |
