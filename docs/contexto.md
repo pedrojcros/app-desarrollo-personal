@@ -58,7 +58,8 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 - Contestar DEC-21 y aprobar el plan.
 - H01: que `git push` funcione desde las sesiones de los agentes (o «ok» al punto 7 de DEC-21 y lo hace el arquitecto).
 - H02: crear las cuentas de Vercel y Supabase antes de la ola 4.
-- DEC-04 se resuelve con P01 (Codex y Copilot), sin bloquear nada.
+- **Arreglar Codex (P01)**: arranca, pero Orca no le entrega el encargo (falla en `agent_readiness`). Se puede hacer ya, sin esperar al plan. Copilot está sin probar. Cierra DEC-04.
+- Limpiar lo que dejó la prueba de agentes del 2026-10-05: los worktrees `prueba-arranque-claude` y `prueba-arranque-codex` y la terminal de Codex que quedó viva (run de Orca `run_95865c545e0d`). Conviene mirarla antes, porque sirve para investigar P01.
 - El ticket `ADP-1` es de prueba y se puede borrar a mano.
 
 ## Cómo se trabaja aquí
