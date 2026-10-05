@@ -42,30 +42,30 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-05.*
+*Actualizado: 2026-10-06.*
 
-- **Fase: planificación.** Visión, alcance y casos de uso de la versión 1 confirmados (app personal de tareas y hábitos con hecho/no hecho, categorías e historial). Falta el stack. No hay código ni plan aprobado. La planificación se guarda en la rama `docs/planificacion`.
-- Estado del plan: ver la cabecera de [05-plan](05-plan.md).
+- **Fase: planificación, a punto de aprobar.** Escritas las sesiones 1 a 7: visión, casos de uso, funcionalidades (14 imprescindibles en la versión 1), riesgos, arquitectura (Next.js + Supabase + Vercel, ADR-0001 a 0004), defaults y plan (13 tareas en 6 olas). Todo está en la rama `docs/planificacion`.
+- Estado del plan: `EN BORRADOR` (ver [05-plan](05-plan.md)). Falta el «ok» del humano a DEC-21 y la aprobación (sesión 8).
 
 ## Lo siguiente
 
-1. `/arquitecto` en modo tandas (DEC-14): sesiones 3 a 7 (funcionalidades, riesgos, arquitectura y stack, defaults y plan). El stack se decide **con el humano** (DEC-16). Las sesiones 1 (visión) y 2 (casos de uso) están hechas.
-2. Cerrar las decisiones que quedan abiertas en [decisiones](decisiones.md) (DEC-04 y DEC-16).
-3. Cuando el plan esté aprobado: `/ejecutar-plan`.
+1. El humano contesta DEC-21 (nueve propuestas: «ok» o cambios).
+2. Sesión 8, revisión final: el humano lee el plan y lo aprueba con sus palabras; el arquitecto lo marca `APROBADO` y abre el PR de `docs/planificacion` a `develop`.
+3. H01 (que `git push` funcione) y, cuando lo pida T12, H02 (cuentas de Vercel y Supabase). Después, `/ejecutar-plan`.
 
 ## Pendiente del humano
 
-- Cerrar DEC-04 (que `codex` y `copilot` funcionen con Orca) y DEC-16 (stack y plataformas: contar al arquitecto qué lenguajes conoce y qué quiere).
-- El conector de Jira ya está configurado y probado, y el tablero de `ADP` tiene los cuatro estados (ver [agentes/jira](agentes/jira.md)). El ticket `ADP-1` es de prueba y se puede borrar a mano.
-- Configurar en GitHub la protección de `develop` y `main`, si el plan del repositorio lo permite.
-- Comprobar en el equipo de trabajo: Orca, los agentes, y el MCP de Jira
-  (ver [agentes/jira](agentes/jira.md)).
+- Contestar DEC-21 y aprobar el plan.
+- H01: que `git push` funcione desde las sesiones de los agentes (o «ok» al punto 7 de DEC-21 y lo hace el arquitecto).
+- H02: crear las cuentas de Vercel y Supabase antes de la ola 4.
+- DEC-04 se resuelve con P01 (Codex y Copilot), sin bloquear nada.
+- El ticket `ADP-1` es de prueba y se puede borrar a mano.
 
 ## Cómo se trabaja aquí
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-17**.
+  chat. Siguiente número libre: **DEC-22**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -87,6 +87,17 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Tanda de las sesiones 3 a 7 del arquitecto
+
+En modo tandas (DEC-14) se escribieron de golpe las funcionalidades (22, de
+las que 14 forman la versión 1, DEC-19), los riesgos, la arquitectura con
+cuatro ADR (stack Next.js + Supabase + Vercel elegido por el humano, DEC-16),
+el recorrido de la lista de defaults (DEC-20), el diseño del orquestador
+autónomo con el [buzón](buzon.md) y las puertas de aprobación, y el plan:
+13 tareas en 6 olas más P01 y las tareas del humano. Nueve propuestas esperan
+su «ok» en DEC-21. Se detectó que `git push` falla por SSH en las sesiones de
+los agentes (H01).
 
 ### 2026-10-06 — Sesión 2 del arquitecto: casos de uso
 

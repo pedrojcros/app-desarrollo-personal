@@ -103,3 +103,42 @@ Marcas: **[día 1]** entra en el esqueleto · **[cuando toque]** se añade al ne
 - **[día 1]** Lista de **fuera de alcance** con nombre, en [01-vision-y-alcance](../01-vision-y-alcance.md), y una **lista de espera** para lo que llegue después. Esta regla decide si el proyecto se entrega.
 - **[día 1]** Qué hace «terminado» a la primera versión, medible.
 - **[según proyecto]** Si no hay fecha límite, **ponerse una**: sin ella no hay freno natural al alcance. *(Descartado en este proyecto, DEC-07: sin fecha límite; el freno es la lista de fuera de alcance.)*
+
+## Recorrido en este proyecto (sesión 6, 2026-10-06, DEC-20)
+
+| Punto | Resultado | Motivo o dónde queda |
+|---|---|---|
+| Ramas protegidas | Ajustado | Repositorio privado con GitHub gratis: la regla vive en `AGENTS.md` (D-04) |
+| `.gitignore`, `.env.example`, plantilla de PR, formato, nombre de rama con ticket | Aceptado | T01; la plantilla de PR ya existe |
+| Etiqueta de versión en `main` | Aceptado | Al publicar (H04) |
+| Tests desde T01, linter estricto, formateador, integración continua, pirámide de pruebas | Aceptado | T01; [04-arquitectura](../04-arquitectura.md#estrategia-de-pruebas) |
+| Legibilidad | Aceptado | `AGENTS.md` |
+| Cobertura mínima en el módulo central | Aceptado | `src/domain` en T03 |
+| Pruebas de carga | Descartado | Solo la prueba de RNF-01 con datos sintéticos (T13) |
+| Arranque con un comando, variables de entorno, versión de la plataforma fijada | Aceptado | T01 |
+| Entornos local, pruebas y producción | Ajustado | Dos proyectos Supabase gratis (`pruebas` y `produccion`), DEC-21 |
+| Migraciones versionadas, convención de nombres | Aceptado | `AGENTS.md`; T02 |
+| Fechas y zona horaria | Ajustado | Fechas de calendario en Europe/Madrid, no UTC ([ADR-0003](../adr/0003-ocurrencias-calculadas.md)) |
+| Copias de seguridad y restauración probada | Aceptado | RNF-04; T12 |
+| Datos semilla | Aceptado | Script de datos sintéticos (T13) |
+| Contrato de API antes que el código | Ajustado | No hay API pública: el contrato son los tipos del dominio y las firmas de las acciones, que escribe el orquestador en cada encargo |
+| Formato único de errores, una sola capa de acceso a datos | Aceptado | `AGENTS.md` (Convenciones) |
+| Paginación | Cuando toque | Historial y pendientes, si crecen |
+| Cero secretos y escaneo en CI, autenticación en ADR, validación en el borde, contraseñas | Aceptado | ADR-0004; Supabase Auth guarda las contraseñas |
+| Dependencias aprobadas, lockfile, revisión de vulnerabilidades | Aceptado | `AGENTS.md`; T01 |
+| Cabeceras de seguridad | Aceptado | T01 |
+| Datos personales | Aceptado | Solo los del dueño (RNF-05) |
+| Límite de peticiones | Descartado | Un solo usuario y sin endpoints públicos; Supabase Auth ya lo limita |
+| Endpoint de salud, registros estructurados | Aceptado | T01 (`/api/health`) |
+| Métricas, alertas, seguimiento de errores | Descartado en la v1 | Uso personal |
+| Despliegue repetible y vuelta atrás | Aceptado | Vercel y migraciones por la integración continua (T12) |
+| Móvil primero | Ajustado | Escritorio en la v1 (DEC-19), sin romperse en pantallas pequeñas |
+| Accesibilidad básica | Aceptado | RNF-03 |
+| Internacionalización | Descartado | Solo español |
+| Nada externo en el camino crítico | Ajustado | Supabase y Vercel lo están por decisión (DEC-16); R-05 y R-07 |
+| Documentación | Aceptado | Ya existe |
+| Agentes disponibles probados | Ajustado | Solo Claude habilitado; Codex y Copilot, tras P01 |
+| Jira | Aceptado | Comprobado (`ADP`) |
+| Lo que nunca se delega, política de merge, tope | Aceptado | [orquestador](orquestador.md) |
+| Primera tarea con un solo agente y revisada por el humano | Aceptado | T01 con `requiere-revisión` |
+| Fecha límite | Descartado | DEC-07 |

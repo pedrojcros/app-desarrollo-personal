@@ -19,13 +19,16 @@ Cuando la decisión es **cara de cambiar** o va a ser cuestionada: lenguaje y fr
 
 | ADR | Decisión | Estado |
 |---|---|---|
-| | | |
+| [0001](0001-stack.md) | Stack: Next.js, Supabase y Vercel | Aceptada |
+| [0002](0002-ramas-y-fusion.md) | Modelo de ramas y de fusión | Aceptada |
+| [0003](0003-ocurrencias-calculadas.md) | Ocurrencias calculadas y fechas de calendario | Propuesta |
+| [0004](0004-acceso-un-usuario.md) | Acceso de un solo usuario | Propuesta |
 
 ### Tomadas, pendientes de registrar
 
 *(Decisiones ya tomadas de palabra que aún no tienen ADR.)*
 
-- Modelo de ramas y de fusión (DEC-01, 2026-10-05): PR contra `develop`, fusiona el orquestador, y `main` solo recibe versiones estables y completas que publica el humano. Pendiente de ADR en la sesión 5 del arquitecto.
+- *(Ninguna: el modelo de ramas ya es la ADR-0002.)*
 
 ## Plantilla
 

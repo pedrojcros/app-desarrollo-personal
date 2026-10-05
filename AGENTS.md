@@ -4,11 +4,11 @@ Reglas comunes para **cualquier agente de código** que trabaje en este reposito
 
 **Al empezar cualquier sesión, lee también [docs/contexto.md](docs/contexto.md):** dice dónde está el proyecto, qué viene y qué está pendiente. Claude Code lo carga solo, a través de `CLAUDE.md`; el resto de agentes tiene que abrirlo.
 
-> Las secciones marcadas con `RELLENAR` las completa el arquitecto con el humano durante la planificación. Mientras estén vacías, no hay stack ni prohibiciones definitivas: no inventes ninguna.
+> Este fichero lo completó el arquitecto con el humano durante la planificación. Las versiones exactas del stack las fija la tarea T01.
 
 ## Qué es este proyecto
 
-RELLENAR: dos o tres frases. Qué es, para quién, y si es un proyecto real con usuarios reales. Detalle en [docs/01-vision-y-alcance.md](docs/01-vision-y-alcance.md).
+Una aplicación web **personal** de tareas y hábitos en la que todo se marca como **hecho o no hecho** y queda un historial. Tiene un único usuario, su autor, que la usará a diario: es un proyecto real. Detalle en [docs/01-vision-y-alcance.md](docs/01-vision-y-alcance.md).
 
 ## Si eres un trabajador
 
@@ -34,7 +34,10 @@ Valen por defecto, y el arquitecto las ajusta en la planificación:
 3. **Nada de secretos en el repositorio**: claves, tokens, contraseñas, ni siquiera "de prueba". Van en variables de entorno; `.env.example` documenta cuáles.
 4. **No reformatear ficheros que no estás tocando.** Los diffs tienen que poder revisarse.
 5. **No desactivar tests, linter ni comprobaciones** para hacer pasar un cambio.
-6. RELLENAR: las prohibiciones propias de este proyecto (dinero, datos personales, servicios externos que no pueden estar en el camino crítico...).
+6. **Nada que cueste dinero** (servicios, planes o APIs de pago) sin aprobación: el proyecto es de coste cero.
+7. **Nunca tocar la base de datos de producción**: ni migraciones, ni datos, ni sus claves. El desarrollo y los tests van contra el Supabase local.
+8. **No cambiar cómo se guardan las fechas ni el motor de ocurrencias** ([ADR-0003](docs/adr/0003-ocurrencias-calculadas.md)) sin aprobación.
+9. **No guardar datos de otras personas** ni enviar los del dueño a servicios distintos de los de la [ADR-0001](docs/adr/0001-stack.md).
 
 ## Legibilidad: regla obligatoria
 
@@ -54,11 +57,22 @@ Quedan fuera solo los ficheros generados por herramientas, que no se tocan a man
 
 ## Stack
 
-RELLENAR tras las ADR de [docs/adr/](docs/adr/README.md). Tabla de pieza y **versión mayor** fijada (los parches se actualizan sin preguntar), más la lista de dependencias aprobadas. Cualquier dependencia fuera de la lista necesita aprobación.
+Decidido en [ADR-0001](docs/adr/0001-stack.md). Se fija la **versión mayor** (los parches se actualizan sin preguntar). Donde pone «T01», la tarea T01 escribe la versión mayor estable del momento y desde entonces no se cambia sin aprobación.
 
 | Pieza | Versión |
 |---|---|
-| | |
+| Node.js | 24 (LTS), fijada en `.nvmrc` |
+| TypeScript (modo `strict`) | T01 |
+| Next.js (App Router) | T01 |
+| React | La que pida Next.js |
+| Tailwind CSS | T01 |
+| `@supabase/supabase-js` y `@supabase/ssr` | T01 |
+| Supabase CLI (`supabase`, dependencia de desarrollo) | T01 |
+| Zod | T01 |
+| Vitest y Playwright | T01 |
+| ESLint y Prettier | T01 |
+
+**Dependencias aprobadas: exactamente las de esta tabla** (más las que ellas instalen por su cuenta). El escaneo de secretos (gitleaks) corre en la integración continua, no es una dependencia. Cualquier otra necesita aprobación.
 
 ## Estructura del repositorio
 
@@ -67,35 +81,60 @@ AGENTS.md      reglas comunes para agentes (este fichero)
 CLAUDE.md      importa este fichero para Claude Code
 README.md      para humanos: qué es y cómo arrancar
 docs/          toda la documentación; índice en docs/README.md
-RELLENAR       el resto de carpetas
+src/domain/    lógica pura: fechas, ocurrencias y reglas de cada vista; sin framework
+src/data/      la única capa que habla con Supabase; acciones de servidor
+src/app/       rutas y pantallas (Next.js App Router)
+src/components/ componentes de interfaz compartidos
+supabase/      configuración local y migraciones
+tests/e2e/     pruebas de extremo a extremo
 ```
 
 ## Comandos
 
-RELLENAR: cómo arrancar en local, ejecutar los tests, el linter y la compilación. Antes de dar un encargo por terminado, los tests de la parte que has tocado tienen que pasar, y la integración continua lo repite en cada push y pull request.
+Los crea la tarea T01; si cambian, se actualizan aquí.
+
+```
+npm install                 instalar dependencias
+npx supabase start          base de datos local (necesita Docker)
+npm run dev                 la aplicación en local
+npm run lint                linter
+npm run typecheck           comprobación de tipos
+npm run test                pruebas unitarias
+npm run test:integration    pruebas contra la base de datos local
+npm run test:e2e            pruebas de extremo a extremo
+npm run build               compilación de producción
+```
+
+Antes de dar un encargo por terminado, los tests de la parte que has tocado tienen que pasar, y la integración continua lo repite en cada push y pull request.
 
 ## Flujo de git
 
-*(Valor por defecto del kit. Es lo primero que conviene revisar con el arquitecto.)*
+*(Decidido en DEC-01 y [ADR-0002](docs/adr/0002-ramas-y-fusion.md).)*
 
 - **Todo por rama y pull request contra `develop`.** Nadie hace commit directo en `develop` ni en `main`.
 - **Solo el orquestador hace merge a `develop`**, y solo si los tests pasan y la revisión es favorable, borrando la rama al fusionar. Los trabajadores nunca fusionan. **El paso de `develop` a `main` lo hace solo el humano.** Ver "Política de merge" en [docs/agentes/orquestador.md](docs/agentes/orquestador.md).
 - **No se apilan PR** sobre otras ramas: cada PR va contra `develop`. Si una tarea depende de otra, espera a que la primera esté fusionada.
 - **Un worktree y una rama por encargo.** Nunca dos agentes en el mismo.
-- **Nombre de rama:** `ADP-123-descripcion-corta` si hay ticket; `tipo/descripcion-corta` si no (`feat/`, `fix/`, `docs/`, `chore/`).
+- **Nombre de rama:** `ADP-123-descripcion-corta` si hay ticket; `tipo/descripcion-corta` si no (`feat/`, `fix/`, `docs/`, `chore/`). Orca antepone el usuario: `pedrojcros/ADP-123-descripcion-corta`.
 - **Commits pequeños y con sentido**, en imperativo y explicando el porqué cuando no es obvio. Un commit mezcla código y la documentación que ese código deja obsoleta.
 - **La clave del ticket** va en el nombre de la rama, en el título del PR y en el informe del trabajador.
 
 ## Convenciones de código
 
-Idioma: **nombres y mensajes de error en inglés; comentarios, commits y documentación en español** (DEC-06). RELLENAR: organización de carpetas (por dominio o por capa), formato de errores, estilo de la API, base de datos, tipos de fecha... Lo que decida el arquitecto en [docs/04-arquitectura.md](docs/04-arquitectura.md) y no deba releerse cada vez, se resume aquí.
+- **Idioma** (DEC-06): nombres y mensajes de error técnicos en inglés; comentarios, commits y documentación en español. Los textos que ve el usuario, en español. Los nombres del dominio, según el glosario de [docs/04-arquitectura.md](docs/04-arquitectura.md#glosario) (`habit`, `occurrence`, `mark`, `task`, `category`, `inbox`...).
+- **Capas:** `src/domain` no importa nada de Next.js ni de Supabase; solo `src/data` habla con Supabase; las pantallas usan `src/data`.
+- **Next.js acotado:** componentes de servidor para leer, acciones de servidor para escribir, componentes de cliente solo donde hay interacción. Sin rutas de API salvo `/api/health`.
+- **Errores:** las acciones devuelven `{ ok: true, value }` o `{ ok: false, error: { code, message } }`. La interfaz nunca muestra un error técnico.
+- **Validación:** Zod en la entrada de cada acción de servidor.
+- **Base de datos:** tablas y columnas en inglés, `snake_case`, tablas en plural. Toda tabla lleva `user_id` y políticas RLS. Migraciones numeradas en `supabase/migrations/`; una migración aplicada no se edita: se crea otra.
+- **Fechas** ([ADR-0003](docs/adr/0003-ocurrencias-calculadas.md)): fechas de calendario `YYYY-MM-DD` en Europe/Madrid; instantes en UTC.
 
 ## Tests
 
 - Toda funcionalidad nueva lleva tests; todo bug corregido lleva un test que lo habría detectado.
 - La lógica de negocio pura se prueba con tests unitarios, sin framework ni base de datos.
 - La integración se prueba contra las piezas reales (la base de datos real, no un sustituto en memoria). Cómo se levantan esas piezas se concreta al elegir el stack.
-- RELLENAR: herramientas y estrategia, según [docs/04-arquitectura.md](docs/04-arquitectura.md#estrategia-de-pruebas).
+- Herramientas: Vitest (unitarias e integración) y Playwright (extremo a extremo). `src/domain` exige tests exhaustivos; las políticas RLS se prueban con dos usuarios. Detalle en [docs/04-arquitectura.md](docs/04-arquitectura.md#estrategia-de-pruebas).
 
 ## Documentación
 

@@ -17,6 +17,7 @@ Toda la documentación del proyecto vive aquí, versionada junto al código. Est
 | [05-plan](05-plan.md) | Tareas, dependencias, reparto y estado del plan. Lo que ejecuta `/ejecutar-plan` |
 | [06-riesgos](06-riesgos.md) | Riesgos con mitigación y contingencia |
 | [decisiones](decisiones.md) | Registro de decisiones: lo que espera respuesta y lo ya cerrado |
+| [buzon](buzon.md) | Ideas y tareas que deja el humano; el orquestador las procesa |
 | [adr/](adr/README.md) | Decisiones de arquitectura, una por fichero, con sus consecuencias negativas |
 | [agentes/](agentes/orquestador.md) | Cómo se organiza el trabajo con agentes: arquitecto, orquestador, Orca, Jira |
 

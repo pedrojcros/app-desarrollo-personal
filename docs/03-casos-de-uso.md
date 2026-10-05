@@ -19,7 +19,7 @@ No hace falta un caso de uso para cada funcionalidad: solo para las que tienen i
 | **Franja** | Momento del día sin hora exacta: mañana, tarde o noche. Cada una tiene una hora asociada (RN-20) |
 | **Tarea** | Algo que se hace una sola vez. Puede tener fecha (con hora o sin ella) o no tenerla |
 | **Categoría** | Agrupación opcional con nombre («Compra», «Universidad»). Cada hábito o tarea tiene como máximo una (DEC-13) |
-| **Vista del día** («Hoy» si es el día actual) | Lo pendiente de una fecha: ocurrencias de hábitos y tareas con esa fecha (y, en Hoy, las tareas vencidas). **Nunca** tareas sin fecha |
+| **Vista del día** («Hoy» si es el día actual) | Lo pendiente de una fecha: ocurrencias de hábitos y tareas con esa fecha. **Nunca** tareas sin fecha ni vencidas |
 | **Bandeja de entrada** | Todo lo que no tiene categoría, con fecha o sin ella. Funciona como una categoría implícita |
 | **Vista de categoría** | Lo pendiente de una categoría (o de la Bandeja de entrada), con y sin fecha |
 | **Estado** | De una ocurrencia o de una tarea: **pendiente**, **hecha** o **no hecha** |
@@ -50,7 +50,7 @@ Se definen aquí una sola vez y los casos las enlazan.
 - **RN-05.** Una ocurrencia de **un día posterior a hoy** no se puede marcar como hecha ni como no hecha.
 - **RN-06.** Las fechas y horas se interpretan en la **zona horaria local** del usuario.
 - **RN-07.** Las ocurrencias de un hábito **no se acumulan**: las de un día pasado que siguen pendientes no aparecen en la vista de hoy; solo se ven en CU-04 y en el historial.
-- **RN-08.** Una **tarea vencida** sigue visible en la vista de hoy hasta que el usuario la marca hecha, no hecha o la reprograma.
+- **RN-08.** Una **tarea vencida** sale de la vista de hoy y queda en «pendientes de días anteriores» (CU-04) hasta que el usuario la marca hecha, no hecha o la reprograma. *(Cambiada el 2026-10-06, DEC-17.)*
 - **RN-09.** Una tarea sin fecha no vence nunca.
 - **RN-24.** El nombre de una categoría es obligatorio y **único**, sin distinguir mayúsculas de minúsculas.
 - **RN-25.** Un hábito o una tarea tiene **como máximo una** categoría, y es opcional.
@@ -60,6 +60,7 @@ Se definen aquí una sola vez y los casos las enlazan.
 - **RN-29.** La vista del día muestra **solo lo pendiente de ese día** y **nunca tareas sin fecha**. Lo que se marca sale de la lista y pasa a un apartado plegado, **«Marcadas hoy»**, cerrado por defecto.
 - **RN-30.** En la vista de una categoría y en la Bandeja de entrada, lo que se marca (hecho o no hecho) **desaparece** de la lista; sigue en el historial.
 - **RN-31.** Cada vez que se marca algo, aparece un **aviso breve y poco invasivo** dentro de la aplicación («Marcada como hecha» o «Marcada como no hecha») con la acción **Deshacer**, que devuelve el elemento a su estado y a su lista anteriores.
+- **RN-32.** Cada ocurrencia de un hábito es **independiente**: lo que pasó con la de un día (hecha, no hecha o sin marcar) no impide ni cambia marcar la de otro día.
 
 ---
 
@@ -178,7 +179,7 @@ Se definen aquí una sola vez y los casos las enlazan.
 ### Flujo normal
 
 1. El usuario abre la vista del día (hoy por defecto).
-2. El sistema muestra lo **pendiente** de ese día: las ocurrencias de hábitos y las tareas con fecha de ese día y, si es hoy, las tareas vencidas (RN-08). No muestra tareas sin fecha (RN-29). Lo que tiene hora va ordenado por ella.
+2. El sistema muestra lo **pendiente** de ese día: las ocurrencias de hábitos y las tareas con fecha de ese día. No muestra tareas sin fecha (RN-29) ni vencidas (RN-08). Lo que tiene hora o franja va ordenado por ella.
 3. El usuario marca un elemento como **hecho**.
 4. El sistema guarda el estado y el momento en que se marcó (RN-04).
 5. El sistema quita el elemento de la lista de pendientes, lo cuenta en «Marcadas hoy» (RN-29) y muestra el aviso con **Deshacer** (RN-31).
@@ -199,19 +200,20 @@ Se definen aquí una sola vez y los casos las enlazan.
 
 ### Reglas de negocio
 
-- Aplican RN-01 a RN-09 y RN-28 a RN-31. En concreto: RN-07 explica por qué los hábitos de días pasados sin marcar no salen aquí, y RN-08 por qué las tareas vencidas sí.
+- Aplican RN-01 a RN-09 y RN-28 a RN-32. En concreto: RN-07 y RN-08 explican por qué ni los hábitos de días pasados sin marcar ni las tareas vencidas salen aquí, y RN-32 por qué la ocurrencia de hoy se marca sin depender de la de ayer.
 
 ### Cómo se comprueba
 
 - **Escenario 1: marcar hecho.** Dado que hoy hay una ocurrencia pendiente de «Lavarme los dientes», cuando el usuario la marca como hecha, entonces sale de la lista de pendientes, aparece en «Marcadas hoy», se muestra el aviso «Marcada como hecha · Deshacer» y se guarda cuándo se marcó.
 - **Escenario 2: marcar no hecho.** Dado el mismo caso, cuando el usuario la marca como no hecha, entonces queda no hecha y deja de aparecer como pendiente.
 - **Escenario 3: hábito sin marcar de ayer.** Dado que ayer una ocurrencia quedó pendiente, cuando el usuario abre hoy, entonces esa ocurrencia no aparece en la vista de hoy.
-- **Escenario 4: tarea vencida.** Dado que una tarea con fecha de ayer sigue pendiente, cuando el usuario abre hoy, entonces la tarea aparece como vencida.
+- **Escenario 4: tarea vencida.** Dado que una tarea con fecha de ayer sigue pendiente, cuando el usuario abre Hoy, entonces la tarea no aparece; está en «pendientes de días anteriores».
 - **Escenario 5: Hoy sin tareas sin fecha.** Dado que existen «Leche» (sin fecha, en «Compra») y «Llamar al banco» (sin fecha ni categoría), cuando el usuario abre Hoy, entonces no ve ninguna de las dos; «Llamar al banco» está en la Bandeja de entrada.
 - **Escenario 6: marcar en una categoría (A5).** Dado «Leche» pendiente en «Compra», cuando el usuario la marca como hecha desde «Compra», entonces desaparece de la lista y aparece el aviso «Marcada como hecha · Deshacer».
 - **Escenario 7: corregir un error (A2).** Dado que el usuario marcó algo como no hecho por error, cuando abre «Marcadas hoy» y lo pasa a hecho, entonces queda hecho.
 - **Escenario 8: día futuro (E2).** Cuando el usuario intenta marcar una ocurrencia de mañana, entonces no se permite y el estado no cambia.
 - **Escenario 9: Deshacer (A6).** Dado que el usuario acaba de marcar «Leche» como hecha, cuando pulsa Deshacer, entonces «Leche» vuelve a estar pendiente en su lista.
+- **Escenario 10: ocurrencias independientes.** Dado que ayer «Lavarme los dientes» quedó sin marcar, cuando hoy el usuario marca la de hoy como hecha, entonces la de hoy queda hecha y la de ayer sigue sin marcar en «pendientes de días anteriores».
 
 ---
 
@@ -248,7 +250,7 @@ Se definen aquí una sola vez y los casos las enlazan.
 
 - **RN-14.** No hay límite hacia atrás: se puede resolver una ocurrencia de cualquier día pasado.
 - **RN-15.** Reprogramar solo existe para **tareas**, no para ocurrencias de hábitos (cada ocurrencia pertenece a su día).
-- Aplican también RN-02, RN-04, RN-07 y RN-08.
+- Aplican también RN-02, RN-04, RN-07, RN-08 y RN-32.
 
 ### Cómo se comprueba
 
@@ -293,6 +295,7 @@ Se definen aquí una sola vez y los casos las enlazan.
 
 - **RN-16.** El historial incluye todo lo que se marcó, también de hábitos y tareas que luego se eliminaron (archivados, RN-18).
 - **RN-17.** Una ocurrencia pasada pendiente se muestra como «sin marcar», no como «no hecha» (RN-02).
+- **RN-33.** El historial sitúa cada tarea en su fecha; si no tiene fecha, en el día en que se marcó.
 
 ### Cómo se comprueba
 
@@ -300,6 +303,7 @@ Se definen aquí una sola vez y los casos las enlazan.
 - **Escenario 2: filtrar por no hechas (A2).** Cuando el usuario filtra por «no hecha», entonces solo ve los elementos no hechos del rango.
 - **Escenario 3: rango inválido (E1).** Cuando el usuario pone una fecha final anterior a la inicial, entonces no se aplica y se indica el error.
 - **Escenario 4: sin datos (A4).** Dado un rango sin actividad, cuando el usuario lo consulta, entonces ve un mensaje de historial vacío.
+- **Escenario 5: tarea sin fecha.** Dado que «Leche», sin fecha, se marcó como hecha el martes, cuando el usuario abre el historial, entonces aparece en el martes.
 
 ---
 
