@@ -6,10 +6,10 @@ Lo que `/ejecutar-plan` ejecuta. Lo escribe el arquitecto con el humano (sesión
 
 | Campo | Valor |
 |---|---|
-| Estado | `EN BORRADOR` |
-| Aprobado el | — |
-| Aprobado por | — |
-| Palabras del humano al aprobar | — |
+| Estado | `APROBADO` |
+| Aprobado el | 2026-10-06 |
+| Aprobado por | El humano (pedrojcros) |
+| Palabras del humano al aprobar | «apruebo el plan» |
 | Modo de seguimiento de tareas | Jira (`ADP`), decidido en DEC-02 |
 
 Estados posibles: `EN BORRADOR` → `APROBADO` → `EN EJECUCIÓN` → `CERRADO`. Solo el arquitecto, con la aprobación expresa del humano, pasa de borrador a aprobado.

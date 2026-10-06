@@ -44,18 +44,19 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 *Actualizado: 2026-10-06.*
 
-- **Fase: planificación, a punto de aprobar.** Escritas las sesiones 1 a 7: visión, casos de uso, funcionalidades (14 imprescindibles en la versión 1), riesgos, arquitectura (Next.js + Supabase + Vercel, ADR-0001 a 0004), defaults y plan (13 tareas en 6 olas). Todo está en la rama `docs/planificacion`.
-- Estado del plan: `EN BORRADOR` (ver [05-plan](05-plan.md)). Falta la aprobación del humano (sesión 8).
+- **Fase: ejecución, a punto de empezar.** El plan está **aprobado** (2026-10-06): 13 tareas en 6 olas para la versión 1, con Next.js, Supabase y Vercel (ADR-0001 a 0004). La planificación entra en `develop` con un PR.
+- Estado del plan: `APROBADO` (ver [05-plan](05-plan.md)).
 - Agentes: Claude, Codex y Copilot habilitados y probados con Orca (DEC-04).
 
 ## Lo siguiente
 
-1. Sesión 8, revisión final: el humano lee el plan y lo aprueba con sus palabras; el arquitecto lo marca `APROBADO` y abre el PR de `docs/planificacion` a `develop`.
-2. Cuando lo pida T12, H02 (cuentas de Vercel y Supabase). Después, `/ejecutar-plan`.
+1. Abrir una sesión **nueva** de Claude Code en el proyecto, con Opus 5.5 y el esfuerzo más alto, y lanzar `/ejecutar-plan`. Empieza por la ola 0: T01, el esqueleto.
+2. Antes de la ola 4 (T12), H02: el humano crea las cuentas de Vercel y Supabase con la guía del orquestador.
 
 ## Pendiente del humano
 
-- Aprobar el plan (DEC-21 ya está aceptada; `git push` ya funciona).
+- Lanzar `/ejecutar-plan` cuando quiera.
+- Revisar T01 y T02 cuando el orquestador lo pida (puertas `requiere-revisión`).
 - H02: crear las cuentas de Vercel y Supabase antes de la ola 4.
 - El ticket `ADP-1` es de prueba y se puede borrar a mano.
 
@@ -89,6 +90,13 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Plan aprobado (sesión 8)
+
+El humano aprobó el plan con las palabras «apruebo el plan». Termina la
+planificación: visión, casos de uso, funcionalidades, riesgos, arquitectura,
+defaults y plan quedan en `docs/`, y la rama `docs/planificacion` se fusiona en
+`develop` con un PR. Lo siguiente es `/ejecutar-plan` en una sesión nueva.
 
 ### 2026-10-06 — Agentes listos: DEC-21 aceptada y P01 cerrada
 

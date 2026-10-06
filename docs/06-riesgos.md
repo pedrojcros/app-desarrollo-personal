@@ -2,7 +2,7 @@
 
 Reconocer por escrito lo que puede salir mal, antes de que salga.
 
-*Estado: **BORRADOR** (sesión 4, 2026-10-06).*
+*Estado: aprobado con el plan, el 2026-10-06.*
 
 ## Cómo se escribe un riesgo
 

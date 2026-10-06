@@ -2,7 +2,7 @@
 
 Qué se construye, para quién y por qué. También, y sobre todo, **qué no**.
 
-*Estado: **alcance confirmado por el humano el 2026-10-05** (DEC-08 y DEC-09). Falta su lectura final antes de aprobar el plan.*
+*Estado: **suscrito por el humano** al aprobar el plan, el 2026-10-06 (DEC-08, DEC-09 y DEC-19).*
 
 ## El problema
 
