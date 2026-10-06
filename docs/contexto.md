@@ -42,28 +42,29 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-07.*
+*Actualizado: 2026-10-07 (madrugada, al terminar la ejecución nocturna).*
 
-- **Fase: ejecución nocturna en marcha** (`/ejecutar-plan`, el humano duerme y pidió trabajar solo toda la noche). Plan `APROBADO`; tickets de Jira creados (T01 = ADP-2 … T13 = ADP-17).
-- **Ola 0:** T01 (esqueleto Expo en Docker) en manos de un trabajador de **Codex**, rama `ADP-2-esqueleto-expo`. El humano autorizó **fusionar T01 esta noche sin su revisión** si pasan todas sus comprobaciones; la revisará por la mañana. Las puertas de T02 y T14 se respetan: se dejan listas para su revisión, sin fusionar.
-- **Reparto de agentes (DEC-35):** Claude y Codex **por igual**, alternando; Copilot, fuera. Sustituye al ciclo de DEC-27.
-- Lo que necesite una decisión del humano se apunta en el [buzón](buzon.md) y se sigue con lo demás.
+- **Fase: ejecución, ola 1 casi cerrada.** Plan `APROBADO`; Jira al día (T01 = ADP-2 … T13 = ADP-17).
+- **Fusionadas en `develop`:** T01 (PR #7, con permiso expreso del humano para fusionarla de noche), T03 (PR #9) y T15 (PR #12). Las tres, revisadas por el orquestador ejecutando él las comprobaciones.
+- **Esperando al humano (puertas `requiere-revisión`):** T02 (PR #10, con las correcciones de la revisión independiente ya hechas) y T14 (PR #11). Los dos se fusionan limpios sobre `develop`; chocan entre sí solo en `jest.config.js`.
+- **Bloqueo que solo el humano puede quitar:** el inicio de sesión con email no funciona en el Supabase local porque `[auth.email] enable_signup = false` lo desactiva. La propuesta (una línea, confirmada con fuentes oficiales) está en el [buzón](buzon.md) y en el PR #10.
+- **PR #8** (documentación del orquestador: DEC-35, encargos, buzón, este contexto) sin fusionar: lo bloqueó el permiso automático. Lo fusiona el humano.
+- **Reparto de agentes (DEC-35):** Claude y Codex por igual; Copilot, fuera.
+- La ola 2 (T04, T07, T08) **no puede empezar** hasta que T02 y T14 estén fusionadas.
 
 
 ## Lo siguiente
 
-1. El humano crea las cuentas y los tokens de Vercel, Supabase y Expo y los guarda en `~/.config/app-desarrollo-personal/secretos.env` (H02, DEC-33).
-2. Se fusionan los PR #4 y #5.
-3. `/ejecutar-plan` en una sesión **nueva**, con Opus 5.5 y el esfuerzo más alto: empieza por T01, el esqueleto, todo en Docker.
+1. El humano revisa y decide: **T02** (PR #10; primero la decisión de `config.toml`), **T14** (PR #11, comparando con su prototipo y decidiendo sobre 4 pares de colores sin contraste AA) y el **PR #8**. Detalle en el [buzón](buzon.md).
+2. Tras fusionar T02 y T14 (y activar los 4 tests omitidos de T02), `/ejecutar-plan` en una sesión nueva lanza la ola 2 (T04, T07, T08), y después las olas 3 a 5 según el [plan](05-plan.md).
+3. H02 (cuentas y tokens) ya está hecha según DEC-34: T12 se puede lanzar cuando T02 esté fusionada.
 
 
 ## Pendiente del humano
 
-- H02: crear las cuentas y los tokens (DEC-33), con la guía del arquitecto.
-- Fusionar los PR #4 y #5, y lanzar `/ejecutar-plan`.
-- Revisar T01, T02 y T14 cuando el orquestador lo pida (puertas `requiere-revisión`).
-- H05: instalar Expo Go en el móvil.
-- Cuando T15 esté fusionada, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
+- **Decidir lo de `config.toml` (T02)**, revisar y fusionar **PR #10 (T02)** y **PR #11 (T14)**, y fusionar el **PR #8**.
+- Revisar T01 ya fusionada: abrir la app con Expo Go (H05) y mirar los paquetes auxiliares que se autorizaron (en el buzón) y los avisos de `npm audit` (72, sin críticos; revisar antes de publicar y el 2026-10-14).
+- Cuando T15 esté en uso, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
 - El ticket `ADP-1` es de prueba y se puede borrar a mano.
 
 
@@ -79,6 +80,10 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 *(Cosas que costaron tiempo y no deben costarlo dos veces.)*
 
+- **Dos worktrees no pueden tener Supabase local a la vez**: `project_id` de `supabase/config.toml` es el mismo (`ADP-2-esqueleto-expo`) y los contenedores y puertos (54321, 54322) chocan. Un trabajador que lo necesite debe parar el anterior o avisar; los revisores no deben pararlo.
+- **Un servidor de Expo por trabajador necesita su puerto**: con la red del anfitrión, el 8081 solo puede usarlo uno. Los demás, otro (por ejemplo 8090).
+- **Un trabajador de Claude puede quedarse con el encargo sin enviar** (`turn_start_unobserved`): hay que mirar su pantalla y darle un Enter (el supervisor también lo hace).
+- **`worker-release` puede dejar `release_unknown`** ("no se pudo confirmar que el proceso se detuvo") aunque el trabajador haya terminado bien: no hay nada pendiente, el terminal está cerrado.
 - **Codex lanzado por Orca no recibía encargos**: sus animaciones impiden que Orca lo vea «listo». Arreglo: `tui.animations = false`. Ver [agentes/orca](agentes/orca.md#trampas-conocidas).
 - **Codex y Copilot necesitan ajustes para trabajar solos** (sandbox, permisos, carpeta de confianza), y **a Copilot, y a veces a Claude, se les puede quedar el encargo aparcado**: todo, con su arreglo, en [agentes/orca](agentes/orca.md#trampas-conocidas).
 - **Un trabajador puede quedarse parado sin que nadie lo vea** (encargo sin enviar, un permiso): con trabajadores en marcha, siempre el supervisor en segundo plano. Ver [agentes/orca](agentes/orca.md#vigilar-a-los-trabajadores).
@@ -104,6 +109,10 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-07 — Ola 0 y casi toda la ola 1 (noche de ejecución)
+
+T01 (esqueleto Expo en Docker, Codex) y T03 (motor de ocurrencias, Codex; 77 tests y 100 % de cobertura de líneas) y T15 (emulador y navegador en Docker, Codex) se fusionaron tras revisarlas el orquestador ejecutando él las comprobaciones. T02 (Claude) y T14 (Claude) quedan abiertas por su puerta de revisión; T02 pasó antes una revisión independiente de Codex (sin críticos, cuatro importantes) y se corrigió. El orquestador no pudo autorizar el cambio de `config.toml` ni fusionar el PR #8: el permiso automático los bloqueó, y quedan para el humano. Dos aclaraciones tomadas en el camino y anotadas en el buzón: los paquetes auxiliares de NativeWind, Reusables y lucide (leídos como «las que ellas instalen por su cuenta») y una línea para el plugin de Compose en la imagen de la app. DEC-35: Claude y Codex por igual.
 
 ### 2026-10-07 — Empieza la ejecución nocturna (DEC-35)
 
