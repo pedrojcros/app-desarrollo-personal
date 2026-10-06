@@ -115,7 +115,7 @@ Si un encargo necesita "y además", son dos.
 
 ### 5. Elige el agente
 
-**Ciclo de cuotas (DEC-27).** Cada agente gasta una cuota distinta, y la de Claude es la que se agota. Orden: **dos de Codex, uno de Claude y uno de Copilot**, y vuelta a empezar; pueden ir a la vez, dentro del tope de paralelismo. **Se sigue en ese orden, sin saltarse ningún turno**: el de Claude no se le da a Copilot, ni el de ninguno a otro. Si a Codex se le acaba la cuota, usa Claude. **Excepción:** si una tarea necesita sí o sí un agente o un modelo concreto (por ejemplo, GPT Astra u Opus 5.5 al máximo, porque es importante), sáltate el ciclo y anota el motivo en el informe. Cuenta todo lo que se lanza: trabajadores de Orca y subagentes.
+**Ciclo de cuotas (DEC-27).** Cada agente gasta una cuota distinta, y la de Claude es la que se agota. Orden: **dos de Codex, uno de Claude y uno de Copilot**, y vuelta a empezar; pueden ir a la vez, dentro del tope de paralelismo. **Se sigue en ese orden, sin saltarse ningún turno**: el de Claude no se le da a Copilot, ni el de ninguno a otro. Si por error se salta uno, devuélvelo en el siguiente lanzamiento. Si a Codex se le acaba la cuota, usa Claude. **Excepción:** si una tarea necesita sí o sí un agente o un modelo concreto (por ejemplo, GPT Astra u Opus 5.5 al máximo, porque es importante), sáltate el ciclo y anota el motivo en el informe. Cuenta todo lo que se lanza: trabajadores de Orca y subagentes.
 
 La tabla de [agentes-disponibles](agentes-disponibles.md) dice quién está habilitado y para qué sirve cada uno. Criterio general:
 
@@ -143,7 +143,7 @@ Los identificadores de modelo de Codex compruébalos en su ayuda o su configurac
 
 ### 6. Tope de paralelismo
 
-**Como máximo tres trabajadores a la vez** (el humano puede cambiar la cifra aquí: `TOPE = 3`). Más allá, la revisión se convierte en el cuello de botella y los conflictos de integración se comen lo ganado. Un worktree por encargo, siempre.
+**En código, como máximo tres trabajadores a la vez** (DEC-28; el humano puede cambiar la cifra aquí: `TOPE = 3`). Más allá, la revisión se convierte en el cuello de botella y los conflictos de integración se comen lo ganado. **Lo que no se integra** (prototipos, revisiones, investigaciones) **no tiene tope**: si no depende de nada, se lanza todo a la vez. Un worktree por encargo, siempre.
 
 ### 7. Orden de integración
 

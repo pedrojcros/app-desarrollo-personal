@@ -69,7 +69,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-28**.
+  chat. Siguiente número libre: **DEC-29**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -78,7 +78,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 *(Cosas que costaron tiempo y no deben costarlo dos veces.)*
 
 - **Codex lanzado por Orca no recibía encargos**: sus animaciones impiden que Orca lo vea «listo». Arreglo: `tui.animations = false`. Ver [agentes/orca](agentes/orca.md#trampas-conocidas).
-- **Codex y Copilot necesitan ajustes para trabajar solos** (sandbox, permisos, carpeta de confianza), y **a Copilot se le puede quedar el encargo aparcado**: todo, con su arreglo, en [agentes/orca](agentes/orca.md#trampas-conocidas).
+- **Codex y Copilot necesitan ajustes para trabajar solos** (sandbox, permisos, carpeta de confianza), y **a Copilot, y a veces a Claude, se les puede quedar el encargo aparcado**: todo, con su arreglo, en [agentes/orca](agentes/orca.md#trampas-conocidas).
 - **`git push` por SSH falla** en las sesiones de los agentes (no pueden pedir la frase de la clave). Resuelto: el remoto va por HTTPS con `gh` (H01).
 - **`sudo` no funciona con `!` en Claude Code**: no hay terminal para pedir la contraseña. Los comandos con `sudo`, en una terminal normal de Orca.
 - **SDK de Android**: `sdkmanager` (cmdline-tools 23) escribe los paquetes con `/`, pero `avdmanager` todavía los pide con `;`.
@@ -99,6 +99,13 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Tope solo en código (DEC-28)
+
+El humano pidió lanzar a la vez lo que no depende de nada: el tope de tres
+trabajadores queda solo para el código, que hay que integrar. En la ronda 2 de
+estilo, el arquitecto volvió a saltarse el turno de Claude: se paró E en Codex
+y se relanzó con Claude, y DEC-27 aclara que un turno saltado se devuelve.
 
 ### 2026-10-06 — Ciclo de cuotas de los agentes (DEC-27, revisada) y ronda 1 de estilo
 
