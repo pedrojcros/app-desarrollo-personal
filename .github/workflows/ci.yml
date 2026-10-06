@@ -51,4 +51,4 @@ jobs:
           docker run --rm
           -v "$PWD:/repository:ro"
           zricethezav/gitleaks:v8.24.3
-          git /repository --redact
+          git /repository --config /repository/.gitleaks.toml --redact

@@ -80,7 +80,9 @@ integración usa Node y el cliente real de Supabase. La exportación queda en `d
 
 La CI repite lint, formato, tipos, tests, integración y exportación dentro de
 Docker. Gitleaks escanea el historial con su imagen fijada, sin licencia de pago
-ni dependencias npm. Expo y Supabase CLI llevan la telemetría desactivada; el
+ni dependencias npm. `.gitleaks.toml` permite únicamente la clave anon pública
+conocida en `.env.example`; cualquier otro JWT se sigue comprobando.
+Expo y Supabase CLI llevan la telemetría desactivada; el
 contenedor no abre aplicaciones gráficas del anfitrión.
 
 ## Estructura
