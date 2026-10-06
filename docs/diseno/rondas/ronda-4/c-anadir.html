@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Añadir rápido · Estilo C</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: light; --paper:#fffbeF; --surface:#fff; --soft:#f4efdf; --ink:#111; --muted:#4a4a4a; --line:#d9d2c0; --yellow:#ffe14d; --blue:#8ab4ff; --green:#6ee7a8; --orange:#ffb86b; --pink:#ff8fb1; --teal:#62d9cb; }
+    * { box-sizing:border-box; }
+    body { height:100vh; min-height:720px; margin:0; overflow:hidden; background:var(--paper); color:var(--ink); font-family:"Archivo",Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+    button,input { color:inherit; font:inherit; }
+    .background { position:absolute; inset:0; padding:18px 16px; }
+    .date { margin:0 0 4px; color:var(--muted); font-size:11px; }
+    .background-head { display:flex; align-items:center; justify-content:space-between; }
+    .background h1 { margin:0; font-size:36px; font-weight:800; letter-spacing:-.05em; }
+    .count { padding:4px 7px; border:1.5px solid var(--ink); background:var(--yellow); box-shadow:2px 2px 0 var(--ink); font-size:12px; font-weight:800; }
+    .ghost-task { display:flex; align-items:center; justify-content:space-between; min-height:55px; border-bottom:1px solid var(--line); font-size:13px; font-weight:700; }
+    .ghost-task small { display:block; margin-top:3px; color:var(--muted); font-size:10px; font-weight:400; }
+    .ghost-mark { display:grid; width:36px; height:36px; place-items:center; border:1.5px solid var(--ink); border-radius:50%; background:var(--orange); box-shadow:1.5px 1.5px 0 var(--ink); }
+    .scrim { position:absolute; inset:0; background:rgba(17,17,17,.48); }
+    .keyboard { position:absolute; z-index:4; right:0; bottom:0; left:0; height:258px; padding:5px 4px 16px; border-top:1px solid #c6c8cc; background:#e7e9ee; color:#24262b; }
+    .suggestions { display:flex; height:34px; align-items:center; justify-content:space-around; color:#41444a; font-size:13px; }
+    .key-row { display:flex; justify-content:center; gap:4px; margin:5px 0; }
+    .key { display:grid; height:39px; min-width:0; flex:1; place-items:center; border-radius:5px; background:#fff; box-shadow:0 1px 0 #a8abb1; font-size:18px; }
+    .key.wide { flex:1.45; background:#d0d4dc; font-size:14px; }
+    .key.space { flex:4; font-size:11px; }
+    .key.enter { background:var(--yellow); }
+    .home-bar { position:absolute; bottom:5px; left:calc(50% - 54px); width:108px; height:4px; border-radius:4px; background:#44474d; }
+    .composer { position:absolute; z-index:3; right:0; bottom:258px; left:0; height:430px; padding:13px 14px; border:1.5px solid var(--ink); border-bottom:0; background:var(--surface); box-shadow:0 -2px 0 var(--yellow); }
+    .composer-top { display:flex; align-items:center; gap:9px; }
+    .task-name { width:0; height:48px; flex:1; padding:0 11px; border:1.5px solid var(--ink); outline:0; background:var(--paper); box-shadow:1.5px 1.5px 0 var(--ink); font-size:16px; font-weight:700; }
+    .send { display:grid; width:48px; height:48px; flex:0 0 auto; place-items:center; border:1.5px solid var(--ink); background:var(--yellow); box-shadow:2px 2px 0 var(--ink); }
+    .send svg { width:22px; height:22px; }
+    .mode-row { display:flex; align-items:center; justify-content:space-between; margin-top:11px; }
+    .mode-toggle { display:flex; padding:3px; border:1.5px solid var(--ink); background:var(--soft); }
+    .mode-toggle button { min-width:70px; height:32px; border:0; background:transparent; font-size:12px; font-weight:700; }
+    .mode-toggle button.selected { border:1.5px solid var(--ink); background:var(--yellow); box-shadow:1px 1px 0 var(--ink); }
+    .more { display:flex; align-items:center; gap:4px; padding:4px; border:0; background:transparent; font-size:12px; font-weight:700; }
+    .date-shortcuts { display:flex; gap:5px; margin-top:9px; }
+    .date-shortcuts button { min-height:32px; padding:0 9px; border:1.5px solid var(--ink); background:var(--surface); font-size:11px; font-weight:600; }
+    .date-shortcuts button.selected { background:var(--yellow); box-shadow:1px 1px 0 var(--ink); font-weight:800; }
+    .category-trigger { position:absolute; right:14px; bottom:11px; left:14px; display:flex; height:36px; align-items:center; gap:7px; padding:0 9px; border:1.5px solid var(--ink); background:var(--soft); box-shadow:1px 1px 0 var(--ink); text-align:left; font-size:11px; font-weight:700; }
+    .category-trigger svg { width:16px; height:16px; }
+    .category-trigger .chevron { margin-left:auto; }
+    .category-popover { position:absolute; z-index:5; right:14px; bottom:52px; left:14px; max-height:230px; overflow:auto; border:1.5px solid var(--ink); background:var(--surface); box-shadow:2px 2px 0 var(--ink); }
+    .choice { display:flex; min-height:26px; align-items:center; gap:8px; padding:2px 8px; border-bottom:1px solid var(--line); font-size:10px; font-weight:600; }
+    .choice:last-child { border-bottom:0; }
+    .choice.current { background:#fff8ce; }
+    .choice-icon { display:grid; width:18px; height:18px; flex:0 0 auto; place-items:center; color:var(--ink); }
+    .choice-icon svg { width:16px; height:16px; stroke-width:1.8; }
+    .color-dot { width:11px; height:11px; flex:0 0 auto; border:1px solid var(--ink); border-radius:50%; background:var(--color); }
+    .choice.nested { min-height:21px; padding-left:39px; color:var(--muted); font-size:10px; }
+    .choice.nested::before { width:6px; height:6px; border:1px solid var(--ink); border-radius:50%; background:var(--teal); content:""; }
+    .category-popover[hidden] { display:none; }
+    @media (min-width:400px) { .background { padding-right:20px; padding-left:20px; } }
+  </style>
+</head>
+<body>
+  <main class="background" aria-hidden="true">
+    <p class="date">Martes, 6 de octubre de 2026</p>
+    <div class="background-head"><h1>Hoy</h1><span class="count">2 de 8</span></div>
+    <div class="ghost-task">Comprar proteína <span class="ghost-mark">✓</span></div>
+    <div class="ghost-task">Llamar al dentista <span class="ghost-mark">✓</span><small>10:00 · Personal · Tarea</small></div>
+    <div class="ghost-task">Beber 2 L de agua <span class="ghost-mark" style="background:var(--green)">✓</span><small>Salud · Hábito</small></div>
+  </main>
+  <div class="scrim" aria-hidden="true"></div>
+  <section class="composer" aria-label="Añadir tarea">
+    <div class="composer-top">
+      <input class="task-name" id="taskName" value="Comprar pilas" aria-label="Nombre de la tarea">
+      <button class="send" id="sendTask" aria-label="Añadir tarea"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+    </div>
+    <div class="mode-row">
+      <div class="mode-toggle" role="group" aria-label="Tipo">
+        <button class="selected" aria-pressed="true">Tarea</button><button aria-pressed="false">Hábito</button>
+      </div>
+      <button class="more">Más <span aria-hidden="true">⌄</span></button>
+    </div>
+    <div class="date-shortcuts" id="dateShortcuts" aria-label="Fecha">
+      <button>Sin fecha</button><button class="selected">Hoy</button><button>Mañana</button><button>Lunes</button><button aria-label="Elegir fecha">▣</button>
+    </div>
+    <button class="category-trigger" id="categoryTrigger" aria-expanded="true" aria-controls="categoryPopover">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v14H3z"/><path d="M3 6l3-3h12l3 3"/></svg>
+      <span class="selection-label">Sin categoría · Bandeja</span>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="category-popover" id="categoryPopover" role="listbox" aria-label="Elegir categoría">
+      <div class="choice current" role="option" aria-selected="true" data-category="Sin categoría · Bandeja"><span class="choice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 6 5h12l3 5.5v7a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z"/><path d="M3 11h5l1.5 2h5L16 11h5"/></svg></span>Bandeja de entrada</div>
+      <div class="choice" role="option"><span class="choice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18l-2 10H5z"/><path d="M8 10 12 4l4 6M7 13l3 4m7-4-3 4"/></svg></span><span class="color-dot" style="--color:var(--teal)"></span>Lista de la compra</div>
+      <div class="choice nested" role="option" data-category="Lista de la compra" data-section="Mercadona">Mercadona</div>
+      <div class="choice nested" role="option" data-category="Lista de la compra" data-section="Lidl">Lidl</div>
+      <div class="choice nested" role="option" data-category="Lista de la compra" data-section="Sin sección">Sin sección</div>
+      <div class="choice" role="option" data-category="Universidad"><span class="choice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg></span><span class="color-dot" style="--color:var(--blue)"></span>Universidad</div>
+      <div class="choice" role="option" data-category="Salud"><span class="choice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg></span><span class="color-dot" style="--color:var(--green)"></span>Salud</div>
+      <div class="choice" role="option" data-category="Personal"><span class="choice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg></span><span class="color-dot" style="--color:var(--orange)"></span>Personal</div>
+      <div class="choice" role="option" data-category="Casa"><span class="choice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg></span><span class="color-dot" style="--color:var(--pink)"></span>Casa</div>
+    </div>
+  </section>
+  <div class="keyboard" aria-hidden="true">
+    <div class="suggestions"><span>pilas</span><span>“pilas”</span><span>pila</span></div>
+    <div class="key-row"><span class="key">q</span><span class="key">w</span><span class="key">e</span><span class="key">r</span><span class="key">t</span><span class="key">y</span><span class="key">u</span><span class="key">i</span><span class="key">o</span><span class="key">p</span></div>
+    <div class="key-row"><span class="key">a</span><span class="key">s</span><span class="key">d</span><span class="key">f</span><span class="key">g</span><span class="key">h</span><span class="key">j</span><span class="key">k</span><span class="key">l</span><span class="key">ñ</span></div>
+    <div class="key-row"><span class="key wide">⇧</span><span class="key">z</span><span class="key">x</span><span class="key">c</span><span class="key">v</span><span class="key">b</span><span class="key">n</span><span class="key">m</span><span class="key wide">⌫</span></div>
+    <div class="key-row"><span class="key wide">?123</span><span class="key">,</span><span class="key space">Español</span><span class="key">.</span><span class="key wide enter">↵</span></div>
+    <span class="home-bar"></span>
+  </div>
+  <script>
+    const categoryTrigger = document.getElementById("categoryTrigger");
+    const categoryPopover = document.getElementById("categoryPopover");
+    const taskName = document.getElementById("taskName");
+    const sendTask = document.getElementById("sendTask");
+    const dateShortcuts = document.getElementById("dateShortcuts");
+    const modeButtons = document.querySelectorAll(".mode-toggle button");
+    const selectionLabel = document.querySelector(".selection-label");
+
+    categoryTrigger.addEventListener("click", () => {
+      const isExpanded = categoryTrigger.getAttribute("aria-expanded") === "true";
+      categoryTrigger.setAttribute("aria-expanded", String(!isExpanded));
+      categoryPopover.hidden = isExpanded;
+    });
+
+    function selectOption(button) {
+      button.parentElement.querySelectorAll("button").forEach((option) => {
+        option.classList.remove("selected");
+        option.setAttribute("aria-pressed", "false");
+      });
+      button.classList.add("selected");
+      button.setAttribute("aria-pressed", "true");
+    }
+
+    function renderDateShortcuts(isHabit) {
+      const labels = isHabit ? ["A diario", "Días", "Cada N días", "Cada mes"] : ["Sin fecha", "Hoy", "Mañana", "Lunes", "▣"];
+      dateShortcuts.replaceChildren();
+      labels.forEach((label) => {
+        const button = document.createElement("button");
+        button.textContent = label;
+        button.setAttribute("aria-pressed", String(label === (isHabit ? "A diario" : "Hoy")));
+        if (label === (isHabit ? "A diario" : "Hoy")) {
+          button.classList.add("selected");
+        }
+        button.addEventListener("click", () => selectOption(button));
+        dateShortcuts.appendChild(button);
+      });
+    }
+
+    modeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        selectOption(button);
+        renderDateShortcuts(button.textContent === "Hábito");
+      });
+    });
+
+    dateShortcuts.querySelectorAll("button").forEach((button) => {
+      button.addEventListener("click", () => selectOption(button));
+    });
+
+    categoryPopover.querySelectorAll(".choice").forEach((choice) => {
+      choice.addEventListener("click", () => {
+        const category = choice.dataset.category || choice.textContent.trim();
+        const section = choice.dataset.section;
+        selectionLabel.textContent = section ? `${category} › ${section}` : category;
+        categoryPopover.querySelectorAll(".choice").forEach((option) => {
+          option.classList.remove("current");
+          option.setAttribute("aria-selected", "false");
+        });
+        choice.classList.add("current");
+        choice.setAttribute("aria-selected", "true");
+        categoryTrigger.setAttribute("aria-expanded", "false");
+        categoryPopover.hidden = true;
+      });
+    });
+
+    sendTask.addEventListener("click", () => {
+      if (taskName.value.trim().length === 0) {
+        taskName.focus();
+        return;
+      }
+      const newTask = document.createElement("div");
+      const taskTitle = document.createElement("span");
+      const taskDetails = document.createElement("small");
+      newTask.className = "ghost-task";
+      taskTitle.textContent = taskName.value.trim();
+      taskDetails.textContent = `Hoy · ${selectionLabel.textContent.trim()} · Tarea`;
+      newTask.appendChild(taskTitle);
+      newTask.appendChild(taskDetails);
+      document.querySelector(".background").appendChild(newTask);
+      document.querySelector(".background").removeAttribute("aria-hidden");
+      document.querySelector(".scrim").hidden = true;
+      document.querySelector(".composer").hidden = true;
+      document.querySelector(".keyboard").hidden = true;
+      sendTask.setAttribute("aria-label", `${taskName.value.trim()} añadida`);
+    });
+  </script>
+</body>
+</html>

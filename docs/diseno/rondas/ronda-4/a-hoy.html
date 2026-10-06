@@ -1,0 +1,185 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Hoy · Blanco</title><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><style>
+:root{--background:#F2ECE1;--surface:#FAF6EF;--raised:#EAE2D4;--border:#D9CDB9;--text:#1F1B16;--muted:#75695A;--accent:#C2410C;--accent-soft:#F4DDCF;--negative:#9C8F7E;--university:#3B5B7A;--health:#4F7A45;--personal:#B7791F;--home:#9B3A4C;--shopping:#1F7A80;--inbox:#75695A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--background);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
+button,input{font:inherit}
+button,a,input{-webkit-tap-highlight-color:transparent}
+button,a{touch-action:manipulation}
+button{cursor:pointer;color:inherit;border:0;background:none;padding:0}
+a{color:inherit;text-decoration:none}
+svg{width:22px;height:22px;flex-shrink:0}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+.serif{font-family:'Fraunces',Georgia,serif}
+header{padding:24px 20px 10px}
+.eyebrow{font-size:12px;color:var(--muted);margin:0 0 4px;letter-spacing:.1px}
+h1{font-family:'Fraunces',Georgia,serif;font-size:36px;line-height:1.1;letter-spacing:-.8px;margin:0;font-weight:600}
+.title-line{display:flex;align-items:flex-end;justify-content:space-between}
+.progress{display:flex;flex-direction:column;align-items:flex-end;gap:7px;padding-bottom:4px}
+.progress-count{font-size:13px;font-weight:600;color:var(--accent)}
+.progress-count span{font-weight:500;color:var(--muted)}
+.squares{display:flex;gap:3px}
+.squares i{display:block;width:10px;height:10px;border-radius:3px;border:1.5px solid var(--border)}
+.squares i.yes{background:var(--text);border-color:var(--text)}
+.squares i.no{background:var(--negative);border-color:var(--negative)}
+main{padding:0 20px 150px}
+.section-title{display:flex;align-items:center;gap:12px;font-size:10.5px;letter-spacing:1.6px;color:var(--muted);font-weight:600;margin:14px 0 0;text-transform:uppercase}
+.section-title:after{content:'';flex:1;height:1px;background:var(--border)}
+.section-title .section-count{order:3;letter-spacing:.3px;font-size:11px;font-weight:500}
+.row{display:flex;align-items:center;min-height:60px;border-bottom:1px solid var(--border);gap:2px}
+.task-text{flex:1;min-width:0;padding:8px 0}
+.task-name{display:block;font-size:15px;font-weight:600;line-height:20px;letter-spacing:-.1px}
+.meta{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:11px;margin-top:3px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--category);display:inline-block;flex-shrink:0}
+.mark{width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mark.yes span{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--category);color:var(--surface)}
+.mark svg{width:18px;height:18px;stroke-width:2.4}
+.mark.no{color:var(--muted)}
+.mark.no svg{stroke-width:2}
+.floating{position:fixed;bottom:146px;right:20px;display:flex;align-items:center;justify-content:center;width:52px;height:52px;background:var(--accent);color:#fff;border-radius:18px;box-shadow:0 6px 16px #c2410c40}
+.floating svg{width:26px;height:26px}
+.toast{position:fixed;left:16px;right:16px;bottom:86px;height:48px;border-radius:12px;display:flex;align-items:center;padding:0 4px 0 16px;background:var(--text);color:var(--surface);font-size:13px;font-weight:500}
+.toast button{margin-left:auto;min-height:44px;padding:0 14px;font-weight:700;color:#fff}
+.navigation{position:fixed;bottom:0;left:0;right:0;height:74px;display:flex;background:var(--surface);border-top:1px solid var(--border);padding:8px 5px 7px;z-index:2}
+.navigation a{flex:1;display:flex;align-items:center;flex-direction:column;font-size:10px;color:var(--muted);gap:3px;min-width:0;font-weight:500}
+.nav-icon{position:relative;display:flex;justify-content:center;align-items:center;height:30px;width:52px;border-radius:15px}
+.nav-icon svg{width:21px;height:21px}
+.navigation a.active{color:var(--accent);font-weight:700}
+.active .nav-icon{background:var(--accent-soft)}
+.badge{position:absolute;top:-2px;right:8px;background:var(--text);color:var(--surface);font-size:9px;min-width:14px;height:14px;border-radius:7px;font-weight:700;text-align:center;line-height:14px}
+
+/* categorías */
+.tile{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--category);background:color-mix(in srgb,var(--category) 13%,var(--surface))}
+.tile svg{width:19px;height:19px}
+.category-row{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;text-align:left}
+.category-row .label{flex:1;font-size:15px;font-weight:600;letter-spacing:-.1px}
+.category-row .number{color:var(--muted);font-size:12px;font-weight:500;min-width:14px;text-align:right}
+.category-row>svg{width:16px;height:16px;color:var(--muted);transition:transform .15s}
+.category.open>.category-row>svg{transform:rotate(180deg)}
+.category{border-bottom:1px solid var(--border)}
+.sections{margin:0 0 8px 18px;padding-left:29px;border-left:2px solid color-mix(in srgb,var(--category) 40%,var(--surface))}
+.section-row{display:flex;align-items:center;justify-content:space-between;min-height:42px;font-size:14px;gap:8px}
+.section-row .number{color:var(--muted);font-size:12px;font-weight:500}
+.section-row.empty .name{color:var(--muted)}
+.categories-intro{margin:0}
+.new-category{margin-top:20px;width:100%;min-height:48px;border-radius:12px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:14px}
+.new-category svg{width:18px;height:18px}
+.categories-screen main{padding-bottom:100px}
+.categories-screen header{padding-bottom:6px}
+.categories-screen h1{font-size:34px}
+
+/* cabecera de categoría */
+.back{min-height:44px;display:inline-flex;gap:2px;align-items:center;color:var(--muted);font-size:12.5px;font-weight:500;margin:-12px 0 0 -6px}
+.back svg{width:18px;height:18px}
+.category-title{display:flex;align-items:center;gap:12px;margin-top:2px}
+.category-title .tile{width:44px;height:44px;border-radius:13px}
+.category-title .tile svg{width:23px;height:23px}
+.category-title h1{font-size:28px;letter-spacing:-.6px}
+.subtitle{color:var(--muted);font-size:12px;margin:2px 0 0}
+
+/* barra de añadir rápido */
+.composer-screen main{padding-bottom:560px}
+.composer-screen .navigation,.composer-screen .toast,.composer-screen .floating{display:none}
+.composer-screen header{padding-bottom:6px}
+.scrim{position:fixed;inset:0;background:#1f1b1655;z-index:4}
+.composer{position:fixed;bottom:290px;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);border-radius:22px 22px 0 0;padding:8px 16px 8px;z-index:5;box-shadow:0 -10px 30px #1f1b1626}
+.handle{height:4px;width:32px;background:var(--border);border-radius:4px;margin:0 auto 6px}
+.compose-title{display:flex;align-items:center;gap:8px;height:52px}
+.compose-title input{width:100%;min-width:0;background:none;border:0;color:var(--text);font-family:'Fraunces',Georgia,serif;font-size:24px;font-weight:500;letter-spacing:-.4px;outline:0;caret-color:var(--accent);padding:0}
+.compose-title input::placeholder{color:#9c8f7e}
+.send{background:var(--accent);color:#fff;height:44px;width:44px;flex-shrink:0;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.send svg{width:22px;height:22px;stroke-width:2.4}
+.input-wrap{position:relative;flex:1;min-width:0}
+.type-line{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.segmented{display:flex;gap:2px;background:var(--raised);padding:3px;border-radius:11px}
+.segmented button{font-size:13px;font-weight:500;min-height:38px;padding:0 18px;border-radius:8px;color:var(--muted)}
+.segmented button.selected{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 3px #1f1b162a}
+.more{min-height:44px;padding:0 4px 0 10px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px;color:var(--muted)}
+.more svg{width:18px;height:18px}
+.chips{display:flex;gap:2px;align-items:center;margin-top:2px;margin-left:-6px}
+.chips button{padding:0 10px;min-height:44px;font-size:13px;font-weight:500;white-space:nowrap;border-radius:10px;color:var(--muted)}
+.chips button.selected{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.chips .calendar{width:44px;padding:0;display:flex;align-items:center;justify-content:center}
+.chips .calendar svg{width:19px;height:19px}
+.extra-row{margin-left:-6px}
+.date-input{margin:2px 0 0;width:100%;min-height:44px;border:1px solid var(--border);border-radius:10px;background:var(--background);padding:0 12px;color:var(--text)}
+.category-picker{border-top:1px solid var(--border);margin-top:4px}
+.category-button{width:100%;display:flex;align-items:center;gap:10px;min-height:48px;text-align:left}
+.category-button .tile{width:28px;height:28px;border-radius:9px}
+.category-button .tile svg{width:16px;height:16px}
+.category-button .label{flex:1;font-size:14px;font-weight:500}
+.category-button .label small{color:var(--muted);font-size:13px;font-weight:400}
+.category-button>svg{width:18px;height:18px;color:var(--muted);transition:transform .15s}
+.category-button[aria-expanded=true]>svg{transform:rotate(180deg)}
+.composer{}.popover{position:absolute;left:12px;right:12px;bottom:calc(100% + 8px);background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 32px #1f1b1640;max-height:268px;overscroll-behavior:contain;overflow-y:auto;padding:4px 0;z-index:7}
+.popover .option{display:flex;align-items:center;gap:12px;width:100%;min-height:42px;padding:0 14px;text-align:left;font-size:14px;font-weight:500}
+.popover .option .tile{width:28px;height:28px;border-radius:9px}
+.popover .option .tile svg{width:16px;height:16px}
+.popover .option .label{flex:1}
+.popover .option>svg{width:17px;height:17px;color:var(--accent);stroke-width:2.6}
+.popover .option.group>svg{color:var(--muted);stroke-width:2}
+.popover .option.selected{background:var(--accent-soft)}
+.popover .sub{padding-left:54px;min-height:38px;font-size:13.5px;font-weight:400}
+.popover .sub .label:before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--category);margin-right:10px;vertical-align:1px}
+.popover .divider{height:1px;background:var(--border);margin:2px 14px}
+
+/* teclado */
+.keyboard{height:290px;position:fixed;bottom:0;left:0;right:0;background:#D6D3CC;z-index:6;padding:0 5px}
+.suggestions{height:43px;display:flex;align-items:center;justify-content:space-evenly;font-size:14px;color:#3b362f}
+.suggestions span+span{border-left:1px solid #b9b5ac;padding-left:24px}
+.key-row{display:flex;gap:4px;justify-content:center;margin-bottom:6px}
+.key-row button{height:43px;flex:1;padding:0;background:#FBFAF7;border-radius:5px;font-size:18px;box-shadow:0 1px 1px #0003;color:#1F1B16;max-width:40px;display:flex;align-items:center;justify-content:center}
+.key-row button svg{width:19px;height:19px}
+.key-row.third{padding:0 2px}
+.key-row.third button.wide{max-width:44px;background:#C4C0B8;flex:1.4}
+.key-row.bottom button{font-size:13px;background:#C4C0B8;max-width:none}
+.key-row.bottom .space{flex:4;background:#FBFAF7;font-size:12px;color:#5f584d}
+.key-row.bottom .enter{background:var(--accent);color:#fff}
+.keyboard-footer{display:flex;align-items:center;justify-content:center;height:35px}
+.home-bar{width:105px;height:4px;background:#1F1B16;border-radius:3px;opacity:.75}
+@media(min-width:400px){header{padding-top:30px}.row{min-height:68px}.key-row button{max-width:none}}
+</style></head><body class=""><header><p class="eyebrow">Martes, 6 de octubre de 2026</p><div class="title-line"><h1>Hoy</h1><div class="progress"><span class="progress-count"><b id="progress">2 de 8</b> <span>marcadas</span></span><span class="squares" id="squares" aria-hidden="true"><i class="yes"></i><i class="no"></i><i></i><i></i><i></i><i></i><i></i><i></i></span></div></div></header><main id="task-list"><section><h2 class="section-title">Sin hora</h2><div class="row" style="--category:var(--personal)" data-group=""><div class="task-text"><span class="task-name">Comprar proteína</span><span class="meta"><i class="dot"></i>Personal · Tarea</span></div><button class="mark yes" aria-label="Marcar Comprar proteína como hecho"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></button><button class="mark no" aria-label="Marcar Comprar proteína como no hecho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></section><section><h2 class="section-title">Mañana</h2><div class="row" style="--category:var(--personal)" data-group=""><div class="task-text"><span class="task-name">Llamar al dentista</span><span class="meta"><i class="dot"></i>10:00 · Personal · Tarea</span></div><button class="mark yes" aria-label="Marcar Llamar al dentista como hecho"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></button><button class="mark no" aria-label="Marcar Llamar al dentista como no hecho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><div class="row" style="--category:var(--health)" data-group=""><div class="task-text"><span class="task-name">Beber 2 L de agua</span><span class="meta"><i class="dot"></i>Salud · Hábito</span></div><button class="mark yes" aria-label="Marcar Beber 2 L de agua como hecho"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></button><button class="mark no" aria-label="Marcar Beber 2 L de agua como no hecho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></section><section><h2 class="section-title">Tarde</h2><div class="row" style="--category:var(--health)" data-group=""><div class="task-text"><span class="task-name">Ir al gimnasio</span><span class="meta"><i class="dot"></i>18:30 · Salud · Hábito</span></div><button class="mark yes" aria-label="Marcar Ir al gimnasio como hecho"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></button><button class="mark no" aria-label="Marcar Ir al gimnasio como no hecho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></section><section><h2 class="section-title">Noche</h2><div class="row" style="--category:var(--university)" data-group=""><div class="task-text"><span class="task-name">Entregar práctica de Redes</span><span class="meta"><i class="dot"></i>23:59 · Universidad · Tarea</span></div><button class="mark yes" aria-label="Marcar Entregar práctica de Redes como hecho"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></button><button class="mark no" aria-label="Marcar Entregar práctica de Redes como no hecho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><div class="row" style="--category:var(--personal)" data-group=""><div class="task-text"><span class="task-name">Leer 20 minutos</span><span class="meta"><i class="dot"></i>Personal · Hábito</span></div><button class="mark yes" aria-label="Marcar Leer 20 minutos como hecho"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></button><button class="mark no" aria-label="Marcar Leer 20 minutos como no hecho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div></section></main><a class="floating" href="a-anadir.html" aria-label="Añadir tarea o hábito"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></a><div class="toast" id="toast" role="status"><span id="toast-message">Marcada como hecha</span><button id="undo" type="button">Deshacer</button></div><nav class="navigation" aria-label="Navegación principal"><a href="a-hoy.html" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></span>Hoy</a><a href="a-categorias.html"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></span>Bandeja</a><a href="a-categorias.html"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Categorías</a><a href="#pendientes"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="badge">2</span></span>Pendientes</a><a href="../ronda-2/a-historial.html"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6M12 7v5l-3 2"/></svg></span>Historial</a></nav><script>
+const outcomes = ['yes', 'no'];
+let lastMarked = null;
+function renderProgress() {
+ document.getElementById('progress').textContent = outcomes.length + ' de 8';
+ const squares = document.getElementById('squares');
+ squares.innerHTML = '';
+ for (let index = 0; index < 8; index += 1) {
+  const square = document.createElement('i');
+  if (index < outcomes.length) square.className = outcomes[index];
+  squares.append(square);
+ }
+}
+document.getElementById('task-list').addEventListener('click', function(event) {
+ const markButton = event.target.closest('.mark');
+ if (!markButton) return;
+ const taskRow = markButton.closest('.row');
+ const outcome = markButton.classList.contains('yes') ? 'yes' : 'no';
+ lastMarked = {row: taskRow, parent: taskRow.parentElement, next: taskRow.nextSibling, outcome: outcome};
+ taskRow.remove();
+ outcomes.push(outcome);
+ renderProgress();
+ document.getElementById('toast-message').textContent = outcome === 'yes' ? 'Marcada como hecha' : 'Marcada como no hecha';
+ document.getElementById('toast').hidden = false;
+});
+document.getElementById('undo').addEventListener('click', function() {
+ if (lastMarked) {
+  lastMarked.parent.insertBefore(lastMarked.row, lastMarked.next);
+  outcomes.splice(outcomes.lastIndexOf(lastMarked.outcome), 1);
+  lastMarked = null;
+ } else {
+  // Lo primero que se puede deshacer es «Meditar 10 min», marcada antes de abrir la pantalla.
+  const restoredRow = document.createElement('div');
+  restoredRow.className = 'row';
+  restoredRow.style.setProperty('--category', 'var(--health)');
+  restoredRow.innerHTML = '<div class="task-text"><span class="task-name">Meditar 10 min</span><span class="meta"><i class="dot"></i>Salud · Hábito</span></div>'
+   + '<button class="mark yes" aria-label="Marcar Meditar 10 min como hecho"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></button>'
+   + '<button class="mark no" aria-label="Marcar Meditar 10 min como no hecho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>';
+  document.querySelector('#task-list section:nth-child(2) .section-title').after(restoredRow);
+  outcomes.shift();
+ }
+ renderProgress();
+ document.getElementById('toast').hidden = true;
+});
+</script></body></html>

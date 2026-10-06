@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lista de la compra · Estilo C</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme:light; --paper:#fffbeF; --surface:#fff; --soft:#f4efdf; --ink:#111; --muted:#4a4a4a; --line:#d9d2c0; --yellow:#ffe14d; --blue:#8ab4ff; --green:#6ee7a8; --orange:#ffb86b; --pink:#ff8fb1; --teal:#62d9cb; }
+    * { box-sizing:border-box; }
+    body { height:100vh; min-height:720px; margin:0; overflow:hidden; background:var(--paper); color:var(--ink); font-family:"Archivo",Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+    button,input { color:inherit; font:inherit; }
+    .content { position:absolute; inset:0; padding:18px 16px; }
+    .back { display:flex; align-items:center; gap:8px; padding:0; border:0; background:transparent; color:var(--muted); font-size:11px; font-weight:600; }
+    .back svg { width:17px; height:17px; }
+    .heading { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:8px; }
+    .title-wrap { display:flex; align-items:center; gap:9px; min-width:0; }
+    .category-icon { display:grid; width:34px; height:34px; flex:0 0 auto; place-items:center; border:1.5px solid var(--ink); background:var(--teal); box-shadow:1.5px 1.5px 0 var(--ink); }
+    .category-icon svg { width:20px; height:20px; }
+    h1 { overflow:hidden; margin:0; font-size:19px; line-height:1.1; font-weight:800; letter-spacing:-.035em; white-space:nowrap; }
+    .count { flex:0 0 auto; padding:4px 6px; border:1.5px solid var(--ink); background:var(--yellow); box-shadow:1.5px 1.5px 0 var(--ink); font-size:10px; font-weight:800; }
+    .list-content { margin-top:18px; }
+    .group { margin-bottom:8px; }
+    .group-title { display:flex; align-items:center; gap:8px; margin:0 0 1px; font-size:10px; line-height:1; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
+    .group-title::after { height:1.5px; flex:1; background:var(--ink); content:""; }
+    .task-row { display:flex; min-height:39px; align-items:center; gap:7px; border-bottom:1px solid var(--line); }
+    .task-name { min-width:0; flex:1; font-size:12px; font-weight:700; }
+    .task-meta { color:var(--muted); font-size:8px; white-space:nowrap; }
+    .mark { display:grid; width:31px; height:31px; flex:0 0 auto; place-items:center; border:1.5px solid var(--ink); border-radius:50%; background:var(--teal); box-shadow:1.5px 1.5px 0 var(--ink); font-size:15px; font-weight:700; }
+    .scrim { position:absolute; z-index:1; inset:0; background:rgba(17,17,17,.43); }
+    .composer { position:absolute; z-index:2; right:0; bottom:254px; left:0; height:138px; padding:11px 14px; border:1.5px solid var(--ink); border-bottom:0; background:var(--surface); box-shadow:0 -2px 0 var(--yellow); }
+    .composer-head { display:flex; align-items:center; gap:9px; }
+    .task-input { width:0; height:47px; flex:1; padding:0 11px; border:1.5px solid var(--ink); outline:0; background:var(--paper); box-shadow:1.5px 1.5px 0 var(--ink); font-size:17px; font-weight:700; }
+    .send { display:grid; width:46px; height:46px; flex:0 0 auto; place-items:center; border:1.5px solid var(--ink); background:var(--yellow); box-shadow:2px 2px 0 var(--ink); }
+    .send svg { width:21px; height:21px; }
+    .composer-meta { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:8px; }
+    .date-chip,.category-chip { display:flex; min-height:33px; align-items:center; gap:6px; padding:0 9px; border:1.5px solid var(--ink); background:var(--soft); font-size:10px; font-weight:700; }
+    .category-chip { min-width:0; max-width:235px; background:#effcf7; }
+    .category-chip span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .category-chip svg { width:15px; height:15px; flex:0 0 auto; }
+    .keyboard { position:absolute; z-index:3; right:0; bottom:0; left:0; height:254px; padding:4px 4px 16px; border-top:1px solid #c6c8cc; background:#e7e9ee; color:#24262b; }
+    .suggestions { display:flex; height:33px; align-items:center; justify-content:space-around; color:#41444a; font-size:12px; }
+    .key-row { display:flex; justify-content:center; gap:4px; margin:5px 0; }
+    .key { display:grid; height:38px; min-width:0; flex:1; place-items:center; border-radius:5px; background:#fff; box-shadow:0 1px 0 #a8abb1; font-size:17px; }
+    .key.wide { flex:1.45; background:#d0d4dc; font-size:13px; }
+    .key.space { flex:4; font-size:10px; }
+    .key.enter { background:var(--yellow); }
+    .home-bar { position:absolute; bottom:5px; left:calc(50% - 54px); width:108px; height:4px; border-radius:4px; background:#44474d; }
+    @media (min-width:400px) { .content { padding-right:20px; padding-left:20px; } }
+  </style>
+</head>
+<body>
+  <main class="content">
+    <button class="back" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Lista de la compra</button>
+    <div class="heading">
+      <div class="title-wrap">
+        <span class="category-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18l-2 10H5z"/><path d="M8 10 12 4l4 6M7 13l3 4m7-4-3 4"/></svg></span>
+        <h1>Lista de la compra</h1>
+      </div>
+      <span class="count">5 pendientes</span>
+    </div>
+    <div class="list-content">
+      <section class="group">
+        <h2 class="group-title">Mercadona</h2>
+        <div class="task-row"><span class="task-name">Leche de avena</span><span class="task-meta">Sin fecha · Tarea</span><button class="mark" aria-label="Marcar Leche de avena como hecha">✓</button></div>
+        <div class="task-row"><span class="task-name">Huevos</span><span class="task-meta">Sin fecha · Tarea</span><button class="mark" aria-label="Marcar Huevos como hecha">✓</button></div>
+        <div class="task-row"><span class="task-name">Pan integral</span><span class="task-meta">Sin fecha · Tarea</span><button class="mark" aria-label="Marcar Pan integral como hecha">✓</button></div>
+      </section>
+      <section class="group">
+        <h2 class="group-title">Lidl</h2>
+        <div class="task-row"><span class="task-name">Papel de cocina</span><span class="task-meta">Sin fecha · Tarea</span><button class="mark" aria-label="Marcar Papel de cocina como hecha">✓</button></div>
+      </section>
+      <section class="group">
+        <h2 class="group-title">Sin sección</h2>
+        <div class="task-row"><span class="task-name">Pilas</span><span class="task-meta">Sin fecha · Tarea</span><button class="mark" aria-label="Marcar Pilas como hecha">✓</button></div>
+      </section>
+    </div>
+  </main>
+  <div class="scrim" aria-hidden="true"></div>
+  <section class="composer" aria-label="Añadir a Mercadona">
+    <div class="composer-head">
+      <input class="task-input" id="taskInput" value="Plátanos" aria-label="Nombre de la tarea">
+      <button class="send" id="sendTask" aria-label="Añadir tarea"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+    </div>
+    <div class="composer-meta">
+      <button class="date-chip" type="button">◷ <span>Sin fecha</span></button>
+      <button class="category-chip" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18l-2 10H5z"/><path d="M8 10 12 4l4 6M7 13l3 4m7-4-3 4"/></svg><span>Lista de la compra › Mercadona</span></button>
+    </div>
+  </section>
+  <div class="keyboard" aria-hidden="true">
+    <div class="suggestions"><span>Plátanos</span><span>plátanos</span><span>Plátano</span></div>
+    <div class="key-row"><span class="key">q</span><span class="key">w</span><span class="key">e</span><span class="key">r</span><span class="key">t</span><span class="key">y</span><span class="key">u</span><span class="key">i</span><span class="key">o</span><span class="key">p</span></div>
+    <div class="key-row"><span class="key">a</span><span class="key">s</span><span class="key">d</span><span class="key">f</span><span class="key">g</span><span class="key">h</span><span class="key">j</span><span class="key">k</span><span class="key">l</span><span class="key">ñ</span></div>
+    <div class="key-row"><span class="key wide">⇧</span><span class="key">z</span><span class="key">x</span><span class="key">c</span><span class="key">v</span><span class="key">b</span><span class="key">n</span><span class="key">m</span><span class="key wide">⌫</span></div>
+    <div class="key-row"><span class="key wide">?123</span><span class="key">,</span><span class="key space">Español</span><span class="key">.</span><span class="key wide enter">↵</span></div>
+    <span class="home-bar"></span>
+  </div>
+  <script>
+    const taskInput = document.getElementById("taskInput");
+    const sendTask = document.getElementById("sendTask");
+
+    sendTask.addEventListener("click", () => {
+      if (taskInput.value.trim().length === 0) {
+        taskInput.focus();
+        return;
+      }
+      sendTask.setAttribute("aria-label", `${taskInput.value.trim()} añadida a Mercadona`);
+    });
+  </script>
+</body>
+</html>
