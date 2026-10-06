@@ -44,6 +44,10 @@ El orquestador dice en cada encargo cuáles usar (campo «Skills a usar» de la 
 | `expo-animation` | expo/skills | Animaciones nativas |
 | `android-emulator-qa` | openai/plugins | Probar flujos en el emulador Android. El dispositivo se controla con la skill de Orca `orca-emulator-android` |
 
+## Plugins
+
+El plugin oficial de **Supabase** está activo para Claude en este proyecto (`.claude/settings.json`, DEC-34): trae la skill `supabase` y su servidor MCP, que pide iniciar sesión en Supabase la primera vez (`/mcp`). No tiene hooks ni telemetría. Codex y Copilot usan la herramienta `supabase` con el token de DEC-33.
+
 ## Origen, licencias y cambios
 
 | Origen | Commit | Licencia | Cambios hechos en nuestra copia |
@@ -75,7 +79,8 @@ Las de `.agents/skills-a-demanda/` tienen su propia ficha.
 | `impeccable` completo | Sus scripts están minificados y no se pueden revisar: solo su guía escrita, a demanda |
 | `animate` (emilkowalski) | Es para web; en la app se usa `expo-animation` |
 | `expo-ui` | Empuja los componentes nativos `@expo/ui`, que chocan con React Native Reusables |
-| `eas-*`, `expo-skill-feedback`, `expo-module`, `expo-app-clip`, `expo-brownfield`, `expo-dom`, `expo-web-to-native` | De pago, para más adelante, con envío de datos a Expo, o no aplican |
+| `eas-*` (salvo `eas-app-stores` y `eas-update`, que están a demanda), `expo-skill-feedback`, `expo-module`, `expo-app-clip`, `expo-brownfield`, `expo-dom`, `expo-web-to-native` | De pago, para más adelante, con envío de datos a Expo, o no aplican |
+| Plugins de Expo y de Vercel para Claude (DEC-34) | Sus hooks envían telemetría en cada sesión, y el de Vercel analiza el proyecto y añade texto a las instrucciones (prohibición 10). Sus skills útiles están copiadas a demanda, sin hooks |
 | `react-native-best-practices` (Callstack) | Ocupa 6,4 MB y la cubre `vercel-react-native-skills` |
 | `react-navigation` (Callstack) | Expo Router ya no depende de React Navigation |
 | `agent-device`, `dogfood` (Callstack) | Otra herramienta de control de dispositivos: aquí se usa Orca |

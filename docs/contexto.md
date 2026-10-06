@@ -46,7 +46,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Fase: ejecución, a punto de empezar.** El plan replanificado está **aprobado** (2026-10-06, «APRUEBO EL PLAN»): una app con Expo para Android y la web, 16 tareas en 6 olas, todo el desarrollo en Docker. Está en el PR #4; el estilo (P02, DEC-32), en el PR #5.
 - Estado del plan: `APROBADO` (ver [05-plan](05-plan.md)).
-- Agentes: Claude, Codex y Copilot con Orca, con el ciclo de cuotas (DEC-27) y el supervisor de trabajadores. Tendrán acceso a Vercel, Supabase y Expo (DEC-33).
+- Agentes: Claude, Codex y Copilot con Orca, con el ciclo de cuotas (DEC-27) y el supervisor de trabajadores. Tendrán acceso a Vercel, Supabase y Expo (DEC-33), con los tokens ya comprobados. Ciclo de DEC-27: el último trabajador lanzado fue Claude (el arreglo del tema C en P02), así que **el siguiente le toca a Copilot**.
 
 
 ## Lo siguiente
@@ -70,7 +70,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-34**.
+  chat. Siguiente número libre: **DEC-35**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -103,6 +103,14 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Tokens comprobados y plugins de los servicios (DEC-34)
+
+El humano creó las cuentas de Supabase (una organización vacía para los
+agentes), Vercel y Expo (un token de robot) y guardó sus tokens fuera del
+repositorio; los tres funcionan. De los plugins oficiales que recomendó Expo,
+solo se instala el de Supabase: los de Expo y Vercel envían telemetría desde
+sus hooks. Sus seis skills útiles se copian a demanda, sin hooks.
 
 ### 2026-10-06 — Plan replanificado aprobado y acceso de los agentes (DEC-33)
 
