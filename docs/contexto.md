@@ -100,6 +100,14 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 Lo más reciente, arriba.
 
+### 2026-10-06 — Ciclo de cuotas de los agentes (DEC-27, revisada) y ronda 1 de estilo
+
+Los siete subagentes de Claude de la ronda 1 se cortaron al agotarse la
+sesión del humano; dejaron cuatro prototipos y la hoja de paletas, y Codex
+hizo los otros dos. Al humano le gustaron más los de Codex, «más pulidos y
+profesionales». DEC-27 pasa a ser un ciclo: dos de Codex, uno de Claude y uno
+de Copilot, con excepción para tareas que necesiten un modelo concreto.
+
 ### 2026-10-06 — Primero Codex (DEC-27)
 
 Para no agotar su cuota de Claude, el humano pidió lanzar siempre primero

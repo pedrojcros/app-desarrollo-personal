@@ -115,14 +115,14 @@ Si un encargo necesita "y además", son dos.
 
 ### 5. Elige el agente
 
-**Primero Codex (DEC-27).** Codex gasta otra cuota; la de Claude es la que se agota. **Por cada tres agentes de Codex, como mucho uno de Claude, y siempre después de los de Codex.** Cuenta todo lo que se lanza: trabajadores de Orca y subagentes. Si Codex no puede con un encargo y hace falta saltarse la regla, pregúntale antes al humano.
+**Ciclo de cuotas (DEC-27).** Cada agente gasta una cuota distinta, y la de Claude es la que se agota. Orden: **dos de Codex, uno de Claude y uno de Copilot**, y vuelta a empezar; pueden ir a la vez, dentro del tope de paralelismo. Claude y Copilot, solo cuando les toca en el ciclo; Codex, siempre que haga falta. Si a Codex se le acaba la cuota, usa Claude. **Excepción:** si una tarea necesita sí o sí un agente o un modelo concreto (por ejemplo, GPT Astra u Opus 5.5 al máximo, porque es importante), sáltate el ciclo y anota el motivo en el informe. Cuenta todo lo que se lanza: trabajadores de Orca y subagentes.
 
 La tabla de [agentes-disponibles](agentes-disponibles.md) dice quién está habilitado y para qué sirve cada uno. Criterio general:
 
 | El encargo es... | Agente |
 |---|---|
 | Acotado, mecánico, con instrucciones claras y casos de prueba ya escritos (CRUD, DTO, componente de interfaz, tests a partir de casos dados) | Codex |
-| Transversal, con razonamiento sobre el dominio, o que otro agente ya ha hecho mal | Codex con esfuerzo alto, o Claude si le toca su turno (uno de cada cuatro) |
+| Transversal, con razonamiento sobre el dominio, o que otro agente ya ha hecho mal | Codex con esfuerzo alto, o Claude cuando le toque en el ciclo |
 | Revisión de algo delicado (seguridad, dinero, datos personales, lógica central) | Un agente **distinto** del que lo escribió: modelos distintos se equivocan en cosas distintas |
 | Decisión de diseño | No se delega: es del arquitecto o del humano |
 

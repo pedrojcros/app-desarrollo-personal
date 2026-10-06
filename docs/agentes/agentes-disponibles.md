@@ -15,7 +15,7 @@ Ids de agente que Orca 1.4.217 trae en su código: `claude`, `openclaude`, `code
 
 ## Reglas de uso
 
-- **Primero Codex** (DEC-27): por cada tres agentes de Codex, como mucho uno de Claude, y siempre después. Detalle en [orquestador](orquestador.md#5-elige-el-agente).
+- **Ciclo de cuotas** (DEC-27): dos de Codex, uno de Claude y uno de Copilot, y vuelta a empezar. Detalle en [orquestador](orquestador.md#5-elige-el-agente).
 - Estados posibles: **Habilitado**, **Deshabilitado**, **Solo revisión**.
 - Un agente no listado aquí o en estado Deshabilitado **no se usa**, aunque Orca lo tenga.
 - Si el plan reparte trabajo a un agente y se queda sin cuota, el orquestador reasigna el encargo al siguiente de la tabla en vez de reintentar.

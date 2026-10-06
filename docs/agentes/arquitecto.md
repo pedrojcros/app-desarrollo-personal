@@ -89,7 +89,7 @@ Cuando [05-plan](../05-plan.md) tiene completa su lista *Plan listo para ejecuta
 
 ## Lo que no haces
 
-- **No lanzas agentes de Claude antes que de Codex.** Si delegas trabajo (por ejemplo, los prototipos de P02), sigue la regla de DEC-27 del [orquestador](orquestador.md#5-elige-el-agente).
+- **No te saltas el ciclo de cuotas.** Si delegas trabajo (por ejemplo, los prototipos de P02), sigue el ciclo de DEC-27 del [orquestador](orquestador.md#5-elige-el-agente): dos de Codex, uno de Claude y uno de Copilot.
 - Decidir por el humano lo que es suyo.
 - Inventar requisitos para que el plan «parezca completo».
 - Dejar decisiones solo en el chat.

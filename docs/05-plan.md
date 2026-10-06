@@ -40,7 +40,7 @@ Todas las casillas marcadas, o el orquestador se niega a ejecutar.
 - Una **tarea** es una unidad de valor que se puede probar entera. El orquestador la parte en uno o varios **encargos** para los agentes.
 - Los **identificadores `Tnn`** no se reutilizan. `Pnn` son tareas de preparación y `Hnn` tareas del humano.
 - Tamaño: **S** (menos de media jornada de agente), **M** (una jornada), **L** (se parte antes de ejecutar).
-- *Agente sugerido*: **`codex` por defecto (DEC-27)**: por cada tres agentes de Codex, como mucho uno de Claude, y siempre después. `claude*` marca la tarea candidata a ese turno de Claude, con el modelo que toque por tamaño (DEC-22). `+revisión` pide una segunda opinión de otro modelo (Claude Opus 5.5, si escribió Codex), y cuenta como un turno de Claude. Ver [agentes disponibles](agentes/agentes-disponibles.md).
+- *Agente sugerido*: **`codex` por defecto (DEC-27)**: el ciclo es dos de Codex, uno de Claude y uno de Copilot. `claude*` marca la tarea candidata al turno de Claude, con el modelo que toque por tamaño (DEC-22). `+revisión` pide una segunda opinión de otro modelo (Claude Opus 5.5, si escribió Codex), y cuenta como un turno de Claude. Ver [agentes disponibles](agentes/agentes-disponibles.md).
 - *Skills*: las que el encargo debe pedir; las marcadas «a demanda» van por su ruta en `.agents/skills-a-demanda/`.
 - *Puerta*: `requiere-plan` o `requiere-revisión` del humano (DEC-12); «—» si no tiene.
 - Una tarea solo puede lanzarse cuando todas sus dependencias están **fusionadas**, no solo hechas.
