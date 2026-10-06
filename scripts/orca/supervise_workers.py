@@ -3,7 +3,7 @@
 
 Cada pocos segundos repasa la terminal de cada trabajador vivo:
 
-- si el encargo se quedó escrito sin enviar (pasa con Claude y con Copilot), envía el Enter;
+- si el encargo se quedó escrito sin enviar (el borrador de Claude o el «[Paste #» de Copilot), envía el Enter;
 - si Copilot pide permiso para rutas del proyecto o de su worktree, lo concede solo para esa sesión;
 - si alguien pide otra cosa, o lleva demasiados minutos con la pantalla quieta, avisa y termina.
 
@@ -23,6 +23,7 @@ import time
 CHECK_INTERVAL_SECONDS = 20
 MAXIMUM_ENTER_ATTEMPTS = 3
 COPILOT_PERMISSION_QUESTION = 'Do you want to allow this?'
+COPILOT_PARKED_PASTE = '[Paste #'
 CLAUDE_PERMISSION_MARKERS = (
     'Do you want to proceed',
     'Allow this read',
@@ -54,14 +55,18 @@ def list_live_workers():
     live_workers = []
     for worker in workers:
         is_active = worker.get('terminalState') == 'active'
-        is_in_progress = worker.get('projection', {}).get('outcome') == 'in_progress'
+        projection = worker.get('projection') or {}
+        is_in_progress = projection.get('outcome') == 'in_progress'
         if is_active and is_in_progress:
             live_workers.append(worker)
     return live_workers
 
 
 def worker_description(worker):
-    agent = worker.get('projection', {}).get('provider', {}).get('id')
+    # Orca deja vacío el proveedor de algunos trabajadores (visto con Copilot).
+    projection = worker.get('projection') or {}
+    provider = projection.get('provider') or {}
+    agent = provider.get('id') or 'agente'
     return f"{worker.get('dispatchId')} ({agent})"
 
 
@@ -130,8 +135,14 @@ def answer_copilot_permission(worker, text, allowed_roots):
     return None
 
 
+def has_unsent_assignment(terminal):
+    if terminal.get('draft'):
+        return True
+    return COPILOT_PARKED_PASTE in screen_text(terminal)
+
+
 def submit_pending_draft(worker, terminal, enter_attempts):
-    if not terminal.get('draft'):
+    if not has_unsent_assignment(terminal):
         return None
     dispatch = worker['dispatchId']
     enter_attempts[dispatch] = enter_attempts.get(dispatch, 0) + 1
@@ -161,7 +172,7 @@ def supervise_worker(worker, repository_root, screen_history, enter_attempts, id
         return None
     terminal = read_terminal(handle)
     draft_problem = submit_pending_draft(worker, terminal, enter_attempts)
-    if draft_problem or terminal.get('draft'):
+    if draft_problem or has_unsent_assignment(terminal):
         return draft_problem
     text = screen_text(terminal)
     allowed_roots = (repository_root, worktree_path(worker))
