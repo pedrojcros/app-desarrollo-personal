@@ -44,27 +44,36 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 *Actualizado: 2026-10-06.*
 
-- **Fase: ejecución, a punto de empezar.** El plan está **aprobado** (2026-10-06): 13 tareas en 6 olas para la versión 1, con Next.js, Supabase y Vercel (ADR-0001 a 0004). La planificación entra en `develop` con un PR.
-- Estado del plan: `APROBADO` (ver [05-plan](05-plan.md)).
+- **Fase: replanificación para el móvil.** El plan vuelve a `EN BORRADOR` (DEC-24): una app con Expo para Android y la web, 15 tareas en 6 olas y P02 (el estilo, con prototipos y con el humano). Está en la rama `docs/replanificacion-expo`; su PR se abre cuando se fusione el #3 (skills móviles, DEC-23), porque no se apilan PR.
+- Estado del plan: `EN BORRADOR` (ver [05-plan](05-plan.md)). Le faltan DEC-26 (Docker) y la aprobación del humano; P02 solo bloquea T14.
 - Agentes: Claude, Codex y Copilot habilitados y probados con Orca (DEC-04).
+
 
 ## Lo siguiente
 
-1. Abrir una sesión **nueva** de Claude Code en el proyecto, con Opus 5.5 y el esfuerzo más alto, y lanzar `/ejecutar-plan`. Empieza por la ola 0: T01, el esqueleto.
-2. Antes de la ola 4 (T12), H02: el humano crea las cuentas de Vercel y Supabase con la guía del orquestador.
+1. El humano fusiona el PR #3 y el arquitecto abre el PR de `docs/replanificacion-expo` contra `develop`.
+2. El humano contesta DEC-26 (Docker: opción A o B).
+3. P02 con `/arquitecto`: el humano trae ejemplos de estilos y se itera con prototipos hasta elegir uno.
+4. El humano aprueba el plan y lanza `/ejecutar-plan` en una sesión nueva. Puede empezar antes de cerrar P02: solo T14 la espera.
+
 
 ## Pendiente del humano
 
-- Lanzar `/ejecutar-plan` cuando quiera.
-- Revisar T01 y T02 cuando el orquestador lo pida (puertas `requiere-revisión`).
-- H02: crear las cuentas de Vercel y Supabase antes de la ola 4.
+- Fusionar el PR #3: `gh pr merge 3 --merge --delete-branch`.
+- Contestar DEC-26 (Docker: A o B).
+- P02: buscar ejemplos visuales de estilos que le gusten.
+- Aprobar el plan replanificado.
+- H05: instalar Expo Go en el móvil.
+- H02: crear las cuentas de Vercel, Supabase y Expo antes de la ola 4.
+- Si se aprueba DEC-26, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
 - El ticket `ADP-1` es de prueba y se puede borrar a mano.
+
 
 ## Cómo se trabaja aquí
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-24**.
+  chat. Siguiente número libre: **DEC-27**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -75,6 +84,9 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 - **Codex lanzado por Orca no recibía encargos**: sus animaciones impiden que Orca lo vea «listo». Arreglo: `tui.animations = false`. Ver [agentes/orca](agentes/orca.md#trampas-conocidas).
 - **Codex y Copilot necesitan ajustes para trabajar solos** (sandbox, permisos, carpeta de confianza), y **a Copilot se le puede quedar el encargo aparcado**: todo, con su arreglo, en [agentes/orca](agentes/orca.md#trampas-conocidas).
 - **`git push` por SSH falla** en las sesiones de los agentes (no pueden pedir la frase de la clave). Resuelto: el remoto va por HTTPS con `gh` (H01).
+- **`sudo` no funciona con `!` en Claude Code**: no hay terminal para pedir la contraseña. Los comandos con `sudo`, en una terminal normal de Orca.
+- **SDK de Android**: `sdkmanager` (cmdline-tools 23) escribe los paquetes con `/`, pero `avdmanager` todavía los pide con `;`.
+- **`docker run` con una imagen propia que no existe la busca en Docker Hub**, donde podría haber otra con el mismo nombre: siempre `--pull never`.
 
 ## Lo que no viaja con el repositorio
 
@@ -84,12 +96,27 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 | Sesiones de los agentes y de `gh` | Configuración de cada máquina | Iniciar sesión otra vez |
 | Configuración de Orca y del MCP de Jira | Cada máquina | Repetir [la comprobación](agentes/jira.md#comprobación-en-un-equipo-nuevo) |
 | Herramientas (lenguajes, Docker, Orca) | El sistema | Instalar las versiones de `AGENTS.md` |
+| Imágenes de Docker y, si DEC-26 queda en B, `~/Android/Sdk` (`adb` y el emulador) | El sistema | Reconstruirlas con los Dockerfiles del repositorio (T01 y T15) |
 
 ---
 
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Replanificación para el móvil (DEC-24 y DEC-25) y Docker (DEC-26, abierta)
+
+Con la opción B (DEC-24), el arquitecto rehízo la arquitectura
+([ADR-0005](adr/0005-stack-expo.md)), los requisitos, los riesgos y el
+[plan](05-plan.md), que vuelve a `EN BORRADOR`: 15 tareas, con dos nuevas
+(T14, el sistema visual, y T15, el emulador y el navegador en Docker), y P02,
+el bucle de estilo con el humano. Antes de irse al gimnasio, el humano aprobó
+dos dependencias y decidió que la versión 1 necesita internet y que el estilo
+se busca con prototipos antes de programarlo (DEC-25). Después pidió Docker
+«en el 100 % de lo que se pueda» (DEC-26): se paró la instalación local del
+SDK de Android y se probó el emulador dentro de Docker. Funciona, y Orca lo ve
+si en el ordenador quedan `adb` y el programa del emulador (lo único que queda
+de la instalación local: 884 MB en `~/Android`).
 
 ### 2026-10-06 — Skills móviles, navegador y herramientas (DEC-23)
 

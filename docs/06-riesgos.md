@@ -34,11 +34,11 @@ Identificador, descripción, probabilidad, impacto, **mitigación** (qué se hac
 - **Mitigación:** trabajadores con Sonnet 5.5; Opus solo para decidir; repartir entre Claude, Codex y Copilot (DEC-04).
 - **Contingencia:** bajar el paralelismo y esperar a que se renueve la cuota; el plan no depende de un agente concreto.
 
-### R-05 — Supabase o Vercel cambian o recortan sus planes gratuitos
+### R-05 — Supabase, Vercel o Expo cambian o recortan sus planes gratuitos
 
 - **Probabilidad:** BAJA · **Impacto:** ALTO
 - **Mitigación:** PostgreSQL estándar y exportación propia (RNF-04); nada específico de un proveedor fuera de `src/data` y la configuración.
-- **Contingencia:** mover la base de datos a otro PostgreSQL gratuito y la aplicación a otro alojamiento de Next.js.
+- **Contingencia:** mover la base de datos a otro PostgreSQL gratuito, la web a otro alojamiento estático, y compilar el APK en local con el SDK de Android en vez de con EAS.
 
 ### R-06 — Se pierde el hilo entre sesiones y agentes
 
@@ -78,17 +78,41 @@ Identificador, descripción, probabilidad, impacto, **mitigación** (qué se hac
 - **Mitigación:** orquestador autónomo por niveles (DEC-12); decisiones en lotes con valores por defecto (DEC-14); puertas solo donde el humano las pida.
 - **Contingencia:** el orquestador sigue con todo lo que no depende del humano y deja las preguntas apuntadas.
 
-### R-12 — El código de Next.js es difícil de revisar para una persona
+### R-12 — El código de React Native es difícil de revisar para una persona
 
 - **Probabilidad:** MEDIA · **Impacto:** MEDIO
-- **Mitigación:** regla de legibilidad; lógica en `src/domain` sin framework; uso acotado de Next.js (ver [04-arquitectura](04-arquitectura.md#estructura-interna)).
+- **Mitigación:** regla de legibilidad y skill `codigo-legible`; lógica en `src/domain` sin framework; pantallas finas (ver [04-arquitectura](04-arquitectura.md#estructura-interna)).
 - **Contingencia:** encargo de simplificación de la parte afectada.
+
+### R-13 — Se agotan las compilaciones gratuitas de EAS o la cola es lenta
+
+- **Probabilidad:** MEDIA · **Impacto:** BAJO
+- **Mitigación:** desarrollar con Expo Go y el emulador; compilar el APK con EAS **solo al publicar** una versión (15 compilaciones Android gratis al mes).
+- **Contingencia:** compilar en local con el SDK de Android (`npx expo run:android` o Gradle).
+
+### R-14 — Una actualización del SDK de Expo rompe dependencias
+
+- **Probabilidad:** MEDIA · **Impacto:** MEDIO
+- **Mitigación:** SDK fijado (56); actualizar solo con un encargo propio y la skill `expo-upgrade`; instalar paquetes con `npx expo install`, que elige versiones compatibles.
+- **Contingencia:** volver a la versión anterior del SDK desde git y repetir la actualización por partes.
+
+### R-15 — La versión web se queda corta para el uso en el ordenador
+
+- **Probabilidad:** MEDIA · **Impacto:** BAJO
+- **Mitigación:** diseño adaptable desde el sistema visual (T14); probar la web con el MCP de Chrome en cada ola.
+- **Contingencia:** ajustar las pantallas de escritorio; si no basta, reconsiderar una web propia (opción C de la ADR-0005).
+
+### R-16 — Sin servidor propio, un fallo en RLS expone datos
+
+- **Probabilidad:** BAJA · **Impacto:** ALTO
+- **Mitigación:** RLS en todas las tablas desde T02, tests con dos usuarios y revisión cruzada de T02; la clave `service_role` nunca en la app.
+- **Contingencia:** cerrar el acceso desactivando la clave pública en Supabase, corregir la política y rotar las claves.
 
 ## Deuda técnica aceptada
 
 | Id | Qué | Por qué se acepta | Cuándo se paga |
 |---|---|---|---|
-| D-01 | Sin modo sin conexión | No hace falta en el ordenador | Si el móvil lo necesita (versión 2) |
-| D-02 | Zona horaria fija (Europe/Madrid) | Un solo usuario en un sitio | Si el dueño cambia de zona horaria |
+| D-01 | Sin modo sin conexión (solo la caché de TanStack Query) | Simplifica la versión 1 (confirmado por el humano, DEC-25) | Si el uso diario en el móvil lo pide |
+| D-02 | Zona horaria del dispositivo, sin gestión de viajes | Un solo usuario en un sitio | Si el dueño viaja y le descoloca el historial |
 | D-03 | Sin borrado definitivo | Protege el historial (RN-18) | Si el dueño lo pide |
 | D-04 | Sin protección de ramas en GitHub | El plan gratuito con repositorio privado puede no ofrecerla; la regla está en `AGENTS.md` | Si se pasa a un plan que la incluya |

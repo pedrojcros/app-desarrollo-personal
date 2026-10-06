@@ -104,7 +104,7 @@ Marcas: **[día 1]** entra en el esqueleto · **[cuando toque]** se añade al ne
 - **[día 1]** Qué hace «terminado» a la primera versión, medible.
 - **[según proyecto]** Si no hay fecha límite, **ponerse una**: sin ella no hay freno natural al alcance. *(Descartado en este proyecto, DEC-07: sin fecha límite; el freno es la lista de fuera de alcance.)*
 
-## Recorrido en este proyecto (sesión 6, 2026-10-06, DEC-20)
+## Recorrido en este proyecto (sesión 6, 2026-10-06, DEC-20; revisado para el móvil, DEC-24 y DEC-26)
 
 | Punto | Resultado | Motivo o dónde queda |
 |---|---|---|
@@ -115,27 +115,27 @@ Marcas: **[día 1]** entra en el esqueleto · **[cuando toque]** se añade al ne
 | Legibilidad | Aceptado | `AGENTS.md` |
 | Cobertura mínima en el módulo central | Aceptado | `src/domain` en T03 |
 | Pruebas de carga | Descartado | Solo la prueba de RNF-01 con datos sintéticos (T13) |
-| Arranque con un comando, variables de entorno, versión de la plataforma fijada | Aceptado | T01 |
+| Arranque con un comando, variables de entorno, versión de la plataforma fijada | Aceptado | T01, con todo en Docker (DEC-26) |
 | Entornos local, pruebas y producción | Ajustado | Dos proyectos Supabase gratis (`pruebas` y `produccion`), DEC-21 |
 | Migraciones versionadas, convención de nombres | Aceptado | `AGENTS.md`; T02 |
-| Fechas y zona horaria | Ajustado | Fechas de calendario en Europe/Madrid, no UTC ([ADR-0003](../adr/0003-ocurrencias-calculadas.md)) |
+| Fechas y zona horaria | Ajustado | Fechas de calendario con la zona horaria del dispositivo (Europe/Madrid para el dueño), no UTC ([ADR-0003](../adr/0003-ocurrencias-calculadas.md)) |
 | Copias de seguridad y restauración probada | Aceptado | RNF-04; T12 |
 | Datos semilla | Aceptado | Script de datos sintéticos (T13) |
-| Contrato de API antes que el código | Ajustado | No hay API pública: el contrato son los tipos del dominio y las firmas de las acciones, que escribe el orquestador en cada encargo |
+| Contrato de API antes que el código | Ajustado | No hay API pública: el contrato son los tipos del dominio y las firmas de las funciones y hooks de `src/data`, que escribe el orquestador en cada encargo |
 | Formato único de errores, una sola capa de acceso a datos | Aceptado | `AGENTS.md` (Convenciones) |
 | Paginación | Cuando toque | Historial y pendientes, si crecen |
 | Cero secretos y escaneo en CI, autenticación en ADR, validación en el borde, contraseñas | Aceptado | ADR-0004; Supabase Auth guarda las contraseñas |
 | Dependencias aprobadas, lockfile, revisión de vulnerabilidades | Aceptado | `AGENTS.md`; T01 |
-| Cabeceras de seguridad | Aceptado | T01 |
+| Cabeceras de seguridad | Ajustado | Solo aplican a la web: van en la configuración de Vercel (T12) |
 | Datos personales | Aceptado | Solo los del dueño (RNF-05) |
 | Límite de peticiones | Descartado | Un solo usuario y sin endpoints públicos; Supabase Auth ya lo limita |
-| Endpoint de salud, registros estructurados | Aceptado | T01 (`/api/health`) |
+| Endpoint de salud, registros estructurados | Ajustado | Sin servidor propio no hay endpoint de salud (DEC-24); registros solo en desarrollo ([04-arquitectura](../04-arquitectura.md#conceptos-transversales)) |
 | Métricas, alertas, seguimiento de errores | Descartado en la v1 | Uso personal |
-| Despliegue repetible y vuelta atrás | Aceptado | Vercel y migraciones por la integración continua (T12) |
-| Móvil primero | Ajustado | Escritorio en la v1 (DEC-19), sin romperse en pantallas pequeñas |
+| Despliegue repetible y vuelta atrás | Aceptado | Vercel, migraciones por la integración continua y APK con EAS (T12, H04) |
+| Móvil primero | Aceptado | Android primero y también en la web (DEC-24), desde 360 dp de ancho (RNF-08) |
 | Accesibilidad básica | Aceptado | RNF-03 |
 | Internacionalización | Descartado | Solo español |
-| Nada externo en el camino crítico | Ajustado | Supabase y Vercel lo están por decisión (DEC-16); R-05 y R-07 |
+| Nada externo en el camino crítico | Ajustado | Supabase lo está por decisión (DEC-24); Vercel solo sirve la web y EAS solo se usa al publicar; R-05, R-07 y R-13 |
 | Documentación | Aceptado | Ya existe |
 | Agentes disponibles probados | Aceptado | Claude, Codex y Copilot probados (P01) |
 | Jira | Aceptado | Comprobado (`ADP`) |

@@ -8,7 +8,7 @@ Reglas comunes para **cualquier agente de código** que trabaje en este reposito
 
 ## Qué es este proyecto
 
-Una aplicación web **personal** de tareas y hábitos en la que todo se marca como **hecho o no hecho** y queda un historial. Tiene un único usuario, su autor, que la usará a diario: es un proyecto real. Detalle en [docs/01-vision-y-alcance.md](docs/01-vision-y-alcance.md).
+Una aplicación **personal** de tareas y hábitos, **para el móvil Android y también en el navegador**, en la que todo se marca como **hecho o no hecho** y queda un historial. Tiene un único usuario, su autor, que la usará a diario: es un proyecto real. Detalle en [docs/01-vision-y-alcance.md](docs/01-vision-y-alcance.md).
 
 ## Si eres un trabajador
 
@@ -37,7 +37,7 @@ Valen por defecto, y el arquitecto las ajusta en la planificación:
 6. **Nada que cueste dinero** (servicios, planes o APIs de pago) sin aprobación: el proyecto es de coste cero.
 7. **Nunca tocar la base de datos de producción**: ni migraciones, ni datos, ni sus claves. El desarrollo y los tests van contra el Supabase local.
 8. **No cambiar cómo se guardan las fechas ni el motor de ocurrencias** ([ADR-0003](docs/adr/0003-ocurrencias-calculadas.md)) sin aprobación.
-9. **No guardar datos de otras personas** ni enviar los del dueño a servicios distintos de los de la [ADR-0001](docs/adr/0001-stack.md).
+9. **No guardar datos de otras personas** ni enviar los del dueño a servicios distintos de los de la [ADR-0005](docs/adr/0005-stack-expo.md).
 10. **No enviar nada del proyecto a terceros** fuera de los servicios del stack: ni comentarios a los autores de una skill (`submit-expo-feedback` y similares), ni telemetría, ni código o datos pegados en servicios externos.
 
 ## Legibilidad: regla obligatoria
@@ -58,22 +58,27 @@ Quedan fuera solo los ficheros generados por herramientas, que no se tocan a man
 
 ## Stack
 
-Decidido en [ADR-0001](docs/adr/0001-stack.md). Se fija la **versión mayor** (los parches se actualizan sin preguntar). Donde pone «T01», la tarea T01 escribe la versión mayor estable del momento y desde entonces no se cambia sin aprobación.
+Decidido en [ADR-0005](docs/adr/0005-stack-expo.md) (sustituye a la ADR-0001). Se fija la **versión mayor** (los parches se actualizan sin preguntar). Donde pone «T01», la tarea T01 escribe la versión del momento y desde entonces no se cambia sin aprobación.
 
 | Pieza | Versión |
 |---|---|
 | Node.js | 24 (LTS), fijada en `.nvmrc` |
+| Expo SDK (con React Native y React que trae) | 56 |
+| Expo Router | La que trae el SDK |
 | TypeScript (modo `strict`) | T01 |
-| Next.js (App Router) | T01 |
-| React | La que pida Next.js |
-| Tailwind CSS | T01 |
-| `@supabase/supabase-js` y `@supabase/ssr` | T01 |
+| NativeWind y Tailwind CSS (la versión que pida NativeWind) | T01 |
+| React Native Reusables (componentes copiados en `src/components/ui`, sus `@rn-primitives/*` y `lucide-react-native`) | T01 |
+| `@supabase/supabase-js` | T01 |
 | Supabase CLI (`supabase`, dependencia de desarrollo) | T01 |
+| TanStack Query (`@tanstack/react-query`) | T01 |
 | Zod | T01 |
-| Vitest y Playwright | T01 |
+| `@react-native-community/datetimepicker` (selector de fecha y hora en Android; DEC-25) | T01 |
+| Lo que pida la guía oficial de Supabase para Expo para guardar la sesión (DEC-25) | T01 |
+| Jest (`jest-expo`) y React Native Testing Library | T01 |
+| Maestro (herramienta del sistema, no dependencia) | T01 |
 | ESLint y Prettier | T01 |
 
-**Dependencias aprobadas: exactamente las de esta tabla** (más las que ellas instalen por su cuenta). El escaneo de secretos (gitleaks) corre en la integración continua, no es una dependencia. Cualquier otra necesita aprobación.
+**Dependencias aprobadas: exactamente las de esta tabla**, más las que ellas instalen por su cuenta y los paquetes `expo-*` que el SDK necesite para lo que pide el encargo (instalados con `npx expo install`, que elige la versión compatible). Cualquier otra necesita aprobación. El escaneo de secretos (gitleaks) corre en la integración continua, no es una dependencia.
 
 ## Estructura del repositorio
 
@@ -84,31 +89,34 @@ README.md      para humanos: qué es y cómo arrancar
 docs/          toda la documentación; índice en docs/README.md
 .agents/skills/ skills automáticas de los agentes (Claude las lee por el enlace .claude/skills)
 .agents/skills-a-demanda/ skills que solo se usan si el encargo las pide por su ruta
-src/domain/    lógica pura: fechas, ocurrencias y reglas de cada vista; sin framework
-src/data/      la única capa que habla con Supabase; acciones de servidor
-src/app/       rutas y pantallas (Next.js App Router)
-src/components/ componentes de interfaz compartidos
+src/domain/    lógica pura: fechas, ocurrencias y reglas de cada vista; sin React ni Supabase
+src/data/      la única capa que habla con Supabase: lecturas, escrituras y hooks de TanStack Query
+src/app/       rutas y pantallas (Expo Router)
+src/components/ componentes compartidos (los de React Native Reusables, en src/components/ui)
+src/theme/     tokens del sistema visual
 supabase/      configuración local y migraciones
-tests/e2e/     pruebas de extremo a extremo
+e2e/           flujos de Maestro (extremo a extremo)
 ```
 
 ## Comandos
 
 Los crea la tarea T01; si cambian, se actualizan aquí.
 
+**Todo se ejecuta dentro de Docker** siempre que se pueda (DEC-26): T01 y T15 dejan estos comandos envueltos en contenedores y los reescriben aquí. Nada del proyecto se instala en el sistema del humano.
+
 ```
-npm install                 instalar dependencias
-npx supabase start          base de datos local (necesita Docker)
-npm run dev                 la aplicación en local
-npm run lint                linter
-npm run typecheck           comprobación de tipos
-npm run test                pruebas unitarias
-npm run test:integration    pruebas contra la base de datos local
-npm run test:e2e            pruebas de extremo a extremo
-npm run build               compilación de producción
+npm install                       instalar dependencias
+npx supabase start                base de datos local (necesita Docker)
+npx expo start                    la app en desarrollo (Expo Go en el móvil, emulador o web)
+npm run lint                      linter
+npm run typecheck                 comprobación de tipos
+npm run test                      pruebas unitarias y de componentes
+npm run test:integration          pruebas contra la base de datos local
+npm run test:e2e                  flujos de Maestro (necesita un emulador o un móvil conectado)
+npx expo export --platform web    compilación de la web
 ```
 
-Antes de dar un encargo por terminado, los tests de la parte que has tocado tienen que pasar, y la integración continua lo repite en cada push y pull request.
+Antes de dar un encargo por terminado, los tests de la parte que has tocado tienen que pasar, y la integración continua lo repite en cada push y pull request. Las compilaciones de Android con EAS **no** se lanzan desde un encargo: solo al publicar una versión.
 
 ## Flujo de git
 
@@ -125,19 +133,21 @@ Antes de dar un encargo por terminado, los tests de la parte que has tocado tien
 ## Convenciones de código
 
 - **Idioma** (DEC-06): nombres y mensajes de error técnicos en inglés; comentarios, commits y documentación en español. Los textos que ve el usuario, en español. Los nombres del dominio, según el glosario de [docs/04-arquitectura.md](docs/04-arquitectura.md#glosario) (`habit`, `occurrence`, `mark`, `task`, `category`, `inbox`...).
-- **Capas:** `src/domain` no importa nada de Next.js ni de Supabase; solo `src/data` habla con Supabase; las pantallas usan `src/data`.
-- **Next.js acotado:** componentes de servidor para leer, acciones de servidor para escribir, componentes de cliente solo donde hay interacción. Sin rutas de API salvo `/api/health`.
-- **Errores:** las acciones devuelven `{ ok: true, value }` o `{ ok: false, error: { code, message } }`. La interfaz nunca muestra un error técnico.
-- **Validación:** Zod en la entrada de cada acción de servidor.
+- **Capas:** `src/domain` no importa nada de React, React Native, Expo ni Supabase; solo `src/data` habla con Supabase; las pantallas usan los hooks de `src/data`.
+- **Pantallas finas:** una pantalla compone componentes y llama a hooks; las reglas viven en `src/domain`.
+- **Interfaz:** componentes de React Native Reusables (`src/components/ui`) y clases de NativeWind con los tokens de `src/theme`; nada de colores, tamaños ni tipografías sueltos.
+- **Errores:** las funciones de `src/data` devuelven `{ ok: true, value }` o `{ ok: false, error: { code, message } }`. La interfaz nunca muestra un error técnico.
+- **Validación:** Zod en `src/data`, antes de cada escritura.
+- **Claves:** en la app solo la URL y la clave pública de Supabase (`EXPO_PUBLIC_*`). La clave `service_role` nunca va en la app.
 - **Base de datos:** tablas y columnas en inglés, `snake_case`, tablas en plural. Toda tabla lleva `user_id` y políticas RLS. Migraciones numeradas en `supabase/migrations/`; una migración aplicada no se edita: se crea otra.
-- **Fechas** ([ADR-0003](docs/adr/0003-ocurrencias-calculadas.md)): fechas de calendario `YYYY-MM-DD` en Europe/Madrid; instantes en UTC.
+- **Fechas** ([ADR-0003](docs/adr/0003-ocurrencias-calculadas.md)): fechas de calendario `YYYY-MM-DD` con la zona horaria del dispositivo; instantes en UTC.
 
 ## Tests
 
 - Toda funcionalidad nueva lleva tests; todo bug corregido lleva un test que lo habría detectado.
 - La lógica de negocio pura se prueba con tests unitarios, sin framework ni base de datos.
-- La integración se prueba contra las piezas reales (la base de datos real, no un sustituto en memoria). Cómo se levantan esas piezas se concreta al elegir el stack.
-- Herramientas: Vitest (unitarias e integración) y Playwright (extremo a extremo). `src/domain` exige tests exhaustivos; las políticas RLS se prueban con dos usuarios. Detalle en [docs/04-arquitectura.md](docs/04-arquitectura.md#estrategia-de-pruebas).
+- La integración se prueba contra las piezas reales: el Supabase local en Docker, nunca un sustituto en memoria.
+- Herramientas: Jest (`jest-expo`) para unitarias, componentes (con React Native Testing Library) e integración, y Maestro para los caminos críticos en el emulador. `src/domain` exige tests exhaustivos; las políticas RLS se prueban con dos usuarios. Detalle en [docs/04-arquitectura.md](docs/04-arquitectura.md#estrategia-de-pruebas).
 
 ## Skills del proyecto
 

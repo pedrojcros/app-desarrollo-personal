@@ -202,13 +202,13 @@ Cómo de bien tiene que hacerlo. Cada uno con **un número**, no con adjetivos.
 
 | Id | Categoría | Requisito | Cómo se comprueba |
 |---|---|---|---|
-| RNF-01 | Rendimiento | Con un año de datos (50 hábitos, 2.000 tareas, 20.000 ocurrencias), la vista Hoy se muestra en menos de 1 segundo y marcar algo se refleja en pantalla en menos de 300 ms | Test con datos sintéticos generados por un script |
+| RNF-01 | Rendimiento | Con un año de datos (50 hábitos, 2.000 tareas, 20.000 ocurrencias), la vista Hoy se muestra en menos de 1 segundo en un móvil Android de gama media, y marcar algo se refleja en pantalla en menos de 300 ms | Test con datos sintéticos generados por un script |
 | RNF-02 | Seguridad | Sin iniciar sesión no se puede leer ni cambiar ningún dato: solo accede el dueño. Ningún secreto en el repositorio | Test de acceso sin sesión; escaneo de secretos en la integración continua |
-| RNF-03 | Accesibilidad | Contraste AA, todo se puede usar con teclado y los formularios tienen etiquetas | Auditoría automática sin errores graves |
+| RNF-03 | Accesibilidad | Contraste AA, etiquetas de accesibilidad en todo lo que se pulsa, zonas de toque de al menos 44 puntos y, en la web, todo usable con teclado | Revisión con `better-accessibility`; en la web, auditoría automática sin errores graves |
 | RNF-04 | Datos | Sin objetivo de disponibilidad (uso personal), pero **ningún dato se pierde**: copia exportable y una restauración probada | Exportar y restaurar una vez antes del uso diario |
 | RNF-05 | Privacidad | Solo hay datos del dueño, y no salen a terceros salvo el proveedor de alojamiento y, en la versión 2, Google Calendar con su permiso | Revisión de servicios en la ADR del stack |
 | RNF-06 | Rapidez de uso | Desde Hoy, marcar algo cuesta **una** acción; crear una tarea con solo el nombre, escribirlo y confirmar | Prueba de extremo a extremo que cuenta las acciones |
-| RNF-07 | Fechas | Zona horaria Europe/Madrid; los cambios de hora no duplican ni pierden ocurrencias, ni mueven sus horas | Tests en los días de cambio de hora |
-| RNF-08 | Móvil | Se usa sin desplazamiento horizontal desde 360 px de ancho *(versión 2, DEC-19)* | Prueba de extremo a extremo a 360 px |
+| RNF-07 | Fechas | Zona horaria del dispositivo (para el dueño, Europe/Madrid); los cambios de hora no duplican ni pierden ocurrencias, ni mueven sus horas | Tests en los días de cambio de hora |
+| RNF-08 | Móvil | Funciona instalada en las versiones de Android que soporta el SDK de Expo fijado, en pantallas desde 360 dp de ancho; la misma app se usa en el navegador del ordenador sin romperse *(versión 1, DEC-24)* | Flujos de Maestro en el emulador; prueba de la web con el MCP de Chrome |
 
 Si un requisito no funcional no tiene número, todavía es una intención.
