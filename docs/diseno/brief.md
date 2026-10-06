@@ -7,7 +7,7 @@ Lo leen los subagentes que generan prototipos. Cada prototipo tiene además su p
 - Tareas y hábitos personales de un estudiante. Todo termina **hecho** o **no hecho**, y queda un historial. Android primero; también se usa en el navegador del ordenador.
 - **Hábitos:** se repiten (a diario, ciertos días de la semana, cada N días o cada mes) y tienen una **franja** (mañana, tarde o noche) o una **hora**.
 - **Tareas:** de una sola vez, con fecha y hora opcionales. Sin categoría van a la **Bandeja de entrada**.
-- **Categorías:** Universidad, Salud, Personal y Casa.
+- **Categorías**, cada una con su icono y su color, y con **secciones** opcionales dentro (DEC-31): Lista de la compra (Mercadona y Lidl), Universidad (Redes y Bases de datos), Salud, Personal y Casa. Una tarea va en la categoría o en una de sus secciones.
 - **Destinos de la navegación (5):** Hoy, Bandeja, Categorías, Pendientes (de días anteriores, con un contador) e Historial. Además, una forma clara de **crear** una tarea o un hábito.
 
 ## La pantalla: Hoy

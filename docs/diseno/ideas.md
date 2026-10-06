@@ -2,6 +2,15 @@
 
 Lo que el humano dice que le gusta y lo que no, ronda a ronda. Es la memoria del bucle, porque las conversaciones se borran. Lo más reciente, arriba.
 
+## Ronda 3 (2026-10-06)
+
+- **Añadir rápido: el de B** (el nombre arriba en grande con el botón de enviar; debajo, Tarea/Hábito con «Más», los atajos de fecha y la categoría).
+- **Hoy:** la fecha pequeña arriba (B) y los 8 cuadritos de progreso junto a «2 de 8» (C). El ↻ de los hábitos (A), no.
+- **Desplegables hacia arriba**: la categoría y todo lo que se elige se abre hacia arriba, porque abajo está el teclado.
+- **Categorías que se despliegan y se recogen, con icono.**
+- **Nombres: categoría > sección** (DEC-31): «Lista de la compra» es la categoría y «Mercadona», una sección. Las tareas van en la categoría o en una sección.
+- Sigue la idea de una sola estructura con tres temas: blanco (A), negro (B) y tercer estilo (C).
+
 ## Ronda 2 (2026-10-06)
 
 - **Listas sin cajitas**, como el P5 de la ronda 1: filas sueltas, con una línea que las separa y sus botones de sí y no.
