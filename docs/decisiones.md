@@ -30,27 +30,6 @@ Cuando una decisión se cierra:
 
 *Dónde acaba:* `agentes/agentes-disponibles.md`.
 
-### DEC-21 — Propuestas de la tanda de sesiones 3 a 7 (esperan un «ok»)
-
-Ya están escritas en los documentos como valor por defecto (DEC-14). Valen cuando el humano conteste.
-
-1. **Login** de la versión 1 con email y contraseña; Google llega con Calendar en la versión 2 (ADR-0004).
-2. **ADR-0003:** las ocurrencias se calculan, no se guardan; solo se guardan las marcas, y los cambios de frecuencia quedan como versiones.
-3. **Dos bases de datos Supabase gratis:** `produccion` (para `main`) y `pruebas` (para `develop` y los PR). Las migraciones llegan a producción solo cuando el humano publica en `main`.
-4. **Puertas por defecto:** T01 (esqueleto) y T02 (base de datos y login) con `requiere-revisión` del humano; el resto, sin puerta.
-5. **Modelos:** trabajadores con Sonnet 5.5; Opus 5.5 al máximo solo para el orquestador y las consultas de diseño.
-6. **Codex y Copilot deshabilitados** hasta que funcionen (tarea P01); todo el trabajo, con trabajadores Claude.
-7. **Push a GitHub:** cambiar el remoto a HTTPS con la sesión de `gh`, porque por SSH falla en las sesiones de los agentes.
-8. **Comando `/idea`** para apuntar ideas en el [buzón](buzon.md) desde cualquier sesión.
-9. **Copia de seguridad:** exportación semanal automática de los datos (GitHub Actions, repositorio privado).
-10. **Ajustes para que Codex y Copilot trabajen solos** (resultado de P01; los aplica el arquitecto con tu «ok»):
-    - Codex: `[tui] animations = false` en `~/.codex/config.toml` y en `~/.config/orca/codex-runtime-home/home/config.toml`.
-    - Codex, argumentos por defecto en Orca: `--dangerously-bypass-approvals-and-sandbox`. Sin pedir permisos y sin sandbox, que es como Orca los lanza normalmente. Alternativa más estricta, sin probar: sandbox de escritura en la carpeta de trabajo con red local permitida.
-    - Copilot, argumentos por defecto en Orca: `--allow-all-tools`; y `~/orca/workspaces` en `trustedFolders` de `~/.copilot/settings.json`.
-    - Después, una prueba de arranque sin aprobar nada a mano. Si pasa, Codex y Copilot se habilitan y DEC-04 se cierra.
-
-**Respuesta:**
-
 ---
 
 ## Cerradas
@@ -74,5 +53,6 @@ Ya están escritas en los documentos como valor por defecto (DEC-14). Valen cuan
 | DEC-16 | Stack | **Next.js + Supabase en Vercel**, en TypeScript, con los planes gratuitos (ADR-0001). | `04-arquitectura.md`, `adr/0001-stack.md`, `AGENTS.md` (Stack) |
 | DEC-19 | Dónde y qué es la versión 1 | **En internet** (Vercel y Supabase gratis) con inicio de sesión solo para el dueño; **solo ordenador** (se mantiene DEC-09: el móvil, en la versión 2). La versión 1 son las **14 funcionalidades imprescindibles**; las 8 deseables van justo después. | `01-vision-y-alcance.md`, `02-funcionalidades.md`, `05-plan.md` |
 | DEC-20 | Lista de defaults (sesión 6) | Recorrida punto por punto: cada uno aceptado, ajustado o descartado con su motivo. | `agentes/checklist-defaults.md` (Recorrido en este proyecto) |
+| DEC-21 | Propuestas de la tanda de sesiones 3 a 7 | **Aceptadas las diez** (2026-10-06): login con email y contraseña (ADR-0004); ocurrencias calculadas (ADR-0003); Supabase `pruebas` y `produccion`; puertas en T01 y T02; Sonnet para trabajadores y Opus para decidir; Codex y Copilot deshabilitados hasta aplicar sus ajustes; `git push` por HTTPS con `gh`; comando `/idea`; copia semanal; y los ajustes de Codex y Copilot de P01. | ADR-0003, ADR-0004, `05-plan.md`, `agentes/agentes-disponibles.md`, `.claude/commands/idea.md` |
 | DEC-05 | Regla de legibilidad | Se mantiene. Los agentes escriben los nombres del código **siempre en inglés** y legible para humanos. | `AGENTS.md` (Legibilidad) |
 | DEC-06 | Idioma | **Nombres de código y mensajes de error en inglés. Comentarios, commits y documentación en español.** | `AGENTS.md` (Convenciones de código) |

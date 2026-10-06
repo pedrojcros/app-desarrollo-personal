@@ -1,6 +1,6 @@
 # ADR-0004: Acceso de un solo usuario
 
-- **Estado:** Propuesta (DEC-21)
+- **Estado:** Aceptada (DEC-21)
 - **Fecha:** 2026-10-06
 - **Decisores:** el humano, a propuesta del arquitecto
 

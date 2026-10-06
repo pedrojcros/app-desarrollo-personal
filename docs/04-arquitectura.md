@@ -2,7 +2,7 @@
 
 Forma del sistema, tecnología y convenciones. Las decisiones importantes tienen su propia ADR en [adr/](adr/README.md); aquí se enlazan, no se repiten.
 
-*Estado: **BORRADOR** (sesión 5, 2026-10-06). ADR-0003 y ADR-0004 esperan el «ok» del humano (DEC-21).*
+*Estado: aceptada por el humano el 2026-10-06 (DEC-16 y DEC-21).*
 
 ## Restricciones
 

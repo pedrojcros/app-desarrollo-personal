@@ -21,8 +21,8 @@ Cuando la decisión es **cara de cambiar** o va a ser cuestionada: lenguaje y fr
 |---|---|---|
 | [0001](0001-stack.md) | Stack: Next.js, Supabase y Vercel | Aceptada |
 | [0002](0002-ramas-y-fusion.md) | Modelo de ramas y de fusión | Aceptada |
-| [0003](0003-ocurrencias-calculadas.md) | Ocurrencias calculadas y fechas de calendario | Propuesta |
-| [0004](0004-acceso-un-usuario.md) | Acceso de un solo usuario | Propuesta |
+| [0003](0003-ocurrencias-calculadas.md) | Ocurrencias calculadas y fechas de calendario | Aceptada |
+| [0004](0004-acceso-un-usuario.md) | Acceso de un solo usuario | Aceptada |
 
 ### Tomadas, pendientes de registrar
 

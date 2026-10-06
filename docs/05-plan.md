@@ -23,7 +23,7 @@ Todas las casillas marcadas, o el orquestador se niega a ejecutar.
 - [x] Cada funcionalidad IMPRESCINDIBLE está cubierta por al menos una tarea (trazabilidad abajo)
 - [x] Las ADR de las decisiones de arquitectura caras de cambiar están escritas (0001 a 0004)
 - [x] `AGENTS.md` tiene stack, prohibiciones, comandos y convenciones rellenados (ninguna casilla `RELLENAR`)
-- [ ] Las decisiones del humano que bloquean tareas están cerradas en [decisiones](decisiones.md) *(falta el «ok» a DEC-21)*
+- [x] Las decisiones del humano que bloquean tareas están cerradas en [decisiones](decisiones.md) (DEC-21 aceptada el 2026-10-06; DEC-04 no bloquea nada)
 - [x] La [lista de defaults](agentes/checklist-defaults.md) está recorrida: cada punto aceptado, ajustado o descartado con motivo
 - [x] Los riesgos principales tienen mitigación **y** contingencia
 - [x] La primera tarea es el esqueleto, a cargo de un solo agente
@@ -227,7 +227,7 @@ Escritas aquí y en [agentes/orquestador](agentes/orquestador.md#lo-que-nunca-se
 
 | Tarea | Por qué la hace el humano | Qué prepara antes el orquestador |
 |---|---|---|
-| H01 — Que `git push` funcione desde las sesiones de los agentes | Es la configuración de su cuenta (lo puede hacer el arquitecto si el humano dice «ok» a DEC-21) | El comando exacto |
+| H01 — Que `git push` funcione desde las sesiones de los agentes *(hecho el 2026-10-06: remoto por HTTPS con `gh`)* | Es la configuración de su cuenta (lo puede hacer el arquitecto si el humano dice «ok» a DEC-21) | El comando exacto |
 | H02 — Crear la cuenta de Vercel (conectada al repositorio) y los proyectos Supabase `pruebas` y `produccion`; poner las claves en Vercel y en GitHub; crear su usuario en producción | Son sus cuentas y sus secretos | Los pasos y los nombres exactos de las variables (T12) |
 | H03 — Revisar T01 y T02 antes de fusionar | Puerta `requiere-revisión` | Un resumen y el diff |
 | H04 — Publicar la versión 1: `develop` a `main`, etiqueta y migraciones a producción | Solo el humano toca `main` | La comprobación de «Preparar una versión para `main`» |

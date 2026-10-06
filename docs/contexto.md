@@ -45,18 +45,16 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 *Actualizado: 2026-10-06.*
 
 - **Fase: planificación, a punto de aprobar.** Escritas las sesiones 1 a 7: visión, casos de uso, funcionalidades (14 imprescindibles en la versión 1), riesgos, arquitectura (Next.js + Supabase + Vercel, ADR-0001 a 0004), defaults y plan (13 tareas en 6 olas). Todo está en la rama `docs/planificacion`.
-- Estado del plan: `EN BORRADOR` (ver [05-plan](05-plan.md)). Falta el «ok» del humano a DEC-21 y la aprobación (sesión 8).
+- Estado del plan: `EN BORRADOR` (ver [05-plan](05-plan.md)). Falta la aprobación del humano (sesión 8).
 
 ## Lo siguiente
 
-1. El humano contesta DEC-21 (nueve propuestas: «ok» o cambios).
-2. Sesión 8, revisión final: el humano lee el plan y lo aprueba con sus palabras; el arquitecto lo marca `APROBADO` y abre el PR de `docs/planificacion` a `develop`.
-3. H01 (que `git push` funcione) y, cuando lo pida T12, H02 (cuentas de Vercel y Supabase). Después, `/ejecutar-plan`.
+1. Sesión 8, revisión final: el humano lee el plan y lo aprueba con sus palabras; el arquitecto lo marca `APROBADO` y abre el PR de `docs/planificacion` a `develop`.
+2. Cuando lo pida T12, H02 (cuentas de Vercel y Supabase). Después, `/ejecutar-plan`.
 
 ## Pendiente del humano
 
-- Contestar DEC-21 y aprobar el plan.
-- H01: que `git push` funcione desde las sesiones de los agentes (o «ok» al punto 7 de DEC-21 y lo hace el arquitecto).
+- Aprobar el plan (DEC-21 ya está aceptada; `git push` ya funciona).
 - H02: crear las cuentas de Vercel y Supabase antes de la ola 4.
 - **P01 (Codex y Copilot): investigado la noche del 2026-10-06.** Los dos funcionan con Orca, pero necesitan ajustes para trabajar sin que nadie apruebe nada. Aprobar el punto 10 de DEC-21; luego se repite la prueba y se cierra DEC-04.
 - Limpiar lo que dejaron las pruebas de agentes: los worktrees `prueba-arranque-claude`, `prueba-arranque-codex` y `prueba-arranque-copilot` (con un fichero de prueba cada uno y sus ramas locales `pedrojcros/prueba-arranque-*`, sin subir). Las terminales ya están cerradas y no queda ningún trabajador pendiente en Orca.

@@ -1,6 +1,6 @@
 # ADR-0003: Ocurrencias calculadas y fechas de calendario
 
-- **Estado:** Propuesta (DEC-21)
+- **Estado:** Aceptada (DEC-21)
 - **Fecha:** 2026-10-06
 - **Decisores:** el humano, a propuesta del arquitecto
 
