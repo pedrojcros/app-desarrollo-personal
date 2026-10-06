@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 description: Ejecuta el plan aprobado de principio a fin como orquestador, delegando en varios agentes.
 argument-hint: "[fase o tarea desde la que empezar, opcional]"
 ---

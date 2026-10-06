@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 description: Orquestador. Divide el trabajo y lo reparte a Claude, Codex, Copilot u otros agentes mediante Orca.
 argument-hint: "[tarea concreta, opcional]"
 ---

@@ -6,7 +6,7 @@ Actualizado: 2026-10-05 · Equipo: portátil de Pedro (Linux CachyOS), Orca 1.4.
 
 | Agente | Id en Orca (`--agent`) | Estado | Úsalo para | Límites y notas |
 |---|---|---|---|---|
-| Claude Code (trabajador) | `claude` | **Probado 2026-10-05: funciona** | Encargos transversales, con razonamiento sobre el dominio, o que otro agente ya ha hecho mal | Trabajadores con Sonnet 5.5 (`--model claude-sonnet-5-5`). Opus 5.5 solo para el orquestador y las consultas de diseño (DEC-12) |
+| Claude Code (trabajador) | `claude` | **Probado 2026-10-05: funciona** | Encargos transversales, con razonamiento sobre el dominio, o que otro agente ya ha hecho mal | Trabajadores según el tamaño del encargo (DEC-22): Haiku 4.5 para lo pequeño, Sonnet 5.5 para lo normal. Opus 5.5 solo para el orquestador y las consultas de diseño |
 | Codex | `codex` | **Habilitado** (P01, 2026-10-06) | Encargos acotados y mecánicos; segunda opinión en revisiones | Argumentos en Orca: `--dangerously-bypass-approvals-and-sandbox`; animaciones apagadas. Cuenta gratuita = límite bajo |
 | GitHub Copilot CLI | `copilot` | **Habilitado** (P01, 2026-10-06) | Encargos acotados con instrucciones muy claras: CRUD, DTO, componentes, tests a partir de casos dados | Argumentos en Orca: `--allow-all-tools --disable-mcp-server atlassian`; `~/orca/workspaces` en `trustedFolders`. **A veces el encargo se queda aparcado** sin enviar: ver [orca](orca.md#trampas-conocidas) |
 | opencode | `opencode` | No instalado | Lo que el humano decida | Usa el modelo de su propia configuración; no admite `--model` |

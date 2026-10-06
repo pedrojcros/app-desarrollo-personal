@@ -81,6 +81,7 @@ AGENTS.md      reglas comunes para agentes (este fichero)
 CLAUDE.md      importa este fichero para Claude Code
 README.md      para humanos: qué es y cómo arrancar
 docs/          toda la documentación; índice en docs/README.md
+.agents/skills/ skills de los agentes (Claude las lee por el enlace .claude/skills)
 src/domain/    lógica pura: fechas, ocurrencias y reglas de cada vista; sin framework
 src/data/      la única capa que habla con Supabase; acciones de servidor
 src/app/       rutas y pantallas (Next.js App Router)
@@ -135,6 +136,15 @@ Antes de dar un encargo por terminado, los tests de la parte que has tocado tien
 - La lógica de negocio pura se prueba con tests unitarios, sin framework ni base de datos.
 - La integración se prueba contra las piezas reales (la base de datos real, no un sustituto en memoria). Cómo se levantan esas piezas se concreta al elegir el stack.
 - Herramientas: Vitest (unitarias e integración) y Playwright (extremo a extremo). `src/domain` exige tests exhaustivos; las políticas RLS se prueban con dos usuarios. Detalle en [docs/04-arquitectura.md](docs/04-arquitectura.md#estrategia-de-pruebas).
+
+## Skills del proyecto
+
+Viven en `.agents/skills/` (Claude las lee por el enlace `.claude/skills`). Qué hay, de dónde salen y cuándo usar cada una: [.agents/skills/README.md](.agents/skills/README.md).
+
+- **Mandan este fichero y el encargo.** Si una skill dice otra cosa (ramas, idioma de los commits, dependencias, preguntar al humano), se sigue `AGENTS.md`.
+- **El encargo dice qué skills usar.** Úsalas; si crees que hace falta otra, dilo en tu informe.
+- **No añadas skills** sin aprobación, igual que con las dependencias.
+- Los comandos `/arquitecto`, `/orquestador`, `/ejecutar-plan` e `/idea` son solo para el humano: un agente nunca los activa por su cuenta.
 
 ## Documentación
 
