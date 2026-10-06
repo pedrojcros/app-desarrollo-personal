@@ -82,7 +82,8 @@ Sin cambios respecto a la planificación anterior. Nombres en inglés (DEC-06); 
 
 | Tabla | Qué guarda | Campos principales |
 |---|---|---|
-| `categories` | Categorías | `id`, `user_id`, `name` (único por usuario, sin distinguir mayúsculas) |
+| `sections` | Secciones: carpetas de categorías (DEC-29) | `id`, `user_id`, `name` (único por usuario, sin distinguir mayúsculas) |
+| `categories` | Categorías | `id`, `user_id`, `section_id` (vacío = sin sección, DEC-29), `name` (único por usuario, sin distinguir mayúsculas) |
 | `habits` | Hábitos | `id`, `user_id`, `category_id` (vacío = Bandeja), `name`, `start_date`, `time_of_day` o `time_slot` (`morning`, `afternoon`, `night`), `duration_minutes`, `archived_at` |
 | `habit_rules` | Versiones de la regla de repetición | `id`, `habit_id`, `valid_from`, `frequency` (`daily`, `weekdays`, `every_n_days`, `monthly`), `weekdays`, `interval_days` |
 | `habit_marks` | Marcas de ocurrencias | `habit_id`, `occurrence_date`, `status` (`done`, `not_done`), `marked_at`; clave única (`habit_id`, `occurrence_date`) |
@@ -139,6 +140,7 @@ Los términos del dominio se definen en [03-casos-de-uso](03-casos-de-uso.md#voc
 | Marca | `mark` / `habit_marks` |
 | Tarea | `task` |
 | Categoría | `category` |
+| Sección | `section` |
 | Bandeja de entrada | `inbox` (categoría vacía) |
 | Franja: mañana, tarde, noche | `timeSlot`: `morning`, `afternoon`, `night` |
 | Pendiente, hecha, no hecha | `pending`, `done`, `not_done` |

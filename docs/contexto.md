@@ -44,7 +44,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 *Actualizado: 2026-10-06.*
 
-- **Fase: replanificación para el móvil.** El plan vuelve a `EN BORRADOR` (DEC-24): una app con Expo para Android y la web, 15 tareas en 6 olas y P02 (el estilo, con prototipos y con el humano). Está en la rama `docs/replanificacion-expo`, con su PR contra `develop` en borrador hasta que se apruebe el plan. El #3 (skills móviles, DEC-23) ya está fusionado.
+- **Fase: replanificación para el móvil.** El plan vuelve a `EN BORRADOR` (DEC-24): una app con Expo para Android y la web, 16 tareas en 6 olas y P02 (el estilo, con prototipos y con el humano). Está en la rama `docs/replanificacion-expo`, con su PR contra `develop` en borrador hasta que se apruebe el plan. El #3 (skills móviles, DEC-23) ya está fusionado.
 - Estado del plan: `EN BORRADOR` (ver [05-plan](05-plan.md)). Le falta la aprobación del humano; P02, en marcha, solo bloquea T14.
 - Agentes: Claude, Codex y Copilot habilitados y probados con Orca (DEC-04).
 
@@ -69,7 +69,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-29**.
+  chat. Siguiente número libre: **DEC-31**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -101,6 +101,14 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Secciones (DEC-29) y crear deprisa (DEC-30)
+
+En la ronda 2 de estilo, el humano pidió carpetas para las categorías
+(«Lista de la compra» > Mercadona) y crear sin cambiar de pantalla: una barra
+rápida sobre el teclado que toma la categoría y la fecha de donde estás. Las
+secciones entran en la versión 1 (T04 crece) y la barra es una tarea nueva,
+T16, después de T05 y T06. Tercer estilo elegido: el neobrutalismo pulido.
 
 ### 2026-10-06 — Supervisor de trabajadores
 

@@ -56,7 +56,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 | 1 | T02, T03, T15 y, cuando P02 esté cerrada, T14 | 3 a la vez | T02 y T14 fusionadas tras la revisión del humano, y T03 y T15 fusionadas |
 | 2 | T04, T07, T08 | 3 | Las tres fusionadas |
 | 3 | T05, T06, T09 | 3 | Las tres fusionadas |
-| 4 | T10, T11, T12 | 3 | Las tres fusionadas (T12 necesita H02) |
+| 4 | T10, T11, T12, T16 | 3 a la vez | Las cuatro fusionadas (T12 necesita H02) |
 | 5 | T13 | 1 | Fusionada: la versión 1 está completa |
 
 **Hitos de versión:**
@@ -139,20 +139,20 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 - **Hecho cuando:** con un comando arranca el emulador en Docker y el flujo trivial de Maestro pasa contra la app que sirve el contenedor de T01; el MCP de Chrome abre la versión web desde su contenedor; las imágenes parten de imágenes oficiales con versiones fijadas. Si algo no puede ir en Docker, **parada**: se le pregunta al humano. Parte de [la prueba de DEC-26](agentes/prueba-emulador-docker.md).
 - **Puerta:** — · **Ticket:** ADP-
 
-### T04 — Gestión de categorías
+### T04 — Gestión de categorías y secciones
 
-- **Objetivo:** crear y eliminar categorías (lo que contienen pasa a la Bandeja de entrada); un selector de categoría reutilizable para los formularios.
-- **Funcionalidades:** RF-20 (crear), RF-21 · **Depende de:** T02, T14
-- **Tamaño:** S · **Agente sugerido:** `codex`
+- **Objetivo:** crear y eliminar categorías (lo que contienen pasa a la Bandeja de entrada) y las secciones que las agrupan (DEC-29); un selector de categoría reutilizable, que enseña la sección, para los formularios y el añadir rápido.
+- **Funcionalidades:** RF-20 (crear y secciones), RF-21 · **Depende de:** T02, T14
+- **Tamaño:** M · **Agente sugerido:** `codex`
 - **Skills:** `expo-router`, `expo-data-fetching`, `codigo-legible`, `test-driven-development`.
-- **Contrato:** el componente `CategorySelect` y las funciones y hooks de `src/data/categories.ts`, con las firmas que escribe el orquestador.
-- **Reserva:** `src/data/categories.ts`, `src/components/category-select/`, la pantalla de gestión en `src/app/(tabs)/categorias/index.tsx`.
-- **Hecho cuando:** pasan los escenarios 1, 2, 3 y 5 de CU-07.
+- **Contrato:** el componente `CategorySelect` y las funciones y hooks de `src/data/categories.ts` y `src/data/sections.ts`, con las firmas que escribe el orquestador.
+- **Reserva:** `src/data/categories.ts`, `src/data/sections.ts`, `src/components/category-select/`, la pantalla de gestión en `src/app/(tabs)/categorias/index.tsx`.
+- **Hecho cuando:** pasan los escenarios 1, 2, 3, 5, 6 y 7 de CU-07.
 - **Puerta:** — · **Ticket:** ADP-
 
 ### T05 — Hábitos: crear, modificar y archivar
 
-- **Objetivo:** el formulario de hábito con las cuatro frecuencias, hora o franja y categoría; modificar (un cambio de frecuencia crea una versión nueva de la regla); archivar.
+- **Objetivo:** el formulario completo de hábito (el «Más» del añadir rápido) con las cuatro frecuencias, hora o franja y categoría; modificar (un cambio de frecuencia crea una versión nueva de la regla); archivar.
 - **Funcionalidades:** RF-01, RF-03, RF-18 y RF-19 (hábitos), RF-20 (asignar) · **Depende de:** T02, T03, T04, T14
 - **Tamaño:** M · **Agente sugerido:** `codex`
 - **Skills:** `expo-native-ui`, `expo-data-fetching`, `codigo-legible`, `test-driven-development`. El selector de fecha y hora es el de DEC-25.
@@ -162,7 +162,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 ### T06 — Tareas: crear, modificar y archivar
 
-- **Objetivo:** el formulario de tarea (nombre, notas, fecha, hora y categoría; sin categoría, a la Bandeja); avisar si la fecha es pasada; modificar y archivar.
+- **Objetivo:** el formulario completo de tarea (el «Más» del añadir rápido: nombre, notas, fecha, hora y categoría; sin categoría, a la Bandeja); avisar si la fecha es pasada; modificar y archivar.
 - **Funcionalidades:** RF-05, RF-18 y RF-19 (tareas), RF-20 (asignar) · **Depende de:** T02, T04, T14
 - **Tamaño:** S · **Agente sugerido:** `codex`
 - **Skills:** `expo-native-ui`, `expo-data-fetching`, `codigo-legible`, `test-driven-development`. El selector de fecha y hora es el de DEC-25.
@@ -231,10 +231,21 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 - **Hecho cuando:** un PR obtiene su web de prueba; una exportación se restaura en local con los mismos datos; `eas.json` sigue la documentación oficial de EAS (la primera compilación la lanza el humano en H04).
 - **Puerta:** — · **Ticket:** ADP-
 
+### T16 — Añadir rápido
+
+- **Objetivo:** la barra de añadir rápido (DEC-30): al pulsar + en cualquier pantalla, aparece encima del teclado con el nombre listo para escribir y los atajos a mano (tarea o hábito, fecha con atajos, categoría con su sección y «Más» para el formulario completo). Toma la fecha y la categoría de la pantalla donde se abre. El diseño es el elegido en P02.
+- **Funcionalidades:** RF-01 y RF-05 (crear deprisa); RNF-06 · **Depende de:** T05, T06
+- **Tamaño:** M · **Agente sugerido:** `codex`
+- **Skills:** `expo-native-ui`, `expo-animation`, `test-driven-development`, `codigo-legible`.
+- **Contrato:** usa las funciones de crear de `src/data/tasks.ts` y `src/data/habits.ts` y el selector de categoría de T04.
+- **Reserva:** `src/components/quick-add/` y el botón + flotante.
+- **Hecho cuando:** crear una tarea con solo el nombre cuesta escribirlo y confirmar (RNF-06); pasan los escenarios 6 y 7 de CU-02; el teclado no tapa la barra, ni en Android ni en la web.
+- **Puerta:** — · **Ticket:** ADP-
+
 ### T13 — Caminos críticos y calidad
 
 - **Objetivo:** flujos de Maestro de los caminos críticos en el emulador de Docker (T15); el script de datos sintéticos de un año; las comprobaciones de RNF-01, RNF-03, RNF-06 y RNF-08 (incluida la web con el MCP de Chrome).
-- **Funcionalidades:** RNF-01, RNF-03, RNF-06, RNF-08 · **Depende de:** T05, T06, T09, T10, T11 y T15
+- **Funcionalidades:** RNF-01, RNF-03, RNF-06, RNF-08 · **Depende de:** T05, T06, T09, T10, T11, T15 y T16
 - **Tamaño:** M · **Agente sugerido:** `codex`
 - **Skills:** `android-emulator-qa`, `verification-before-completion`; a demanda `better-accessibility`, `browser-testing-with-devtools`, `performance-optimization`.
 - **Reserva:** `e2e/` (salvo el flujo trivial de T01), `scripts/seed/`.
@@ -245,10 +256,10 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 | Funcionalidad | Tareas |
 |---|---|
-| RF-01 | T05 |
+| RF-01 | T05, T16 |
 | RF-02 | T03 |
 | RF-03 | T03, T05 |
-| RF-05 | T06 |
+| RF-05 | T06, T16 |
 | RF-06 | T07 |
 | RF-07 | T07 |
 | RF-08 | T09 |
@@ -259,7 +270,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 | RF-19 | T05, T06 |
 | RF-20 | T04, T05, T06 |
 | RF-21 | T04 |
-| RNF-01, RNF-03, RNF-06 | T13 (RNF-03 también T14) |
+| RNF-01, RNF-03, RNF-06 | T13 (RNF-03 también T14; RNF-06 también T16) |
 | RNF-02 | T02 |
 | RNF-04 | T12 |
 | RNF-05 | ADR-0005 |
