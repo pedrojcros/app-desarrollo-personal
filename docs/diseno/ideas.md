@@ -2,6 +2,14 @@
 
 Lo que el humano dice que le gusta y lo que no, ronda a ronda. Es la memoria del bucle, porque las conversaciones se borran. Lo más reciente, arriba.
 
+## Ronda 4 (2026-10-06): aprobada
+
+- **«Es una buena estructura inicial, ya la iremos puliendo con el uso.»** P02 queda cerrada (DEC-32); las decisiones, en [diseno.md](../diseno.md).
+- **«Más» no abre la categoría**: abre el resto de opciones.
+- **C:** su desplegable de categoría no funcionaba bien; tiene que funcionar igual que en A y B, con sus colores.
+- **Temas:** siguen el modo del móvil (claro, blanco; oscuro, negro) y en Ajustes se puede fijar cualquiera de los tres.
+- El resto de pantallas, en la siguiente versión del diseño.
+
 ## Ronda 3 (2026-10-06)
 
 - **Añadir rápido: el de B** (el nombre arriba en grande con el botón de enviar; debajo, Tarea/Hábito con «Más», los atajos de fecha y la categoría).

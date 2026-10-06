@@ -8,53 +8,84 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { color-scheme: light; --paper:#fffbeF; --surface:#fff; --soft:#f4efdf; --ink:#111; --muted:#4a4a4a; --line:#d9d2c0; --yellow:#ffe14d; --blue:#8ab4ff; --green:#6ee7a8; --orange:#ffb86b; --pink:#ff8fb1; --teal:#62d9cb; }
+    :root { color-scheme: light; --paper:#fffbef; --surface:#fff; --soft:#f4efdf; --ink:#111; --muted:#4a4a4a; --line:#d9d2c0; --yellow:#ffe14d; --blue:#8ab4ff; --green:#6ee7a8; --orange:#ffb86b; --pink:#ff8fb1; --teal:#62d9cb; --inbox:#d4d0c4; --keyboard-height:258px; }
     * { box-sizing:border-box; }
+    [hidden] { display:none !important; }
     body { height:100vh; min-height:720px; margin:0; overflow:hidden; background:var(--paper); color:var(--ink); font-family:"Archivo",Arial,sans-serif; -webkit-font-smoothing:antialiased; }
     button,input { color:inherit; font:inherit; }
-    .background { position:absolute; inset:0; padding:18px 16px; }
-    .date { margin:0 0 4px; color:var(--muted); font-size:11px; }
-    .background-head { display:flex; align-items:center; justify-content:space-between; }
-    .background h1 { margin:0; font-size:36px; font-weight:800; letter-spacing:-.05em; }
-    .count { padding:4px 7px; border:1.5px solid var(--ink); background:var(--yellow); box-shadow:2px 2px 0 var(--ink); font-size:12px; font-weight:800; }
-    .ghost-task { display:flex; align-items:center; justify-content:space-between; min-height:55px; border-bottom:1px solid var(--line); font-size:13px; font-weight:700; }
-    .ghost-task small { display:block; margin-top:3px; color:var(--muted); font-size:10px; font-weight:400; }
-    .ghost-mark { display:grid; width:36px; height:36px; place-items:center; border:1.5px solid var(--ink); border-radius:50%; background:var(--orange); box-shadow:1.5px 1.5px 0 var(--ink); }
-    .scrim { position:absolute; inset:0; background:rgba(17,17,17,.48); }
-    .keyboard { position:absolute; z-index:4; right:0; bottom:0; left:0; height:258px; padding:5px 4px 16px; border-top:1px solid #c6c8cc; background:#e7e9ee; color:#24262b; }
+    button { cursor:pointer; touch-action:manipulation; }
+    button:focus-visible,input:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+    svg { flex:0 0 auto; }
+
+    .scrim { position:absolute; z-index:2; inset:0; background:rgba(17,17,17,.46); }
+
+    /* barra de añadir rápido: los menús se abren hacia arriba, encima de la barra */
+    .sheet { position:absolute; z-index:3; top:0; right:0; bottom:var(--keyboard-height); left:0; display:flex; flex-direction:column; justify-content:flex-end; pointer-events:none; }
+    .sheet > * { pointer-events:auto; }
+    .menu-area { flex:0 1 auto; min-height:0; overflow-y:auto; padding:10px 14px 8px; }
+    .menu { border:1.5px solid var(--ink); background:var(--surface); box-shadow:2px 2px 0 var(--ink); }
+    .menu-item { display:flex; width:100%; min-height:44px; align-items:center; gap:10px; padding:0 10px; border:0; border-bottom:1px solid var(--line); background:var(--surface); text-align:left; font-size:14px; font-weight:700; }
+    .menu-item[aria-selected="true"] { background:#fff3b0; }
+    .menu-label { min-width:0; flex:1; }
+    .menu-indicator { display:grid; width:20px; height:20px; place-items:center; }
+    .menu-indicator svg { width:18px; height:18px; }
+    .menu-item .check-mark { visibility:hidden; }
+    .menu-item[aria-selected="true"] .check-mark { visibility:visible; }
+    .menu-item[aria-expanded="true"] .caret { transform:rotate(180deg); }
+    .tile { display:grid; width:30px; height:30px; flex:0 0 auto; place-items:center; border:1.5px solid var(--ink); background:var(--category); box-shadow:1.5px 1.5px 0 var(--ink); }
+    .tile svg { width:18px; height:18px; }
+    .chips { display:flex; flex-wrap:wrap; gap:6px; padding:6px 10px 8px 50px; border-bottom:1px solid var(--line); background:var(--soft); }
+    .chip { min-height:36px; padding:0 12px; border:1.5px solid var(--ink); background:var(--surface); font-size:14px; font-weight:700; }
+    .chip[aria-pressed="true"] { background:var(--yellow); box-shadow:1.5px 1.5px 0 var(--ink); }
+
+    .composer { margin:0; padding:12px 14px 10px; border:1.5px solid var(--ink); border-bottom:0; background:var(--surface); box-shadow:0 -2px 0 var(--yellow); }
+    .composer-top { display:flex; align-items:center; gap:9px; }
+    .name-input { width:0; height:48px; flex:1; padding:0 11px; border:1.5px solid var(--ink); outline:0; background:var(--paper); box-shadow:1.5px 1.5px 0 var(--ink); font-size:18px; font-weight:700; }
+    .name-input:focus-visible { outline:0; background:#fff; }
+    .send { display:grid; width:48px; height:48px; flex:0 0 auto; place-items:center; border:1.5px solid var(--ink); background:var(--yellow); box-shadow:2px 2px 0 var(--ink); }
+    .send:active { transform:translate(1px,1px); box-shadow:1px 1px 0 var(--ink); }
+    .send svg { width:22px; height:22px; }
+    .mode-row { display:flex; align-items:center; justify-content:space-between; min-height:44px; margin-top:4px; }
+    .mode-toggle { display:flex; padding:3px; border:1.5px solid var(--ink); background:var(--soft); }
+    .mode-toggle button { min-width:72px; height:34px; border:1.5px solid transparent; background:transparent; font-size:14px; font-weight:700; }
+    .mode-toggle button[aria-pressed="true"] { border-color:var(--ink); background:var(--yellow); box-shadow:1px 1px 0 var(--ink); }
+    .more { display:flex; height:44px; align-items:center; gap:5px; padding:0 4px 0 10px; border:0; background:transparent; font-size:14px; font-weight:700; }
+    .more svg { width:18px; height:18px; }
+    .more[aria-expanded="true"] svg { transform:rotate(180deg); }
+    .shortcuts { display:flex; gap:5px; }
+    .shortcuts button { min-height:40px; padding:0 10px; border:1.5px solid var(--ink); background:var(--surface); font-size:13px; font-weight:600; white-space:nowrap; }
+    .shortcuts button[aria-pressed="true"] { background:var(--yellow); box-shadow:1px 1px 0 var(--ink); font-weight:800; }
+    .shortcuts .calendar-button { display:grid; width:42px; padding:0; place-items:center; }
+    .shortcuts .calendar-button svg { width:21px; height:21px; }
+    .extra-row { display:flex; gap:8px; margin-top:8px; }
+    .extra-row input { min-width:0; height:44px; flex:1; padding:0 11px; border:1.5px solid var(--ink); background:var(--paper); font-size:14px; }
+    .category-trigger { display:flex; width:100%; height:44px; align-items:center; gap:10px; margin-top:8px; padding:0 9px 0 7px; border:1.5px solid var(--ink); background:var(--soft); box-shadow:1.5px 1.5px 0 var(--ink); text-align:left; font-size:14px; font-weight:700; }
+    .category-trigger .tile { width:28px; height:28px; box-shadow:none; }
+    .category-trigger .tile svg { width:16px; height:16px; }
+    .category-label { min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .category-trigger > svg { width:18px; height:18px; }
+    .category-trigger[aria-expanded="true"] { background:#fff3b0; }
+    .category-trigger[aria-expanded="true"] > svg { transform:rotate(180deg); }
+
+    /* teclado de Android (maqueta) */
+    .keyboard { position:absolute; z-index:4; right:0; bottom:0; left:0; height:var(--keyboard-height); padding:5px 4px 16px; border-top:1px solid #c6c8cc; background:#e7e9ee; color:#24262b; }
     .suggestions { display:flex; height:34px; align-items:center; justify-content:space-around; color:#41444a; font-size:13px; }
     .key-row { display:flex; justify-content:center; gap:4px; margin:5px 0; }
-    .key { display:grid; height:39px; min-width:0; flex:1; place-items:center; border-radius:5px; background:#fff; box-shadow:0 1px 0 #a8abb1; font-size:18px; }
+    .key { display:grid; height:39px; min-width:0; flex:1; place-items:center; padding:0; border:0; border-radius:5px; background:#fff; box-shadow:0 1px 0 #a8abb1; font-size:18px; }
     .key.wide { flex:1.45; background:#d0d4dc; font-size:14px; }
     .key.space { flex:4; font-size:11px; }
     .key.enter { background:var(--yellow); }
+    .key svg { width:20px; height:20px; }
     .home-bar { position:absolute; bottom:5px; left:calc(50% - 54px); width:108px; height:4px; border-radius:4px; background:#44474d; }
-    .composer { position:absolute; z-index:3; right:0; bottom:258px; left:0; height:430px; padding:13px 14px; border:1.5px solid var(--ink); border-bottom:0; background:var(--surface); box-shadow:0 -2px 0 var(--yellow); }
-    .composer-top { display:flex; align-items:center; gap:9px; }
-    .task-name { width:0; height:48px; flex:1; padding:0 11px; border:1.5px solid var(--ink); outline:0; background:var(--paper); box-shadow:1.5px 1.5px 0 var(--ink); font-size:16px; font-weight:700; }
-    .send { display:grid; width:48px; height:48px; flex:0 0 auto; place-items:center; border:1.5px solid var(--ink); background:var(--yellow); box-shadow:2px 2px 0 var(--ink); }
-    .send svg { width:22px; height:22px; }
-    .mode-row { display:flex; align-items:center; justify-content:space-between; margin-top:11px; }
-    .mode-toggle { display:flex; padding:3px; border:1.5px solid var(--ink); background:var(--soft); }
-    .mode-toggle button { min-width:70px; height:32px; border:0; background:transparent; font-size:12px; font-weight:700; }
-    .mode-toggle button.selected { border:1.5px solid var(--ink); background:var(--yellow); box-shadow:1px 1px 0 var(--ink); }
-    .more { display:flex; align-items:center; gap:4px; padding:4px; border:0; background:transparent; font-size:12px; font-weight:700; }
-    .date-shortcuts { display:flex; gap:5px; margin-top:9px; }
-    .date-shortcuts button { min-height:32px; padding:0 9px; border:1.5px solid var(--ink); background:var(--surface); font-size:11px; font-weight:600; }
-    .date-shortcuts button.selected { background:var(--yellow); box-shadow:1px 1px 0 var(--ink); font-weight:800; }
-    .category-trigger { position:absolute; right:14px; bottom:11px; left:14px; display:flex; height:36px; align-items:center; gap:7px; padding:0 9px; border:1.5px solid var(--ink); background:var(--soft); box-shadow:1px 1px 0 var(--ink); text-align:left; font-size:11px; font-weight:700; }
-    .category-trigger svg { width:16px; height:16px; }
-    .category-trigger .chevron { margin-left:auto; }
-    .category-popover { position:absolute; z-index:5; right:14px; bottom:52px; left:14px; max-height:230px; overflow:auto; border:1.5px solid var(--ink); background:var(--surface); box-shadow:2px 2px 0 var(--ink); }
-    .choice { display:flex; min-height:26px; align-items:center; gap:8px; padding:2px 8px; border-bottom:1px solid var(--line); font-size:10px; font-weight:600; }
-    .choice:last-child { border-bottom:0; }
-    .choice.current { background:#fff8ce; }
-    .choice-icon { display:grid; width:18px; height:18px; flex:0 0 auto; place-items:center; color:var(--ink); }
-    .choice-icon svg { width:16px; height:16px; stroke-width:1.8; }
-    .color-dot { width:11px; height:11px; flex:0 0 auto; border:1px solid var(--ink); border-radius:50%; background:var(--color); }
-    .choice.nested { min-height:21px; padding-left:39px; color:var(--muted); font-size:10px; }
-    .choice.nested::before { width:6px; height:6px; border:1px solid var(--ink); border-radius:50%; background:var(--teal); content:""; }
-    .category-popover[hidden] { display:none; }
+
+    .background { position:absolute; inset:0; padding:18px 16px; }
+    .date { margin:0 0 4px; color:var(--muted); font-size:12px; }
+    .background-head { display:flex; align-items:center; justify-content:space-between; }
+    .background h1 { margin:0; font-size:36px; font-weight:800; letter-spacing:-.05em; }
+    .count { padding:4px 7px; border:1.5px solid var(--ink); background:var(--yellow); box-shadow:2px 2px 0 var(--ink); font-size:12px; font-weight:800; }
+    .ghost-task { display:flex; align-items:center; justify-content:space-between; min-height:55px; border-bottom:1px solid var(--line); font-size:14px; font-weight:700; }
+    .ghost-task small { display:block; margin-top:3px; color:var(--muted); font-size:11px; font-weight:400; }
+    .ghost-mark { display:grid; width:36px; height:36px; place-items:center; border:1.5px solid var(--ink); border-radius:50%; background:var(--orange); box-shadow:1.5px 1.5px 0 var(--ink); }
     @media (min-width:400px) { .background { padding-right:20px; padding-left:20px; } }
   </style>
 </head>
@@ -62,136 +93,343 @@
   <main class="background" aria-hidden="true">
     <p class="date">Martes, 6 de octubre de 2026</p>
     <div class="background-head"><h1>Hoy</h1><span class="count">2 de 8</span></div>
-    <div class="ghost-task">Comprar proteína <span class="ghost-mark">✓</span></div>
-    <div class="ghost-task">Llamar al dentista <span class="ghost-mark">✓</span><small>10:00 · Personal · Tarea</small></div>
-    <div class="ghost-task">Beber 2 L de agua <span class="ghost-mark" style="background:var(--green)">✓</span><small>Salud · Hábito</small></div>
+    <div id="background-list">
+      <div class="ghost-task"><span>Comprar proteína</span><span class="ghost-mark">✓</span></div>
+      <div class="ghost-task"><span>Llamar al dentista<small>10:00 · Personal · Tarea</small></span><span class="ghost-mark">✓</span></div>
+      <div class="ghost-task"><span>Beber 2 L de agua<small>Salud · Hábito</small></span><span class="ghost-mark" style="background:var(--green)">✓</span></div>
+    </div>
   </main>
-  <div class="scrim" aria-hidden="true"></div>
-  <section class="composer" aria-label="Añadir tarea">
-    <div class="composer-top">
-      <input class="task-name" id="taskName" value="Comprar pilas" aria-label="Nombre de la tarea">
-      <button class="send" id="sendTask" aria-label="Añadir tarea"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet">
+    <div class="menu-area" id="menu-area" hidden>
+      <div class="menu" id="category-menu" role="listbox" aria-label="Elegir categoría"></div>
     </div>
-    <div class="mode-row">
-      <div class="mode-toggle" role="group" aria-label="Tipo">
-        <button class="selected" aria-pressed="true">Tarea</button><button aria-pressed="false">Hábito</button>
+    <form class="composer" id="composer" autocomplete="off" aria-label="Añadir tarea">
+      <div class="composer-top">
+        <input class="name-input" id="task-name" value="Comprar pilas" placeholder="Nombre de la tarea" aria-label="Nombre de la tarea o hábito">
+        <button type="submit" class="send" aria-label="Añadir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
       </div>
-      <button class="more">Más <span aria-hidden="true">⌄</span></button>
-    </div>
-    <div class="date-shortcuts" id="dateShortcuts" aria-label="Fecha">
-      <button>Sin fecha</button><button class="selected">Hoy</button><button>Mañana</button><button>Lunes</button><button aria-label="Elegir fecha">▣</button>
-    </div>
-    <button class="category-trigger" id="categoryTrigger" aria-expanded="true" aria-controls="categoryPopover">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v14H3z"/><path d="M3 6l3-3h12l3 3"/></svg>
-      <span class="selection-label">Sin categoría · Bandeja</span>
-      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-    </button>
-    <div class="category-popover" id="categoryPopover" role="listbox" aria-label="Elegir categoría">
-      <div class="choice current" role="option" aria-selected="true" data-category="Sin categoría · Bandeja"><span class="choice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 6 5h12l3 5.5v7a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z"/><path d="M3 11h5l1.5 2h5L16 11h5"/></svg></span>Bandeja de entrada</div>
-      <div class="choice" role="option"><span class="choice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18l-2 10H5z"/><path d="M8 10 12 4l4 6M7 13l3 4m7-4-3 4"/></svg></span><span class="color-dot" style="--color:var(--teal)"></span>Lista de la compra</div>
-      <div class="choice nested" role="option" data-category="Lista de la compra" data-section="Mercadona">Mercadona</div>
-      <div class="choice nested" role="option" data-category="Lista de la compra" data-section="Lidl">Lidl</div>
-      <div class="choice nested" role="option" data-category="Lista de la compra" data-section="Sin sección">Sin sección</div>
-      <div class="choice" role="option" data-category="Universidad"><span class="choice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z"/></svg></span><span class="color-dot" style="--color:var(--blue)"></span>Universidad</div>
-      <div class="choice" role="option" data-category="Salud"><span class="choice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg></span><span class="color-dot" style="--color:var(--green)"></span>Salud</div>
-      <div class="choice" role="option" data-category="Personal"><span class="choice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg></span><span class="color-dot" style="--color:var(--orange)"></span>Personal</div>
-      <div class="choice" role="option" data-category="Casa"><span class="choice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></svg></span><span class="color-dot" style="--color:var(--pink)"></span>Casa</div>
-    </div>
-  </section>
-  <div class="keyboard" aria-hidden="true">
+      <div class="mode-row">
+        <div class="mode-toggle" role="group" aria-label="Tipo">
+          <button type="button" data-mode="task" aria-pressed="true">Tarea</button><button type="button" data-mode="habit" aria-pressed="false">Hábito</button>
+        </div>
+        <button type="button" class="more" id="more" aria-expanded="false">Más <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      </div>
+      <div class="shortcuts" id="task-shortcuts" role="group" aria-label="Fecha">
+        <button type="button" data-date="Sin fecha" aria-pressed="false">Sin fecha</button><button type="button" data-date="Hoy" aria-pressed="true">Hoy</button><button type="button" data-date="Mañana" aria-pressed="false">Mañana</button><button type="button" data-date="Lunes" aria-pressed="false">Lunes</button><button type="button" class="calendar-button" id="calendar-button" aria-label="Elegir otra fecha" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg></button>
+      </div>
+      <div class="shortcuts" id="habit-shortcuts" role="group" aria-label="Frecuencia" hidden>
+        <button type="button" data-frequency="A diario" aria-pressed="true">A diario</button><button type="button" data-frequency="Días" aria-pressed="false">Días</button><button type="button" data-frequency="Cada 2 días" aria-pressed="false">Cada 2 días</button><button type="button" data-frequency="Cada mes" aria-pressed="false">Cada mes</button>
+      </div>
+      <div class="extra-row" id="date-extra" hidden><input type="date" id="custom-date" aria-label="Otra fecha"></div>
+      <div class="extra-row" id="more-extra" hidden><input id="notes" aria-label="Notas" placeholder="Notas"><input type="time" id="exact-time" aria-label="Hora exacta"></div>
+      <button type="button" class="category-trigger" id="category-trigger" aria-haspopup="listbox" aria-expanded="false"><span class="tile" id="category-tile"></span><span class="category-label" id="category-label"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button>
+    </form>
+  </div>
+  <div class="keyboard" aria-label="Teclado de Android (maqueta)">
     <div class="suggestions"><span>pilas</span><span>“pilas”</span><span>pila</span></div>
-    <div class="key-row"><span class="key">q</span><span class="key">w</span><span class="key">e</span><span class="key">r</span><span class="key">t</span><span class="key">y</span><span class="key">u</span><span class="key">i</span><span class="key">o</span><span class="key">p</span></div>
-    <div class="key-row"><span class="key">a</span><span class="key">s</span><span class="key">d</span><span class="key">f</span><span class="key">g</span><span class="key">h</span><span class="key">j</span><span class="key">k</span><span class="key">l</span><span class="key">ñ</span></div>
-    <div class="key-row"><span class="key wide">⇧</span><span class="key">z</span><span class="key">x</span><span class="key">c</span><span class="key">v</span><span class="key">b</span><span class="key">n</span><span class="key">m</span><span class="key wide">⌫</span></div>
-    <div class="key-row"><span class="key wide">?123</span><span class="key">,</span><span class="key space">Español</span><span class="key">.</span><span class="key wide enter">↵</span></div>
+    <div class="key-row"><button type="button" class="key" data-key="q" tabindex="-1">q</button><button type="button" class="key" data-key="w" tabindex="-1">w</button><button type="button" class="key" data-key="e" tabindex="-1">e</button><button type="button" class="key" data-key="r" tabindex="-1">r</button><button type="button" class="key" data-key="t" tabindex="-1">t</button><button type="button" class="key" data-key="y" tabindex="-1">y</button><button type="button" class="key" data-key="u" tabindex="-1">u</button><button type="button" class="key" data-key="i" tabindex="-1">i</button><button type="button" class="key" data-key="o" tabindex="-1">o</button><button type="button" class="key" data-key="p" tabindex="-1">p</button></div>
+    <div class="key-row"><button type="button" class="key" data-key="a" tabindex="-1">a</button><button type="button" class="key" data-key="s" tabindex="-1">s</button><button type="button" class="key" data-key="d" tabindex="-1">d</button><button type="button" class="key" data-key="f" tabindex="-1">f</button><button type="button" class="key" data-key="g" tabindex="-1">g</button><button type="button" class="key" data-key="h" tabindex="-1">h</button><button type="button" class="key" data-key="j" tabindex="-1">j</button><button type="button" class="key" data-key="k" tabindex="-1">k</button><button type="button" class="key" data-key="l" tabindex="-1">l</button><button type="button" class="key" data-key="ñ" tabindex="-1">ñ</button></div>
+    <div class="key-row"><button type="button" class="key wide" data-key="shift" tabindex="-1" aria-label="Mayúsculas">⇧</button><button type="button" class="key" data-key="z" tabindex="-1">z</button><button type="button" class="key" data-key="x" tabindex="-1">x</button><button type="button" class="key" data-key="c" tabindex="-1">c</button><button type="button" class="key" data-key="v" tabindex="-1">v</button><button type="button" class="key" data-key="b" tabindex="-1">b</button><button type="button" class="key" data-key="n" tabindex="-1">n</button><button type="button" class="key" data-key="m" tabindex="-1">m</button><button type="button" class="key wide" data-key="delete" tabindex="-1" aria-label="Borrar">⌫</button></div>
+    <div class="key-row"><button type="button" class="key wide" data-key="numbers" tabindex="-1">?123</button><button type="button" class="key" data-key="," tabindex="-1">,</button><button type="button" class="key space" data-key=" " tabindex="-1">Español</button><button type="button" class="key" data-key="." tabindex="-1">.</button><button type="button" class="key wide enter" data-key="send" tabindex="-1" aria-label="Añadir">↵</button></div>
     <span class="home-bar"></span>
   </div>
   <script>
-    const categoryTrigger = document.getElementById("categoryTrigger");
-    const categoryPopover = document.getElementById("categoryPopover");
-    const taskName = document.getElementById("taskName");
-    const sendTask = document.getElementById("sendTask");
-    const dateShortcuts = document.getElementById("dateShortcuts");
-    const modeButtons = document.querySelectorAll(".mode-toggle button");
-    const selectionLabel = document.querySelector(".selection-label");
 
-    categoryTrigger.addEventListener("click", () => {
-      const isExpanded = categoryTrigger.getAttribute("aria-expanded") === "true";
-      categoryTrigger.setAttribute("aria-expanded", String(!isExpanded));
-      categoryPopover.hidden = isExpanded;
-    });
-
-    function selectOption(button) {
-      button.parentElement.querySelectorAll("button").forEach((option) => {
-        option.classList.remove("selected");
-        option.setAttribute("aria-pressed", "false");
-      });
-      button.classList.add("selected");
-      button.setAttribute("aria-pressed", "true");
+    // Lo escrito se añade a la lista de Hoy que hay detrás de la barra
+    function handleTaskAdded(task) {
+      const row = document.createElement('div');
+      row.className = 'ghost-task';
+      const text = document.createElement('span');
+      text.textContent = task.title;
+      const details = document.createElement('small');
+      details.textContent = task.categoryLabel + ' · ' + task.description;
+      text.append(details);
+      const mark = document.createElement('span');
+      mark.className = 'ghost-mark';
+      mark.style.background = task.color;
+      mark.textContent = '✓';
+      row.append(text, mark);
+      document.getElementById('background-list').append(row);
     }
 
-    function renderDateShortcuts(isHabit) {
-      const labels = isHabit ? ["A diario", "Días", "Cada N días", "Cada mes"] : ["Sin fecha", "Hoy", "Mañana", "Lunes", "▣"];
-      dateShortcuts.replaceChildren();
-      labels.forEach((label) => {
-        const button = document.createElement("button");
-        button.textContent = label;
-        button.setAttribute("aria-pressed", String(label === (isHabit ? "A diario" : "Hoy")));
-        if (label === (isHabit ? "A diario" : "Hoy")) {
-          button.classList.add("selected");
+    const ICONS = {
+      check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
+      chevronDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>',
+      inbox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>',
+      basket: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 11-1 9"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4"/><path d="M4.5 15.5h15"/><path d="m5 11 4-7"/><path d="m9 11 1 9"/></svg>',
+      cap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>',
+      heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+      user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+      house: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>'
+    };
+    const NO_SECTION = 'Sin sección';
+    const CATEGORIES = [
+      {id: 'inbox', label: 'Bandeja de entrada', icon: 'inbox', color: 'var(--inbox)', sections: []},
+      {id: 'shopping', label: 'Lista de la compra', icon: 'basket', color: 'var(--teal)', sections: ['Mercadona', 'Lidl']},
+      {id: 'university', label: 'Universidad', icon: 'cap', color: 'var(--blue)', sections: ['Redes', 'Bases de datos']},
+      {id: 'health', label: 'Salud', icon: 'heart', color: 'var(--green)', sections: []},
+      {id: 'personal', label: 'Personal', icon: 'user', color: 'var(--orange)', sections: []},
+      {id: 'home', label: 'Casa', icon: 'house', color: 'var(--pink)', sections: []}
+    ];
+
+    const composerState = {
+      mode: 'task',
+      date: 'Hoy',
+      frequency: 'A diario',
+      categoryId: 'inbox',
+      section: null,
+      expandedCategoryId: 'shopping'
+    };
+
+    const composerForm = document.getElementById('composer');
+    const nameInput = document.getElementById('task-name');
+    const scrim = document.getElementById('scrim');
+    const menuArea = document.getElementById('menu-area');
+    const categoryMenu = document.getElementById('category-menu');
+    const categoryTrigger = document.getElementById('category-trigger');
+    const categoryTile = document.getElementById('category-tile');
+    const categoryLabel = document.getElementById('category-label');
+    const taskShortcuts = document.getElementById('task-shortcuts');
+    const habitShortcuts = document.getElementById('habit-shortcuts');
+    const calendarButton = document.getElementById('calendar-button');
+    const dateExtra = document.getElementById('date-extra');
+    const moreButton = document.getElementById('more');
+    const moreExtra = document.getElementById('more-extra');
+
+    function findCategory(categoryId) {
+      return CATEGORIES.find((category) => category.id === categoryId);
+    }
+
+    function currentLabel() {
+      const category = findCategory(composerState.categoryId);
+      if (composerState.section === null) return category.label;
+      return category.label + ' › ' + composerState.section;
+    }
+
+    function createIconTile(category) {
+      const tile = document.createElement('span');
+      tile.className = 'tile';
+      tile.style.setProperty('--category', category.color);
+      tile.innerHTML = ICONS[category.icon];
+      return tile;
+    }
+
+    function createIndicator(className, iconMarkup) {
+      const indicator = document.createElement('span');
+      indicator.className = 'menu-indicator ' + className;
+      indicator.innerHTML = iconMarkup;
+      return indicator;
+    }
+
+    // Elige la categoría (y su sección, si la hay), refleja la elección en la barra y cierra el menú
+    function chooseCategory(categoryId, section) {
+      composerState.categoryId = categoryId;
+      composerState.section = section;
+      renderCategory();
+      setMenuOpen(false);
+    }
+
+    // Una categoría con secciones solo se despliega; la elección se hace con sus secciones
+    function toggleExpanded(categoryId) {
+      const isExpanded = composerState.expandedCategoryId === categoryId;
+      composerState.expandedCategoryId = isExpanded ? null : categoryId;
+      renderCategory();
+    }
+
+    function createSectionChips(category) {
+      const chips = document.createElement('div');
+      chips.className = 'chips';
+      chips.dataset.chips = category.id;
+      for (const sectionName of [...category.sections, NO_SECTION]) {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'chip';
+        chip.dataset.section = sectionName;
+        chip.textContent = sectionName;
+        const section = sectionName === NO_SECTION ? null : sectionName;
+        chip.addEventListener('click', () => chooseCategory(category.id, section));
+        chips.append(chip);
+      }
+      return chips;
+    }
+
+    function createCategoryItem(category) {
+      const hasSections = category.sections.length > 0;
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'menu-item';
+      item.setAttribute('role', 'option');
+      item.dataset.category = category.id;
+      const label = document.createElement('span');
+      label.className = 'menu-label';
+      label.textContent = category.label;
+      const indicator = hasSections
+        ? createIndicator('caret', ICONS.chevronDown)
+        : createIndicator('check-mark', ICONS.check);
+      item.append(createIconTile(category), label, indicator);
+      item.addEventListener('click', () => {
+        if (hasSections) toggleExpanded(category.id);
+        else chooseCategory(category.id, null);
+      });
+      return item;
+    }
+
+    function buildCategoryMenu() {
+      for (const category of CATEGORIES) {
+        categoryMenu.append(createCategoryItem(category));
+        if (category.sections.length > 0) categoryMenu.append(createSectionChips(category));
+      }
+    }
+
+    function renderCategory() {
+      const category = findCategory(composerState.categoryId);
+      categoryTile.style.setProperty('--category', category.color);
+      categoryTile.innerHTML = ICONS[category.icon];
+      categoryLabel.textContent = currentLabel();
+      for (const item of categoryMenu.querySelectorAll('.menu-item')) {
+        const itemCategory = findCategory(item.dataset.category);
+        const isCurrent = itemCategory.id === composerState.categoryId;
+        item.setAttribute('aria-selected', String(isCurrent));
+        if (itemCategory.sections.length > 0) {
+          item.setAttribute('aria-expanded', String(composerState.expandedCategoryId === itemCategory.id));
         }
-        button.addEventListener("click", () => selectOption(button));
-        dateShortcuts.appendChild(button);
+      }
+      for (const chips of categoryMenu.querySelectorAll('.chips')) {
+        chips.hidden = chips.dataset.chips !== composerState.expandedCategoryId;
+        for (const chip of chips.querySelectorAll('.chip')) {
+          const chipSection = chip.dataset.section === NO_SECTION ? null : chip.dataset.section;
+          const isChosen = chips.dataset.chips === composerState.categoryId && chipSection === composerState.section;
+          chip.setAttribute('aria-pressed', String(isChosen));
+        }
+      }
+    }
+
+    function setMenuOpen(isOpen) {
+      menuArea.hidden = !isOpen;
+      categoryTrigger.setAttribute('aria-expanded', String(isOpen));
+    }
+
+    categoryTrigger.addEventListener('click', () => {
+      const willOpen = menuArea.hidden;
+      if (willOpen && findCategory(composerState.categoryId).sections.length > 0) {
+        composerState.expandedCategoryId = composerState.categoryId;
+        renderCategory();
+      }
+      setMenuOpen(willOpen);
+    });
+    scrim.addEventListener('click', () => setMenuOpen(false));
+
+    // Marca un solo botón de un grupo como elegido
+    function pressOnly(group, chosenButton) {
+      for (const button of group.querySelectorAll('button')) {
+        button.setAttribute('aria-pressed', String(button === chosenButton));
+      }
+    }
+
+    for (const dateButton of taskShortcuts.querySelectorAll('[data-date]')) {
+      dateButton.addEventListener('click', () => {
+        composerState.date = dateButton.dataset.date;
+        pressOnly(taskShortcuts, dateButton);
       });
     }
 
-    modeButtons.forEach((button) => {
-      button.addEventListener("click", () => {
-        selectOption(button);
-        renderDateShortcuts(button.textContent === "Hábito");
+    for (const frequencyButton of habitShortcuts.querySelectorAll('[data-frequency]')) {
+      frequencyButton.addEventListener('click', () => {
+        composerState.frequency = frequencyButton.dataset.frequency;
+        pressOnly(habitShortcuts, frequencyButton);
       });
+    }
+
+    calendarButton.addEventListener('click', () => {
+      dateExtra.hidden = !dateExtra.hidden;
+      calendarButton.setAttribute('aria-pressed', String(!dateExtra.hidden));
     });
 
-    dateShortcuts.querySelectorAll("button").forEach((button) => {
-      button.addEventListener("click", () => selectOption(button));
+    document.getElementById('custom-date').addEventListener('change', (event) => {
+      composerState.date = event.target.value;
+      pressOnly(taskShortcuts, calendarButton);
     });
 
-    categoryPopover.querySelectorAll(".choice").forEach((choice) => {
-      choice.addEventListener("click", () => {
-        const category = choice.dataset.category || choice.textContent.trim();
-        const section = choice.dataset.section;
-        selectionLabel.textContent = section ? `${category} › ${section}` : category;
-        categoryPopover.querySelectorAll(".choice").forEach((option) => {
-          option.classList.remove("current");
-          option.setAttribute("aria-selected", "false");
-        });
-        choice.classList.add("current");
-        choice.setAttribute("aria-selected", "true");
-        categoryTrigger.setAttribute("aria-expanded", "false");
-        categoryPopover.hidden = true;
+    // «Más» solo abre las opciones extra (notas y hora exacta); nunca el menú de categoría
+    moreButton.addEventListener('click', () => {
+      moreExtra.hidden = !moreExtra.hidden;
+      moreButton.setAttribute('aria-expanded', String(!moreExtra.hidden));
+    });
+
+    for (const modeButton of document.querySelectorAll('[data-mode]')) {
+      modeButton.addEventListener('click', () => {
+        composerState.mode = modeButton.dataset.mode;
+        const isHabit = composerState.mode === 'habit';
+        pressOnly(modeButton.parentElement, modeButton);
+        taskShortcuts.hidden = isHabit;
+        habitShortcuts.hidden = !isHabit;
+        dateExtra.hidden = true;
+        calendarButton.setAttribute('aria-pressed', 'false');
       });
-    });
+    }
 
-    sendTask.addEventListener("click", () => {
-      if (taskName.value.trim().length === 0) {
-        taskName.focus();
+    function describeWhen() {
+      if (composerState.mode === 'habit') return composerState.frequency + ' · Hábito';
+      return composerState.date + ' · Tarea';
+    }
+
+    composerForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const title = nameInput.value.trim();
+      if (title === '') {
+        nameInput.focus();
         return;
       }
-      const newTask = document.createElement("div");
-      const taskTitle = document.createElement("span");
-      const taskDetails = document.createElement("small");
-      newTask.className = "ghost-task";
-      taskTitle.textContent = taskName.value.trim();
-      taskDetails.textContent = `Hoy · ${selectionLabel.textContent.trim()} · Tarea`;
-      newTask.appendChild(taskTitle);
-      newTask.appendChild(taskDetails);
-      document.querySelector(".background").appendChild(newTask);
-      document.querySelector(".background").removeAttribute("aria-hidden");
-      document.querySelector(".scrim").hidden = true;
-      document.querySelector(".composer").hidden = true;
-      document.querySelector(".keyboard").hidden = true;
-      sendTask.setAttribute("aria-label", `${taskName.value.trim()} añadida`);
+      const category = findCategory(composerState.categoryId);
+      handleTaskAdded({
+        title: title,
+        categoryId: composerState.categoryId,
+        section: composerState.section,
+        categoryLabel: currentLabel(),
+        color: category.color,
+        description: describeWhen()
+      });
+      setMenuOpen(false);
+      nameInput.value = '';
+      nameInput.placeholder = 'Añadida a ' + category.label + '. ¿Otra?';
+      nameInput.focus({preventScroll: true});
     });
+
+    // Teclado de maqueta: escribe en el mismo campo
+    let isUppercase = false;
+    const keyboardKeys = document.querySelectorAll('[data-key]');
+
+    function isLetterKey(key) {
+      return key.dataset.key.length === 1 && /\p{L}/u.test(key.dataset.key);
+    }
+
+    function showKeyCase() {
+      for (const key of keyboardKeys) {
+        if (!isLetterKey(key)) continue;
+        key.textContent = isUppercase ? key.dataset.key.toUpperCase() : key.dataset.key;
+      }
+    }
+
+    for (const key of keyboardKeys) {
+      key.addEventListener('mousedown', (event) => event.preventDefault());
+      key.addEventListener('click', () => {
+        const value = key.dataset.key;
+        if (value === 'send') { composerForm.requestSubmit(); return; }
+        if (value === 'delete') { nameInput.value = nameInput.value.slice(0, -1); return; }
+        if (value === 'numbers') return;
+        if (value === 'shift') { isUppercase = !isUppercase; showKeyCase(); return; }
+        nameInput.value += isUppercase ? value.toUpperCase() : value;
+        isUppercase = false;
+        showKeyCase();
+      });
+    }
+
+    buildCategoryMenu();
+    renderCategory();
+    setMenuOpen(true);
+    nameInput.focus({preventScroll: true});
   </script>
 </body>
 </html>
