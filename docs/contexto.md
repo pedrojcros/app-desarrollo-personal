@@ -46,6 +46,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Fase: planificación, a punto de aprobar.** Escritas las sesiones 1 a 7: visión, casos de uso, funcionalidades (14 imprescindibles en la versión 1), riesgos, arquitectura (Next.js + Supabase + Vercel, ADR-0001 a 0004), defaults y plan (13 tareas en 6 olas). Todo está en la rama `docs/planificacion`.
 - Estado del plan: `EN BORRADOR` (ver [05-plan](05-plan.md)). Falta la aprobación del humano (sesión 8).
+- Agentes: Claude, Codex y Copilot habilitados y probados con Orca (DEC-04).
 
 ## Lo siguiente
 
@@ -56,8 +57,6 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - Aprobar el plan (DEC-21 ya está aceptada; `git push` ya funciona).
 - H02: crear las cuentas de Vercel y Supabase antes de la ola 4.
-- **P01 (Codex y Copilot): investigado la noche del 2026-10-06.** Los dos funcionan con Orca, pero necesitan ajustes para trabajar sin que nadie apruebe nada. Aprobar el punto 10 de DEC-21; luego se repite la prueba y se cierra DEC-04.
-- Limpiar lo que dejaron las pruebas de agentes: los worktrees `prueba-arranque-claude`, `prueba-arranque-codex` y `prueba-arranque-copilot` (con un fichero de prueba cada uno y sus ramas locales `pedrojcros/prueba-arranque-*`, sin subir). Las terminales ya están cerradas y no queda ningún trabajador pendiente en Orca.
 - El ticket `ADP-1` es de prueba y se puede borrar a mano.
 
 ## Cómo se trabaja aquí
@@ -73,8 +72,8 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 *(Cosas que costaron tiempo y no deben costarlo dos veces.)*
 
 - **Codex lanzado por Orca no recibía encargos**: sus animaciones impiden que Orca lo vea «listo». Arreglo: `tui.animations = false`. Ver [agentes/orca](agentes/orca.md#trampas-conocidas).
-- **El sandbox de Codex bloquea el CLI de Orca** y **Copilot pregunta por cada carpeta y cada comando**: sin ajustes, se quedan esperando a alguien que apruebe. Ver DEC-21, punto 10.
-- **`git push` por SSH falla** en las sesiones de los agentes (no pueden pedir la frase de la clave). Ver H01.
+- **Codex y Copilot necesitan ajustes para trabajar solos** (sandbox, permisos, carpeta de confianza), y **a Copilot se le puede quedar el encargo aparcado**: todo, con su arreglo, en [agentes/orca](agentes/orca.md#trampas-conocidas).
+- **`git push` por SSH falla** en las sesiones de los agentes (no pueden pedir la frase de la clave). Resuelto: el remoto va por HTTPS con `gh` (H01).
 
 ## Lo que no viaja con el repositorio
 
@@ -90,6 +89,16 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Agentes listos: DEC-21 aceptada y P01 cerrada
+
+El humano aceptó las diez propuestas de DEC-21. Se aplicaron los ajustes de
+Codex (sin animaciones, sin sandbox) y de Copilot (carpeta de confianza, sin
+permisos por comando, sin el MCP de Jira) y se repitió la prueba: Codex
+funciona solo; a Copilot hay que darle un Enter si el encargo se le queda
+aparcado (fallo conocido de Orca), y el orquestador ya sabe hacerlo (ver
+[agentes/orca](agentes/orca.md#trampas-conocidas)). `git push` funciona por
+HTTPS con `gh`. Se borraron los worktrees de prueba. Queda aprobar el plan.
 
 ### 2026-10-06 — P01: por qué Codex no recibía encargos (de noche, con permiso del humano)
 

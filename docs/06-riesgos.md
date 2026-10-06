@@ -30,8 +30,8 @@ Identificador, descripción, probabilidad, impacto, **mitigación** (qué se hac
 
 ### R-04 — Se agotan las cuotas de los agentes
 
-- **Probabilidad:** MEDIA · **Impacto:** MEDIO (hoy solo funciona Claude, DEC-04)
-- **Mitigación:** trabajadores con Sonnet 5.5; Opus solo para decidir; arreglar Codex y Copilot (P01).
+- **Probabilidad:** MEDIA · **Impacto:** MEDIO
+- **Mitigación:** trabajadores con Sonnet 5.5; Opus solo para decidir; repartir entre Claude, Codex y Copilot (DEC-04).
 - **Contingencia:** bajar el paralelismo y esperar a que se renueve la cuota; el plan no depende de un agente concreto.
 
 ### R-05 — Supabase o Vercel cambian o recortan sus planes gratuitos
@@ -68,8 +68,8 @@ Identificador, descripción, probabilidad, impacto, **mitigación** (qué se hac
 
 ### R-10 — Codex y Copilot no funcionan con Orca
 
-- **Probabilidad:** ALTA (ya pasa) · **Impacto:** MEDIO
-- **Mitigación:** investigarlo en P01 sin bloquear el plan.
+- **Probabilidad:** BAJA (resuelto en P01; puede volver con versiones nuevas de Orca o de los agentes) · **Impacto:** MEDIO
+- **Mitigación:** los ajustes y trampas de [agentes/orca](agentes/orca.md#trampas-conocidas); repetir la prueba de arranque tras actualizar Orca o un agente.
 - **Contingencia:** todo el trabajo con trabajadores Claude; la revisión cruzada, con otro modelo de Claude.
 
 ### R-11 — El humano tiene poco tiempo y de forma irregular (es estudiante)

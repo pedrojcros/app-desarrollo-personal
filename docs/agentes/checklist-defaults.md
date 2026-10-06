@@ -137,7 +137,7 @@ Marcas: **[día 1]** entra en el esqueleto · **[cuando toque]** se añade al ne
 | Internacionalización | Descartado | Solo español |
 | Nada externo en el camino crítico | Ajustado | Supabase y Vercel lo están por decisión (DEC-16); R-05 y R-07 |
 | Documentación | Aceptado | Ya existe |
-| Agentes disponibles probados | Ajustado | Solo Claude habilitado; Codex y Copilot, tras P01 |
+| Agentes disponibles probados | Aceptado | Claude, Codex y Copilot probados (P01) |
 | Jira | Aceptado | Comprobado (`ADP`) |
 | Lo que nunca se delega, política de merge, tope | Aceptado | [orquestador](orquestador.md) |
 | Primera tarea con un solo agente y revisada por el humano | Aceptado | T01 con `requiere-revisión` |

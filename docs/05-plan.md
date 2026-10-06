@@ -30,7 +30,7 @@ Todas las casillas marcadas, o el orquestador se niega a ejecutar.
 - [x] Cada tarea tiene objetivo, criterio de hecho, dependencias, contrato (si lo necesita) y sugerencia de agente
 - [x] Los recursos compartidos o numerados (migraciones, ficheros comunes) están reservados por tarea
 - [x] Lo que nunca se delega está escrito en [agentes/orquestador](agentes/orquestador.md)
-- [x] [Agentes disponibles](agentes/agentes-disponibles.md) está al día y cada agente habilitado probado (solo Claude; Codex y Copilot, deshabilitados hasta P01)
+- [x] [Agentes disponibles](agentes/agentes-disponibles.md) está al día y cada agente habilitado probado (Claude, Codex y Copilot, el 2026-10-06)
 - [x] Jira comprobado en el equipo de ejecución
 - [x] Política de merge y tope de paralelismo decididos
 - [x] La entrada final está en la bitácora de [contexto](contexto.md)
@@ -40,7 +40,7 @@ Todas las casillas marcadas, o el orquestador se niega a ejecutar.
 - Una **tarea** es una unidad de valor que se puede probar entera. El orquestador la parte en uno o varios **encargos** para los agentes.
 - Los **identificadores `Tnn`** no se reutilizan. `Pnn` son tareas de preparación y `Hnn` tareas del humano.
 - Tamaño: **S** (menos de media jornada de agente), **M** (una jornada), **L** (se parte antes de ejecutar).
-- *Agente sugerido*: `claude` es un trabajador Claude con Sonnet 5.5; `+revisión` pide una segunda opinión de otro modelo (Opus 5.5, o Codex cuando funcione).
+- *Agente sugerido*: `claude` es un trabajador Claude con Sonnet 5.5; `+revisión` pide una segunda opinión de otro modelo (Opus 5.5 o Codex). El orquestador puede dar lo mecánico a Codex o Copilot (ver [agentes disponibles](agentes/agentes-disponibles.md)).
 - *Puerta*: `requiere-plan` o `requiere-revisión` del humano (DEC-12); «—» si no tiene.
 - Una tarea solo puede lanzarse cuando todas sus dependencias están **fusionadas**, no solo hechas.
 - **Solo T01 toca `package.json`.** Si otra tarea necesita un script o una dependencia, para y lo dice.
@@ -71,7 +71,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 - **Funcionalidades:** — · **Depende de:** nada; no bloquea ninguna tarea
 - **Tamaño:** S · **Agente sugerido:** el orquestador (investigación, no es código de producción); el humano si hay que tocar la configuración de Orca
 - **Hecho cuando:** los dos agentes superan la prueba de arranque, o queda escrito por qué no y DEC-04 se cierra con «solo Claude».
-- **Avance (2026-10-06):** causas encontradas y verificadas; los dos agentes funcionan con aprobaciones manuales. Falta aplicar los ajustes (DEC-21, punto 10) y repetir la prueba sin aprobar nada a mano.
+- **Hecha (2026-10-06):** ajustes aplicados y prueba superada por los dos agentes; DEC-04 cerrada.
 - **Puerta:** — · **Ticket:** ADP-
 
 ### T01 — Esqueleto del proyecto

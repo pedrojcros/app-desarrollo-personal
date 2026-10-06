@@ -162,7 +162,7 @@ Cuando se cierra una ola del plan o un hito, propón al humano publicar. No lo h
 
 1. **Elige la tarea** del plan respetando dependencias, y **crea o actualiza su ticket** según [jira](jira.md).
 2. **Escribe el encargo** con la [plantilla](plantilla-encargo.md), en `docs/agentes/encargos/NNN-titulo.md`.
-3. **Lanza el trabajador** con `worker-start`. El texto íntegro del encargo va en `--spec`: el trabajador arranca en un worktree nuevo y **no verá un fichero que solo exista en el tuyo** sin commitear. El fichero del encargo sirve de registro.
+3. **Lanza el trabajador** con `worker-start`. El texto íntegro del encargo va en `--spec`: el trabajador arranca en un worktree nuevo y **no verá un fichero que solo exista en el tuyo** sin commitear. El fichero del encargo sirve de registro. Con Copilot, comprueba a los 20 segundos que el encargo no se ha quedado aparcado (ver [orca](orca.md#trampas-conocidas)).
 4. **Espera** con `check --wait`, no con sondeos. Si pasa mucho tiempo sin señales, mira el estado (`worker-list`, `worker-show`, `worker-read`) antes de decidir nada.
 5. **Revisa** con la lista de más abajo. Los tests los ejecutas tú.
 6. **Si no está bien**, escribe un encargo de corrección. Si ya ha fallado dos veces, pregunta al humano.

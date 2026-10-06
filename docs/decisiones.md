@@ -20,15 +20,7 @@ Cuando una decisión se cierra:
 
 ## Abiertas
 
-### DEC-04 — Agentes habilitados y para qué
-
-**Respuesta parcial (2026-10-05):** se usarán Claude Code, Codex y Copilot CLI. **Falta confirmar** que los tres arrancan desde Orca y que el orquestador se comunica con ellos de forma limpia y sencilla (prueba de arranque de [agentes-disponibles](agentes/agentes-disponibles.md)). Comprobado el 2026-10-05: los tres están instalados y Orca tiene id para los tres (`claude`, `codex`, `copilot`). Prueba real: **`claude` funciona** (y ve Jira desde Orca); **`codex` falla** en `agent_readiness` y no recibe el encargo; `copilot` sin probar. Falta lanzarlos de verdad (ver [agentes-disponibles](agentes/agentes-disponibles.md)). Se está investigando además qué IA gratuita o local podría ayudar con archivos locales; el humano decide después si se añade alguna.
-
-**Propuesta (2026-10-06, DEC-21):** Codex y Copilot quedan **deshabilitados** hasta la tarea P01 del plan; todo el trabajo va a trabajadores Claude.
-
-**Investigación P01 (2026-10-06):** los dos funcionan con Orca, pero no sin supervisión. Codex necesita apagar sus animaciones y no pedir permiso para usar Orca; Copilot necesita confiar en `~/orca/workspaces` y no pedir permiso por comando. Detalle en [agentes-disponibles](agentes/agentes-disponibles.md#prueba-de-arranque-una-vez-por-agente-y-equipo); los ajustes, en DEC-21, punto 10.
-
-*Dónde acaba:* `agentes/agentes-disponibles.md`.
+*(Ninguna.)*
 
 ---
 
@@ -54,5 +46,6 @@ Cuando una decisión se cierra:
 | DEC-19 | Dónde y qué es la versión 1 | **En internet** (Vercel y Supabase gratis) con inicio de sesión solo para el dueño; **solo ordenador** (se mantiene DEC-09: el móvil, en la versión 2). La versión 1 son las **14 funcionalidades imprescindibles**; las 8 deseables van justo después. | `01-vision-y-alcance.md`, `02-funcionalidades.md`, `05-plan.md` |
 | DEC-20 | Lista de defaults (sesión 6) | Recorrida punto por punto: cada uno aceptado, ajustado o descartado con su motivo. | `agentes/checklist-defaults.md` (Recorrido en este proyecto) |
 | DEC-21 | Propuestas de la tanda de sesiones 3 a 7 | **Aceptadas las diez** (2026-10-06): login con email y contraseña (ADR-0004); ocurrencias calculadas (ADR-0003); Supabase `pruebas` y `produccion`; puertas en T01 y T02; Sonnet para trabajadores y Opus para decidir; Codex y Copilot deshabilitados hasta aplicar sus ajustes; `git push` por HTTPS con `gh`; comando `/idea`; copia semanal; y los ajustes de Codex y Copilot de P01. | ADR-0003, ADR-0004, `05-plan.md`, `agentes/agentes-disponibles.md`, `.claude/commands/idea.md` |
+| DEC-04 | Agentes habilitados | **Claude, Codex y Copilot habilitados** tras P01 (2026-10-06). Codex: sin animaciones y con `--dangerously-bypass-approvals-and-sandbox`. Copilot: `~/orca/workspaces` de confianza, `--allow-all-tools --disable-mcp-server atlassian`, y un Enter si el encargo se queda aparcado. Trabajadores Claude con Sonnet 5.5. Una IA local gratuita queda sin decidir: no hace falta ahora. | `agentes/agentes-disponibles.md`, `agentes/orca.md` |
 | DEC-05 | Regla de legibilidad | Se mantiene. Los agentes escriben los nombres del código **siempre en inglés** y legible para humanos. | `AGENTS.md` (Legibilidad) |
 | DEC-06 | Idioma | **Nombres de código y mensajes de error en inglés. Comentarios, commits y documentación en español.** | `AGENTS.md` (Convenciones de código) |
