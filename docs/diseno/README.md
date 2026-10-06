@@ -25,3 +25,10 @@ Se hacen con Chromium dentro de Docker (DEC-26), con la imagen de [captura/](cap
 docker build -t adp-captura docs/diseno/captura
 docker run --rm --pull never --user "$(id -u):$(id -g)" -v "$PWD":/work adp-captura p1.html p1.png 360 800
 ```
+
+Los vídeos de referencia se miran como una hoja de fotogramas, con la imagen de [fotogramas/](fotogramas/):
+
+```
+docker build -t adp-fotogramas docs/diseno/fotogramas
+docker run --rm --pull never --user "$(id -u):$(id -g)" -v "$PWD":/work adp-fotogramas video.mp4 hoja.png 24
+```
