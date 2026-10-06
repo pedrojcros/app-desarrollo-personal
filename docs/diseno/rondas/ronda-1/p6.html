@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>P6 · Bloques</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  /* P6 · Bloques. Paleta T3 (neobrutalismo): bordes negros de 2 px y sombra desplazada de 3 px.
+     Solo se usan los colores de esta paleta. */
+  :root {
+    --background: #FFFBEF;
+    --surface: #FFFFFF;
+    --surface-alt: #F4EFDF;
+    --border: #111111;
+    --text: #111111;
+    --text-soft: #4A4A4A;
+    --accent: #FFE14D;
+    --not-done: #111111;
+    --university: #8AB4FF;
+    --health: #6EE7A8;
+    --personal: #FFB86B;
+    --home: #FF8FB1;
+
+    --line: 2px;
+    --offset: 3px;
+    --radius: 8px;
+    --rail-width: 56px;
+  }
+
+  /* El color de cada categoría lo leen los bloques, los segmentos de la barra y el aviso. */
+  [data-category="university"] { --category: var(--university); }
+  [data-category="health"] { --category: var(--health); }
+  [data-category="personal"] { --category: var(--personal); }
+  [data-category="home"] { --category: var(--home); }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    display: flex;
+    overflow: hidden;
+    background: var(--background);
+    color: var(--text);
+    font-family: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.25;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
+  ul, ol { list-style: none; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  [hidden] { display: none !important; }
+  :focus-visible { outline: 3px solid var(--border); outline-offset: 2px; }
+
+  .icon {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* A 16 px el trazo se escala: 3 en el dibujo son 2 px en pantalla. */
+  .icon-small { width: 16px; height: 16px; stroke-width: 3; }
+
+  /* ---------- Carril de navegación (56 px) ---------- */
+  .rail {
+    flex: none;
+    width: var(--rail-width);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+    background: var(--surface-alt);
+    border-right: var(--line) solid var(--border);
+  }
+  .rail-button {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: transparent;
+    border: var(--line) solid transparent;
+    border-radius: var(--radius);
+    color: var(--text);
+  }
+  .rail-button[aria-current="page"] { background: var(--border); color: var(--surface); }
+  .rail-add {
+    background: var(--accent);
+    border-color: var(--border);
+    box-shadow: var(--offset) var(--offset) 0 var(--border);
+    transition: transform 90ms ease-out, box-shadow 90ms ease-out;
+  }
+  .rail-add:active { transform: translate(var(--offset), var(--offset)); box-shadow: 0 0 0 var(--border); }
+  .rail-title { position: relative; width: 44px; height: 96px; margin-top: auto; }
+  .rail-title span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    font-size: 38px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .rail-divider { width: 28px; height: var(--line); margin: 6px 0 4px; background: var(--border); }
+  .badge {
+    position: absolute;
+    top: -6px;
+    right: -4px;
+    display: grid;
+    place-items: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 4px;
+    background: var(--accent);
+    border: var(--line) solid var(--border);
+    border-radius: 999px;
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  /* ---------- Pantalla ---------- */
+  .screen {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---------- Cabecera: fecha enorme y barra de 8 segmentos ---------- */
+  .header {
+    flex: none;
+    padding: 8px 11px 8px 8px;
+    border-bottom: var(--line) solid var(--border);
+  }
+  .date {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .date-day {
+    padding: 4px 7px 2px;
+    background: var(--accent);
+    border: var(--line) solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--offset) var(--offset) 0 var(--border);
+    transform: rotate(-3deg);
+  }
+  .date-month {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 1;
+  }
+  .date-year { color: var(--text-soft); font-weight: 700; }
+
+  .meter { display: flex; gap: 3px; margin-top: 10px; }
+  .cell {
+    flex: 1;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    background: var(--surface);
+    border: var(--line) solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+  }
+  .cell[data-result="done"] { background: var(--category); }
+  .cell[data-result="not-done"] { background: var(--not-done); color: var(--surface); }
+  .cell .icon { display: none; width: 14px; height: 14px; stroke-width: 3.5; }
+  .cell[data-result="done"] .cell-icon-done,
+  .cell[data-result="not-done"] .cell-icon-not-done { display: block; }
+
+  .score { display: flex; align-items: baseline; justify-content: space-between; margin-top: 5px; }
+  .score-count { font-size: 13px; font-weight: 700; }
+  .score-percent { font-size: 20px; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+
+  /* ---------- Lista por franjas ---------- */
+  .list {
+    flex: 1;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 10px 8px 72px;
+    scrollbar-width: none;
+  }
+  .list::-webkit-scrollbar { display: none; }
+
+  /* flow-root: el margen del último bloque se queda dentro del grupo y no salta al plegarlo. */
+  .group { display: flow-root; margin-bottom: 2px; }
+  .group-label { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .group-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 22px;
+    padding: 0 10px 0 6px;
+    background: var(--surface);
+    border: var(--line) solid var(--border);
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .group-rule { flex: 1; height: var(--line); background: var(--border); }
+
+  /* El hueco de la derecha y de abajo es para la sombra: así nada la recorta al plegar. */
+  .slot { padding: 0 var(--offset) var(--offset) 0; margin-bottom: 8px; }
+  .is-animating { overflow: hidden; }
+
+  .block {
+    --sink: 0px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 64px;
+    padding: 7px;
+    background: var(--category);
+    border: var(--line) solid var(--border);
+    border-radius: var(--radius);
+    transform: translate(var(--sink), var(--sink));
+    box-shadow: calc(var(--offset) - var(--sink)) calc(var(--offset) - var(--sink)) 0 var(--border);
+    transition: transform 90ms ease-out, box-shadow 90ms ease-out;
+  }
+  /* Microanimación propia: al pulsar, el bloque se hunde y su sombra desaparece. */
+  .block.is-sunk { --sink: var(--offset); }
+  .block:has(.mark-button:active) { --sink: var(--offset); }
+
+  .indicator { flex: none; display: grid; place-items: center; width: 34px; height: 34px; }
+  .task-badge { display: grid; place-items: center; width: 30px; height: 30px; background: var(--surface); border-radius: 50%; }
+  .task-dot { width: 10px; height: 10px; background: var(--border); border-radius: 50%; }
+  .ring { position: relative; display: grid; place-items: center; width: 34px; height: 34px; }
+  .ring svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ring-track { fill: none; stroke: var(--surface); stroke-width: 5; }
+  .ring-arc { fill: none; stroke: var(--border); stroke-width: 5; }
+  .ring-value { position: relative; font-size: 11px; font-weight: 800; line-height: 1; }
+
+  .block-text { flex: 1; min-width: 0; }
+  .block-name { font-size: 15px; font-weight: 700; line-height: 1.15; }
+  .block-detail { margin-top: 3px; font-size: 12px; font-weight: 600; line-height: 1.2; }
+
+  .block-actions { flex: none; display: flex; gap: 4px; }
+  .mark-button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: var(--line) solid var(--border);
+    border-radius: 6px;
+  }
+  .mark-button-done { background: var(--surface); color: var(--text); }
+  .mark-button-not-done { background: var(--not-done); color: var(--surface); }
+
+  .empty-state {
+    margin-top: 8px;
+    padding: 22px 12px;
+    border: var(--line) dashed var(--border);
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  /* ---------- Aviso con Deshacer ---------- */
+  .toast {
+    position: absolute;
+    left: 8px;
+    right: 11px;
+    bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 2px;
+    min-height: 48px;
+    padding: 0 6px 0 14px;
+    background: var(--category);
+    border: var(--line) solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--offset) var(--offset) 0 var(--border);
+  }
+  .toast[data-result="not-done"] { background: var(--not-done); color: var(--surface); }
+  .toast-message { font-size: 14px; font-weight: 500; }
+  .toast-undo {
+    min-height: 44px;
+    padding: 0 8px;
+    background: none;
+    border: 0;
+    font-size: 14px;
+    font-weight: 900;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+  .toast[data-result="not-done"] .toast-undo { color: var(--accent); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .block, .rail-add { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <!-- Iconos al estilo de lucide: 24 px, trazo 2 y extremos redondeados. -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="icon-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+      <symbol id="icon-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+      <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+      <symbol id="icon-calendar-check" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></symbol>
+      <symbol id="icon-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+      <symbol id="icon-layout-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+      <symbol id="icon-circle-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></symbol>
+      <symbol id="icon-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+      <symbol id="icon-infinity" viewBox="0 0 24 24"><path d="M6 16c5 0 7-8 12-8a4 4 0 0 1 0 8c-5 0-7-8-12-8a4 4 0 1 0 0 8"/></symbol>
+      <symbol id="icon-sunrise" viewBox="0 0 24 24"><path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></symbol>
+      <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+      <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+    </defs>
+  </svg>
+
+  <nav class="rail" aria-label="Navegación principal">
+    <button class="rail-button rail-add" type="button" aria-label="Crear tarea o hábito" title="Crear">
+      <svg class="icon" aria-hidden="true"><use href="#icon-plus"/></svg>
+    </button>
+    <span class="rail-divider" aria-hidden="true"></span>
+    <button class="rail-button" type="button" aria-current="page" aria-label="Hoy" title="Hoy">
+      <svg class="icon" aria-hidden="true"><use href="#icon-calendar-check"/></svg>
+    </button>
+    <button class="rail-button" type="button" aria-label="Bandeja de entrada" title="Bandeja">
+      <svg class="icon" aria-hidden="true"><use href="#icon-inbox"/></svg>
+    </button>
+    <button class="rail-button" type="button" aria-label="Categorías" title="Categorías">
+      <svg class="icon" aria-hidden="true"><use href="#icon-layout-grid"/></svg>
+    </button>
+    <button class="rail-button" type="button" aria-label="Pendientes de días anteriores: 2" title="Pendientes">
+      <svg class="icon" aria-hidden="true"><use href="#icon-circle-alert"/></svg>
+      <span class="badge" aria-hidden="true">2</span>
+    </button>
+    <button class="rail-button" type="button" aria-label="Historial" title="Historial">
+      <svg class="icon" aria-hidden="true"><use href="#icon-history"/></svg>
+    </button>
+    <p class="rail-title" aria-hidden="true"><span>Hoy</span></p>
+  </nav>
+
+  <div class="screen">
+    <header class="header">
+      <h1 class="date" aria-label="Hoy, martes 6 de octubre de 2026">
+        <span aria-hidden="true">MAR</span>
+        <span class="date-day" aria-hidden="true">06</span>
+        <span class="date-month" aria-hidden="true"><span>OCT</span><span class="date-year">2026</span></span>
+      </h1>
+
+      <!-- Un segmento por tarea o hábito del día. De momento: uno hecho (Salud), uno no hecho y seis vacíos. -->
+      <ol class="meter" id="meter" aria-hidden="true">
+        <li class="cell" data-result="done" data-category="health">
+          <svg class="icon cell-icon-done"><use href="#icon-check"/></svg>
+          <svg class="icon cell-icon-not-done"><use href="#icon-x"/></svg>
+        </li>
+        <li class="cell" data-result="not-done" data-category="university">
+          <svg class="icon cell-icon-done"><use href="#icon-check"/></svg>
+          <svg class="icon cell-icon-not-done"><use href="#icon-x"/></svg>
+        </li>
+        <li class="cell"><svg class="icon cell-icon-done"><use href="#icon-check"/></svg><svg class="icon cell-icon-not-done"><use href="#icon-x"/></svg></li>
+        <li class="cell"><svg class="icon cell-icon-done"><use href="#icon-check"/></svg><svg class="icon cell-icon-not-done"><use href="#icon-x"/></svg></li>
+        <li class="cell"><svg class="icon cell-icon-done"><use href="#icon-check"/></svg><svg class="icon cell-icon-not-done"><use href="#icon-x"/></svg></li>
+        <li class="cell"><svg class="icon cell-icon-done"><use href="#icon-check"/></svg><svg class="icon cell-icon-not-done"><use href="#icon-x"/></svg></li>
+        <li class="cell"><svg class="icon cell-icon-done"><use href="#icon-check"/></svg><svg class="icon cell-icon-not-done"><use href="#icon-x"/></svg></li>
+        <li class="cell"><svg class="icon cell-icon-done"><use href="#icon-check"/></svg><svg class="icon cell-icon-not-done"><use href="#icon-x"/></svg></li>
+      </ol>
+      <p class="score">
+        <span class="score-count"><span id="marked-count">2</span> de 8 marcadas</span>
+        <span class="score-percent"><span id="percent-value">25</span>&nbsp;%</span>
+      </p>
+    </header>
+
+    <main class="list" id="list">
+      <section class="group" aria-labelledby="group-no-time">
+        <h2 class="group-label" id="group-no-time">
+          <span class="group-chip"><svg class="icon icon-small" aria-hidden="true"><use href="#icon-infinity"/></svg>Sin hora</span>
+          <span class="group-rule" aria-hidden="true"></span>
+        </h2>
+        <ul>
+          <li class="slot">
+            <article class="block" data-category="personal">
+              <span class="indicator" aria-hidden="true"><span class="task-badge"><span class="task-dot"></span></span></span>
+              <div class="block-text">
+                <h3 class="block-name">Comprar proteína</h3>
+                <p class="block-detail">Personal</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-button-done" type="button" data-result="done" aria-label="Marcar «Comprar proteína» como hecha"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></button>
+                <button class="mark-button mark-button-not-done" type="button" data-result="not-done" aria-label="Marcar «Comprar proteína» como no hecha"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></button>
+              </div>
+            </article>
+          </li>
+        </ul>
+      </section>
+
+      <section class="group" aria-labelledby="group-morning">
+        <h2 class="group-label" id="group-morning">
+          <span class="group-chip"><svg class="icon icon-small" aria-hidden="true"><use href="#icon-sunrise"/></svg>Mañana</span>
+          <span class="group-rule" aria-hidden="true"></span>
+        </h2>
+        <ul>
+          <!-- «Meditar 10 min» ya está marcada: sale de la lista, pero vuelve aquí si se pulsa Deshacer en el aviso inicial.
+               Su franja, su categoría y su 70 % no vienen en el brief: son un supuesto solo para poder devolverla. -->
+          <li class="slot" id="slot-meditate" data-collapsed="true" hidden>
+            <article class="block" id="block-meditate" data-category="health" data-marked="true">
+              <span class="indicator">
+                <span class="ring" role="img" aria-label="Cumplimiento de los últimos 30 días: 70 %" title="Últimos 30 días: 70 %">
+                  <svg viewBox="0 0 36 36" aria-hidden="true">
+                    <circle class="ring-track" cx="18" cy="18" r="14"/>
+                    <circle class="ring-arc" cx="18" cy="18" r="14" stroke-dasharray="61.58 87.96" transform="rotate(-90 18 18)"/>
+                  </svg>
+                  <span class="ring-value" aria-hidden="true">70</span>
+                </span>
+              </span>
+              <div class="block-text">
+                <h3 class="block-name">Meditar 10 min</h3>
+                <p class="block-detail">Salud</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-button-done" type="button" data-result="done" aria-label="Marcar «Meditar 10 min» como hecha"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></button>
+                <button class="mark-button mark-button-not-done" type="button" data-result="not-done" aria-label="Marcar «Meditar 10 min» como no hecha"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></button>
+              </div>
+            </article>
+          </li>
+          <li class="slot">
+            <article class="block" data-category="personal">
+              <span class="indicator" aria-hidden="true"><span class="task-badge"><span class="task-dot"></span></span></span>
+              <div class="block-text">
+                <h3 class="block-name">Llamar al dentista</h3>
+                <p class="block-detail">10:00 · Personal</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-button-done" type="button" data-result="done" aria-label="Marcar «Llamar al dentista» como hecha"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></button>
+                <button class="mark-button mark-button-not-done" type="button" data-result="not-done" aria-label="Marcar «Llamar al dentista» como no hecha"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></button>
+              </div>
+            </article>
+          </li>
+          <li class="slot">
+            <article class="block" data-category="health">
+              <span class="indicator">
+                <span class="ring" role="img" aria-label="Cumplimiento de los últimos 30 días: 80 %" title="Últimos 30 días: 80 %">
+                  <svg viewBox="0 0 36 36" aria-hidden="true">
+                    <circle class="ring-track" cx="18" cy="18" r="14"/>
+                    <circle class="ring-arc" cx="18" cy="18" r="14" stroke-dasharray="70.37 87.96" transform="rotate(-90 18 18)"/>
+                  </svg>
+                  <span class="ring-value" aria-hidden="true">80</span>
+                </span>
+              </span>
+              <div class="block-text">
+                <h3 class="block-name">Beber 2 L de agua</h3>
+                <p class="block-detail">Salud</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-button-done" type="button" data-result="done" aria-label="Marcar «Beber 2 L de agua» como hecha"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></button>
+                <button class="mark-button mark-button-not-done" type="button" data-result="not-done" aria-label="Marcar «Beber 2 L de agua» como no hecha"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></button>
+              </div>
+            </article>
+          </li>
+        </ul>
+      </section>
+
+      <section class="group" aria-labelledby="group-afternoon">
+        <h2 class="group-label" id="group-afternoon">
+          <span class="group-chip"><svg class="icon icon-small" aria-hidden="true"><use href="#icon-sun"/></svg>Tarde</span>
+          <span class="group-rule" aria-hidden="true"></span>
+        </h2>
+        <ul>
+          <li class="slot">
+            <article class="block" data-category="health">
+              <span class="indicator">
+                <span class="ring" role="img" aria-label="Cumplimiento de los últimos 30 días: 60 %" title="Últimos 30 días: 60 %">
+                  <svg viewBox="0 0 36 36" aria-hidden="true">
+                    <circle class="ring-track" cx="18" cy="18" r="14"/>
+                    <circle class="ring-arc" cx="18" cy="18" r="14" stroke-dasharray="52.78 87.96" transform="rotate(-90 18 18)"/>
+                  </svg>
+                  <span class="ring-value" aria-hidden="true">60</span>
+                </span>
+              </span>
+              <div class="block-text">
+                <h3 class="block-name">Ir al gimnasio</h3>
+                <p class="block-detail">18:30 · Salud</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-button-done" type="button" data-result="done" aria-label="Marcar «Ir al gimnasio» como hecha"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></button>
+                <button class="mark-button mark-button-not-done" type="button" data-result="not-done" aria-label="Marcar «Ir al gimnasio» como no hecha"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></button>
+              </div>
+            </article>
+          </li>
+        </ul>
+      </section>
+
+      <section class="group" aria-labelledby="group-night">
+        <h2 class="group-label" id="group-night">
+          <span class="group-chip"><svg class="icon icon-small" aria-hidden="true"><use href="#icon-moon"/></svg>Noche</span>
+          <span class="group-rule" aria-hidden="true"></span>
+        </h2>
+        <ul>
+          <li class="slot">
+            <article class="block" data-category="university">
+              <span class="indicator" aria-hidden="true"><span class="task-badge"><span class="task-dot"></span></span></span>
+              <div class="block-text">
+                <h3 class="block-name">Entregar práctica de Redes</h3>
+                <p class="block-detail">23:59 · Universidad</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-button-done" type="button" data-result="done" aria-label="Marcar «Entregar práctica de Redes» como hecha"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></button>
+                <button class="mark-button mark-button-not-done" type="button" data-result="not-done" aria-label="Marcar «Entregar práctica de Redes» como no hecha"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></button>
+              </div>
+            </article>
+          </li>
+          <li class="slot">
+            <article class="block" data-category="personal">
+              <span class="indicator">
+                <span class="ring" role="img" aria-label="Cumplimiento de los últimos 30 días: 45 %" title="Últimos 30 días: 45 %">
+                  <svg viewBox="0 0 36 36" aria-hidden="true">
+                    <circle class="ring-track" cx="18" cy="18" r="14"/>
+                    <circle class="ring-arc" cx="18" cy="18" r="14" stroke-dasharray="39.58 87.96" transform="rotate(-90 18 18)"/>
+                  </svg>
+                  <span class="ring-value" aria-hidden="true">45</span>
+                </span>
+              </span>
+              <div class="block-text">
+                <h3 class="block-name">Leer 20 minutos</h3>
+                <p class="block-detail">Personal</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-button-done" type="button" data-result="done" aria-label="Marcar «Leer 20 minutos» como hecha"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></button>
+                <button class="mark-button mark-button-not-done" type="button" data-result="not-done" aria-label="Marcar «Leer 20 minutos» como no hecha"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></button>
+              </div>
+            </article>
+          </li>
+        </ul>
+      </section>
+
+      <p class="empty-state" id="empty-state" hidden>Todo marcado por hoy</p>
+    </main>
+
+    <!-- Aviso inicial: acaba de marcarse «Meditar 10 min» como hecha. -->
+    <div class="toast" id="toast" role="status" aria-live="polite" data-result="done" data-category="health">
+      <p class="toast-message"><span id="toast-text">Marcada como hecha</span> ·</p>
+      <button class="toast-undo" id="undo-button" type="button">Deshacer</button>
+    </div>
+  </div>
+
+  <script>
+    // Marcar, deshacer, el aviso y el progreso del día. Lo mínimo para enseñar cómo se siente.
+    const TOTAL_ITEMS = 8;
+    const LEAVE_DURATION_MS = 260;
+    const TOAST_DURATION_MS = 200;
+    const TOAST_VISIBLE_MS = 7000;
+    const COUNT_DURATION_MS = 500;
+    const TOAST_MESSAGES = {
+      "done": "Marcada como hecha",
+      "not-done": "Marcada como no hecha",
+    };
+
+    // Así queda un elemento plegado: sin alto, sin hueco y desplazado hacia la derecha.
+    const COLLAPSED_LOOK = {
+      height: "0px",
+      marginBottom: "0px",
+      paddingBottom: "0px",
+      opacity: 0,
+      transform: "translateX(32px)",
+    };
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const list = document.getElementById("list");
+    const meter = document.getElementById("meter");
+    const markedCountValue = document.getElementById("marked-count");
+    const percentValue = document.getElementById("percent-value");
+    const emptyState = document.getElementById("empty-state");
+    const toast = document.getElementById("toast");
+    const toastText = document.getElementById("toast-text");
+    const undoButton = document.getElementById("undo-button");
+
+    // Marcas del día en el orden en que se hicieron: pintan los segmentos de la barra.
+    // «Repasar apuntes de Redes» (no hecha) ya no está en la lista, así que no tiene bloque.
+    const meditateSlot = document.getElementById("slot-meditate");
+    const meditateBlock = document.getElementById("block-meditate");
+    const marks = [
+      { block: meditateBlock, collapsedElement: meditateSlot, result: "done", category: "health" },
+      { block: null, collapsedElement: null, result: "not-done", category: "university" },
+    ];
+
+    // Solo se puede deshacer la última marca, mientras su aviso sigue en pantalla.
+    let lastMark = marks[0];
+    let displayedPercent = 25;
+    let percentAnimationFrame = 0;
+    let toastTimer = 0;
+
+    list.addEventListener("click", handleListClick);
+    undoButton.addEventListener("click", undoLastMark);
+
+    function handleListClick(event) {
+      const button = event.target.closest(".mark-button");
+      if (button === null) {
+        return;
+      }
+      const block = button.closest(".block");
+      markBlock(block, button.dataset.result);
+    }
+
+    function markBlock(block, result) {
+      if (block.dataset.marked === "true") {
+        return;
+      }
+      block.dataset.marked = "true";
+      block.classList.add("is-sunk");
+
+      const collapsedElement = chooseElementToCollapse(block);
+      collapse(collapsedElement);
+
+      const mark = { block, collapsedElement, result, category: block.dataset.category };
+      marks.push(mark);
+      lastMark = mark;
+
+      renderProgress();
+      popNewestCell();
+      showToast(mark, true);
+    }
+
+    // Si es el último bloque de su franja, se pliega la franja entera con su etiqueta.
+    function chooseElementToCollapse(block) {
+      const slot = block.closest(".slot");
+      const group = block.closest(".group");
+      const pendingSlots = group.querySelectorAll('.slot:not([data-collapsed="true"])');
+      if (pendingSlots.length === 1) {
+        return group;
+      }
+      return slot;
+    }
+
+    function undoLastMark() {
+      const mark = lastMark;
+      if (mark === null) {
+        return;
+      }
+      const markIndex = marks.indexOf(mark);
+      marks.splice(markIndex, 1);
+
+      mark.block.dataset.marked = "false";
+      mark.block.classList.remove("is-sunk");
+      expand(mark.collapsedElement);
+
+      renderProgress();
+      hideToast();
+    }
+
+    // ---------- Progreso del día ----------
+
+    function renderProgress() {
+      paintMeter();
+      markedCountValue.textContent = String(marks.length);
+      emptyState.hidden = marks.length < TOTAL_ITEMS;
+
+      const ratio = marks.length / TOTAL_ITEMS;
+      const percent = Math.round(ratio * 100);
+      countTo(percent);
+    }
+
+    function paintMeter() {
+      const cells = meter.children;
+      for (let index = 0; index < cells.length; index += 1) {
+        paintCell(cells[index], marks[index]);
+      }
+    }
+
+    function paintCell(cell, mark) {
+      if (mark === undefined) {
+        delete cell.dataset.result;
+        delete cell.dataset.category;
+        return;
+      }
+      cell.dataset.result = mark.result;
+      cell.dataset.category = mark.category;
+    }
+
+    function popNewestCell() {
+      const newestCell = meter.children[marks.length - 1];
+      const popFrames = [
+        { transform: "scale(0.6)" },
+        { transform: "scale(1.12)", offset: 0.6 },
+        { transform: "scale(1)" },
+      ];
+      newestCell.animate(popFrames, { duration: animationDuration(280), easing: "ease-out" });
+    }
+
+    // El porcentaje sube (o baja, al deshacer) pasando por todos los números intermedios.
+    function countTo(targetPercent) {
+      window.cancelAnimationFrame(percentAnimationFrame);
+      const startPercent = displayedPercent;
+      if (prefersReducedMotion || startPercent === targetPercent) {
+        showPercent(targetPercent);
+        return;
+      }
+
+      let startTime = null;
+      function step(now) {
+        if (startTime === null) {
+          startTime = now;
+        }
+        const progress = Math.min((now - startTime) / COUNT_DURATION_MS, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const distance = targetPercent - startPercent;
+        showPercent(Math.round(startPercent + distance * eased));
+        if (progress < 1) {
+          percentAnimationFrame = window.requestAnimationFrame(step);
+        }
+      }
+      percentAnimationFrame = window.requestAnimationFrame(step);
+    }
+
+    function showPercent(value) {
+      displayedPercent = value;
+      percentValue.textContent = String(value);
+    }
+
+    // ---------- Aviso con Deshacer ----------
+
+    function showToast(mark, hidesByItself) {
+      window.clearTimeout(toastTimer);
+      stopAnimations(toast);
+
+      toast.dataset.result = mark.result;
+      toast.dataset.category = mark.category;
+      toastText.textContent = TOAST_MESSAGES[mark.result];
+      toast.hidden = false;
+
+      const enterFrames = [
+        { transform: "translateY(16px)", opacity: 0 },
+        { transform: "translateY(0)", opacity: 1 },
+      ];
+      toast.animate(enterFrames, { duration: animationDuration(TOAST_DURATION_MS), easing: "ease-out" });
+
+      if (hidesByItself) {
+        toastTimer = window.setTimeout(hideToast, TOAST_VISIBLE_MS);
+      }
+    }
+
+    function hideToast() {
+      window.clearTimeout(toastTimer);
+      lastMark = null;
+
+      const leaveFrames = [
+        { transform: "translateY(0)", opacity: 1 },
+        { transform: "translateY(16px)", opacity: 0 },
+      ];
+      const animation = toast.animate(leaveFrames, {
+        duration: animationDuration(TOAST_DURATION_MS),
+        easing: "ease-in",
+        fill: "forwards",
+      });
+      animation.finished
+        .then(function () {
+          toast.hidden = true;
+          animation.cancel();
+        })
+        .catch(ignoreCancelledAnimation);
+    }
+
+    // ---------- Plegar y desplegar ----------
+
+    function readNaturalLook(element) {
+      const style = window.getComputedStyle(element);
+      return {
+        height: element.offsetHeight + "px",
+        marginBottom: style.marginBottom,
+        paddingBottom: style.paddingBottom,
+        opacity: 1,
+        transform: "translateX(0)",
+      };
+    }
+
+    function collapse(element) {
+      stopAnimations(element);
+      element.dataset.collapsed = "true";
+      element.classList.add("is-animating");
+
+      const animation = element.animate([readNaturalLook(element), COLLAPSED_LOOK], {
+        duration: animationDuration(LEAVE_DURATION_MS),
+        easing: "ease-in",
+        fill: "forwards",
+      });
+      animation.finished
+        .then(function () {
+          element.hidden = true;
+          element.classList.remove("is-animating");
+          animation.cancel();
+        })
+        .catch(ignoreCancelledAnimation);
+    }
+
+    function expand(element) {
+      stopAnimations(element);
+      element.dataset.collapsed = "false";
+      element.hidden = false;
+      element.classList.add("is-animating");
+
+      const animation = element.animate([COLLAPSED_LOOK, readNaturalLook(element)], {
+        duration: animationDuration(LEAVE_DURATION_MS),
+        easing: "ease-out",
+      });
+      animation.finished
+        .then(function () {
+          element.classList.remove("is-animating");
+        })
+        .catch(ignoreCancelledAnimation);
+    }
+
+    function stopAnimations(element) {
+      const animations = element.getAnimations();
+      for (const animation of animations) {
+        animation.cancel();
+      }
+    }
+
+    function animationDuration(milliseconds) {
+      if (prefersReducedMotion) {
+        return 0;
+      }
+      return milliseconds;
+    }
+
+    // Cancelar una animación a mitad es normal (por ejemplo, al deshacer): no es un error.
+    function ignoreCancelledAnimation() {}
+  </script>
+</body>
+</html>

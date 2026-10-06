@@ -1,0 +1,1190 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>P1 · Lista con anillos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap">
+<script>
+  // Chromium sin cabeza (las capturas automáticas) hace la foto unos 200 ms después de
+  // cargar. Para que el PNG enseñe los anillos completos y no a medio dibujar, ahí se
+  // salta la animación de entrada. En un navegador normal se ve entera.
+  if (navigator.userAgent.includes('HeadlessChrome')) {
+    document.documentElement.classList.add('skip-intro');
+  }
+</script>
+<style>
+  /* ───────── Paleta N3 · Negro monocromo (el color, solo en las categorías) ───────── */
+  :root {
+    --background: #000000;
+    --surface: #121212;
+    --surface-raised: #1C1C1C;
+    --border: #262626;
+    --text: #FFFFFF;
+    --text-soft: #8E8E8E;
+    --accent: #FFFFFF;
+    --undone: #6B6B6B;
+    --university: #6EA8FE;
+    --health: #63E6BE;
+    --personal: #FFD43B;
+    --home: #FF8787;
+
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+    --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --exit-duration: 240ms;
+  }
+
+  /* Cada elemento que lleva data-category recibe el color de su categoría. */
+  [data-category="university"] { --category-color: var(--university); }
+  [data-category="health"] { --category-color: var(--health); }
+  [data-category="personal"] { --category-color: var(--personal); }
+  [data-category="home"] { --category-color: var(--home); }
+
+  /* ───────── Base ───────── */
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    color-scheme: dark;
+    background: var(--background);
+  }
+
+  body {
+    height: 100vh;
+    height: 100dvh;
+    margin: 0;
+    background: var(--background);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.3;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior: none;
+  }
+
+  h1, h2, p, ul { margin: 0; padding: 0; }
+  ul { list-style: none; }
+
+  button {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  [hidden] { display: none !important; }
+
+  .sprite {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  .icon {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+
+  /* ───────── Pantalla ───────── */
+  .screen {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 480px;
+    height: 100%;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  /* ───────── Cabecera: fecha pequeña y limpia, y el progreso del día ───────── */
+  .header {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 4px;
+  }
+
+  .date {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 32px;
+    letter-spacing: -0.02em;
+  }
+
+  .date-weekday {
+    color: var(--text-soft);
+    font-weight: 500;
+  }
+
+  .progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 32px;
+  }
+
+  .progress-ring {
+    width: 28px;
+    height: 28px;
+    transform: rotate(-90deg);
+  }
+
+  .progress-ring circle {
+    fill: none;
+    stroke-width: 3.5;
+  }
+
+  .progress-track { stroke: var(--border); }
+
+  .progress-arc {
+    stroke: var(--accent);
+    stroke-linecap: round;
+    stroke-dasharray: 100 100;
+    stroke-dashoffset: calc(100 - var(--value));
+    transition: stroke-dashoffset 500ms var(--ease-out);
+    animation: ring-fill 900ms var(--ease-out) 100ms both;
+  }
+
+  .progress-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-soft);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  /* El número del contador rueda hacia arriba (o hacia abajo al deshacer). */
+  .counter {
+    position: relative;
+    width: 13px;
+    height: 24px;
+    overflow: clip;
+    color: var(--text);
+    font-size: 20px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .counter-digit {
+    position: absolute;
+    inset: 0;
+    line-height: 24px;
+    text-align: center;
+  }
+
+  .rolls-in-up { animation: roll-in-up 320ms var(--ease-out) both; }
+  .rolls-out-up { animation: roll-out-up 320ms var(--ease-out) both; }
+  .rolls-in-down { animation: roll-in-down 320ms var(--ease-out) both; }
+  .rolls-out-down { animation: roll-out-down 320ms var(--ease-out) both; }
+
+  /* ───────── Lista por franjas ───────── */
+  .body {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .content {
+    position: absolute;
+    inset: 0;
+    padding: 12px 16px 130px;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .content::-webkit-scrollbar { display: none; }
+
+  .group { margin-bottom: 12px; }
+
+  .group-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 22px;
+    margin: 0 4px 4px;
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .group-title .icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .group-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .card {
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+  }
+
+  /* Salir de la lista: el elemento se desliza, se desvanece y encoge la altura. */
+  .collapsible {
+    overflow: hidden;
+    transition:
+      height var(--exit-duration) var(--ease-out) 40ms,
+      margin-bottom var(--exit-duration) var(--ease-out) 40ms,
+      opacity 180ms linear,
+      visibility 0s;
+  }
+
+  .collapsible.is-collapsed {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      height var(--exit-duration) var(--ease-out) 40ms,
+      margin-bottom var(--exit-duration) var(--ease-out) 40ms,
+      opacity 180ms linear,
+      visibility 0s linear 300ms;
+  }
+
+  .group.is-collapsed { margin-bottom: 0; }
+
+  .row-wrap { position: relative; }
+
+  /* Línea fina entre filas, sangrada hasta donde empieza el texto. */
+  .row-wrap + .row-wrap::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 64px;
+    right: 0;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .row-wrap.is-leaving + .row-wrap::before { opacity: 0; }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 60px;
+    padding: 8px 6px 8px 12px;
+    transition: transform var(--exit-duration) var(--ease-out), opacity 200ms linear;
+  }
+
+  .slides-right .row,
+  .slides-left .row {
+    opacity: 0;
+    transition: transform var(--exit-duration) var(--ease-in), opacity var(--exit-duration) linear;
+  }
+
+  .slides-right .row { transform: translateX(48px); }
+  .slides-left .row { transform: translateX(-48px); }
+
+  .text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .name {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 20px;
+    text-wrap: balance;
+  }
+
+  .meta {
+    margin-top: 1px;
+    color: var(--text-soft);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 16px;
+  }
+
+  .meta-time {
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ───────── Indicador a la izquierda: anillo (hábito) o punto (tarea) ───────── */
+  .habit-ring {
+    position: relative;
+    flex: none;
+    width: 40px;
+    height: 40px;
+  }
+
+  .habit-ring svg {
+    display: block;
+    width: 40px;
+    height: 40px;
+    transform: rotate(-90deg);
+  }
+
+  .habit-ring circle {
+    fill: none;
+    stroke-width: 4;
+  }
+
+  .ring-track { stroke: var(--border); }
+
+  .ring-arc {
+    stroke: var(--category-color);
+    stroke-linecap: round;
+    stroke-dasharray: 100 100;
+    stroke-dashoffset: calc(100 - var(--value));
+    animation: ring-fill 900ms var(--ease-out) calc(150ms + var(--order) * 120ms) both;
+  }
+
+  .ring-value {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ring-unit {
+    margin-left: 1px;
+    color: var(--text-soft);
+    font-size: 9px;
+    font-weight: 600;
+  }
+
+  .task-marker {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--surface-raised);
+  }
+
+  .task-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--category-color);
+  }
+
+  /* Al terminar la entrada, los anillos dejan de animarse (también los que vuelven al deshacer). */
+  .is-ready .ring-arc,
+  .is-ready .progress-arc,
+  .skip-intro .ring-arc,
+  .skip-intro .progress-arc {
+    animation: none;
+  }
+
+  /* ───────── Botones de marcar: ✓ con el color de la categoría y ✗ con el de «no hecho» ───────── */
+  .actions {
+    display: flex;
+    flex: none;
+  }
+
+  .action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+  }
+
+  .action-disc {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: transform 120ms var(--ease-out);
+  }
+
+  .action:active .action-disc { transform: scale(0.88); }
+
+  .action .icon {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5;
+  }
+
+  .action-done .action-disc {
+    background: var(--category-color);
+    color: var(--background);
+  }
+
+  .action-undone .action-disc {
+    border: 2px solid var(--undone);
+    color: var(--undone);
+  }
+
+  /* ───────── Todo marcado ───────── */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding-top: 96px;
+    text-align: center;
+    animation: fade-in 300ms linear 200ms both;
+  }
+
+  .empty-state-ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border: 4px solid var(--accent);
+    border-radius: 50%;
+  }
+
+  .empty-state-ring .icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .empty-state p {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  /* ───────── Botón + flotante y aviso con Deshacer ───────── */
+  .fab {
+    position: absolute;
+    right: 16px;
+    bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--background);
+    box-shadow: 0 0 0 5px var(--background);
+    transition: transform 260ms var(--ease-out);
+  }
+
+  .fab .icon {
+    width: 26px;
+    height: 26px;
+    stroke-width: 2.25;
+  }
+
+  .fab:active .icon { transform: scale(0.88); }
+
+  /* Cuando hay aviso, el botón + se aparta hacia arriba. */
+  .has-toast .fab { transform: translateY(-58px); }
+
+  .toast {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 48px;
+    padding: 0 6px 0 14px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(12px);
+    transition: opacity 180ms linear, transform 220ms var(--ease-out), visibility 0s linear 220ms;
+  }
+
+  .has-toast .toast {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity 180ms linear, transform 220ms var(--ease-out), visibility 0s;
+  }
+
+  .toast.is-refreshing { animation: toast-pop 260ms var(--ease-out); }
+
+  .toast-icon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+  }
+
+  .toast-icon .icon {
+    width: 14px;
+    height: 14px;
+    stroke-width: 3;
+  }
+
+  .toast-icon[data-outcome="done"] {
+    background: var(--category-color);
+    color: var(--background);
+  }
+
+  .toast-icon[data-outcome="undone"] {
+    background: var(--undone);
+    color: var(--text);
+  }
+
+  .toast-icon[data-outcome="done"] .glyph-undone,
+  .toast-icon[data-outcome="undone"] .glyph-done {
+    display: none;
+  }
+
+  .toast-message {
+    display: flex;
+    align-items: center;
+  }
+
+  .toast-separator {
+    margin: 0 2px 0 8px;
+    color: var(--text-soft);
+  }
+
+  .undo-button {
+    min-height: 44px;
+    padding: 0 8px;
+    color: var(--text);
+    font-weight: 700;
+  }
+
+  /* ───────── Barra de pestañas ───────── */
+  .tab-bar {
+    flex: none;
+    display: flex;
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+
+  .tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 64px;
+    color: var(--text-soft);
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .tab[aria-current="page"] { color: var(--text); }
+
+  .tab-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 30px;
+    border-radius: 15px;
+  }
+
+  .tab[aria-current="page"] .tab-icon { background: var(--surface-raised); }
+
+  .tab:active .tab-icon .icon { transform: scale(0.9); }
+
+  .tab-badge {
+    position: absolute;
+    top: -3px;
+    right: 5px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 4px;
+    border: 2px solid var(--surface);
+    border-radius: 10px;
+    background: var(--accent);
+    color: var(--background);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+  }
+
+  /* ───────── Animaciones ───────── */
+  @keyframes ring-fill {
+    from { stroke-dashoffset: 100; }
+    to { stroke-dashoffset: calc(100 - var(--value)); }
+  }
+
+  @keyframes roll-in-up {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: none; opacity: 1; }
+  }
+
+  @keyframes roll-out-up {
+    from { transform: none; opacity: 1; }
+    to { transform: translateY(-100%); opacity: 0; }
+  }
+
+  @keyframes roll-in-down {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: none; opacity: 1; }
+  }
+
+  @keyframes roll-out-down {
+    from { transform: none; opacity: 1; }
+    to { transform: translateY(100%); opacity: 0; }
+  }
+
+  @keyframes toast-pop {
+    from { transform: translateY(6px) scale(0.97); }
+    to { transform: none; }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Iconos de lucide (24 px, trazo 2, extremos redondeados), definidos una vez y reutilizados. -->
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="icon-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="icon-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+  <symbol id="icon-sunrise" viewBox="0 0 24 24"><path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></symbol>
+  <symbol id="icon-sunset" viewBox="0 0 24 24"><path d="M12 10V2"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m16 6-4 4-4-4"/><path d="M16 18a4 4 0 0 0-8 0"/></symbol>
+  <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="icon-circle-dashed" viewBox="0 0 24 24"><path d="M10.1 2.182a10 10 0 0 1 3.8 0"/><path d="M13.9 21.818a10 10 0 0 1-3.8 0"/><path d="M17.609 3.721a10 10 0 0 1 2.69 2.7"/><path d="M2.182 13.9a10 10 0 0 1 0-3.8"/><path d="M20.279 17.609a10 10 0 0 1-2.7 2.69"/><path d="M21.818 10.1a10 10 0 0 1 0 3.8"/><path d="M3.721 6.391a10 10 0 0 1 2.7-2.69"/><path d="M6.391 20.279a10 10 0 0 1-2.69-2.7"/></symbol>
+  <symbol id="icon-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+  <symbol id="icon-layout-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+  <symbol id="icon-hourglass" viewBox="0 0 24 24"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></symbol>
+  <symbol id="icon-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+</svg>
+
+<div class="screen has-toast" id="screen">
+
+  <header class="header">
+    <time class="date" datetime="2026-10-06" aria-label="martes 6 de octubre de 2026">
+      <span class="date-weekday">mar</span>
+      <span class="date-day">6</span>
+    </time>
+
+    <div class="progress" id="progress" role="img" aria-label="2 de 8 marcadas" style="--value: 25">
+      <svg class="progress-ring" viewBox="0 0 28 28" aria-hidden="true">
+        <circle class="progress-track" cx="14" cy="14" r="12.25"/>
+        <circle class="progress-arc" cx="14" cy="14" r="12.25" pathLength="100"/>
+      </svg>
+      <p class="progress-label" aria-hidden="true">
+        <span class="counter" id="counter"><span class="counter-digit">2</span></span>
+        <span>de 8</span>
+      </p>
+    </div>
+  </header>
+
+  <main class="body">
+    <div class="content" id="content">
+
+      <section class="group collapsible" aria-labelledby="title-untimed">
+        <h2 class="group-title" id="title-untimed">
+          <svg class="icon" aria-hidden="true"><use href="#icon-circle-dashed"/></svg>
+          Sin hora
+        </h2>
+        <ul class="card">
+          <li class="row-wrap collapsible" data-kind="task" data-category="personal">
+            <div class="row">
+              <span class="task-marker" aria-hidden="true"><span class="task-dot"></span></span>
+              <div class="text">
+                <p class="name">Comprar proteína</p>
+                <p class="meta">Personal</p>
+              </div>
+              <div class="actions">
+                <button type="button" class="action action-undone" data-outcome="undone" aria-label="Marcar «Comprar proteína» como no hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+                <button type="button" class="action action-done" data-outcome="done" aria-label="Marcar «Comprar proteína» como hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="group collapsible" aria-labelledby="title-morning">
+        <h2 class="group-title" id="title-morning">
+          <svg class="icon" aria-hidden="true"><use href="#icon-sunrise"/></svg>
+          Mañana
+        </h2>
+        <ul class="card" id="list-morning">
+          <li class="row-wrap collapsible" data-kind="task" data-category="personal">
+            <div class="row">
+              <span class="task-marker" aria-hidden="true"><span class="task-dot"></span></span>
+              <div class="text">
+                <p class="name">Llamar al dentista</p>
+                <p class="meta"><span class="meta-time">10:00</span> · Personal</p>
+              </div>
+              <div class="actions">
+                <button type="button" class="action action-undone" data-outcome="undone" aria-label="Marcar «Llamar al dentista» como no hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+                <button type="button" class="action action-done" data-outcome="done" aria-label="Marcar «Llamar al dentista» como hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+              </div>
+            </div>
+          </li>
+          <li class="row-wrap collapsible" data-kind="habit" data-category="health">
+            <div class="row">
+              <div class="habit-ring" role="img" aria-label="Cumplimiento de los últimos 30 días: 80 %" style="--value: 80; --order: 0">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                  <circle class="ring-track" cx="20" cy="20" r="18"/>
+                  <circle class="ring-arc" cx="20" cy="20" r="18" pathLength="100"/>
+                </svg>
+                <span class="ring-value" aria-hidden="true">80<span class="ring-unit">%</span></span>
+              </div>
+              <div class="text">
+                <p class="name">Beber 2 L de agua</p>
+                <p class="meta">Salud</p>
+              </div>
+              <div class="actions">
+                <button type="button" class="action action-undone" data-outcome="undone" aria-label="Marcar «Beber 2 L de agua» como no hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+                <button type="button" class="action action-done" data-outcome="done" aria-label="Marcar «Beber 2 L de agua» como hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="group collapsible" aria-labelledby="title-afternoon">
+        <h2 class="group-title" id="title-afternoon">
+          <svg class="icon" aria-hidden="true"><use href="#icon-sunset"/></svg>
+          Tarde
+        </h2>
+        <ul class="card">
+          <li class="row-wrap collapsible" data-kind="habit" data-category="health">
+            <div class="row">
+              <div class="habit-ring" role="img" aria-label="Cumplimiento de los últimos 30 días: 60 %" style="--value: 60; --order: 1">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                  <circle class="ring-track" cx="20" cy="20" r="18"/>
+                  <circle class="ring-arc" cx="20" cy="20" r="18" pathLength="100"/>
+                </svg>
+                <span class="ring-value" aria-hidden="true">60<span class="ring-unit">%</span></span>
+              </div>
+              <div class="text">
+                <p class="name">Ir al gimnasio</p>
+                <p class="meta"><span class="meta-time">18:30</span> · Salud</p>
+              </div>
+              <div class="actions">
+                <button type="button" class="action action-undone" data-outcome="undone" aria-label="Marcar «Ir al gimnasio» como no hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+                <button type="button" class="action action-done" data-outcome="done" aria-label="Marcar «Ir al gimnasio» como hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="group collapsible" aria-labelledby="title-night">
+        <h2 class="group-title" id="title-night">
+          <svg class="icon" aria-hidden="true"><use href="#icon-moon"/></svg>
+          Noche
+        </h2>
+        <ul class="card">
+          <li class="row-wrap collapsible" data-kind="task" data-category="university">
+            <div class="row">
+              <span class="task-marker" aria-hidden="true"><span class="task-dot"></span></span>
+              <div class="text">
+                <p class="name">Entregar práctica de Redes</p>
+                <p class="meta"><span class="meta-time">23:59</span> · Universidad</p>
+              </div>
+              <div class="actions">
+                <button type="button" class="action action-undone" data-outcome="undone" aria-label="Marcar «Entregar práctica de Redes» como no hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+                <button type="button" class="action action-done" data-outcome="done" aria-label="Marcar «Entregar práctica de Redes» como hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+              </div>
+            </div>
+          </li>
+          <li class="row-wrap collapsible" data-kind="habit" data-category="personal">
+            <div class="row">
+              <div class="habit-ring" role="img" aria-label="Cumplimiento de los últimos 30 días: 45 %" style="--value: 45; --order: 2">
+                <svg viewBox="0 0 40 40" aria-hidden="true">
+                  <circle class="ring-track" cx="20" cy="20" r="18"/>
+                  <circle class="ring-arc" cx="20" cy="20" r="18" pathLength="100"/>
+                </svg>
+                <span class="ring-value" aria-hidden="true">45<span class="ring-unit">%</span></span>
+              </div>
+              <div class="text">
+                <p class="name">Leer 20 minutos</p>
+                <p class="meta">Personal</p>
+              </div>
+              <div class="actions">
+                <button type="button" class="action action-undone" data-outcome="undone" aria-label="Marcar «Leer 20 minutos» como no hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+                <button type="button" class="action action-done" data-outcome="done" aria-label="Marcar «Leer 20 minutos» como hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <div class="empty-state" id="empty-state" hidden>
+        <span class="empty-state-ring"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></span>
+        <p>Todo marcado por hoy</p>
+      </div>
+
+    </div>
+
+    <button type="button" class="fab" aria-label="Crear una tarea o un hábito">
+      <svg class="icon" aria-hidden="true"><use href="#icon-plus"/></svg>
+    </button>
+
+    <!-- Acaba de marcarse «Meditar 10 min», así que el aviso ya está a la vista al cargar. -->
+    <div class="toast" id="toast" role="status" aria-live="polite">
+      <span class="toast-icon" id="toast-icon" data-outcome="done" data-category="health" aria-hidden="true">
+        <svg class="icon glyph-done"><use href="#icon-check"/></svg>
+        <svg class="icon glyph-undone"><use href="#icon-x"/></svg>
+      </span>
+      <p class="toast-message">
+        <span id="toast-text">Marcada como hecha</span>
+        <span class="toast-separator" aria-hidden="true">·</span>
+        <button type="button" class="undo-button" id="undo-button">Deshacer</button>
+      </p>
+    </div>
+  </main>
+
+  <nav class="tab-bar" aria-label="Navegación principal">
+    <button type="button" class="tab" aria-current="page">
+      <span class="tab-icon"><svg class="icon" aria-hidden="true"><use href="#icon-sun"/></svg></span>
+      <span>Hoy</span>
+    </button>
+    <button type="button" class="tab">
+      <span class="tab-icon"><svg class="icon" aria-hidden="true"><use href="#icon-inbox"/></svg></span>
+      <span>Bandeja</span>
+    </button>
+    <button type="button" class="tab">
+      <span class="tab-icon"><svg class="icon" aria-hidden="true"><use href="#icon-layout-grid"/></svg></span>
+      <span>Categorías</span>
+    </button>
+    <button type="button" class="tab">
+      <span class="tab-icon">
+        <svg class="icon" aria-hidden="true"><use href="#icon-hourglass"/></svg>
+        <span class="tab-badge" aria-hidden="true">2</span>
+      </span>
+      <span>Pendientes<span class="visually-hidden">, 2 de días anteriores</span></span>
+    </button>
+    <button type="button" class="tab">
+      <span class="tab-icon"><svg class="icon" aria-hidden="true"><use href="#icon-history"/></svg></span>
+      <span>Historial</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- La fila de «Meditar 10 min» solo se usa si se pulsa Deshacer en el aviso inicial. -->
+<template id="meditation-row-template">
+  <li class="row-wrap collapsible" data-kind="habit" data-category="health">
+    <div class="row">
+      <div class="habit-ring" role="img" aria-label="Cumplimiento de los últimos 30 días: 70 %" style="--value: 70; --order: 0">
+        <svg viewBox="0 0 40 40" aria-hidden="true">
+          <circle class="ring-track" cx="20" cy="20" r="18"/>
+          <circle class="ring-arc" cx="20" cy="20" r="18" pathLength="100"/>
+        </svg>
+        <span class="ring-value" aria-hidden="true">70<span class="ring-unit">%</span></span>
+      </div>
+      <div class="text">
+        <p class="name">Meditar 10 min</p>
+        <p class="meta">Salud</p>
+      </div>
+      <div class="actions">
+        <button type="button" class="action action-undone" data-outcome="undone" aria-label="Marcar «Meditar 10 min» como no hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+        <button type="button" class="action action-done" data-outcome="done" aria-label="Marcar «Meditar 10 min» como hecha"><span class="action-disc"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+      </div>
+    </div>
+  </li>
+</template>
+
+<script>
+(function () {
+  'use strict';
+
+  const TOTAL_ITEMS = 8;
+  const COLLAPSE_DURATION_MS = 300;
+  const COUNTER_ROLL_MS = 340;
+  const TOAST_DURATION_MS = 6000;
+  const INTRO_DURATION_MS = 1800;
+  const TOAST_MESSAGES = {
+    done: 'Marcada como hecha',
+    undone: 'Marcada como no hecha'
+  };
+
+  const screen = document.getElementById('screen');
+  const content = document.getElementById('content');
+  const emptyState = document.getElementById('empty-state');
+  const progress = document.getElementById('progress');
+  const counter = document.getElementById('counter');
+  const toast = document.getElementById('toast');
+  const toastIcon = document.getElementById('toast-icon');
+  const toastText = document.getElementById('toast-text');
+  const undoButton = document.getElementById('undo-button');
+  const morningGroup = document.getElementById('title-morning').parentElement;
+  const morningList = document.getElementById('list-morning');
+  const meditationTemplate = document.getElementById('meditation-row-template');
+
+  let markedCount = 2;
+  let lastAction = null;
+  let toastTimer = null;
+
+  // ───────── Ayudas de animación ─────────
+
+  function forceLayout(element) {
+    // Leer la geometría obliga al navegador a calcular el estilo actual,
+    // así la transición siguiente parte de ese estado y no se salta.
+    element.getBoundingClientRect();
+  }
+
+  function collapse(element) {
+    element.style.height = element.offsetHeight + 'px';
+    forceLayout(element);
+    element.classList.add('is-collapsed');
+    element.style.height = '0px';
+  }
+
+  function expand(element) {
+    element.classList.remove('is-collapsed');
+    element.style.height = element.scrollHeight + 'px';
+    window.setTimeout(function () {
+      element.style.height = '';
+    }, COLLAPSE_DURATION_MS);
+  }
+
+  // ───────── Filas ─────────
+
+  function countActiveRows(list) {
+    return list.querySelectorAll('.row-wrap:not(.is-leaving)').length;
+  }
+
+  function findNextActiveRow(rowElement) {
+    let candidate = rowElement.nextElementSibling;
+    while (candidate !== null && candidate.classList.contains('is-leaving')) {
+      candidate = candidate.nextElementSibling;
+    }
+    return candidate;
+  }
+
+  function slideOut(rowElement, outcome) {
+    const slideClass = outcome === 'done' ? 'slides-right' : 'slides-left';
+    rowElement.classList.add('is-leaving', slideClass);
+  }
+
+  // Quita la fila del documento cuando acaba la animación. Devuelve la función
+  // que lo hace ya mismo, por si se pulsa Deshacer antes de que termine.
+  function scheduleRemoval(rowElement) {
+    let timer = null;
+    let removed = false;
+
+    function removeNow() {
+      if (removed) {
+        return;
+      }
+      removed = true;
+      window.clearTimeout(timer);
+      rowElement.remove();
+    }
+
+    timer = window.setTimeout(removeNow, COLLAPSE_DURATION_MS);
+    return removeNow;
+  }
+
+  function restoreRow(rowElement, list, nextRow, group, groupWasCollapsed) {
+    list.insertBefore(rowElement, nextRow);
+    forceLayout(rowElement);
+    rowElement.classList.remove('is-leaving', 'slides-right', 'slides-left');
+    if (groupWasCollapsed) {
+      expand(group);
+      return;
+    }
+    expand(rowElement);
+  }
+
+  function markRow(rowElement, outcome) {
+    if (rowElement.classList.contains('is-leaving')) {
+      return;
+    }
+    const list = rowElement.parentElement;
+    const group = rowElement.closest('.group');
+    const nextRow = findNextActiveRow(rowElement);
+    const isLastRowOfGroup = countActiveRows(list) === 1;
+
+    slideOut(rowElement, outcome);
+    if (isLastRowOfGroup) {
+      collapse(group);
+    } else {
+      collapse(rowElement);
+    }
+
+    lastAction = {
+      outcome: outcome,
+      category: rowElement.dataset.category,
+      finishExit: scheduleRemoval(rowElement),
+      restore: function () {
+        restoreRow(rowElement, list, nextRow, group, isLastRowOfGroup);
+      }
+    };
+
+    setMarkedCount(markedCount + 1);
+    showToast(lastAction, true);
+    updateEmptyState();
+  }
+
+  // «Meditar 10 min» no está en la lista: se crea solo si se deshace su marca.
+  function restoreMeditation() {
+    const fragment = meditationTemplate.content.cloneNode(true);
+    const rowElement = fragment.querySelector('.row-wrap');
+    rowElement.classList.add('is-leaving', 'slides-right', 'is-collapsed');
+    rowElement.style.height = '0px';
+    restoreRow(rowElement, morningList, null, morningGroup, false);
+  }
+
+  function updateEmptyState() {
+    const activeRowCount = countActiveRows(content);
+    emptyState.hidden = activeRowCount > 0;
+  }
+
+  // ───────── Progreso del día ─────────
+
+  function rollCounter(value, direction) {
+    const currentDigit = counter.lastElementChild;
+    const nextDigit = document.createElement('span');
+    nextDigit.className = 'counter-digit rolls-in-' + direction;
+    nextDigit.textContent = String(value);
+    currentDigit.className = 'counter-digit rolls-out-' + direction;
+    counter.appendChild(nextDigit);
+    window.setTimeout(function () {
+      currentDigit.remove();
+    }, COUNTER_ROLL_MS);
+  }
+
+  function setMarkedCount(newCount) {
+    const direction = newCount > markedCount ? 'up' : 'down';
+    markedCount = newCount;
+    rollCounter(newCount, direction);
+
+    const percent = (newCount / TOTAL_ITEMS) * 100;
+    progress.style.setProperty('--value', String(percent));
+    progress.setAttribute('aria-label', newCount + ' de ' + TOTAL_ITEMS + ' marcadas');
+  }
+
+  // ───────── Aviso con Deshacer ─────────
+
+  function showToast(action, hidesByItself) {
+    toastIcon.dataset.outcome = action.outcome;
+    toastIcon.dataset.category = action.category;
+    toastText.textContent = TOAST_MESSAGES[action.outcome];
+
+    toast.classList.remove('is-refreshing');
+    forceLayout(toast);
+    toast.classList.add('is-refreshing');
+    screen.classList.add('has-toast');
+
+    window.clearTimeout(toastTimer);
+    if (hidesByItself) {
+      toastTimer = window.setTimeout(hideToast, TOAST_DURATION_MS);
+    }
+  }
+
+  function hideToast() {
+    window.clearTimeout(toastTimer);
+    screen.classList.remove('has-toast');
+    lastAction = null;
+  }
+
+  function undoLastAction() {
+    if (lastAction === null) {
+      return;
+    }
+    const action = lastAction;
+    action.finishExit();
+    action.restore();
+    setMarkedCount(markedCount - 1);
+    hideToast();
+    updateEmptyState();
+  }
+
+  // ───────── Arranque ─────────
+
+  function handleContentClick(event) {
+    const button = event.target.closest('.action');
+    if (button === null) {
+      return;
+    }
+    const rowElement = button.closest('.row-wrap');
+    markRow(rowElement, button.dataset.outcome);
+  }
+
+  function finishIntro() {
+    document.body.classList.add('is-ready');
+  }
+
+  // El aviso inicial es el de «Meditar 10 min»: se queda hasta la primera pulsación.
+  lastAction = {
+    outcome: 'done',
+    category: 'health',
+    finishExit: function () {},
+    restore: restoreMeditation
+  };
+
+  content.addEventListener('click', handleContentClick);
+  undoButton.addEventListener('click', undoLastAction);
+  window.setTimeout(finishIntro, INTRO_DURATION_MS);
+})();
+</script>
+</body>
+</html>

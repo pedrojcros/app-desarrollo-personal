@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0A0A0A">
+  <title>P2 · Marcador en vivo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Paleta N1 · Carbón y lima. Son los únicos colores de la pantalla. */
+    :root {
+      --bg: #0A0A0A;
+      --surface: #151515;
+      --surface-2: #1E1E1E;
+      --border: #2A2A2A;
+      --text: #F2F2F2;
+      --text-soft: #8C8C8C;
+      --accent: #CDFF3F;
+      --missed: #FF6B57;
+      --cat-university: #6CB4FF;
+      --cat-health: #4FE3A3;
+      --cat-personal: #FFC453;
+      --cat-home: #FF8FB8;
+
+      --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+      --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+      --ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+      --count-duration: 700ms;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      background: var(--bg);
+      color-scheme: dark;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      height: 100dvh;
+      background: var(--bg);
+      color: var(--text);
+      font: 500 14px/1.3 var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, p, ul { margin: 0; padding: 0; }
+    ul { list-style: none; }
+
+    button {
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+    /* Iconos: estilo lucide, 24 px, trazo de 2 y extremos redondeados. */
+    .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+    .icon {
+      flex: none;
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .cat-university { --category-color: var(--cat-university); }
+    .cat-health { --category-color: var(--cat-health); }
+    .cat-personal { --category-color: var(--cat-personal); }
+    .cat-home { --category-color: var(--cat-home); }
+
+    /* Pantalla: en el móvil ocupa todo; en un ordenador se queda en una columna centrada. */
+    .screen {
+      position: relative;
+      height: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    @media (min-width: 481px) {
+      .screen { border-inline: 1px solid var(--border); }
+    }
+
+    .screen-scroll {
+      height: 100%;
+      padding: max(20px, env(safe-area-inset-top)) 0 164px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: none;
+    }
+
+    .screen-scroll::-webkit-scrollbar { display: none; }
+
+    /* Plegado animado: es lo que usan las filas, los grupos y el mensaje de «todo marcado». */
+    .collapsible {
+      display: grid;
+      grid-template-rows: 1fr;
+      transition: grid-template-rows 220ms var(--ease-out);
+    }
+
+    .collapsible > .collapsible-inner { min-height: 0; overflow: hidden; }
+
+    .collapsible.is-away {
+      grid-template-rows: 0fr;
+      visibility: hidden;
+      transition: grid-template-rows 220ms var(--ease-out), visibility 0s linear 220ms;
+    }
+
+    /* Cabecera: el marcador del día. */
+    .score-card {
+      margin-inline: 14px;
+      padding: 14px 18px 18px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: var(--surface);
+    }
+
+    .score-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .score-title { font: 600 16px/20px var(--font-display); }
+    .score-date { color: var(--text-soft); font: 500 12.5px/20px var(--font-body); }
+
+    .score-main {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-top: 2px;
+    }
+
+    .score-percent {
+      display: flex;
+      align-items: baseline;
+      color: var(--accent);
+      font-family: var(--font-display);
+    }
+
+    .score-number {
+      font-size: 72px;
+      font-weight: 700;
+      line-height: 64px;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .score-unit { margin-left: 3px; font-size: 30px; font-weight: 500; }
+
+    .score-count { padding-bottom: 6px; text-align: right; }
+
+    .score-count-numbers {
+      display: block;
+      font: 600 22px/24px var(--font-display);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .score-count-numbers span { display: inline-block; }
+    .score-count-label { display: block; color: var(--text-soft); font: 500 12px/16px var(--font-body); }
+
+    .score-bar {
+      display: flex;
+      gap: 2px;
+      height: 6px;
+      margin-top: 14px;
+      overflow: hidden;
+      border-radius: 3px;
+      background: var(--border);
+    }
+
+    .score-bar-done,
+    .score-bar-missed {
+      height: 100%;
+      transition: width var(--count-duration) var(--ease-out);
+    }
+
+    .score-bar-done { width: calc(var(--done-share) * 1%); background: var(--accent); }
+    .score-bar-missed { width: calc(var(--missed-share) * 1%); background: var(--missed); }
+
+    /* Lista por franjas. */
+    .group-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px 4px;
+      color: var(--text-soft);
+      font: 600 11.5px/16px var(--font-body);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .group-title .icon { width: 14px; height: 14px; }
+
+    /* Las filas llegan hasta el borde de la pantalla: así los botones tienen 44 px de zona de toque. */
+    .row {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 58px;
+      padding: 6px 5px 6px 14px;
+      transition: transform 240ms var(--ease-out), opacity 200ms ease-out;
+    }
+
+    .row::after {
+      content: "";
+      position: absolute;
+      right: 14px;
+      bottom: 0;
+      left: 58px;
+      height: 1px;
+      background: var(--surface-2);
+    }
+
+    .row-slot.is-away .row {
+      transform: translateX(28px);
+      opacity: 0;
+      transition: transform 200ms ease-in, opacity 160ms ease-in;
+    }
+
+    .indicator {
+      position: relative;
+      display: grid;
+      flex: none;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+    }
+
+    .ring svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      fill: none;
+      stroke-width: 4;
+    }
+
+    .ring-track { stroke: var(--border); }
+    .ring-arc { stroke: var(--category-color); stroke-linecap: round; stroke-dasharray: var(--ring-value) 100; }
+
+    .ring-number {
+      position: relative;
+      font: 600 11.5px/1 var(--font-display);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .task-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--category-color); }
+
+    .row-text { flex: 1; min-width: 0; }
+
+    .row-name {
+      font: 600 15px/1.25 var(--font-body);
+      letter-spacing: -0.01em;
+      text-wrap: balance;
+    }
+
+    .row-detail { margin-top: 2px; color: var(--text-soft); font: 500 12.5px/16px var(--font-body); }
+    .row-time { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    .row-actions { display: flex; flex: none; }
+
+    .mark-button {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+    }
+
+    /* Hecho: círculo grande con el color de la categoría; al tocarlo se rellena. */
+    .done-circle {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      overflow: hidden;
+      border: 2px solid var(--category-color);
+      border-radius: 50%;
+      color: var(--category-color);
+      transition: transform 90ms ease-out;
+    }
+
+    .done-fill {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: var(--category-color);
+      transform: scale(0);
+      transition: transform 120ms ease-out;
+    }
+
+    .done-glyph {
+      position: relative;
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.5;
+      transition: color 120ms ease-out;
+    }
+
+    .row-slot[data-pressed="done"] .done-fill { transform: scale(1); }
+    .row-slot[data-pressed="done"] .done-glyph { color: var(--bg); }
+
+    /* No hecho: × pequeña y discreta; al tocarla se pinta con el color de «no hecho». */
+    .missed-circle {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      border: 1.5px solid var(--border);
+      border-radius: 50%;
+      color: var(--text-soft);
+      transition: transform 90ms ease-out, background-color 120ms ease-out, border-color 120ms ease-out, color 120ms ease-out;
+    }
+
+    .missed-glyph { width: 14px; height: 14px; stroke-width: 2.5; }
+
+    .row-slot[data-pressed="missed"] .missed-circle {
+      border-color: var(--missed);
+      background: var(--missed);
+      color: var(--bg);
+    }
+
+    .mark-button:active .done-circle,
+    .mark-button:active .missed-circle { transform: scale(0.9); }
+
+    /* Mensaje cuando no queda nada por marcar. */
+    .empty-message {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 36px 0;
+      color: var(--text-soft);
+      font: 500 14px/20px var(--font-body);
+    }
+
+    .empty-message .icon { width: 18px; height: 18px; color: var(--accent); }
+
+    /* Navegación: píldora flotante con los cinco destinos y el botón + aparte. */
+    .dock {
+      position: absolute;
+      right: 14px;
+      bottom: calc(16px + env(safe-area-inset-bottom));
+      left: 14px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dock-pill {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      justify-content: space-between;
+      height: 62px;
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 31px;
+      background: var(--surface);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .dock-item {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      color: var(--text-soft);
+      transition: background-color 150ms ease-out, color 150ms ease-out, transform 90ms ease-out;
+    }
+
+    .dock-item.is-active { background: var(--accent); color: var(--bg); }
+    .dock-item:active { transform: scale(0.92); }
+
+    .dock-badge {
+      position: absolute;
+      top: 2px;
+      right: 0;
+      display: grid;
+      place-items: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 5px;
+      border: 2px solid var(--surface);
+      border-radius: 10px;
+      background: var(--missed);
+      color: var(--bg);
+      font: 700 11px/1 var(--font-display);
+    }
+
+    .dock-add {
+      display: grid;
+      flex: none;
+      place-items: center;
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--bg);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      transition: transform 90ms ease-out;
+    }
+
+    .dock-add .icon { width: 28px; height: 28px; stroke-width: 2.5; }
+    .dock-add:active { transform: scale(0.92); }
+
+    /* Aviso con Deshacer. */
+    .snackbar {
+      position: absolute;
+      right: 14px;
+      bottom: calc(88px + env(safe-area-inset-bottom));
+      left: 14px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface-2);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(14px);
+      transition: opacity 180ms ease-in, transform 180ms ease-in, visibility 0s linear 180ms;
+    }
+
+    .snackbar.is-visible {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition: opacity 220ms ease-out, transform 220ms var(--ease-out), visibility 0s;
+    }
+
+    .snackbar-icon {
+      display: grid;
+      flex: none;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--category-color);
+      color: var(--bg);
+    }
+
+    .snackbar[data-status="missed"] .snackbar-icon { background: var(--missed); }
+    .snackbar-icon .icon { width: 18px; height: 18px; stroke-width: 2.75; }
+
+    .snackbar-body { min-width: 0; }
+    .snackbar-message { color: var(--text); font: 500 14px/18px var(--font-body); }
+
+    .undo-button {
+      position: relative;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* Amplía la zona de toque de Deshacer hasta 44 px sin mover nada. */
+    .undo-button::before { content: ""; position: absolute; inset: -14px -10px; }
+
+    .snackbar-item {
+      overflow: hidden;
+      color: var(--text-soft);
+      font: 500 12px/16px var(--font-body);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .snackbar-timer {
+      position: absolute;
+      right: 16px;
+      bottom: 0;
+      left: 16px;
+      height: 2px;
+      border-radius: 1px;
+      background: var(--accent);
+      opacity: 0;
+      transform-origin: left;
+    }
+
+    .snackbar.is-timed .snackbar-timer { opacity: 1; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 1ms !important;
+        transition-delay: 0s !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="icon-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+    <symbol id="icon-calendar" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></symbol>
+    <symbol id="icon-calendar-check" viewBox="0 0 24 24"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></symbol>
+    <symbol id="icon-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+    <symbol id="icon-layout-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+    <symbol id="icon-hourglass" viewBox="0 0 24 24"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></symbol>
+    <symbol id="icon-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+    <symbol id="icon-sunrise" viewBox="0 0 24 24"><path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/></symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  </svg>
+
+  <main class="screen">
+    <div class="screen-scroll">
+
+      <!-- Marcador del día: el porcentaje sube contando cada vez que se marca algo. -->
+      <header class="score-card">
+        <div class="score-top">
+          <h1 class="score-title">Hoy</h1>
+          <time class="score-date" datetime="2026-10-06">martes 6 de octubre de 2026</time>
+        </div>
+        <div class="score-main">
+          <p class="score-percent" aria-hidden="true"><span class="score-number" id="scoreNumber">25</span><span class="score-unit">%</span></p>
+          <p class="score-count"><strong class="score-count-numbers"><span id="markedCount">2</span> de 8</strong><span class="score-count-label">marcadas</span></p>
+        </div>
+        <div class="score-bar" id="scoreBar" aria-hidden="true" style="--done-share: 12.5; --missed-share: 12.5;">
+          <span class="score-bar-done"></span>
+          <span class="score-bar-missed"></span>
+        </div>
+        <p class="visually-hidden" id="scoreAnnouncement" role="status">25 % del día. 2 de 8 marcadas.</p>
+      </header>
+
+      <!-- Mañana -->
+      <section class="group collapsible" aria-labelledby="title-morning">
+        <div class="collapsible-inner">
+          <h2 class="group-title" id="title-morning"><svg class="icon" aria-hidden="true"><use href="#icon-sunrise"/></svg>Mañana</h2>
+          <ul>
+            <li class="row-slot collapsible cat-personal" data-name="Llamar al dentista">
+              <div class="collapsible-inner">
+                <div class="row">
+                  <span class="indicator" role="img" aria-label="Tarea"><span class="task-dot"></span></span>
+                  <div class="row-text">
+                    <p class="row-name">Llamar al dentista</p>
+                    <p class="row-detail"><span class="row-time">10:00</span> · Personal</p>
+                  </div>
+                  <div class="row-actions">
+                    <button class="mark-button" type="button" data-action="mark-done" aria-label="Marcar como hecha: Llamar al dentista"><span class="done-circle"><span class="done-fill"></span><svg class="icon done-glyph" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+                    <button class="mark-button" type="button" data-action="mark-missed" aria-label="Marcar como no hecha: Llamar al dentista"><span class="missed-circle"><svg class="icon missed-glyph" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <li class="row-slot collapsible cat-health" data-name="Beber 2 L de agua">
+              <div class="collapsible-inner">
+                <div class="row">
+                  <span class="indicator ring" role="img" aria-label="Hábito: cumplimiento del 80 % en los últimos 30 días" style="--ring-value: 80;">
+                    <svg viewBox="0 0 34 34" aria-hidden="true"><circle class="ring-track" cx="17" cy="17" r="14"/><circle class="ring-arc" cx="17" cy="17" r="14" pathLength="100" transform="rotate(-90 17 17)"/></svg>
+                    <span class="ring-number">80</span>
+                  </span>
+                  <div class="row-text">
+                    <p class="row-name">Beber 2 L de agua</p>
+                    <p class="row-detail">Salud</p>
+                  </div>
+                  <div class="row-actions">
+                    <button class="mark-button" type="button" data-action="mark-done" aria-label="Marcar como hecha: Beber 2 L de agua"><span class="done-circle"><span class="done-fill"></span><svg class="icon done-glyph" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+                    <button class="mark-button" type="button" data-action="mark-missed" aria-label="Marcar como no hecha: Beber 2 L de agua"><span class="missed-circle"><svg class="icon missed-glyph" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <!-- Ya marcada al abrir. Está aquí, plegada, para que Deshacer la devuelva a su sitio. -->
+            <li class="row-slot collapsible cat-health is-away" id="meditateSlot" data-name="Meditar 10 min" inert>
+              <div class="collapsible-inner">
+                <div class="row">
+                  <span class="indicator ring" role="img" aria-label="Hábito: cumplimiento del 70 % en los últimos 30 días" style="--ring-value: 70;">
+                    <svg viewBox="0 0 34 34" aria-hidden="true"><circle class="ring-track" cx="17" cy="17" r="14"/><circle class="ring-arc" cx="17" cy="17" r="14" pathLength="100" transform="rotate(-90 17 17)"/></svg>
+                    <span class="ring-number">70</span>
+                  </span>
+                  <div class="row-text">
+                    <p class="row-name">Meditar 10 min</p>
+                    <p class="row-detail">Salud</p>
+                  </div>
+                  <div class="row-actions">
+                    <button class="mark-button" type="button" data-action="mark-done" aria-label="Marcar como hecha: Meditar 10 min"><span class="done-circle"><span class="done-fill"></span><svg class="icon done-glyph" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+                    <button class="mark-button" type="button" data-action="mark-missed" aria-label="Marcar como no hecha: Meditar 10 min"><span class="missed-circle"><svg class="icon missed-glyph" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Tarde -->
+      <section class="group collapsible" aria-labelledby="title-afternoon">
+        <div class="collapsible-inner">
+          <h2 class="group-title" id="title-afternoon"><svg class="icon" aria-hidden="true"><use href="#icon-sun"/></svg>Tarde</h2>
+          <ul>
+            <li class="row-slot collapsible cat-health" data-name="Ir al gimnasio">
+              <div class="collapsible-inner">
+                <div class="row">
+                  <span class="indicator ring" role="img" aria-label="Hábito: cumplimiento del 60 % en los últimos 30 días" style="--ring-value: 60;">
+                    <svg viewBox="0 0 34 34" aria-hidden="true"><circle class="ring-track" cx="17" cy="17" r="14"/><circle class="ring-arc" cx="17" cy="17" r="14" pathLength="100" transform="rotate(-90 17 17)"/></svg>
+                    <span class="ring-number">60</span>
+                  </span>
+                  <div class="row-text">
+                    <p class="row-name">Ir al gimnasio</p>
+                    <p class="row-detail"><span class="row-time">18:30</span> · Salud</p>
+                  </div>
+                  <div class="row-actions">
+                    <button class="mark-button" type="button" data-action="mark-done" aria-label="Marcar como hecha: Ir al gimnasio"><span class="done-circle"><span class="done-fill"></span><svg class="icon done-glyph" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+                    <button class="mark-button" type="button" data-action="mark-missed" aria-label="Marcar como no hecha: Ir al gimnasio"><span class="missed-circle"><svg class="icon missed-glyph" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Noche -->
+      <section class="group collapsible" aria-labelledby="title-evening">
+        <div class="collapsible-inner">
+          <h2 class="group-title" id="title-evening"><svg class="icon" aria-hidden="true"><use href="#icon-moon"/></svg>Noche</h2>
+          <ul>
+            <li class="row-slot collapsible cat-university" data-name="Entregar práctica de Redes">
+              <div class="collapsible-inner">
+                <div class="row">
+                  <span class="indicator" role="img" aria-label="Tarea"><span class="task-dot"></span></span>
+                  <div class="row-text">
+                    <p class="row-name">Entregar práctica de Redes</p>
+                    <p class="row-detail"><span class="row-time">23:59</span> · Universidad</p>
+                  </div>
+                  <div class="row-actions">
+                    <button class="mark-button" type="button" data-action="mark-done" aria-label="Marcar como hecha: Entregar práctica de Redes"><span class="done-circle"><span class="done-fill"></span><svg class="icon done-glyph" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+                    <button class="mark-button" type="button" data-action="mark-missed" aria-label="Marcar como no hecha: Entregar práctica de Redes"><span class="missed-circle"><svg class="icon missed-glyph" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <li class="row-slot collapsible cat-personal" data-name="Leer 20 minutos">
+              <div class="collapsible-inner">
+                <div class="row">
+                  <span class="indicator ring" role="img" aria-label="Hábito: cumplimiento del 45 % en los últimos 30 días" style="--ring-value: 45;">
+                    <svg viewBox="0 0 34 34" aria-hidden="true"><circle class="ring-track" cx="17" cy="17" r="14"/><circle class="ring-arc" cx="17" cy="17" r="14" pathLength="100" transform="rotate(-90 17 17)"/></svg>
+                    <span class="ring-number">45</span>
+                  </span>
+                  <div class="row-text">
+                    <p class="row-name">Leer 20 minutos</p>
+                    <p class="row-detail">Personal</p>
+                  </div>
+                  <div class="row-actions">
+                    <button class="mark-button" type="button" data-action="mark-done" aria-label="Marcar como hecha: Leer 20 minutos"><span class="done-circle"><span class="done-fill"></span><svg class="icon done-glyph" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+                    <button class="mark-button" type="button" data-action="mark-missed" aria-label="Marcar como no hecha: Leer 20 minutos"><span class="missed-circle"><svg class="icon missed-glyph" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Sin hora -->
+      <section class="group collapsible" aria-labelledby="title-unscheduled">
+        <div class="collapsible-inner">
+          <h2 class="group-title" id="title-unscheduled"><svg class="icon" aria-hidden="true"><use href="#icon-calendar"/></svg>Sin hora</h2>
+          <ul>
+            <li class="row-slot collapsible cat-personal" data-name="Comprar proteína">
+              <div class="collapsible-inner">
+                <div class="row">
+                  <span class="indicator" role="img" aria-label="Tarea"><span class="task-dot"></span></span>
+                  <div class="row-text">
+                    <p class="row-name">Comprar proteína</p>
+                    <p class="row-detail">Personal</p>
+                  </div>
+                  <div class="row-actions">
+                    <button class="mark-button" type="button" data-action="mark-done" aria-label="Marcar como hecha: Comprar proteína"><span class="done-circle"><span class="done-fill"></span><svg class="icon done-glyph" aria-hidden="true"><use href="#icon-check"/></svg></span></button>
+                    <button class="mark-button" type="button" data-action="mark-missed" aria-label="Marcar como no hecha: Comprar proteína"><span class="missed-circle"><svg class="icon missed-glyph" aria-hidden="true"><use href="#icon-x"/></svg></span></button>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Cuando no queda nada por marcar -->
+      <div class="collapsible is-away" id="emptyState" inert>
+        <div class="collapsible-inner">
+          <p class="empty-message"><svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg>Todo marcado por hoy</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Aviso con Deshacer: al abrir ya enseña lo último marcado, «Meditar 10 min». -->
+    <div class="snackbar is-visible cat-health" id="snackbar" data-status="done" role="status">
+      <span class="snackbar-icon"><svg class="icon" aria-hidden="true"><use id="snackbarIcon" href="#icon-check"/></svg></span>
+      <div class="snackbar-body">
+        <p class="snackbar-message"><span id="snackbarMessage">Marcada como hecha</span> · <button class="undo-button" type="button" data-action="undo">Deshacer</button></p>
+        <p class="snackbar-item" id="snackbarItem">Meditar 10 min</p>
+      </div>
+      <span class="snackbar-timer" id="snackbarTimer" aria-hidden="true"></span>
+    </div>
+
+    <nav class="dock" aria-label="Navegación principal">
+      <ul class="dock-pill">
+        <li><button class="dock-item is-active" type="button" aria-label="Hoy" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#icon-calendar-check"/></svg></button></li>
+        <li><button class="dock-item" type="button" aria-label="Bandeja de entrada"><svg class="icon" aria-hidden="true"><use href="#icon-inbox"/></svg></button></li>
+        <li><button class="dock-item" type="button" aria-label="Categorías"><svg class="icon" aria-hidden="true"><use href="#icon-layout-grid"/></svg></button></li>
+        <li><button class="dock-item" type="button" aria-label="Pendientes de días anteriores: 2"><svg class="icon" aria-hidden="true"><use href="#icon-hourglass"/></svg><span class="dock-badge" aria-hidden="true">2</span></button></li>
+        <li><button class="dock-item" type="button" aria-label="Historial"><svg class="icon" aria-hidden="true"><use href="#icon-history"/></svg></button></li>
+      </ul>
+      <button class="dock-add" type="button" aria-label="Crear una tarea o un hábito"><svg class="icon" aria-hidden="true"><use href="#icon-plus"/></svg></button>
+    </nav>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const TOTAL_ITEMS = 8;
+      const COUNT_DURATION_MILLISECONDS = 700;
+      const EXIT_DELAY_MILLISECONDS = 90;
+      const UNDO_WINDOW_MILLISECONDS = 7000;
+
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const scoreNumber = document.getElementById("scoreNumber");
+      const markedCountElement = document.getElementById("markedCount");
+      const scoreBar = document.getElementById("scoreBar");
+      const scoreAnnouncement = document.getElementById("scoreAnnouncement");
+      const emptyState = document.getElementById("emptyState");
+      const snackbar = document.getElementById("snackbar");
+      const snackbarIcon = document.getElementById("snackbarIcon");
+      const snackbarMessage = document.getElementById("snackbarMessage");
+      const snackbarItem = document.getElementById("snackbarItem");
+      const snackbarTimer = document.getElementById("snackbarTimer");
+
+      // Al abrir ya hay dos marcadas: «Meditar 10 min» (hecha) y «Repasar apuntes de Redes» (no hecha).
+      const markCounts = { done: 1, missed: 1 };
+      let shownPercent = 25;
+      let countAnimationFrame = 0;
+      let undoTimeout = 0;
+      let timerAnimation = null;
+
+      // Lo último marcado, que es lo único que Deshacer puede devolver. Al abrir es «Meditar 10 min».
+      let lastMark = { rowSlot: document.getElementById("meditateSlot"), status: "done" };
+
+      function motionDuration(milliseconds) {
+        return prefersReducedMotion ? 0 : milliseconds;
+      }
+
+      function playTick(element) {
+        const keyframes = [
+          { opacity: 0.35, transform: "translateY(-4px)" },
+          { opacity: 1, transform: "translateY(0)" },
+        ];
+        element.animate(keyframes, { duration: motionDuration(200), easing: "ease-out" });
+      }
+
+      /* Marcador */
+
+      function countPercentTo(targetPercent) {
+        cancelAnimationFrame(countAnimationFrame);
+        const startPercent = shownPercent;
+        const startTime = performance.now();
+        const duration = motionDuration(COUNT_DURATION_MILLISECONDS);
+
+        function showFrame() {
+          const elapsed = performance.now() - startTime;
+          const progress = duration === 0 ? 1 : Math.min(elapsed / duration, 1);
+          const easedProgress = 1 - Math.pow(1 - progress, 3);
+          shownPercent = startPercent + (targetPercent - startPercent) * easedProgress;
+          scoreNumber.textContent = Math.round(shownPercent);
+
+          if (progress < 1) {
+            countAnimationFrame = requestAnimationFrame(showFrame);
+          }
+        }
+
+        countAnimationFrame = requestAnimationFrame(showFrame);
+      }
+
+      function updateScore() {
+        const markedCount = markCounts.done + markCounts.missed;
+        const targetPercent = Math.round((markedCount / TOTAL_ITEMS) * 100);
+
+        scoreBar.style.setProperty("--done-share", (markCounts.done / TOTAL_ITEMS) * 100);
+        scoreBar.style.setProperty("--missed-share", (markCounts.missed / TOTAL_ITEMS) * 100);
+        markedCountElement.textContent = markedCount;
+        playTick(markedCountElement);
+        scoreAnnouncement.textContent = `${targetPercent} % del día. ${markedCount} de ${TOTAL_ITEMS} marcadas.`;
+
+        countPercentTo(targetPercent);
+      }
+
+      /* Lista */
+
+      function updateGroupVisibility(rowSlot) {
+        const group = rowSlot.closest(".group");
+        const visibleRows = group.querySelectorAll(".row-slot:not(.is-away)");
+        const isEmpty = visibleRows.length === 0;
+        group.classList.toggle("is-away", isEmpty);
+        group.inert = isEmpty;
+      }
+
+      function updateEmptyState() {
+        const visibleRows = document.querySelectorAll(".row-slot:not(.is-away)");
+        const hasPendingRows = visibleRows.length > 0;
+        emptyState.classList.toggle("is-away", hasPendingRows);
+        emptyState.inert = hasPendingRows;
+      }
+
+      function moveRowAway(rowSlot) {
+        rowSlot.classList.add("is-away");
+        rowSlot.inert = true;
+        updateGroupVisibility(rowSlot);
+        updateEmptyState();
+      }
+
+      function bringRowBack(rowSlot) {
+        rowSlot.classList.remove("is-away");
+        rowSlot.inert = false;
+        updateGroupVisibility(rowSlot);
+        updateEmptyState();
+      }
+
+      /* Aviso */
+
+      function hideSnackbar() {
+        window.clearTimeout(undoTimeout);
+        timerAnimation?.cancel();
+        snackbar.classList.remove("is-visible");
+        lastMark = null;
+      }
+
+      function startUndoTimer() {
+        window.clearTimeout(undoTimeout);
+        timerAnimation?.cancel();
+        snackbar.classList.add("is-timed");
+
+        // La línea que se vacía solo es el dibujo del plazo; quien lo cuenta de verdad es el temporizador.
+        const keyframes = [{ transform: "scaleX(1)" }, { transform: "scaleX(0)" }];
+        timerAnimation = snackbarTimer.animate(keyframes, {
+          duration: UNDO_WINDOW_MILLISECONDS,
+          easing: "linear",
+          fill: "forwards",
+        });
+
+        // Cuando se acaba el plazo, la marca queda firme y ya no se puede deshacer.
+        undoTimeout = window.setTimeout(hideSnackbar, UNDO_WINDOW_MILLISECONDS);
+      }
+
+      function showSnackbar(mark) {
+        const wasVisible = snackbar.classList.contains("is-visible");
+        const isDone = mark.status === "done";
+        const iconId = isDone ? "#icon-check" : "#icon-x";
+        const message = isDone ? "Marcada como hecha" : "Marcada como no hecha";
+        const categoryColor = getComputedStyle(mark.rowSlot).getPropertyValue("--category-color");
+
+        snackbar.dataset.status = mark.status;
+        snackbar.style.setProperty("--category-color", categoryColor);
+        snackbarIcon.setAttribute("href", iconId);
+        snackbarMessage.textContent = message;
+        snackbarItem.textContent = mark.rowSlot.dataset.name;
+        snackbar.classList.add("is-visible");
+
+        if (wasVisible) {
+          playTick(snackbar);
+        }
+      }
+
+      /* Marcar y deshacer */
+
+      function markRow(rowSlot, status) {
+        // Una fila que ya se ha marcado (y puede estar saliendo) no se vuelve a marcar.
+        const isAlreadyMarked = rowSlot.dataset.pressed !== undefined;
+        const isHidden = rowSlot.classList.contains("is-away");
+        if (isAlreadyMarked || isHidden) {
+          return;
+        }
+
+        // Pinta el círculo (hecho) o la × (no hecho) al instante y bloquea otro toque mientras sale.
+        rowSlot.dataset.pressed = status;
+        rowSlot.inert = true;
+
+        markCounts[status] += 1;
+        lastMark = { rowSlot, status };
+        updateScore();
+        showSnackbar(lastMark);
+        startUndoTimer();
+
+        // Una pausa breve para que se vea el relleno antes de que la fila salga.
+        window.setTimeout(() => {
+          const wasUndoneMeanwhile = rowSlot.dataset.pressed === undefined;
+          if (wasUndoneMeanwhile) {
+            return;
+          }
+          moveRowAway(rowSlot);
+        }, motionDuration(EXIT_DELAY_MILLISECONDS));
+      }
+
+      function undoLastMark() {
+        if (lastMark === null) {
+          return;
+        }
+
+        const { rowSlot, status } = lastMark;
+        markCounts[status] -= 1;
+        delete rowSlot.dataset.pressed;
+        bringRowBack(rowSlot);
+        hideSnackbar();
+        updateScore();
+      }
+
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-action]");
+        if (button === null) {
+          return;
+        }
+
+        const action = button.dataset.action;
+        if (action === "undo") {
+          undoLastMark();
+          return;
+        }
+
+        const rowSlot = button.closest(".row-slot");
+        const status = action === "mark-done" ? "done" : "missed";
+        markRow(rowSlot, status);
+      });
+    })();
+  </script>
+</body>
+</html>

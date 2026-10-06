@@ -1,0 +1,1428 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ronda 1 · Hoja de paletas</title>
+<!-- Cada paleta trae su propia letra, así que aquí se cargan las seis familias (en los prototipos, dos como mucho). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..800&family=DM+Sans:opsz,wght@9..40,400..700&family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@400..800&family=Manrope:wght@400..800&family=Space+Grotesk:wght@400..700&display=swap">
+<style>
+/* ============ Página (no es ninguna de las siete paletas) ============ */
+:root {
+  color-scheme: light;
+  --page-background: #E3E2DD;
+  --page-text: #171714;
+  --page-text-soft: #54534D;
+  --page-rule: #BDBCB5;
+  --page-pill: #D3D2CC;
+  --page-font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --code-font: ui-monospace, "SF Mono", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--page-background);
+  color: var(--page-text);
+  font-family: var(--page-font);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 44px 48px 80px;
+}
+
+/* ---- Cabecera de la hoja ---- */
+.page-header {
+  text-align: center;
+}
+
+.page-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+}
+
+.page-eyebrow {
+  grid-column: 2;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--page-text-soft);
+}
+
+.back-link {
+  grid-column: 3;
+  justify-self: end;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--page-text);
+  text-underline-offset: 3px;
+}
+
+.page-title {
+  margin: 18px 0 0;
+  font-size: 52px;
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.page-lead {
+  margin: 18px auto 0;
+  max-width: 62ch;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--page-text-soft);
+  text-wrap: balance;
+}
+
+/* ---- Familias ---- */
+.family {
+  margin-top: 60px;
+}
+
+.family-title-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+/* Las dos líneas a los lados del nombre de la familia. */
+.family-title-row::before,
+.family-title-row::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--page-rule);
+}
+
+.family-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.family-title {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.family-count {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--page-pill);
+  color: var(--page-text-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.family-description {
+  margin: 12px auto 0;
+  max-width: 80ch;
+  font-size: 15px;
+  text-align: center;
+  color: var(--page-text-soft);
+  text-wrap: balance;
+}
+
+/* Las tarjetas de una familia comparten filas (subcuadrícula) para que cabecera, colores y muestra queden alineados. */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 24px;
+  margin-top: 28px;
+}
+
+/* Una familia con una sola paleta la centra, para que la fila quede equilibrada. */
+.cards > .palette-card:only-child {
+  grid-column: 2;
+}
+
+/* ============ Tarjeta de paleta ============ */
+.palette-card {
+  /* Valores por defecto; el neobrutalismo cambia los suyos en su propia paleta. */
+  --line-width: 1px;
+  --offset-shadow: none;
+  --edge-on-fills: transparent;
+  --card-radius: 24px;
+  --panel-radius: 18px;
+  --control-radius: 14px;
+  --chip-radius: 10px;
+  --round-button-radius: 999px;
+  --ring-track: var(--border);
+  --ring-edge: transparent;
+  --ring-cap: round;
+  --card-shadow: 0 1px 2px rgba(23, 23, 20, 0.12), 0 26px 50px -28px rgba(23, 23, 20, 0.55);
+  --toast-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.6);
+
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  background: var(--background);
+  color: var(--text);
+  font-family: var(--font-body);
+  border: var(--line-width) solid var(--border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+}
+
+/* La línea de la letra queda abajo en todas las tarjetas, aunque alguna no tenga nota. */
+.card-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 24px 0;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.palette-code {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  min-width: 40px;
+  height: 28px;
+  padding: 0 8px;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: var(--line-width) solid var(--edge-on-fills);
+  border-radius: 8px;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.palette-name {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: var(--heading-weight);
+  letter-spacing: -0.015em;
+}
+
+.palette-note,
+.palette-font {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-soft);
+}
+
+.palette-note + .palette-font {
+  margin-top: 4px;
+}
+
+.font-name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* ---- Colores ---- */
+.card-colors {
+  padding: 22px 24px 0;
+}
+
+.group-title {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.card-colors .group-title + .swatch-list + .group-title {
+  margin-top: 20px;
+}
+
+.swatch-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.swatch-chip {
+  display: block;
+  height: 36px;
+  background: var(--swatch-color);
+  border: var(--line-width) solid var(--border);
+  border-radius: var(--chip-radius);
+}
+
+.swatch-name {
+  display: block;
+  margin-top: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.swatch-code {
+  display: block;
+  margin-top: 1px;
+  font-family: var(--code-font);
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--text-soft);
+}
+
+/* ---- Muestra ---- */
+.card-sample {
+  padding: 22px 24px 24px;
+}
+
+.sample {
+  display: grid;
+  gap: 12px;
+}
+
+.sample-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 12px 14px;
+  background: var(--surface);
+  border: var(--line-width) solid var(--border);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--offset-shadow);
+}
+
+.ring {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  overflow: visible;
+}
+
+.ring-track,
+.ring-progress,
+.ring-edge {
+  fill: none;
+}
+
+.ring-track {
+  stroke: var(--ring-track);
+  stroke-width: 5;
+}
+
+.ring-progress {
+  stroke: var(--category-health);
+  stroke-width: 5;
+  stroke-linecap: var(--ring-cap);
+}
+
+.ring-edge {
+  stroke: var(--ring-edge);
+  stroke-width: var(--line-width);
+}
+
+.ring-label {
+  fill: var(--text);
+  font-family: var(--font-numbers);
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.sample-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.sample-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.sample-detail {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  line-height: 1.3;
+  color: var(--text-soft);
+}
+
+.round-button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--round-button-radius);
+  box-shadow: var(--offset-shadow);
+}
+
+/* Hecho se pinta con el color de la categoría (aquí, Salud). */
+.round-button-done {
+  background: var(--category-health);
+  color: var(--on-category);
+  border: var(--line-width) solid var(--edge-on-fills);
+}
+
+/* No hecho, con su propio color. */
+.round-button-not-done {
+  background: transparent;
+  color: var(--not-done);
+  border: 2px solid var(--not-done);
+}
+
+.primary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  background: var(--accent);
+  color: var(--on-accent);
+  border: var(--line-width) solid var(--edge-on-fills);
+  border-radius: var(--control-radius);
+  box-shadow: var(--offset-shadow);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.toast {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--surface-raised);
+  color: var(--text);
+  border: var(--line-width) solid var(--border);
+  border-radius: var(--control-radius);
+  box-shadow: var(--toast-shadow);
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.toast strong {
+  font-weight: 800;
+}
+
+/* ============ Ventanas estrechas (la hoja está pensada para el ordenador) ============ */
+@media (max-width: 1279px) {
+  .page {
+    padding-inline: 24px;
+  }
+}
+
+/* Por debajo de este ancho las tres columnas se quedan sin sitio para los nombres de los colores. */
+@media (max-width: 1199px) {
+  .cards {
+    grid-template-columns: minmax(0, 520px);
+    justify-content: center;
+    row-gap: 28px;
+  }
+
+  .cards > .palette-card:only-child {
+    grid-column: auto;
+  }
+
+  .palette-card {
+    grid-row: auto;
+    grid-template-rows: none;
+  }
+}
+
+/* En una ventana de móvil la cabecera se apila (no es el uso previsto, pero no debe romperse). */
+@media (max-width: 640px) {
+  .page-top {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    row-gap: 8px;
+  }
+
+  .page-eyebrow,
+  .back-link {
+    grid-column: 1;
+    justify-self: center;
+  }
+
+  .page-title {
+    font-size: 40px;
+  }
+}
+
+
+/* ============ Las siete paletas, tal cual están en encargos.md ============ */
+.palette-charcoal-lime {
+  --background: #0A0A0A;
+  --surface: #151515;
+  --surface-raised: #1E1E1E;
+  --border: #2A2A2A;
+  --text: #F2F2F2;
+  --text-soft: #8C8C8C;
+  --accent: #CDFF3F;
+  --not-done: #FF6B57;
+  --category-university: #6CB4FF;
+  --category-health: #4FE3A3;
+  --category-personal: #FFC453;
+  --category-home: #FF8FB8;
+  --on-accent: var(--background);
+  --on-category: var(--background);
+  --font-heading: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-numbers: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --heading-weight: 700;
+}
+
+.palette-warm-amber {
+  --background: #0E0D0C;
+  --surface: #1A1817;
+  --surface-raised: #24211F;
+  --border: #34302C;
+  --text: #F6F0E8;
+  --text-soft: #A39888;
+  --accent: #FF9F1C;
+  --not-done: #E5484D;
+  --category-university: #82B1FF;
+  --category-health: #7ED492;
+  --category-personal: #FFCF66;
+  --category-home: #F497B6;
+  --on-accent: var(--background);
+  --on-category: var(--background);
+  --font-heading: "Manrope", system-ui, sans-serif;
+  --font-numbers: "Manrope", system-ui, sans-serif;
+  --font-body: "Manrope", system-ui, sans-serif;
+  --heading-weight: 800;
+}
+
+.palette-monochrome-dark {
+  --background: #000000;
+  --surface: #121212;
+  --surface-raised: #1C1C1C;
+  --border: #262626;
+  --text: #FFFFFF;
+  --text-soft: #8E8E8E;
+  --accent: #FFFFFF;
+  --not-done: #6B6B6B;
+  --category-university: #6EA8FE;
+  --category-health: #63E6BE;
+  --category-personal: #FFD43B;
+  --category-home: #FF8787;
+  --on-accent: var(--background);
+  --on-category: var(--background);
+  --font-heading: "Inter", system-ui, sans-serif;
+  --font-numbers: "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --heading-weight: 700;
+}
+
+.palette-monochrome-light {
+  --background: #FFFFFF;
+  --surface: #F6F6F5;
+  --surface-raised: #EDEDEC;
+  --border: #E3E3E1;
+  --text: #0B0B0B;
+  --text-soft: #6F6F6B;
+  --accent: #0B0B0B;
+  --not-done: #A3A3A0;
+  --category-university: #2563EB;
+  --category-health: #059669;
+  --category-personal: #D97706;
+  --category-home: #E11D48;
+  --on-accent: var(--background);
+  --on-category: var(--background);
+  --font-heading: "Inter", system-ui, sans-serif;
+  --font-numbers: "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --heading-weight: 700;
+  --toast-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.28);
+}
+
+.palette-paper-ink {
+  --background: #F2ECE1;
+  --surface: #FAF6EF;
+  --surface-raised: #EAE2D4;
+  --border: #D9CDB9;
+  --text: #1F1B16;
+  --text-soft: #75695A;
+  --accent: #C2410C;
+  --not-done: #9C8F7E;
+  --category-university: #3B5B7A;
+  --category-health: #4F7A45;
+  --category-personal: #B7791F;
+  --category-home: #9B3A4C;
+  --on-accent: var(--surface);
+  --on-category: var(--surface);
+  --font-heading: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-numbers: "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --heading-weight: 600;
+  --toast-shadow: 0 10px 24px -12px rgba(31, 27, 22, 0.35);
+}
+
+.palette-night-forest {
+  --background: #0E1813;
+  --surface: #15221B;
+  --surface-raised: #1C2C23;
+  --border: #27392F;
+  --text: #E9F1EB;
+  --text-soft: #93A89A;
+  --accent: #E8C468;
+  --not-done: #D9776A;
+  --category-university: #8DB8F2;
+  --category-health: #7AD39A;
+  --category-personal: #EFA66A;
+  --category-home: #F2A7A0;
+  --on-accent: var(--background);
+  --on-category: var(--background);
+  --font-heading: "DM Sans", system-ui, sans-serif;
+  --font-numbers: "DM Sans", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --heading-weight: 700;
+}
+
+.palette-neobrutalism {
+  --background: #FFFBEF;
+  --surface: #FFFFFF;
+  --surface-raised: #F4EFDF;
+  --border: #111111;
+  --text: #111111;
+  --text-soft: #4A4A4A;
+  --accent: #FFE14D;
+  --not-done: #111111;
+  --category-university: #8AB4FF;
+  --category-health: #6EE7A8;
+  --category-personal: #FFB86B;
+  --category-home: #FF8FB1;
+  --on-accent: var(--text);
+  --on-category: var(--text);
+  --font-heading: "Archivo", system-ui, sans-serif;
+  --font-numbers: "Archivo", system-ui, sans-serif;
+  --font-body: "Archivo", system-ui, sans-serif;
+  --heading-weight: 800;
+  --line-width: 2px;
+  --offset-shadow: 3px 3px 0 var(--border);
+  --card-shadow: 3px 3px 0 var(--border);
+  --toast-shadow: 3px 3px 0 var(--border);
+  --edge-on-fills: var(--border);
+  --ring-edge: var(--border);
+  --ring-track: var(--surface-raised);
+  --ring-cap: butt;
+  --card-radius: 14px;
+  --panel-radius: 12px;
+  --control-radius: 10px;
+  --chip-radius: 8px;
+  --round-button-radius: 10px;
+}
+
+/* ============ Nombres de tipografía escritos con su propia letra ============ */
+.font-space-grotesk { font-family: "Space Grotesk", "Inter", system-ui, sans-serif; }
+.font-inter { font-family: "Inter", system-ui, sans-serif; }
+.font-manrope { font-family: "Manrope", system-ui, sans-serif; }
+.font-dm-sans { font-family: "DM Sans", system-ui, sans-serif; }
+.font-fraunces { font-family: "Fraunces", Georgia, "Times New Roman", serif; }
+.font-archivo { font-family: "Archivo", system-ui, sans-serif; }
+</style>
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <div class="page-top">
+        <p class="page-eyebrow">Ronda 1 · Estilo de la app</p>
+        <a class="back-link" href="index.html">← Prototipos de Hoy</a>
+      </div>
+      <h1 class="page-title">Hoja de paletas</h1>
+      <p class="page-lead">La app tendrá un estilo negro, uno blanco y un tercer estilo a elegir. Estas son las siete paletas de la ronda 1: cada tarjeta se pinta con sus propios colores y su propia letra, y trae una fila de muestra de la pantalla Hoy.</p>
+    </header>
+
+    <section class="family" aria-labelledby="family-dark">
+      <header class="family-header">
+        <div class="family-title-row">
+          <div class="family-name">
+            <h2 class="family-title" id="family-dark">Negro</h2>
+            <span class="family-count">3 paletas</span>
+          </div>
+        </div>
+        <p class="family-description">Tres paletas sobre fondo negro: dos con un color de acento, lima o ámbar, y una monocroma.</p>
+      </header>
+      <div class="cards">
+        <article class="palette-card palette-charcoal-lime" id="n1" aria-labelledby="n1-name">
+          <header class="card-header">
+            <div class="card-title-row">
+              <span class="palette-code">N1</span>
+              <h3 class="palette-name" id="n1-name">Carbón y lima</h3>
+            </div>
+            <p class="palette-font">Letra: <span class="font-name font-space-grotesk">Space Grotesk</span> (títulos y números) e <span class="font-name font-inter">Inter</span></p>
+          </header>
+
+          <div class="card-colors">
+            <h4 class="group-title">Colores</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--background)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Fondo</span>
+                <code class="swatch-code">#0A0A0A</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie</span>
+                <code class="swatch-code">#151515</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface-raised)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie 2</span>
+                <code class="swatch-code">#1E1E1E</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--border)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Borde</span>
+                <code class="swatch-code">#2A2A2A</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto</span>
+                <code class="swatch-code">#F2F2F2</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text-soft)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto suave</span>
+                <code class="swatch-code">#8C8C8C</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--accent)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Acento</span>
+                <code class="swatch-code">#CDFF3F</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--not-done)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">No hecho</span>
+                <code class="swatch-code">#FF6B57</code>
+              </li>
+            </ul>
+            <h4 class="group-title">Categorías</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--category-university)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Universidad</span>
+                <code class="swatch-code">#6CB4FF</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-health)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Salud</span>
+                <code class="swatch-code">#4FE3A3</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-personal)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Personal</span>
+                <code class="swatch-code">#FFC453</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-home)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Casa</span>
+                <code class="swatch-code">#FF8FB8</code>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-sample">
+            <h4 class="group-title">Muestra</h4>
+            <div class="sample" role="group" aria-label="Muestra de la paleta N1">
+              <div class="sample-row">
+                <svg class="ring" viewBox="0 0 52 52" role="img" aria-label="Cumplimiento de los últimos 30 días: 60 %">
+                  <circle class="ring-edge" cx="26" cy="26" r="23.5"/>
+                  <circle class="ring-edge" cx="26" cy="26" r="16.5"/>
+                  <circle class="ring-track" cx="26" cy="26" r="20"/>
+                  <circle class="ring-progress" cx="26" cy="26" r="20" pathLength="100" stroke-dasharray="60 100" transform="rotate(-90 26 26)"/>
+                  <text class="ring-label" x="26" y="26">60%</text>
+                </svg>
+                <div class="sample-text">
+                  <p class="sample-title">Ir al gimnasio</p>
+                  <p class="sample-detail">18:30 · Salud</p>
+                </div>
+                <span class="round-button round-button-done" role="img" aria-label="Hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                <span class="round-button round-button-not-done" role="img" aria-label="No hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+              </div>
+              <span class="primary-button"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Crear tarea o hábito</span>
+              <p class="toast">Marcada como hecha · <strong>Deshacer</strong></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="palette-card palette-warm-amber" id="n2" aria-labelledby="n2-name">
+          <header class="card-header">
+            <div class="card-title-row">
+              <span class="palette-code">N2</span>
+              <h3 class="palette-name" id="n2-name">Negro cálido y ámbar</h3>
+            </div>
+            <p class="palette-font">Letra: <span class="font-name font-manrope">Manrope</span></p>
+          </header>
+
+          <div class="card-colors">
+            <h4 class="group-title">Colores</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--background)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Fondo</span>
+                <code class="swatch-code">#0E0D0C</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie</span>
+                <code class="swatch-code">#1A1817</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface-raised)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie 2</span>
+                <code class="swatch-code">#24211F</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--border)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Borde</span>
+                <code class="swatch-code">#34302C</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto</span>
+                <code class="swatch-code">#F6F0E8</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text-soft)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto suave</span>
+                <code class="swatch-code">#A39888</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--accent)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Acento</span>
+                <code class="swatch-code">#FF9F1C</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--not-done)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">No hecho</span>
+                <code class="swatch-code">#E5484D</code>
+              </li>
+            </ul>
+            <h4 class="group-title">Categorías</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--category-university)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Universidad</span>
+                <code class="swatch-code">#82B1FF</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-health)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Salud</span>
+                <code class="swatch-code">#7ED492</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-personal)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Personal</span>
+                <code class="swatch-code">#FFCF66</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-home)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Casa</span>
+                <code class="swatch-code">#F497B6</code>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-sample">
+            <h4 class="group-title">Muestra</h4>
+            <div class="sample" role="group" aria-label="Muestra de la paleta N2">
+              <div class="sample-row">
+                <svg class="ring" viewBox="0 0 52 52" role="img" aria-label="Cumplimiento de los últimos 30 días: 60 %">
+                  <circle class="ring-edge" cx="26" cy="26" r="23.5"/>
+                  <circle class="ring-edge" cx="26" cy="26" r="16.5"/>
+                  <circle class="ring-track" cx="26" cy="26" r="20"/>
+                  <circle class="ring-progress" cx="26" cy="26" r="20" pathLength="100" stroke-dasharray="60 100" transform="rotate(-90 26 26)"/>
+                  <text class="ring-label" x="26" y="26">60%</text>
+                </svg>
+                <div class="sample-text">
+                  <p class="sample-title">Ir al gimnasio</p>
+                  <p class="sample-detail">18:30 · Salud</p>
+                </div>
+                <span class="round-button round-button-done" role="img" aria-label="Hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                <span class="round-button round-button-not-done" role="img" aria-label="No hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+              </div>
+              <span class="primary-button"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Crear tarea o hábito</span>
+              <p class="toast">Marcada como hecha · <strong>Deshacer</strong></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="palette-card palette-monochrome-dark" id="n3" aria-labelledby="n3-name">
+          <header class="card-header">
+            <div class="card-title-row">
+              <span class="palette-code">N3</span>
+              <h3 class="palette-name" id="n3-name">Negro monocromo</h3>
+            </div>
+            <p class="palette-note">El color, solo en las categorías; botones blancos.</p>
+            <p class="palette-font">Letra: <span class="font-name font-inter">Inter</span></p>
+          </header>
+
+          <div class="card-colors">
+            <h4 class="group-title">Colores</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--background)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Fondo</span>
+                <code class="swatch-code">#000000</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie</span>
+                <code class="swatch-code">#121212</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface-raised)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie 2</span>
+                <code class="swatch-code">#1C1C1C</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--border)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Borde</span>
+                <code class="swatch-code">#262626</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto</span>
+                <code class="swatch-code">#FFFFFF</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text-soft)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto suave</span>
+                <code class="swatch-code">#8E8E8E</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--accent)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Acento</span>
+                <code class="swatch-code">#FFFFFF</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--not-done)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">No hecho</span>
+                <code class="swatch-code">#6B6B6B</code>
+              </li>
+            </ul>
+            <h4 class="group-title">Categorías</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--category-university)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Universidad</span>
+                <code class="swatch-code">#6EA8FE</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-health)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Salud</span>
+                <code class="swatch-code">#63E6BE</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-personal)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Personal</span>
+                <code class="swatch-code">#FFD43B</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-home)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Casa</span>
+                <code class="swatch-code">#FF8787</code>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-sample">
+            <h4 class="group-title">Muestra</h4>
+            <div class="sample" role="group" aria-label="Muestra de la paleta N3">
+              <div class="sample-row">
+                <svg class="ring" viewBox="0 0 52 52" role="img" aria-label="Cumplimiento de los últimos 30 días: 60 %">
+                  <circle class="ring-edge" cx="26" cy="26" r="23.5"/>
+                  <circle class="ring-edge" cx="26" cy="26" r="16.5"/>
+                  <circle class="ring-track" cx="26" cy="26" r="20"/>
+                  <circle class="ring-progress" cx="26" cy="26" r="20" pathLength="100" stroke-dasharray="60 100" transform="rotate(-90 26 26)"/>
+                  <text class="ring-label" x="26" y="26">60%</text>
+                </svg>
+                <div class="sample-text">
+                  <p class="sample-title">Ir al gimnasio</p>
+                  <p class="sample-detail">18:30 · Salud</p>
+                </div>
+                <span class="round-button round-button-done" role="img" aria-label="Hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                <span class="round-button round-button-not-done" role="img" aria-label="No hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+              </div>
+              <span class="primary-button"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Crear tarea o hábito</span>
+              <p class="toast">Marcada como hecha · <strong>Deshacer</strong></p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="family" aria-labelledby="family-light">
+      <header class="family-header">
+        <div class="family-title-row">
+          <div class="family-name">
+            <h2 class="family-title" id="family-light">Blanco</h2>
+            <span class="family-count">1 paleta</span>
+          </div>
+        </div>
+        <p class="family-description">Una paleta sobre fondo blanco, monocroma: el color queda solo en las categorías.</p>
+      </header>
+      <div class="cards">
+        <article class="palette-card palette-monochrome-light" id="b1" aria-labelledby="b1-name">
+          <header class="card-header">
+            <div class="card-title-row">
+              <span class="palette-code">B1</span>
+              <h3 class="palette-name" id="b1-name">Blanco monocromo</h3>
+            </div>
+            <p class="palette-note">El color, solo en las categorías; botones negros.</p>
+            <p class="palette-font">Letra: <span class="font-name font-inter">Inter</span></p>
+          </header>
+
+          <div class="card-colors">
+            <h4 class="group-title">Colores</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--background)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Fondo</span>
+                <code class="swatch-code">#FFFFFF</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie</span>
+                <code class="swatch-code">#F6F6F5</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface-raised)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie 2</span>
+                <code class="swatch-code">#EDEDEC</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--border)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Borde</span>
+                <code class="swatch-code">#E3E3E1</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto</span>
+                <code class="swatch-code">#0B0B0B</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text-soft)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto suave</span>
+                <code class="swatch-code">#6F6F6B</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--accent)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Acento</span>
+                <code class="swatch-code">#0B0B0B</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--not-done)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">No hecho</span>
+                <code class="swatch-code">#A3A3A0</code>
+              </li>
+            </ul>
+            <h4 class="group-title">Categorías</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--category-university)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Universidad</span>
+                <code class="swatch-code">#2563EB</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-health)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Salud</span>
+                <code class="swatch-code">#059669</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-personal)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Personal</span>
+                <code class="swatch-code">#D97706</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-home)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Casa</span>
+                <code class="swatch-code">#E11D48</code>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-sample">
+            <h4 class="group-title">Muestra</h4>
+            <div class="sample" role="group" aria-label="Muestra de la paleta B1">
+              <div class="sample-row">
+                <svg class="ring" viewBox="0 0 52 52" role="img" aria-label="Cumplimiento de los últimos 30 días: 60 %">
+                  <circle class="ring-edge" cx="26" cy="26" r="23.5"/>
+                  <circle class="ring-edge" cx="26" cy="26" r="16.5"/>
+                  <circle class="ring-track" cx="26" cy="26" r="20"/>
+                  <circle class="ring-progress" cx="26" cy="26" r="20" pathLength="100" stroke-dasharray="60 100" transform="rotate(-90 26 26)"/>
+                  <text class="ring-label" x="26" y="26">60%</text>
+                </svg>
+                <div class="sample-text">
+                  <p class="sample-title">Ir al gimnasio</p>
+                  <p class="sample-detail">18:30 · Salud</p>
+                </div>
+                <span class="round-button round-button-done" role="img" aria-label="Hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                <span class="round-button round-button-not-done" role="img" aria-label="No hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+              </div>
+              <span class="primary-button"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Crear tarea o hábito</span>
+              <p class="toast">Marcada como hecha · <strong>Deshacer</strong></p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="family" aria-labelledby="family-third">
+      <header class="family-header">
+        <div class="family-title-row">
+          <div class="family-name">
+            <h2 class="family-title" id="family-third">Tercer estilo</h2>
+            <span class="family-count">3 paletas</span>
+          </div>
+        </div>
+        <p class="family-description">Tres candidatas al tercer estilo, a elegir: papel y tinta, bosque nocturno y neobrutalismo.</p>
+      </header>
+      <div class="cards">
+        <article class="palette-card palette-paper-ink" id="t1" aria-labelledby="t1-name">
+          <header class="card-header">
+            <div class="card-title-row">
+              <span class="palette-code">T1</span>
+              <h3 class="palette-name" id="t1-name">Papel y tinta</h3>
+            </div>
+            <p class="palette-font">Letra: <span class="font-name font-fraunces">Fraunces</span> (títulos) e <span class="font-name font-inter">Inter</span></p>
+          </header>
+
+          <div class="card-colors">
+            <h4 class="group-title">Colores</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--background)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Fondo</span>
+                <code class="swatch-code">#F2ECE1</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie</span>
+                <code class="swatch-code">#FAF6EF</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface-raised)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie 2</span>
+                <code class="swatch-code">#EAE2D4</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--border)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Borde</span>
+                <code class="swatch-code">#D9CDB9</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto</span>
+                <code class="swatch-code">#1F1B16</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text-soft)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto suave</span>
+                <code class="swatch-code">#75695A</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--accent)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Acento</span>
+                <code class="swatch-code">#C2410C</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--not-done)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">No hecho</span>
+                <code class="swatch-code">#9C8F7E</code>
+              </li>
+            </ul>
+            <h4 class="group-title">Categorías</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--category-university)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Universidad</span>
+                <code class="swatch-code">#3B5B7A</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-health)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Salud</span>
+                <code class="swatch-code">#4F7A45</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-personal)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Personal</span>
+                <code class="swatch-code">#B7791F</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-home)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Casa</span>
+                <code class="swatch-code">#9B3A4C</code>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-sample">
+            <h4 class="group-title">Muestra</h4>
+            <div class="sample" role="group" aria-label="Muestra de la paleta T1">
+              <div class="sample-row">
+                <svg class="ring" viewBox="0 0 52 52" role="img" aria-label="Cumplimiento de los últimos 30 días: 60 %">
+                  <circle class="ring-edge" cx="26" cy="26" r="23.5"/>
+                  <circle class="ring-edge" cx="26" cy="26" r="16.5"/>
+                  <circle class="ring-track" cx="26" cy="26" r="20"/>
+                  <circle class="ring-progress" cx="26" cy="26" r="20" pathLength="100" stroke-dasharray="60 100" transform="rotate(-90 26 26)"/>
+                  <text class="ring-label" x="26" y="26">60%</text>
+                </svg>
+                <div class="sample-text">
+                  <p class="sample-title">Ir al gimnasio</p>
+                  <p class="sample-detail">18:30 · Salud</p>
+                </div>
+                <span class="round-button round-button-done" role="img" aria-label="Hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                <span class="round-button round-button-not-done" role="img" aria-label="No hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+              </div>
+              <span class="primary-button"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Crear tarea o hábito</span>
+              <p class="toast">Marcada como hecha · <strong>Deshacer</strong></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="palette-card palette-night-forest" id="t2" aria-labelledby="t2-name">
+          <header class="card-header">
+            <div class="card-title-row">
+              <span class="palette-code">T2</span>
+              <h3 class="palette-name" id="t2-name">Bosque nocturno</h3>
+            </div>
+            <p class="palette-font">Letra: <span class="font-name font-dm-sans">DM Sans</span></p>
+          </header>
+
+          <div class="card-colors">
+            <h4 class="group-title">Colores</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--background)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Fondo</span>
+                <code class="swatch-code">#0E1813</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie</span>
+                <code class="swatch-code">#15221B</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface-raised)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie 2</span>
+                <code class="swatch-code">#1C2C23</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--border)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Borde</span>
+                <code class="swatch-code">#27392F</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto</span>
+                <code class="swatch-code">#E9F1EB</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text-soft)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto suave</span>
+                <code class="swatch-code">#93A89A</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--accent)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Acento</span>
+                <code class="swatch-code">#E8C468</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--not-done)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">No hecho</span>
+                <code class="swatch-code">#D9776A</code>
+              </li>
+            </ul>
+            <h4 class="group-title">Categorías</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--category-university)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Universidad</span>
+                <code class="swatch-code">#8DB8F2</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-health)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Salud</span>
+                <code class="swatch-code">#7AD39A</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-personal)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Personal</span>
+                <code class="swatch-code">#EFA66A</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-home)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Casa</span>
+                <code class="swatch-code">#F2A7A0</code>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-sample">
+            <h4 class="group-title">Muestra</h4>
+            <div class="sample" role="group" aria-label="Muestra de la paleta T2">
+              <div class="sample-row">
+                <svg class="ring" viewBox="0 0 52 52" role="img" aria-label="Cumplimiento de los últimos 30 días: 60 %">
+                  <circle class="ring-edge" cx="26" cy="26" r="23.5"/>
+                  <circle class="ring-edge" cx="26" cy="26" r="16.5"/>
+                  <circle class="ring-track" cx="26" cy="26" r="20"/>
+                  <circle class="ring-progress" cx="26" cy="26" r="20" pathLength="100" stroke-dasharray="60 100" transform="rotate(-90 26 26)"/>
+                  <text class="ring-label" x="26" y="26">60%</text>
+                </svg>
+                <div class="sample-text">
+                  <p class="sample-title">Ir al gimnasio</p>
+                  <p class="sample-detail">18:30 · Salud</p>
+                </div>
+                <span class="round-button round-button-done" role="img" aria-label="Hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                <span class="round-button round-button-not-done" role="img" aria-label="No hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+              </div>
+              <span class="primary-button"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Crear tarea o hábito</span>
+              <p class="toast">Marcada como hecha · <strong>Deshacer</strong></p>
+            </div>
+          </div>
+        </article>
+
+        <article class="palette-card palette-neobrutalism" id="t3" aria-labelledby="t3-name">
+          <header class="card-header">
+            <div class="card-title-row">
+              <span class="palette-code">T3</span>
+              <h3 class="palette-name" id="t3-name">Neobrutalismo</h3>
+            </div>
+            <p class="palette-note">Bordes negros de 2 px y sombra desplazada de 3 px.</p>
+            <p class="palette-font">Letra: <span class="font-name font-archivo">Archivo</span></p>
+          </header>
+
+          <div class="card-colors">
+            <h4 class="group-title">Colores</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--background)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Fondo</span>
+                <code class="swatch-code">#FFFBEF</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie</span>
+                <code class="swatch-code">#FFFFFF</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--surface-raised)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Superficie 2</span>
+                <code class="swatch-code">#F4EFDF</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--border)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Borde</span>
+                <code class="swatch-code">#111111</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto</span>
+                <code class="swatch-code">#111111</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--text-soft)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Texto suave</span>
+                <code class="swatch-code">#4A4A4A</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--accent)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Acento</span>
+                <code class="swatch-code">#FFE14D</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--not-done)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">No hecho</span>
+                <code class="swatch-code">#111111</code>
+              </li>
+            </ul>
+            <h4 class="group-title">Categorías</h4>
+            <ul class="swatch-list">
+              <li class="swatch" style="--swatch-color: var(--category-university)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Universidad</span>
+                <code class="swatch-code">#8AB4FF</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-health)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Salud</span>
+                <code class="swatch-code">#6EE7A8</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-personal)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Personal</span>
+                <code class="swatch-code">#FFB86B</code>
+              </li>
+              <li class="swatch" style="--swatch-color: var(--category-home)">
+                <span class="swatch-chip"></span>
+                <span class="swatch-name">Casa</span>
+                <code class="swatch-code">#FF8FB1</code>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card-sample">
+            <h4 class="group-title">Muestra</h4>
+            <div class="sample" role="group" aria-label="Muestra de la paleta T3">
+              <div class="sample-row">
+                <svg class="ring" viewBox="0 0 52 52" role="img" aria-label="Cumplimiento de los últimos 30 días: 60 %">
+                  <circle class="ring-edge" cx="26" cy="26" r="23.5"/>
+                  <circle class="ring-edge" cx="26" cy="26" r="16.5"/>
+                  <circle class="ring-track" cx="26" cy="26" r="20"/>
+                  <circle class="ring-progress" cx="26" cy="26" r="20" pathLength="100" stroke-dasharray="60 100" transform="rotate(-90 26 26)"/>
+                  <text class="ring-label" x="26" y="26">60%</text>
+                </svg>
+                <div class="sample-text">
+                  <p class="sample-title">Ir al gimnasio</p>
+                  <p class="sample-detail">18:30 · Salud</p>
+                </div>
+                <span class="round-button round-button-done" role="img" aria-label="Hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                <span class="round-button round-button-not-done" role="img" aria-label="No hecho"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+              </div>
+              <span class="primary-button"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Crear tarea o hábito</span>
+              <p class="toast">Marcada como hecha · <strong>Deshacer</strong></p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Pide las seis tipografías nada más empezar: el navegador espera a tenerlas antes de dar la página por
+    // cargada, y así la captura sale con la letra de cada paleta y no con la de reserva.
+    var fontFamilies = ["Space Grotesk", "Inter", "Manrope", "DM Sans", "Fraunces", "Archivo"];
+    fontFamilies.forEach(function (fontFamily) {
+      document.fonts.load('700 16px "' + fontFamily + '"').catch(function () {
+        // Sin conexión no hay nada que hacer: la página se ve con las tipografías de reserva.
+      });
+    });
+  </script>
+</body>
+</html>
