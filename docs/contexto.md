@@ -44,22 +44,24 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 *Actualizado: 2026-10-06.*
 
-- **Fase: replanificación para el móvil, a punto de aprobar.** El plan (DEC-24) es una app con Expo para Android y la web: 16 tareas en 6 olas. Está en el PR #4 (`docs/replanificacion-expo`), en borrador hasta que el humano lo apruebe.
-- **P02, el estilo, cerrada** (DEC-32): tres temas y la estructura de la ronda 4, en `docs/diseno.md`, en la rama `docs/estilo-p02` y su PR.
-- Agentes: Claude, Codex y Copilot habilitados y probados con Orca (DEC-04), con el ciclo de cuotas de DEC-27 y el supervisor de trabajadores.
+- **Fase: ejecución, a punto de empezar.** El plan replanificado está **aprobado** (2026-10-06, «APRUEBO EL PLAN»): una app con Expo para Android y la web, 16 tareas en 6 olas, todo el desarrollo en Docker. Está en el PR #4; el estilo (P02, DEC-32), en el PR #5.
+- Estado del plan: `APROBADO` (ver [05-plan](05-plan.md)).
+- Agentes: Claude, Codex y Copilot con Orca, con el ciclo de cuotas (DEC-27) y el supervisor de trabajadores. Tendrán acceso a Vercel, Supabase y Expo (DEC-33).
 
 
 ## Lo siguiente
 
-1. El humano aprueba el plan con sus palabras; el arquitecto lo marca `APROBADO` y se fusionan el PR #4 y el del estilo.
-2. `/ejecutar-plan` en una sesión nueva: empieza por T01, el esqueleto, todo en Docker.
+1. El humano crea las cuentas y los tokens de Vercel, Supabase y Expo y los guarda en `~/.config/app-desarrollo-personal/secretos.env` (H02, DEC-33).
+2. Se fusionan los PR #4 y #5.
+3. `/ejecutar-plan` en una sesión **nueva**, con Opus 5.5 y el esfuerzo más alto: empieza por T01, el esqueleto, todo en Docker.
 
 
 ## Pendiente del humano
 
-- Aprobar el plan replanificado y fusionar el PR #4 y el del estilo.
+- H02: crear las cuentas y los tokens (DEC-33), con la guía del arquitecto.
+- Fusionar los PR #4 y #5, y lanzar `/ejecutar-plan`.
+- Revisar T01, T02 y T14 cuando el orquestador lo pida (puertas `requiere-revisión`).
 - H05: instalar Expo Go en el móvil.
-- H02: crear las cuentas de Vercel, Supabase y Expo antes de la ola 4.
 - Cuando T15 esté fusionada, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
 - El ticket `ADP-1` es de prueba y se puede borrar a mano.
 
@@ -68,7 +70,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-33**.
+  chat. Siguiente número libre: **DEC-34**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -93,6 +95,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 | Sesiones de los agentes y de `gh` | Configuración de cada máquina | Iniciar sesión otra vez |
 | Configuración de Orca y del MCP de Jira | Cada máquina | Repetir [la comprobación](agentes/jira.md#comprobación-en-un-equipo-nuevo) |
 | Herramientas (lenguajes, Docker, Orca) | El sistema | Instalar las versiones de `AGENTS.md` |
+| Tokens de Vercel, Supabase y Expo (DEC-33) | `~/.config/app-desarrollo-personal/secretos.env` | Copiarlos o crear unos nuevos en cada servicio |
 | Imágenes de Docker y `~/Android/Sdk` (`adb` y el emulador, para el panel de Orca) | El sistema | Reconstruir las imágenes con los Dockerfiles del repositorio (T01 y T15) e instalar esas dos herramientas (DEC-26) |
 
 ---
@@ -100,6 +103,14 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Plan replanificado aprobado y acceso de los agentes (DEC-33)
+
+El humano aprobó el plan con las palabras «APRUEBO EL PLAN». Además pidió dar a
+los agentes acceso total a Vercel, Supabase y Expo, también a producción, para
+que lo hagan todo: él crea las cuentas y los tokens, y la prohibición 7 pasa a
+exigir una copia de seguridad antes de tocar producción (DEC-33). Lo siguiente
+es fusionar los PR #4 y #5 y lanzar `/ejecutar-plan` en una sesión nueva.
 
 ### 2026-10-06 — P02 cerrada: estilo y temas (DEC-32)
 

@@ -96,7 +96,7 @@ Las ocurrencias **no son filas**: se calculan (ADR-0003). «Cada mes» usa el d�
 | Tema | Decisión |
 |---|---|
 | Autenticación y autorización | Supabase Auth con email y contraseña, registro desactivado y RLS en todas las tablas ([ADR-0004](adr/0004-acceso-un-usuario.md)). La sesión se guarda en el dispositivo según la guía oficial de Supabase para Expo |
-| Claves | En la app solo van `EXPO_PUBLIC_SUPABASE_URL` y la clave pública (*anon*): están pensadas para ir dentro de la app y RLS las limita. **La clave `service_role` nunca va en la app ni en una variable `EXPO_PUBLIC_*`** |
+| Claves | En la app solo van `EXPO_PUBLIC_SUPABASE_URL` y la clave pública (*anon*): están pensadas para ir dentro de la app y RLS las limita. **La clave `service_role` nunca va en la app ni en una variable `EXPO_PUBLIC_*`**. Los tokens de los servicios, en `~/.config/app-desarrollo-personal/secretos.env` y en los secretos de GitHub Actions (DEC-33) |
 | Gestión de errores | Las funciones de `src/data` devuelven `{ ok: true, value }` o `{ ok: false, error: { code, message } }`. Códigos y mensajes técnicos en inglés; la interfaz muestra textos en español y nunca un error técnico |
 | Actualizaciones optimistas | Marcar y «Deshacer» se ven al instante (TanStack Query) y se deshacen solos si Supabase falla (CU-03, E1) |
 | Validación | Zod en `src/data`, antes de cada escritura |

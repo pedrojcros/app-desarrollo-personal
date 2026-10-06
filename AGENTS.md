@@ -35,7 +35,7 @@ Valen por defecto, y el arquitecto las ajusta en la planificación:
 4. **No reformatear ficheros que no estás tocando.** Los diffs tienen que poder revisarse.
 5. **No desactivar tests, linter ni comprobaciones** para hacer pasar un cambio.
 6. **Nada que cueste dinero** (servicios, planes o APIs de pago) sin aprobación: el proyecto es de coste cero.
-7. **Nunca tocar la base de datos de producción**: ni migraciones, ni datos, ni sus claves. El desarrollo y los tests van contra el Supabase local.
+7. **La base de datos de producción, con cuidado** (DEC-33): los agentes pueden tocarla, pero siempre con una copia de seguridad recién hecha antes de cualquier migración o cambio de datos, y sin borrar datos del dueño sin preguntarle. El desarrollo y los tests van contra el Supabase local.
 8. **No cambiar cómo se guardan las fechas ni el motor de ocurrencias** ([ADR-0003](docs/adr/0003-ocurrencias-calculadas.md)) sin aprobación.
 9. **No guardar datos de otras personas** ni enviar los del dueño a servicios distintos de los de la [ADR-0005](docs/adr/0005-stack-expo.md).
 10. **No enviar nada del proyecto a terceros** fuera de los servicios del stack: ni comentarios a los autores de una skill (`submit-expo-feedback` y similares), ni telemetría, ni código o datos pegados en servicios externos.
@@ -139,7 +139,7 @@ Antes de dar un encargo por terminado, los tests de la parte que has tocado tien
 - **Interfaz:** componentes de React Native Reusables (`src/components/ui`) y clases de NativeWind con los tokens de `src/theme`; nada de colores, tamaños ni tipografías sueltos.
 - **Errores:** las funciones de `src/data` devuelven `{ ok: true, value }` o `{ ok: false, error: { code, message } }`. La interfaz nunca muestra un error técnico.
 - **Validación:** Zod en `src/data`, antes de cada escritura.
-- **Claves:** en la app solo la URL y la clave pública de Supabase (`EXPO_PUBLIC_*`). La clave `service_role` nunca va en la app.
+- **Claves:** en la app solo la URL y la clave pública de Supabase (`EXPO_PUBLIC_*`). La clave `service_role` nunca va en la app. Los tokens de Supabase, Vercel y Expo (DEC-33) viven en `~/.config/app-desarrollo-personal/secretos.env` (permisos 600) y en los secretos de GitHub Actions: nunca en el repositorio, en un registro ni en el chat.
 - **Base de datos:** tablas y columnas en inglés, `snake_case`, tablas en plural. Toda tabla lleva `user_id` y políticas RLS. Migraciones numeradas en `supabase/migrations/`; una migración aplicada no se edita: se crea otra.
 - **Fechas** ([ADR-0003](docs/adr/0003-ocurrencias-calculadas.md)): fechas de calendario `YYYY-MM-DD` con la zona horaria del dispositivo; instantes en UTC.
 

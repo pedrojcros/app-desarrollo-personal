@@ -6,10 +6,10 @@ Lo que `/ejecutar-plan` ejecuta. Lo escribe el arquitecto con el humano (sesión
 
 | Campo | Valor |
 |---|---|
-| Estado | `EN BORRADOR` (replanificado el 2026-10-06 para móvil primero, DEC-24) |
-| Aprobado el | — *(la versión anterior, para Next.js, se aprobó el 2026-10-06; ver la bitácora)* |
-| Aprobado por | — |
-| Palabras del humano al aprobar | — |
+| Estado | `APROBADO` (replanificado el 2026-10-06 para móvil primero, DEC-24) |
+| Aprobado el | 2026-10-06 *(la versión anterior, para Next.js, también se aprobó ese día; ver la bitácora)* |
+| Aprobado por | El humano (pedrojcros) |
+| Palabras del humano al aprobar | «APRUEBO EL PLAN» |
 | Modo de seguimiento de tareas | Jira (`ADP`), decidido en DEC-02 |
 
 Estados posibles: `EN BORRADOR` → `APROBADO` → `EN EJECUCIÓN` → `CERRADO`. Solo el arquitecto, con la aprobación expresa del humano, pasa de borrador a aprobado.
@@ -224,12 +224,12 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 ### T12 — Despliegue, migraciones y copia de seguridad
 
-- **Objetivo:** la web exportada en Vercel, con sus cabeceras de seguridad (`develop` y los PR contra Supabase `pruebas`; `main` contra `produccion`); `eas.json` con un perfil que genera el APK instalable (la primera compilación se hace al publicar, en H04); la integración continua aplica las migraciones a `pruebas` al fusionar en `develop`, y a `produccion` solo desde `main`; exportación semanal automática de los datos; el README explica cómo restaurar y cómo reactivar Supabase si se pausa.
+- **Objetivo:** con los tokens de DEC-33, crear los proyectos de Supabase (`pruebas` y `produccion`), de Vercel y de Expo; la web exportada en Vercel, con sus cabeceras de seguridad (`develop` y los PR contra Supabase `pruebas`; `main` contra `produccion`); `eas.json` con un perfil que genera el APK instalable (la primera compilación se hace al publicar, en H04); la integración continua aplica las migraciones a `pruebas` al fusionar en `develop`, y a `produccion` solo desde `main`; exportación semanal automática de los datos; el README explica cómo restaurar y cómo reactivar Supabase si se pausa.
 - **Funcionalidades:** RNF-04 · **Depende de:** T02 y **H02**
 - **Tamaño:** M · **Agente sugerido:** `codex`
 - **Skills:** a demanda `ci-cd-and-automation`, `shipping-and-launch`; `source-driven-development` para `eas.json`.
 - **Reserva:** `.github/workflows/deploy-*.yml` y `.github/workflows/backup.yml` (T01 reserva el resto de flujos), `eas.json`, la configuración de Vercel, `scripts/backup/`.
-- **Hecho cuando:** un PR obtiene su web de prueba; una exportación se restaura en local con los mismos datos; `eas.json` sigue la documentación oficial de EAS (la primera compilación la lanza el humano en H04).
+- **Hecho cuando:** un PR obtiene su web de prueba; una exportación se restaura en local con los mismos datos; `eas.json` sigue la documentación oficial de EAS (la primera compilación se lanza al publicar, en H04).
 - **Puerta:** — · **Ticket:** ADP-
 
 ### T16 — Añadir rápido
@@ -286,9 +286,9 @@ Escritas aquí y en [agentes/orquestador](agentes/orquestador.md#lo-que-nunca-se
 | Tarea | Por qué la hace el humano | Qué prepara antes el orquestador |
 |---|---|---|
 | H01 — Que `git push` funcione desde las sesiones de los agentes *(hecho el 2026-10-06: remoto por HTTPS con `gh`)* | Es la configuración de su cuenta | — |
-| H02 — Crear las cuentas de Vercel (conectada al repositorio), Supabase (proyectos `pruebas` y `produccion`) y **Expo** (para EAS Build); poner las claves en Vercel y en GitHub; crear su usuario en producción | Son sus cuentas y sus secretos | Los pasos y los nombres exactos de las variables (T12) |
+| H02 — Crear las cuentas de Vercel, Supabase y **Expo** y sus **tokens**, y guardarlos en `~/.config/app-desarrollo-personal/secretos.env` (DEC-33). Los agentes hacen el resto: los proyectos `pruebas` y `produccion`, las claves en Vercel y en GitHub, y su usuario en producción | Son sus cuentas: llevan su nombre y su email | Los pasos exactos |
 | H03 — Revisar T01, T02 y T14 antes de fusionar (en T14, compararla con su prototipo) | Puerta `requiere-revisión` | Un resumen, el diff y cómo verlo en el móvil |
-| H04 — Publicar la versión 1: `develop` a `main`, etiqueta, migraciones a producción, **compilar el APK con EAS e instalarlo en el móvil** | Solo el humano toca `main` | La comprobación de «Preparar una versión para `main`» |
+| H04 — Publicar la versión 1: pasar `develop` a `main` y poner la etiqueta. Las migraciones a producción, con su copia previa, y el APK los hacen los agentes (DEC-33); el humano instala el APK en el móvil | Solo el humano toca `main` | La comprobación de «Preparar una versión para `main`» |
 | H05 — Instalar **Expo Go** en el móvil, para ver la app desde T01 (el emulador va en Docker, T15) | Es su móvil | — |
 
 ## Después de la versión 1
