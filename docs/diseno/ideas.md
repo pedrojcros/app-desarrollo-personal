@@ -2,6 +2,17 @@
 
 Lo que el humano dice que le gusta y lo que no, ronda a ronda. Es la memoria del bucle, porque las conversaciones se borran. Lo más reciente, arriba.
 
+## Ronda 1 (2026-10-06)
+
+- **P1:** le gusta la pastilla que resalta «Hoy» en la barra de navegación de abajo.
+- **P2 y P3:** nada.
+- **P4:** sus colores, como **estilo blanco**; la cabecera; y el botón + abajo a la derecha.
+- **P5:** sus colores, como **estilo negro**; el aviso «Marcada como hecha · Deshacer», pero **sin el punto** del medio.
+- **P6:** sus colores podrían ser el **tercer estilo**, pero no le terminan de convencer: quiere ver más.
+- **En general:** le gustaron más los de **Codex** (P4 y P5): «más pulidos y profesionales».
+- **Sin anillos de progreso junto a las tareas y los hábitos.** En Hoy, la única función es marcar lo que va haciendo; el progreso se ve en otras páginas.
+- Quiere ver **otras páginas**: en la ronda 2, Historial y Crear tarea o hábito.
+
 ## Antes de la ronda 1 (2026-10-06)
 
 Referencias en `~/Pictures/ideas-app/` del ordenador del humano, con sus notas en `notas.txt`. No están en el repositorio: son de otros autores, sacadas de Pinterest.
