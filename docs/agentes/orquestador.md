@@ -126,7 +126,7 @@ La tabla de [agentes-disponibles](agentes-disponibles.md) dice quién está habi
 
 Sé honesto con el ahorro: un trabajador de Claude arranca en frío y relee la documentación, así que ahorra **contexto tuyo**, no necesariamente tokens. El ahorro real está en repartir a agentes que se facturan aparte o con límites distintos. Cuidado con las cuentas gratuitas, que tienen límites bajos: si un agente se queda sin cuota, reasigna el encargo en vez de reintentarlo.
 
-**Reparto del trabajo (DEC-12 y DEC-22).** Tú, Opus 5.5 al máximo, decides. No escribes encargos al milímetro: fijas lo que vale de verdad (contratos, criterios de hecho comprobables, ficheros reservados) y **qué skills** debe usar el trabajador. El «cómo se hace aquí» va en las [skills del proyecto](../../.agents/skills/README.md), que se escriben una vez y cargan todos. Revisas el resultado con `code-review-and-quality`.
+**Reparto del trabajo (DEC-12 y DEC-22).** Tú, Opus 5.5 al máximo, decides. No escribes encargos al milímetro: fijas lo que vale de verdad (contratos, criterios de hecho comprobables, ficheros reservados) y **qué skills** debe usar el trabajador. El «cómo se hace aquí» va en las [skills del proyecto](../../.agents/skills/README.md), que se escriben una vez y cargan todos. Revisas el resultado con `code-review-and-quality`. Las skills de diseño, revisión visual y publicación son **a demanda** ([lista](../../.agents/skills-a-demanda/README.md)): pídelas por su ruta en el encargo cuando toquen. Para probar en Android, la skill de Orca `orca-emulator-android` controla el dispositivo y `android-emulator-qa` da el método; para la web, el MCP `chrome-devtools` y `browser-testing-with-devtools`.
 
 **Modelos según el tamaño del encargo:**
 
@@ -146,6 +146,14 @@ Los identificadores de modelo de Codex compruébalos en su ayuda o su configurac
 ### 7. Orden de integración
 
 Cuando varios encargos terminan a la vez, propón fusionarlos de menos a más conflictivo: primero los que no comparten ficheros con nadie, después los que tocan zonas comunes, y rebasa los que queden tras cada fusión.
+
+### 8. Cuando fallan varias cosas a la vez
+
+Ideas de la skill `dispatching-parallel-agents`, aplicadas con Orca en lugar de subagentes:
+
+- **Agrupa los fallos por zona** (un fichero de tests, un subsistema). Un trabajador por cada zona **independiente**, todos a la vez dentro del tope.
+- **No repartas** si los fallos están relacionados (arreglar uno puede arreglar los demás), si hace falta ver el sistema entero, o si todavía no se sabe qué falla: primero investiga con un solo trabajador.
+- **Al volver:** lee cada informe, comprueba que no han tocado el mismo código, ejecuta la batería completa con todo junto y revisa algo al azar, porque los agentes cometen errores sistemáticos.
 
 ## Política de merge
 
@@ -172,7 +180,7 @@ Cuando se cierra una ola del plan o un hito, propón al humano publicar. No lo h
 ## Flujo de un encargo
 
 1. **Elige la tarea** del plan respetando dependencias, y **crea o actualiza su ticket** según [jira](jira.md).
-2. **Escribe el encargo** con la [plantilla](plantilla-encargo.md), en `docs/agentes/encargos/NNN-titulo.md`.
+2. **Escribe el encargo** con la [plantilla](plantilla-encargo.md), en `docs/agentes/encargos/NNN-titulo.md`. Que sea autosuficiente: pega los mensajes de error y los nombres exactos de los tests implicados, pon las restricciones explícitas («no toques el código de producción», «solo estos ficheros») y di qué debe devolver.
 3. **Lanza el trabajador** con `worker-start`. El texto íntegro del encargo va en `--spec`: el trabajador arranca en un worktree nuevo y **no verá un fichero que solo exista en el tuyo** sin commitear. El fichero del encargo sirve de registro. Con Copilot, comprueba a los 20 segundos que el encargo no se ha quedado aparcado (ver [orca](orca.md#trampas-conocidas)).
 4. **Espera** con `check --wait`, no con sondeos. Si pasa mucho tiempo sin señales, mira el estado (`worker-list`, `worker-show`, `worker-read`) antes de decidir nada.
 5. **Revisa** con la lista de más abajo. Los tests los ejecutas tú.
@@ -195,6 +203,7 @@ Antes de dar un encargo por bueno:
 - [ ] Respeta las prohibiciones y la regla de legibilidad de `AGENTS.md`.
 - [ ] No hay dependencias nuevas ni cambios de modelo de datos o de contrato sin aprobación.
 - [ ] **Has ejecutado tú los tests y pasan.** No te fíes del informe del trabajador.
+- [ ] Si han trabajado varios a la vez: no han tocado el mismo código y la batería completa pasa con todo junto.
 - [ ] Lo nuevo tiene tests, y los tests comprueban algo (no pasan por vacíos).
 - [ ] La documentación afectada está actualizada.
 - [ ] Las dudas que anota el trabajador están resueltas o llevadas a una decisión.

@@ -10,7 +10,7 @@
 | Ticket | `ADP-nnn` (solo informativo: no lo toques) |
 | Agente | claude / codex / copilot |
 | Modelo y esfuerzo | Según el tamaño del encargo (ver «Modelos» en el orquestador). Copilot usa el suyo |
-| Skills a usar | De `.agents/skills/`, por ejemplo `test-driven-development`, `frontend-ui-engineering` |
+| Skills a usar | Automáticas de `.agents/skills/` (por ejemplo `test-driven-development`, `codigo-legible`) y, si hacen falta, a demanda por su ruta (`.agents/skills-a-demanda/<skill>/SKILL.md`) |
 | Rama y worktree | Rama `ADP-nnn-descripcion-corta`, creada desde `develop`. Un worktree solo para este encargo |
 | Depende de | Encargos que tienen que estar integrados antes |
 | Reservado para este encargo | Números de migración, ficheros compartidos... (ver método del orquestador, punto 3) |

@@ -64,7 +64,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-23**.
+  chat. Siguiente número libre: **DEC-24**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -90,6 +90,17 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Skills móviles, navegador y herramientas (DEC-23)
+
+Tras elegir la opción B (app con Expo, ver la replanificación), se revisaron
+unas cuarenta skills propuestas por el humano y se quedaron 22 automáticas y
+16 a demanda; el resto, fuera con su motivo (ver [la ficha](../.agents/skills/README.md)).
+Se escribieron dos skills propias (`flujo-git` y `codigo-legible`). A las de
+Expo se les quitó la sección que enviaba comentarios a Expo, y se prohibió en
+`AGENTS.md` enviar nada a terceros. `/idea` ahora puede aclarar una idea con el
+humano antes de apuntarla. Se configuró el MCP de Chrome, aislado y sin enviar
+datos a Google.
 
 ### 2026-10-06 — Skills del proyecto y modelos según el tamaño (DEC-22)
 

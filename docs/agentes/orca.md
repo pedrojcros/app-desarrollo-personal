@@ -80,6 +80,22 @@ Para trabajo planificado con dependencias: `task-create --spec ... --deps '<json
 - **Una terminal viva no prueba un agente vivo.** `worker-show` da la vida de la terminal; `worker-list` da la del agente. Sin prueba positiva de que ha muerto, no hagas `stop`, `abandon`, reintento ni `release`: sigue esperando o inspecciona.
 - **No sustituyas la orquestación de Orca por subagentes propios** de Claude Code cuando el humano ha pedido repartir con Orca.
 
+## Navegador para los agentes (MCP `chrome-devtools`)
+
+Permite a los agentes abrir páginas, leer el DOM y la consola, medir rendimiento y hacer capturas de la **versión web**. Configurado así (DEC-23):
+
+| Agente | Dónde está configurado |
+|---|---|
+| Claude y Copilot | `.mcp.json` del proyecto (versionado) |
+| Codex | `~/.codex/config.toml` (configuración de este equipo) |
+
+Comando: `npx -y chrome-devtools-mcp@1.10.1 --isolated --headless --executablePath /usr/bin/chromium --no-usage-statistics --no-performance-crux`.
+
+- `--isolated`: perfil **temporal** que se borra al cerrar; nunca el navegador ni las sesiones del humano, y varios agentes a la vez no se pisan el perfil.
+- `--headless`: sin ventana, para no llenar la pantalla con tres agentes en paralelo.
+- `--no-usage-statistics` y `--no-performance-crux`: no se envían estadísticas de uso ni URLs a Google.
+- Necesita **Chromium** instalado en `/usr/bin/chromium` (`sudo pacman -S chromium`). La versión del paquete está fijada: para actualizarla, se cambia aquí y en las dos configuraciones.
+
 ## Trampas conocidas
 
 - **En Windows, Smart App Control puede bloquear la CLI de Orca** tras una actualización. Síntoma: la CLI deja de responder o falla al arrancar. Se resolvió desactivándolo (decisión del humano).
