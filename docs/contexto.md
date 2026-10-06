@@ -69,7 +69,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-31**.
+  chat. Siguiente número libre: **DEC-32**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -101,6 +101,14 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Categoría > sección (DEC-31)
+
+Viendo la ronda 3 de estilo, el humano propuso invertir los nombres: la
+categoría es el contenedor («Lista de la compra») y la sección, una parte
+(«Mercadona»), como en Todoist. Las tareas van en la categoría o en una
+sección, y las categorías ganan icono y color (el color por categoría ya se
+usaba en el diseño, pero no estaba en el modelo de datos).
 
 ### 2026-10-06 — Secciones (DEC-29) y crear deprisa (DEC-30)
 

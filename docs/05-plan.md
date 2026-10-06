@@ -141,7 +141,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 ### T04 — Gestión de categorías y secciones
 
-- **Objetivo:** crear y eliminar categorías (lo que contienen pasa a la Bandeja de entrada) y las secciones que las agrupan (DEC-29); un selector de categoría reutilizable, que enseña la sección, para los formularios y el añadir rápido.
+- **Objetivo:** crear y eliminar categorías, con su icono y su color (lo que contienen pasa a la Bandeja de entrada), y sus secciones (DEC-31); la lista de categorías se despliega y se recoge; un selector de categoría y sección reutilizable para los formularios y el añadir rápido.
 - **Funcionalidades:** RF-20 (crear y secciones), RF-21 · **Depende de:** T02, T14
 - **Tamaño:** M · **Agente sugerido:** `codex`
 - **Skills:** `expo-router`, `expo-data-fetching`, `codigo-legible`, `test-driven-development`.

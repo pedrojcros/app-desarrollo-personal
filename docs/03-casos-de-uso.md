@@ -164,7 +164,7 @@ Se definen aquí una sola vez y los casos las enlazan.
 - **Escenario 3: fecha pasada (A4).** Cuando el usuario elige una fecha anterior a hoy y confirma el aviso, entonces la tarea se crea ya vencida.
 - **Escenario 4: nombre vacío (E1).** Cuando el usuario intenta guardar sin nombre, entonces no se crea la tarea y se indica que el nombre es obligatorio.
 - **Escenario 5: tarea en categoría (A5).** Dado que existe la categoría «Compra», cuando el usuario crea «Leche» sin fecha en esa categoría, entonces la tarea existe, pendiente y dentro de «Compra».
-- **Escenario 6: crear desde una categoría (DEC-30).** Dado que el usuario está en «Mercadona», cuando pulsa +, escribe «Plátanos» y confirma, entonces la tarea queda en «Mercadona», sin fecha.
+- **Escenario 6: crear desde una sección (DEC-30).** Dado que el usuario está en la sección «Mercadona» de «Lista de la compra», cuando pulsa +, escribe «Plátanos» y confirma, entonces la tarea queda en «Lista de la compra», sección «Mercadona», sin fecha.
 - **Escenario 7: crear desde Hoy (DEC-30).** Cuando el usuario, desde Hoy, pulsa +, escribe «Comprar pilas» y confirma, entonces la tarea queda con la fecha de hoy y sale en Hoy.
 
 ---
@@ -391,5 +391,5 @@ Se definen aquí una sola vez y los casos las enlazan.
 - **Escenario 3: eliminar con contenido (A2).** Dado que «Compra» tiene tres tareas, cuando el usuario la elimina y confirma, entonces las tres tareas siguen existiendo, ahora en la Bandeja de entrada.
 - **Escenario 4: renombrar (A1).** Cuando el usuario cambia «Compra» por «Supermercado», entonces sus tareas aparecen bajo «Supermercado».
 - **Escenario 5: la Bandeja de entrada no se elimina (E4).** Cuando el usuario intenta eliminar la Bandeja de entrada, entonces no se permite y no cambia nada.
-- **Escenario 6: secciones (DEC-29).** Dado que existen «Mercadona» y «Lidl», cuando el usuario crea la sección «Lista de la compra» y mete en ella las dos categorías, entonces aparecen agrupadas bajo «Lista de la compra», y el resto de categorías siguen sin sección.
-- **Escenario 7: eliminar una sección (DEC-29).** Dada «Lista de la compra» con «Mercadona» y «Lidl», cuando el usuario la elimina y confirma, entonces las dos categorías siguen existiendo, con sus tareas, ahora sin sección.
+- **Escenario 6: secciones (DEC-31).** Dada la categoría «Lista de la compra», cuando el usuario crea en ella las secciones «Mercadona» y «Lidl» y pone «Leche» en «Mercadona», entonces al abrir «Lista de la compra» ve «Leche» bajo «Mercadona», y lo que no tiene sección, aparte.
+- **Escenario 7: eliminar una sección (DEC-31).** Dada la sección «Mercadona», con dos tareas, dentro de «Lista de la compra», cuando el usuario la elimina y confirma, entonces las dos tareas siguen en «Lista de la compra», sin sección.

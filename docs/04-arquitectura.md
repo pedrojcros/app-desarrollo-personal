@@ -82,12 +82,12 @@ Sin cambios respecto a la planificación anterior. Nombres en inglés (DEC-06); 
 
 | Tabla | Qué guarda | Campos principales |
 |---|---|---|
-| `sections` | Secciones: carpetas de categorías (DEC-29) | `id`, `user_id`, `name` (único por usuario, sin distinguir mayúsculas) |
-| `categories` | Categorías | `id`, `user_id`, `section_id` (vacío = sin sección, DEC-29), `name` (único por usuario, sin distinguir mayúsculas) |
-| `habits` | Hábitos | `id`, `user_id`, `category_id` (vacío = Bandeja), `name`, `start_date`, `time_of_day` o `time_slot` (`morning`, `afternoon`, `night`), `duration_minutes`, `archived_at` |
+| `categories` | Categorías | `id`, `user_id`, `name` (único por usuario, sin distinguir mayúsculas), `icon`, `color` (DEC-31) |
+| `sections` | Secciones de una categoría (DEC-31) | `id`, `user_id`, `category_id`, `name` (único dentro de su categoría) |
+| `habits` | Hábitos | `id`, `user_id`, `category_id` (vacío = Bandeja), `section_id` (vacío = sin sección; de su misma categoría), `name`, `start_date`, `time_of_day` o `time_slot` (`morning`, `afternoon`, `night`), `duration_minutes`, `archived_at` |
 | `habit_rules` | Versiones de la regla de repetición | `id`, `habit_id`, `valid_from`, `frequency` (`daily`, `weekdays`, `every_n_days`, `monthly`), `weekdays`, `interval_days` |
 | `habit_marks` | Marcas de ocurrencias | `habit_id`, `occurrence_date`, `status` (`done`, `not_done`), `marked_at`; clave única (`habit_id`, `occurrence_date`) |
-| `tasks` | Tareas | `id`, `user_id`, `category_id` (vacío = Bandeja), `name`, `notes`, `due_date`, `due_time`, `status` (`pending`, `done`, `not_done`), `marked_at`, `archived_at` |
+| `tasks` | Tareas | `id`, `user_id`, `category_id` (vacío = Bandeja), `section_id` (vacío = sin sección; de su misma categoría), `name`, `notes`, `due_date`, `due_time`, `status` (`pending`, `done`, `not_done`), `marked_at`, `archived_at` |
 
 Las ocurrencias **no son filas**: se calculan (ADR-0003). «Cada mes» usa el día de `valid_from`. Todas las tablas tienen RLS por `user_id` (ADR-0004).
 

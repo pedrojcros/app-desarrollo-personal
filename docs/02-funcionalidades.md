@@ -36,7 +36,7 @@ Registro de funcionalidades (`RF`) y requisitos no funcionales (`RNF`). Es el co
 | RF-17 | Corregir desde el historial | DESEABLE | CU-05 | | |
 | RF-18 | Modificar un hábito o una tarea | IMPRESCINDIBLE | CU-06 | | |
 | RF-19 | Archivar (eliminar) un hábito o una tarea | IMPRESCINDIBLE | CU-06 | | |
-| RF-20 | Crear categorías, agruparlas en secciones y asignarlas | IMPRESCINDIBLE | CU-07, CU-01, CU-02 | | |
+| RF-20 | Crear categorías con secciones y asignarlas | IMPRESCINDIBLE | CU-07, CU-01, CU-02 | | |
 | RF-21 | Eliminar una categoría | IMPRESCINDIBLE | CU-07 | | |
 | RF-22 | Renombrar una categoría | DESEABLE | CU-07 | | |
 
@@ -177,7 +177,7 @@ El estado de construcción **no** se apunta aquí: vive en las tareas (ver [agen
 
 ### RF-20 — Crear categorías y asignarlas
 
-- **Descripción:** el sistema debe permitir crear una categoría con nombre único y asignarla, como máximo una, a hábitos y tareas. Las categorías se pueden agrupar en **secciones**, como carpetas de un solo nivel (una categoría puede no tener sección); las secciones se crean y se eliminan, y al eliminar una, sus categorías se quedan sin sección (DEC-29).
+- **Descripción:** el sistema debe permitir crear una categoría con nombre único y asignarla, como máximo una, a hábitos y tareas. Cada categoría tiene un icono y un color, y puede dividirse en **secciones** (por ejemplo, «Lista de la compra» en «Mercadona» y «Lidl»); una tarea o un hábito va en la categoría o en una de sus secciones. Las secciones se crean y se eliminan; al eliminar una, lo que contiene queda en la categoría, sin sección (DEC-29 y DEC-31).
 - **Prioridad:** IMPRESCINDIBLE
 - **Criterio de aceptación:** CU-07, escenarios 1, 2, 6 y 7; CU-02, escenario 5.
 - **Notas:** RN-24, RN-25.
