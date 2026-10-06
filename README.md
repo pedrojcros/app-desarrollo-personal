@@ -107,7 +107,6 @@ contenedor no abre aplicaciones gráficas del anfitrión.
 - [Jest con Expo](https://docs.expo.dev/develop/unit-testing/). El renderer se fija a 19.2.3 mediante un override para coincidir con React y evitar que el peer de RNTL elija otra versión.
 - [Persistencia de sesión con AsyncStorage en Expo](https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native); T02 implementará el cliente y el acceso.
 - [Telemetría de Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started#telemetry) y [telemetría de Expo CLI](https://docs.expo.dev/more/expo-cli/#telemetry).
-- [Modo sin interfaz gráfica del CLI de Expo](https://github.com/expo/expo/blob/sdk-56/packages/%40expo/cli/src/utils/env.ts).
 
 ## Documentación
 

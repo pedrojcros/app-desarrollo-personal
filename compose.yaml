@@ -16,7 +16,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       BROWSER: none
-      EXPO_UNSTABLE_HEADLESS: '1'
       REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
       EXPO_NO_TELEMETRY: '1'
       SUPABASE_TELEMETRY_DISABLED: '1'
