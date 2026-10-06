@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hoy · Lo siguiente</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{--background:#0E1813;--surface:#15221B;--surface-two:#1C2C23;--border:#27392F;--text:#E9F1EB;--muted:#93A89A;--accent:#E8C468;--negative:#D9776A;--university:#8DB8F2;--health:#7AD39A;--personal:#EFA66A;--home:#F2A7A0}
+*{box-sizing:border-box}body{margin:0;background:var(--background);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px}button{font:inherit;cursor:pointer;border:0;color:inherit}button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}.symbols{position:absolute;width:0;height:0;overflow:hidden}main{padding:20px 20px 164px;max-width:520px;margin:auto}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.date{font-size:11px;color:var(--muted);margin:0 0 4px}h1{font-size:27px;letter-spacing:-1px;margin:0;font-weight:600}.daily{display:flex;align-items:center;gap:8px}.daily svg{width:34px;height:34px;transform:rotate(-90deg);stroke-width:3}.track{stroke:var(--border)}.daily .fill{stroke:var(--accent);stroke-dasharray:25 100;transition:stroke-dasharray .25s}.daily strong{display:block;font-size:13px;font-weight:500}.daily small{font-size:10px;color:var(--muted)}.hero{background:var(--surface-two);border:1px solid var(--border);border-radius:20px;padding:16px;margin-bottom:16px;position:relative;overflow:hidden;min-height:172px}.hero-top{display:flex;justify-content:space-between;align-items:center}.eyebrow{font-size:10px;letter-spacing:1.7px;text-transform:uppercase;color:var(--accent);font-weight:700}.hero-time{font-size:13px;color:var(--muted)}.hero h2{font-size:25px;line-height:1.16;font-weight:500;letter-spacing:-.7px;margin:11px 0 8px;max-width:250px}.detail{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:11px}.category-dot{width:5px;height:5px;border-radius:50%;background:var(--category)}.hero-actions{display:flex;gap:10px;margin-top:16px}.hero-actions button{height:44px;flex:1;border-radius:10px;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;gap:7px}.hero-actions svg{width:18px;height:18px}.positive{background:var(--category);color:var(--background)}.negative{background:var(--surface);color:var(--negative);border:1px solid var(--negative)}.list-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.list-heading h2{font-size:14px;font-weight:500;margin:0}.list-heading span{font-size:11px;color:var(--muted)}.group{margin-bottom:5px}.group h3{margin:0;height:18px;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:500;color:var(--muted)}.row{display:flex;gap:10px;align-items:center;min-height:48px;border-bottom:1px solid var(--border);transition:opacity .25s,transform .25s;overflow:hidden}.indicator{width:29px;height:29px;display:flex;align-items:center;justify-content:center;color:var(--category);flex-shrink:0}.indicator svg{width:29px;height:29px;transform:rotate(-90deg);stroke-width:2.5}.indicator .fill{stroke:var(--category)}.task-dot{width:9px;height:9px;border:2px solid var(--category);border-radius:3px}.row-copy{flex:1;min-width:0}.row-title{font-size:12px;font-weight:500;line-height:1.35;display:block}.row .detail{font-size:10px;margin-top:3px}.row-actions{display:flex;gap:2px}.row-actions button{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:none;border-radius:50%;padding:0}.row-actions svg{width:19px;height:19px}.row-actions .done{color:var(--category)}.row-actions .undone{color:var(--negative)}.row-actions .done svg{background:var(--category);color:var(--background);border-radius:50%;padding:3px;width:26px;height:26px}.leaving{opacity:0;transform:translateX(-22px)}.entering{animation:slide-in .25s ease-out}@keyframes slide-in{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}.toast{position:fixed;bottom:100px;left:20px;right:20px;max-width:480px;margin:auto;background:var(--surface-two);border:1px solid var(--border);border-radius:12px;padding:4px 12px;display:flex;align-items:center;justify-content:space-between;min-height:48px;font-size:11px;z-index:3}.toast svg{width:17px;height:17px;color:var(--health);margin-right:7px}.toast-message{display:flex;align-items:center}.toast button{background:none;font-weight:700;color:var(--accent);min-height:44px;padding:0 0 0 6px;font-size:11px}nav{position:fixed;bottom:0;left:0;right:0;height:80px;background:var(--surface);border-top:1px solid var(--border);display:flex;padding:15px 8px 10px;z-index:4}nav .destination{flex:1;min-width:0;background:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:9px;position:relative;min-height:44px}nav .destination svg{width:20px;height:20px}nav .active{color:var(--accent)}nav .middle{padding-top:17px}nav .middle svg{width:16px;height:16px}nav .create{position:absolute;top:-28px;left:calc(50% - 28px);width:56px;height:56px;border-radius:18px;background:var(--accent);color:var(--background);border:5px solid var(--background);display:flex;align-items:center;justify-content:center}.badge{position:absolute;top:0;left:calc(50% + 7px);background:var(--accent);color:var(--background);font-size:9px;font-weight:700;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center}.complete{margin:20px 0;color:var(--muted)}@media(min-height:880px){main{padding-top:32px}.hero{margin-top:24px;margin-bottom:28px}.row{min-height:62px}.group{margin-bottom:12px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg class="symbols" aria-hidden="true"><defs>
+<symbol id="check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol><symbol id="cross" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol><symbol id="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></symbol><symbol id="inbox" viewBox="0 0 24 24"><path d="M4 4h16l2 10v6H2v-6L4 4Zm-2 10h6l2 3h4l2-3h6"/></symbol><symbol id="category" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol><symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol><symbol id="history" viewBox="0 0 24 24"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6m3-3v5l4 2"/></symbol><symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+</defs></svg>
+<main>
+<header><div><p class="date">Martes, 6 de octubre de 2026</p><h1>Hoy</h1></div><div class="daily"><svg viewBox="0 0 40 40" aria-label="2 de 8 marcadas"><circle class="track" cx="20" cy="20" r="15.9"/><circle id="daily-ring" class="fill" cx="20" cy="20" r="15.9"/></svg><div><strong><span id="daily-count">2</span> de 8</strong><small>marcadas</small></div></div></header>
+<section id="next" aria-label="Siguiente actividad"></section>
+<div class="list-heading"><h2>El resto del día</h2><span id="remaining">5 pendientes</span></div>
+<div id="list"></div>
+</main>
+<div class="toast" role="status"><div class="toast-message"><svg><use href="#check"/></svg><span id="notice">Marcada como hecha ·</span></div><button id="undo">Deshacer</button></div>
+<nav aria-label="Navegación principal">
+<button class="destination active" aria-current="page"><svg><use href="#sun"/></svg>Hoy</button>
+<button class="destination"><svg><use href="#inbox"/></svg>Bandeja</button>
+<button class="destination middle"><svg><use href="#category"/></svg>Categorías</button>
+<button class="destination"><svg><use href="#clock"/></svg><span class="badge">2</span>Pendientes</button>
+<button class="destination"><svg><use href="#history"/></svg>Historial</button>
+<button class="create" aria-label="Crear tarea o hábito"><svg><use href="#plus"/></svg></button>
+</nav>
+<script>
+const activities = [
+  {id:'dentist',title:'Llamar al dentista',group:'Mañana',time:'10:00',category:'Personal',color:'personal',type:'Tarea'},
+  {id:'water',title:'Beber 2 L de agua',group:'Mañana',time:'',category:'Salud',color:'health',type:'Hábito',progress:80},
+  {id:'gym',title:'Ir al gimnasio',group:'Tarde',time:'18:30',category:'Salud',color:'health',type:'Hábito',progress:60},
+  {id:'practice',title:'Entregar práctica de Redes',group:'Noche',time:'23:59',category:'Universidad',color:'university',type:'Tarea'},
+  {id:'read',title:'Leer 20 minutos',group:'Noche',time:'',category:'Personal',color:'personal',type:'Hábito',progress:45},
+  {id:'protein',title:'Comprar proteína',group:'Sin hora',time:'',category:'Personal',color:'personal',type:'Tarea'}
+];
+let markedCount = 2;
+let lastAction = {activity:{id:'meditate',title:'Meditar 10 min',group:'Mañana',time:'',category:'Salud',color:'health',type:'Hábito'},index:2};
+let busy = false;
+function icon(name){return `<svg aria-hidden="true"><use href="#${name}"/></svg>`;}
+function indicator(activity){
+  if(activity.progress === undefined){return '<span class="indicator"><span class="task-dot"></span></span>';}
+  return `<span class="indicator"><svg viewBox="0 0 36 36" role="img" aria-label="Cumplimiento en 30 días: ${activity.progress} %"><circle class="track" cx="18" cy="18" r="15.9"/><circle class="fill" cx="18" cy="18" r="15.9" stroke-dasharray="${activity.progress} 100"/></svg></span>`;
+}
+function detail(activity){
+  const time = activity.time ? `${activity.time} · ` : '';
+  return `<span class="detail"><span class="category-dot"></span>${time}${activity.category} · ${activity.type}</span>`;
+}
+function render(animateHero = false){
+  const nextActivity = activities[0];
+  const nextPanel = document.getElementById('next');
+  if(nextActivity){
+    nextPanel.className = 'hero';
+    if(animateHero){nextPanel.classList.add('entering');}
+    nextPanel.style.setProperty('--category',`var(--${nextActivity.color})`);
+    nextPanel.innerHTML = `<div class="hero-top"><span class="eyebrow">Siguiente</span><span class="hero-time">${nextActivity.time || nextActivity.group}</span></div><h2>${nextActivity.title}</h2><div class="detail">${nextActivity.progress === undefined ? '' : indicator(nextActivity)}${detail(nextActivity)}</div><div class="hero-actions"><button class="positive" data-id="${nextActivity.id}" data-result="done">${icon('check')}Hecho</button><button class="negative" data-id="${nextActivity.id}" data-result="undone">${icon('cross')}No hecho</button></div>`;
+  }else{
+    nextPanel.className = 'hero';
+    nextPanel.innerHTML = '<span class="eyebrow">Día resuelto</span><h2>Todo marcado.</h2><p class="complete">Las actividades quedan en tu historial.</p>';
+  }
+  const groups = ['Sin hora','Mañana','Tarde','Noche'];
+  const restActivities = activities.slice(1);
+  document.getElementById('list').innerHTML = groups.map(function(group){
+    const rows = restActivities.filter(function(activity){return activity.group === group;});
+    if(!rows.length){return '';}
+    const content = rows.map(function(activity){return `<div class="row" data-row="${activity.id}" style="--category:var(--${activity.color})">${indicator(activity)}<div class="row-copy"><span class="row-title">${activity.title}</span>${detail(activity)}</div><div class="row-actions"><button class="done" data-id="${activity.id}" data-result="done" aria-label="Marcar ${activity.title} como hecha">${icon('check')}</button><button class="undone" data-id="${activity.id}" data-result="undone" aria-label="Marcar ${activity.title} como no hecha">${icon('cross')}</button></div></div>`;});
+    return `<section class="group"><h3>${group}</h3>${content.join('')}</section>`;
+  }).join('');
+  document.getElementById('remaining').textContent = `${restActivities.length} pendientes`;
+}
+function updateProgress(){
+  const counter = document.getElementById('daily-count');
+  const initialCount = Number(counter.textContent);
+  const startTime = performance.now();
+  function countFrame(currentTime){
+    const fraction = Math.min((currentTime - startTime) / 250,1);
+    const interpolatedCount = initialCount + (markedCount - initialCount) * fraction;
+    counter.textContent = Math.round(interpolatedCount);
+    if(fraction < 1){requestAnimationFrame(countFrame);}
+  }
+  requestAnimationFrame(countFrame);
+  document.getElementById('daily-ring').style.strokeDasharray = `${markedCount / 8 * 100} 100`;
+  document.getElementById('daily-ring').parentElement.setAttribute('aria-label',`${markedCount} de 8 marcadas`);
+}
+document.addEventListener('click',function(event){
+  const actionButton = event.target.closest('[data-result]');
+  if(!actionButton || busy){return;}
+  busy = true;
+  const activityIndex = activities.findIndex(function(activity){return activity.id === actionButton.dataset.id;});
+  const activity = activities[activityIndex];
+  const leavingElement = actionButton.closest('.row') || document.getElementById('next');
+  leavingElement.classList.remove('entering');
+  leavingElement.classList.add('leaving');
+  setTimeout(function(){
+    activities.splice(activityIndex,1);
+    lastAction = {activity:activity,index:activityIndex};
+    markedCount += 1;
+    const resultLabel = actionButton.dataset.result === 'done' ? 'hecha' : 'no hecha';
+    document.getElementById('notice').textContent = `Marcada como ${resultLabel} ·`;
+    document.querySelector('.toast-message svg').innerHTML = `<use href="#${actionButton.dataset.result === 'done' ? 'check' : 'cross'}"/>`;
+    document.querySelector('.toast-message svg').style.color = actionButton.dataset.result === 'done' ? `var(--${activity.color})` : 'var(--negative)';
+    document.getElementById('undo').disabled = false;
+    render(activityIndex === 0);
+    updateProgress();
+    busy = false;
+  },250);
+});
+document.getElementById('undo').addEventListener('click',function(){
+  if(!lastAction || busy){return;}
+  activities.splice(lastAction.index,0,lastAction.activity);
+  markedCount -= 1;
+  lastAction = null;
+  document.getElementById('notice').textContent = 'Marca deshecha';
+  document.getElementById('undo').disabled = true;
+  render(true);
+  updateProgress();
+});
+render();
+</script>
+</body>
+</html>

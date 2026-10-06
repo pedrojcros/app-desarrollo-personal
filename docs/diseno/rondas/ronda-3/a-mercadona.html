@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A · Blanco — mercadona</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap');
+:root{
+--paper:#F2ECE1;
+--surface:#FAF6EF;
+--soft:#EAE2D4;
+--line:#D9CDB9;
+--ink:#1F1B16;
+--muted:#75695A;
+--accent:#C2410C;
+--personal:#B7791F;
+--health:#4F7A45;
+--university:#3B5B7A;
+--house:#9B3A4C}
+*{
+box-sizing:border-box}
+body{
+margin:0;
+background:var(--paper);
+color:var(--ink);
+font:14px Inter,Arial,sans-serif;
+height:100dvh;
+overflow:hidden}
+button,a,input,select,textarea{
+font:inherit;
+color:inherit}
+button,a{
+-webkit-tap-highlight-color:transparent}
+button{
+cursor:pointer;
+border:0;
+background:none;
+padding:0;
+min-height:44px}
+a{
+text-decoration:none}
+svg{
+width:22px;
+height:22px;
+flex-shrink:0}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{
+outline:2px solid var(--accent);
+outline-offset:3px}
+.screen{
+height:100%;
+display:flex;
+flex-direction:column}
+.header{
+padding:26px 20px 20px;
+flex-shrink:0}
+.heading{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px}
+h1{
+font:500 34px/1.12 Fraunces,Georgia,serif;
+margin:0;
+letter-spacing:-1.2px}
+.date{
+margin:10px 0 0;
+color:var(--muted);
+font-size:12px}
+.progress{
+font-size:12px;
+font-weight:600;
+color:var(--accent);
+white-space:nowrap;
+padding-top:8px}
+.content{
+padding:0 20px;
+overflow-y:auto;
+flex:1;
+min-height:0;
+scrollbar-width:none}
+.group-title{
+display:flex;
+align-items:center;
+gap:10px;
+color:var(--muted);
+font-size:10px;
+font-weight:600;
+letter-spacing:1.7px;
+text-transform:uppercase;
+margin:13px 0 3px;
+height:20px}
+.group-title:after{
+content:"";
+height:1px;
+background:var(--line);
+flex:1}
+.task-row{
+display:flex;
+align-items:center;
+min-height:58px;
+border-bottom:1px solid var(--line);
+gap:5px}
+.task-copy{
+flex:1;
+min-width:0;
+padding:11px 0}
+.task-name{
+font-size:13px;
+line-height:19px;
+font-weight:600}
+.metadata{
+font-size:10px;
+color:var(--muted);
+margin-top:5px;
+display:flex;
+align-items:center;
+gap:5px;
+flex-wrap:wrap}
+.dot{
+width:5px;
+height:5px;
+border-radius:50%;
+background:var(--category);
+flex-shrink:0}
+.habit{
+width:11px;
+height:11px;
+margin-left:3px}
+.mark{
+width:44px;
+flex-shrink:0;
+display:flex;
+align-items:center;
+justify-content:center}
+.mark span{
+width:30px;
+height:30px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:color-mix(in srgb,var(--category) 12%,transparent);
+color:var(--category)}
+.mark svg{
+width:19px;
+height:19px}
+.no{
+color:var(--muted)}
+.bottom-space{
+height:92px;
+flex-shrink:0}
+.add{
+position:fixed;
+right:20px;
+bottom:146px;
+background:var(--accent);
+color:var(--surface);
+width:52px;
+height:52px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+box-shadow:0 4px 9px #5e391322}
+.add svg{
+width:26px;
+height:26px}
+.toast{
+position:fixed;
+bottom:87px;
+left:16px;
+right:16px;
+min-height:56px;
+background:var(--ink);
+border-radius:12px;
+color:var(--surface);
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:4px 14px;
+gap:8px;
+font-size:12px;
+z-index:4}
+.toast button{
+font-size:12px;
+font-weight:700;
+color:var(--surface)}
+.nav{
+height:78px;
+padding:8px 6px 12px;
+background:var(--surface);
+border-top:1px solid var(--line);
+display:flex;
+flex-shrink:0;
+z-index:3}
+.nav a{
+flex:1;
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:5px;
+color:var(--muted);
+font-size:9px;
+position:relative}
+.nav-icon{
+width:48px;
+height:31px;
+border-radius:22px;
+display:flex;
+align-items:center;
+justify-content:center}
+.nav a.active{
+color:var(--accent);
+font-weight:600}
+.active .nav-icon{
+background:#C2410C12}
+.badge{
+position:absolute;
+top:-2px;
+margin-left:28px;
+background:var(--soft);
+border:2px solid var(--surface);
+border-radius:12px;
+min-width:16px;
+text-align:center;
+line-height:13px;
+font-size:9px;
+color:var(--ink)}
+.quick .content{
+padding-bottom:12px}
+.quick .header{
+padding-bottom:14px}
+.quick .toast,.quick .add,.quick .nav{
+display:none}
+.composer{
+background:var(--surface);
+border-top:1px solid var(--line);
+padding:12px 16px 10px;
+flex-shrink:0;
+box-shadow:0 -6px 18px #5e391309;
+z-index:5}
+.composer-top{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:8px}
+.mode{
+display:flex;
+align-items:center;
+gap:2px;
+padding:2px;
+background:var(--soft);
+border-radius:9px}
+.mode button{
+min-height:44px;
+padding:0 16px;
+font-size:11px;
+color:var(--muted);
+border-radius:7px}
+.mode button.selected{
+background:var(--surface);
+color:var(--ink);
+font-weight:600;
+box-shadow:0 1px 3px #1f1b1610}
+.dismiss{
+width:44px;
+height:44px;
+min-height:44px;
+display:flex;
+align-items:center;
+justify-content:center;
+color:var(--muted)}
+.dismiss svg{
+width:18px}
+.name-line{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:8px}
+.name-line input{
+border:0;
+outline:none;
+background:transparent;
+flex:1;
+min-width:0;
+font-size:20px;
+letter-spacing:-.6px;
+height:44px;
+font-weight:500;
+caret-color:var(--accent)}
+.send{
+width:44px;
+background:var(--accent);
+color:var(--surface);
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-shrink:0}
+.shortcuts{
+display:flex;
+align-items:center;
+gap:3px}
+.date-chip{
+min-height:44px;
+padding:0 8px;
+border-radius:8px;
+white-space:nowrap;
+font-size:11px;
+color:var(--muted)}
+.date-chip.selected{
+color:var(--accent);
+font-weight:600;
+background:#C2410C0D}
+.calendar{
+width:44px;
+display:flex;
+align-items:center;
+justify-content:center}
+.calendar svg{
+width:18px}
+.category-line{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:5px;
+border-top:1px solid var(--line);
+margin-top:6px;
+padding-top:4px}
+.category-selector{
+border:0;
+background:transparent;
+min-height:44px;
+max-width:270px;
+font-size:11px;
+color:var(--muted);
+padding:0;
+cursor:pointer}
+.more{
+min-width:44px;
+color:var(--muted);
+font-size:11px}
+.habit-options{
+display:flex;
+gap:8px;
+padding:0 0 4px}
+.habit-options select{
+min-height:44px;
+background:var(--soft);
+border:0;
+border-radius:7px;
+padding:0 9px;
+flex:1;
+min-width:0;
+font-size:11px}
+.start-label{
+font-size:10px;
+color:var(--muted);
+margin-top:4px}
+.extra{
+padding:6px 0;
+display:flex;
+gap:8px}
+.extra input,.extra textarea{
+width:100%;
+min-width:0;
+background:var(--paper);
+border:1px solid var(--line);
+border-radius:6px;
+padding:8px;
+font-size:11px}
+.extra textarea{
+resize:none}
+.keyboard{
+height:290px;
+background:#E4DED4;
+flex-shrink:0;
+padding:0 5px 6px;
+z-index:5;
+color:#302a23}
+.suggestions{
+height:41px;
+display:flex;
+align-items:center;
+justify-content:space-around;
+font-size:13px}
+.suggestions span{
+width:31%;
+text-align:center}
+.suggestions span+span{
+border-left:1px solid #c7bdb0}
+.key-row{
+display:flex;
+justify-content:center;
+gap:4px;
+margin-bottom:7px}
+.key{
+height:44px;
+min-height:44px;
+flex:1;
+max-width:39px;
+border-radius:5px;
+background:#FAF6EF;
+box-shadow:0 1px 1px #b7ada0;
+font-size:18px;
+display:flex;
+align-items:center;
+justify-content:center}
+.key-row.middle{
+padding:0 5px}
+.key.modifier{
+background:#CEC5B8;
+max-width:45px;
+font-size:13px}
+.key.space{
+max-width:none;
+flex:4;
+font-size:12px}
+.key.enter{
+background:#c2410c;
+color:white;
+max-width:49px}
+.keyboard-footer{
+height:22px;
+display:flex;
+align-items:center;
+justify-content:center}
+.gesture{
+width:92px;
+height:4px;
+border-radius:3px;
+background:#75695A}
+.keyboard-footer svg{
+width:16px;
+position:absolute;
+right:20px}
+.breadcrumbs{
+font-size:11px;
+color:var(--muted);
+margin-bottom:12px;
+display:flex;
+align-items:center;
+gap:6px}
+.breadcrumbs svg{
+width:14px;
+height:14px}
+.subtitle{
+font-size:12px;
+color:var(--muted);
+margin:10px 0 0}
+.category-row{
+display:flex;
+align-items:center;
+gap:12px;
+min-height:62px;
+border-bottom:1px solid var(--line)}
+.category-icon{
+width:36px;
+height:36px;
+border-radius:10px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:color-mix(in srgb,var(--category) 10%,transparent);
+color:var(--category)}
+.category-icon svg{
+width:20px;
+height:20px}
+.category-name{
+font-size:14px;
+font-weight:500;
+flex:1}
+.category-count{
+font-size:12px;
+color:var(--muted)}
+.category-row>svg{
+width:16px;
+height:16px;
+color:var(--muted)}
+.section-title{
+display:flex;
+align-items:center;
+gap:8px;
+font-size:12px;
+font-weight:600;
+margin:25px 0 5px}
+.section-title svg{
+width:17px;
+color:var(--muted)}
+.category-row.nested{
+margin-left:24px}
+.ungrouped{
+margin-top:26px;
+margin-bottom:4px;
+color:var(--muted);
+font-size:10px;
+font-weight:600;
+letter-spacing:1.7px}
+.category-actions{
+display:flex;
+gap:8px;
+margin:24px 0}
+.category-actions button{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:7px;
+font-size:11px;
+border:1px solid var(--line);
+border-radius:9px;
+background:var(--surface);
+flex:1}
+.category-actions svg{
+width:16px;
+height:16px}
+.category-actions .primary{
+background:var(--ink);
+color:var(--surface);
+border-color:var(--ink)}
+.back-link{
+display:flex;
+align-items:center;
+gap:5px;
+min-height:44px;
+font-size:11px;
+color:var(--muted)}
+[hidden]{
+display:none!important}
+@media(min-width:400px){
+.task-row{
+min-height:72px}
+.header{
+padding-top:32px}
+.composer{
+padding-left:20px;
+padding-right:20px}
+.category-row{
+min-height:70px}
+}
+.quick .header{
+padding-top:16px;
+padding-bottom:10px}
+.breadcrumbs{
+margin-bottom:7px}
+.quick .task-row{
+min-height:53px}
+.quick .task-copy{
+padding:7px 0}
+.quick .subtitle{
+margin-top:7px}
+@media(min-width:400px){
+.quick .header{
+padding-top:24px}
+.quick .task-row{
+min-height:65px}
+}
+</style>
+</head>
+<body>
+<div class="screen quick">
+<header class="header">
+<div class="breadcrumbs">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="M3 7V5h7l2 3h9v12H3Z"/>
+</svg>Lista de la compra <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="m9 6 6 6-6 6"/>
+</svg>
+</div>
+<h1>Mercadona</h1>
+<p class="subtitle">3 pendientes · Sin fecha</p>
+</header>
+<main class="content" id="task-list">
+<div class="task-row" style="--category:var(--health)">
+<div class="task-copy">
+<div class="task-name">Leche de avena</div>
+<div class="metadata">Sin fecha · <span class="dot">
+</span>Mercadona</div>
+</div>
+<button class="mark yes" aria-label="Marcar Leche de avena como hecho">
+<span>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="m5 12 4 4L19 6"/>
+</svg>
+</span>
+</button>
+<button class="mark no" aria-label="Marcar Leche de avena como no hecho">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="m6 6 12 12M18 6 6 18"/>
+</svg>
+</button>
+</div>
+<div class="task-row" style="--category:var(--health)">
+<div class="task-copy">
+<div class="task-name">Huevos</div>
+<div class="metadata">Sin fecha · <span class="dot">
+</span>Mercadona</div>
+</div>
+<button class="mark yes" aria-label="Marcar Huevos como hecho">
+<span>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="m5 12 4 4L19 6"/>
+</svg>
+</span>
+</button>
+<button class="mark no" aria-label="Marcar Huevos como no hecho">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="m6 6 12 12M18 6 6 18"/>
+</svg>
+</button>
+</div>
+<div class="task-row" style="--category:var(--health)">
+<div class="task-copy">
+<div class="task-name">Pan integral</div>
+<div class="metadata">Sin fecha · <span class="dot">
+</span>Mercadona</div>
+</div>
+<button class="mark yes" aria-label="Marcar Pan integral como hecho">
+<span>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="m5 12 4 4L19 6"/>
+</svg>
+</span>
+</button>
+<button class="mark no" aria-label="Marcar Pan integral como no hecho">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="m6 6 12 12M18 6 6 18"/>
+</svg>
+</button>
+</div>
+</main>
+<form class="composer" id="composer">
+<div class="composer-top">
+<div class="mode" role="group" aria-label="Tipo">
+<button type="button" data-mode="task" class="selected" aria-pressed="true">Tarea</button>
+<button type="button" data-mode="habit" aria-pressed="false">Hábito</button>
+</div>
+<button type="button" class="dismiss" aria-label="Cerrar añadir rápido">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="m6 6 12 12M18 6 6 18"/>
+</svg>
+</button>
+</div>
+<div class="name-line">
+<input id="task-name" aria-label="Nombre" value="Plátanos" placeholder="¿Qué quieres añadir?" autocomplete="off" autofocus>
+<button class="send" type="submit" aria-label="Añadir">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="M12 19V5m-6 6 6-6 6 6"/>
+</svg>
+</button>
+</div>
+<div class="habit-options" hidden>
+<select aria-label="Frecuencia">
+<option>A diario</option>
+<option>L X V</option>
+<option>Cada 2 días</option>
+<option>Cada mes</option>
+</select>
+<select aria-label="Cuándo">
+<option>Mañana</option>
+<option>Tarde</option>
+<option>Noche</option>
+<option>A una hora</option>
+</select>
+</div>
+<div class="start-label" hidden>Empieza</div>
+<div class="shortcuts" role="group" aria-label="Fecha">
+<button type="button" class="date-chip" data-date="Hoy" aria-pressed="false">Hoy</button>
+<button type="button" class="date-chip" data-date="Mañana" aria-pressed="false">Mañana</button>
+<button type="button" class="date-chip" data-date="Lunes" aria-pressed="false">Lunes</button>
+<button type="button" class="date-chip selected" data-date="Sin fecha" aria-pressed="true">Sin fecha</button>
+<button type="button" class="date-chip calendar" aria-label="Elegir fecha">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<rect x="3" y="5" width="18" height="16" rx="2"/>
+<path d="M7 3v4M17 3v4M3 11h18"/>
+</svg>
+</button>
+<input type="date" id="custom-date" aria-label="Otra fecha" hidden>
+</div>
+<div class="category-line">
+<select class="category-selector" aria-label="Categoría">
+<option value="Mercadona">Lista de la compra › Mercadona</option>
+<option value="Personal">Personal</option>
+<option value="Salud">Salud</option>
+<option value="Universidad">Universidad</option>
+</select>
+<button type="button" class="more" aria-expanded="false">Más</button>
+</div>
+<div class="extra" hidden>
+<textarea aria-label="Notas" placeholder="Notas" rows="2">
+</textarea>
+<input type="time" aria-label="Hora exacta">
+</div>
+</form>
+<div class="keyboard" aria-label="Teclado Android español simulado">
+<div class="suggestions">
+<span>Plátanos</span>
+<span>plátano</span>
+<span>plátanos</span>
+</div>
+<div class="key-row">
+<button class="key" data-key="q">q</button>
+<button class="key" data-key="w">w</button>
+<button class="key" data-key="e">e</button>
+<button class="key" data-key="r">r</button>
+<button class="key" data-key="t">t</button>
+<button class="key" data-key="y">y</button>
+<button class="key" data-key="u">u</button>
+<button class="key" data-key="i">i</button>
+<button class="key" data-key="o">o</button>
+<button class="key" data-key="p">p</button>
+</div>
+<div class="key-row middle">
+<button class="key" data-key="a">a</button>
+<button class="key" data-key="s">s</button>
+<button class="key" data-key="d">d</button>
+<button class="key" data-key="f">f</button>
+<button class="key" data-key="g">g</button>
+<button class="key" data-key="h">h</button>
+<button class="key" data-key="j">j</button>
+<button class="key" data-key="k">k</button>
+<button class="key" data-key="l">l</button>
+<button class="key" data-key="ñ">ñ</button>
+</div>
+<div class="key-row">
+<button class="key modifier" data-key="shift" aria-label="Mayúsculas">⇧</button>
+<button class="key" data-key="z">z</button>
+<button class="key" data-key="x">x</button>
+<button class="key" data-key="c">c</button>
+<button class="key" data-key="v">v</button>
+<button class="key" data-key="b">b</button>
+<button class="key" data-key="n">n</button>
+<button class="key" data-key="m">m</button>
+<button class="key modifier" data-key="delete" aria-label="Borrar">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="m9 5-7 7 7 7h13V5Zm4 4 5 6m0-6-5 6"/>
+</svg>
+</button>
+</div>
+<div class="key-row">
+<button class="key modifier" data-key="numbers">?123</button>
+<button class="key" data-key=",">,</button>
+<button class="key space" data-key=" " aria-label="Espacio">Español</button>
+<button class="key" data-key=".">.</button>
+<button class="key enter" data-key="enter" aria-label="Enviar">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<path d="M12 19V5m-6 6 6-6 6 6"/>
+</svg>
+</button>
+</div>
+<div class="keyboard-footer">
+<span class="gesture">
+</span>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<rect x="2" y="5" width="20" height="14" rx="2"/>
+<path d="M6 9h.1M10 9h.1M14 9h.1M18 9h.1M6 13h.1M10 13h.1M14 13h.1M18 13h.1M8 16h8"/>
+</svg>
+</div>
+</div>
+</div>
+<script>
+const taskList = document.querySelector('#task-list');
+const toast = document.querySelector('.toast');
+let lastMark = null;
+let markedCount = 2;
+let totalCount = 8;
+function showToast(message) {
+  if (!toast) return;
+  toast.hidden = false;
+  toast.querySelector('.toast-message').textContent = message;
+}
+function bindMarks(container) {
+  for (const button of container.querySelectorAll('.mark')) {
+    button.addEventListener('click', function () {
+      const taskRow = button.closest('.task-row');
+      const marker = document.createComment('Lugar de la fila');
+      taskRow.before(marker);
+      lastMark = { taskRow, marker };
+      taskRow.remove();
+      markedCount += 1;
+      const progress = document.querySelector('.progress');
+      if (progress) progress.textContent = markedCount + ' de ' + totalCount;
+      let message = 'Marcada como no hecha';
+      if (button.classList.contains('yes')) message = 'Marcada como hecha';
+      showToast(message);
+    });
+  }
+}
+if (taskList) bindMarks(taskList);
+const undo = document.querySelector('#undo');
+if (undo) {
+  undo.addEventListener('click', function () {
+    if (lastMark) {
+      lastMark.marker.replaceWith(lastMark.taskRow);
+      lastMark = null;
+    } else {
+      const restoredRow = document.createElement('div');
+      restoredRow.className = 'task-row';
+      restoredRow.style.setProperty('--category', 'var(--health)');
+      restoredRow.innerHTML = '<div class="task-copy"><div class="task-name">Meditar 10 min</div><div class="metadata"><span class="dot"></span>Salud</div></div><button class="mark yes" aria-label="Marcar Meditar 10 min como hecho"><span>✓</span></button><button class="mark no" aria-label="Marcar Meditar 10 min como no hecho">✕</button>';
+      document.querySelector('#no-time').append(restoredRow);
+      bindMarks(restoredRow);
+    }
+    markedCount -= 1;
+    document.querySelector('.progress').textContent = markedCount + ' de ' + totalCount;
+    toast.hidden = true;
+  });
+}
+const composer = document.querySelector('#composer');
+if (composer) {
+  const nameInput = document.querySelector('#task-name');
+  let currentMode = 'task';
+  for (const button of document.querySelectorAll('[data-mode]')) {
+    button.addEventListener('click', function () {
+      currentMode = button.dataset.mode;
+      for (const modeButton of document.querySelectorAll('[data-mode]')) {
+        const selected = modeButton === button;
+        modeButton.classList.toggle('selected', selected);
+        modeButton.setAttribute('aria-pressed', String(selected));
+      }
+      const isHabit = currentMode === 'habit';
+      document.querySelector('.habit-options').hidden = !isHabit;
+      document.querySelector('.start-label').hidden = !isHabit;
+      const noDate = document.querySelector('[data-date="Sin fecha"]');
+      noDate.hidden = isHabit;
+      if (isHabit && noDate.classList.contains('selected')) {
+        document.querySelector('[data-date="Hoy"]').click();
+      }
+      nameInput.focus();
+    });
+  }
+  for (const button of document.querySelectorAll('[data-date]')) {
+    button.addEventListener('click', function () {
+      for (const dateButton of document.querySelectorAll('[data-date]')) {
+        const selected = dateButton === button;
+        dateButton.classList.toggle('selected', selected);
+        dateButton.setAttribute('aria-pressed', String(selected));
+      }
+    });
+  }
+  const dateInput = document.querySelector('#custom-date');
+  document.querySelector('.calendar').addEventListener('click', function () {
+    dateInput.hidden = false;
+    dateInput.showPicker();
+  });
+  dateInput.addEventListener('change', function () {
+    for (const button of document.querySelectorAll('[data-date]')) {
+      button.classList.remove('selected');
+      button.setAttribute('aria-pressed', 'false');
+    }
+    document.querySelector('.calendar').classList.add('selected');
+    dateInput.hidden = true;
+  });
+  document.querySelector('.more').addEventListener('click', function () {
+    const extra = document.querySelector('.extra');
+    extra.hidden = !extra.hidden;
+    this.setAttribute('aria-expanded', String(!extra.hidden));
+  });
+  document.querySelector('.dismiss').addEventListener('click', function () {
+    composer.hidden = true;
+    document.querySelector('.keyboard').hidden = true;
+    const reopen = document.createElement('button');
+    reopen.className = 'add';
+    reopen.setAttribute('aria-label', 'Añadir');
+    reopen.textContent = '+';
+    reopen.style.bottom = '24px';
+    document.body.append(reopen);
+    reopen.addEventListener('click', function () {
+      composer.hidden = false;
+      document.querySelector('.keyboard').hidden = false;
+      reopen.remove();
+      nameInput.focus();
+    });
+  });
+  composer.addEventListener('submit', function (event) {
+    event.preventDefault();
+    const taskName = nameInput.value.trim();
+    if (!taskName) {
+      nameInput.focus();
+      return;
+    }
+    const taskRow = document.createElement('div');
+    taskRow.className = 'task-row';
+    taskRow.style.setProperty('--category', 'var(--health)');
+    const taskCopy = document.createElement('div');
+    taskCopy.className = 'task-copy';
+    const title = document.createElement('div');
+    title.className = 'task-name';
+    title.textContent = taskName;
+    const metadata = document.createElement('div');
+    metadata.className = 'metadata';
+    const selectedDate = document.querySelector('[data-date].selected');
+    let dateLabel = dateInput.value;
+    if (selectedDate) dateLabel = selectedDate.dataset.date;
+    const category = document.querySelector('.category-selector').value;
+    let details = dateLabel + ' · ' + category;
+    if (currentMode === 'habit') {
+      const frequency = document.querySelector('.habit-options select').value;
+      details = frequency + ' · ' + category;
+    }
+    metadata.textContent = details;
+    taskCopy.append(title, metadata);
+    taskRow.append(taskCopy);
+    for (const state of ['yes', 'no']) {
+      const mark = document.createElement('button');
+      mark.className = 'mark ' + state;
+      let label = 'Marcar ' + taskName + ' como no hecho';
+      let symbol = '✕';
+      if (state === 'yes') {
+        label = 'Marcar ' + taskName + ' como hecho';
+        symbol = '✓';
+      }
+      mark.setAttribute('aria-label', label);
+      const markSymbol = document.createElement('span');
+      markSymbol.textContent = symbol;
+      mark.append(markSymbol);
+      taskRow.append(mark);
+    }
+    taskList.prepend(taskRow);
+    totalCount += 1;
+    bindMarks(taskRow);
+    taskList.scrollTop = 0;
+    nameInput.value = '';
+    nameInput.focus();
+  });
+  let uppercase = false;
+  for (const button of document.querySelectorAll('[data-key]')) {
+    button.addEventListener('click', function () {
+      const key = button.dataset.key;
+      if (key === 'enter') {
+        composer.requestSubmit();
+        return;
+      }
+      if (key === 'shift') {
+        uppercase = !uppercase;
+        return;
+      }
+      if (key === 'numbers') {
+        nameInput.focus();
+        return;
+      }
+      if (key === 'delete') {
+        nameInput.value = nameInput.value.slice(0, -1);
+      } else {
+        let letter = key;
+        if (uppercase) letter = key.toUpperCase();
+        nameInput.value += letter;
+      }
+      nameInput.focus();
+    });
+  }
+  nameInput.focus();
+  nameInput.setSelectionRange(nameInput.value.length, nameInput.value.length);
+}
+for (const button of document.querySelectorAll('[data-create]')) {
+  button.addEventListener('click', function () {
+    const isSection = button.dataset.create === 'section';
+    let question = 'Nombre de la categoría';
+    if (isSection) question = 'Nombre de la sección';
+    const name = window.prompt(question);
+    if (!name || !name.trim()) return;
+    const element = document.createElement('div');
+    element.textContent = name.trim();
+    element.className = 'category-row';
+    if (isSection) element.className = 'section-title';
+    document.querySelector('.category-actions').before(element);
+  });
+}
+</script></body></html>
