@@ -1,0 +1,214 @@
+# Funcionalidades
+
+Registro de funcionalidades (`RF`) y requisitos no funcionales (`RNF`). Es el contrato de **qué hace** el sistema; el plan en [05-plan](05-plan.md) dice cómo y cuándo se construye.
+
+*Estado: **confirmado** por el humano el 2026-10-06: la versión 1 son las 14 imprescindibles; las deseables van justo después (DEC-19).*
+
+## Cómo se escribe una funcionalidad
+
+- **Dice QUÉ, nunca CÓMO.** «El sistema permite X», no «usar una tabla Y». Si cambiar de tecnología obliga a reescribirla, estaba mal escrita.
+- **Es comprobable.** Si no se puede escribir cómo verificarla, no es una funcionalidad.
+- **Es atómica.** Si lleva un «y», probablemente son dos.
+- **Prioridad:** IMPRESCINDIBLE / DESEABLE / OPCIONAL (MoSCoW: must, should, could). La versión 1 son los imprescindibles.
+- **Identificadores** `RF-nn` y `RNF-nn`. Nunca se reutilizan.
+- **El criterio de aceptación enlaza los escenarios** de [03-casos-de-uso](03-casos-de-uso.md) en vez de copiarlos; solo se escribe aquí lo que no está allí.
+
+## Registro
+
+| Id | Funcionalidad | Prioridad | Caso de uso | Tarea del plan | Epic en Jira |
+|---|---|---|---|---|---|
+| RF-01 | Crear un hábito | IMPRESCINDIBLE | CU-01 | | |
+| RF-02 | Generar las ocurrencias de un hábito según su frecuencia | IMPRESCINDIBLE | CU-01 | | |
+| RF-03 | Hora exacta o franja de un hábito | IMPRESCINDIBLE | CU-01 | | |
+| RF-04 | Duración opcional de un hábito | DESEABLE | CU-01 | | |
+| RF-05 | Crear una tarea | IMPRESCINDIBLE | CU-02 | | |
+| RF-06 | Cambiar el estado: hecho, no hecho o pendiente | IMPRESCINDIBLE | CU-03, CU-04 | | |
+| RF-07 | Aviso al marcar, con «Deshacer» | IMPRESCINDIBLE | CU-03 | | |
+| RF-08 | Vista Hoy | IMPRESCINDIBLE | CU-03 | | |
+| RF-09 | Apartado «Marcadas hoy» | DESEABLE | CU-03 | | |
+| RF-10 | Ver otros días | DESEABLE | CU-03 | | |
+| RF-11 | Vista de categoría y Bandeja de entrada | IMPRESCINDIBLE | CU-03, CU-07 | | |
+| RF-12 | Pendientes de días anteriores | IMPRESCINDIBLE | CU-04 | | |
+| RF-13 | Reprogramar una tarea vencida | DESEABLE | CU-04 | | |
+| RF-14 | Marcar un día entero como no hecho | DESEABLE | CU-04 | | |
+| RF-15 | Consultar el historial | IMPRESCINDIBLE | CU-05 | | |
+| RF-16 | Filtrar el historial | DESEABLE | CU-05 | | |
+| RF-17 | Corregir desde el historial | DESEABLE | CU-05 | | |
+| RF-18 | Modificar un hábito o una tarea | IMPRESCINDIBLE | CU-06 | | |
+| RF-19 | Archivar (eliminar) un hábito o una tarea | IMPRESCINDIBLE | CU-06 | | |
+| RF-20 | Crear categorías y asignarlas | IMPRESCINDIBLE | CU-07, CU-01, CU-02 | | |
+| RF-21 | Eliminar una categoría | IMPRESCINDIBLE | CU-07 | | |
+| RF-22 | Renombrar una categoría | DESEABLE | CU-07 | | |
+
+El estado de construcción **no** se apunta aquí: vive en las tareas (ver [agentes/jira](agentes/jira.md)).
+
+## Funcionalidades
+
+### RF-01 — Crear un hábito
+
+- **Descripción:** el sistema debe permitir crear un hábito con nombre, frecuencia, fecha de inicio (hoy por defecto) y, opcionalmente, categoría.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-01, escenarios 1, 5 y 6.
+- **Notas:** RN-10, RN-12, RN-25.
+
+### RF-02 — Generar las ocurrencias de un hábito según su frecuencia
+
+- **Descripción:** el sistema debe tener, para cada día que toque desde la fecha de inicio, una ocurrencia pendiente del hábito, con las cuatro frecuencias: todos los días, días de la semana, cada N días y cada mes.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-01, escenarios 2, 3 y 4. Además: dado un hábito diario, cuando llega un día de cambio de hora (último domingo de marzo o de octubre), entonces ese día tiene exactamente una ocurrencia (RNF-07).
+- **Notas:** RN-10, RN-12, RN-22, RN-23 y RN-32. Es la lógica central del producto: va en un módulo propio con tests unitarios exhaustivos.
+
+### RF-03 — Hora exacta o franja de un hábito
+
+- **Descripción:** el sistema debe permitir indicar, de forma opcional, una hora exacta o una franja (mañana, tarde o noche), y ordenar las ocurrencias del día por ella.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-01, escenarios 1 y 2. Además: dado un hábito con hora a las 17:00, cuando el usuario elige la franja «noche», entonces el hábito queda solo con la franja.
+- **Notas:** RN-11, RN-20.
+
+### RF-04 — Duración opcional de un hábito
+
+- **Descripción:** el sistema debe permitir indicar una duración opcional para un hábito.
+- **Prioridad:** DESEABLE. *No se usa hasta la conexión con Google Calendar (versión 2): se puede posponer sin coste.*
+- **Criterio de aceptación:** CU-01, escenario 2 (la duración de 1 hora y media queda guardada). Error: una duración de cero o negativa no se guarda.
+- **Notas:** RN-21.
+
+### RF-05 — Crear una tarea
+
+- **Descripción:** el sistema debe permitir crear una tarea con nombre obligatorio y, opcionalmente, notas, fecha, hora y categoría. Sin categoría, va a la Bandeja de entrada. Con fecha pasada, avisa antes de crearla.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-02, escenarios 1 a 5.
+- **Notas:** RN-09, RN-13, RN-25, RN-28.
+
+### RF-06 — Cambiar el estado: hecho, no hecho o pendiente
+
+- **Descripción:** el sistema debe permitir marcar una ocurrencia o una tarea como hecha o no hecha, cambiarla entre ambas y devolverla a pendiente, guardando cuándo se marcó.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-03, escenarios 1, 2, 7, 8 y 10; CU-04, escenario 1.
+- **Notas:** RN-01 a RN-05 y RN-32.
+
+### RF-07 — Aviso al marcar, con «Deshacer»
+
+- **Descripción:** al marcar algo, el sistema debe mostrar un aviso breve y poco invasivo con la acción «Deshacer».
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-03, escenarios 6 y 9.
+- **Notas:** RN-31.
+
+### RF-08 — Vista Hoy
+
+- **Descripción:** el sistema debe mostrar lo pendiente de hoy: las ocurrencias de hábitos y las tareas con fecha de hoy, ordenadas por hora o franja; nunca tareas sin fecha ni vencidas.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-03, escenarios 3, 4 y 5. Además: dado un día sin nada pendiente, se muestra un mensaje de día libre.
+- **Notas:** RN-07, RN-08, RN-29.
+
+### RF-09 — Apartado «Marcadas hoy»
+
+- **Descripción:** el sistema debe mostrar, plegado por defecto, lo marcado hoy, y permitir cambiarlo desde ahí.
+- **Prioridad:** DESEABLE. *El aviso con «Deshacer» y el historial ya permiten corregir.*
+- **Criterio de aceptación:** CU-03, escenario 7.
+- **Notas:** RN-29.
+
+### RF-10 — Ver otros días
+
+- **Descripción:** el sistema debe permitir abrir la vista de otra fecha; las fechas futuras solo se consultan.
+- **Prioridad:** DESEABLE
+- **Criterio de aceptación:** CU-03, escenario 8. Además: cuando el usuario abre el próximo miércoles, ve la ocurrencia de «Nadar» a las 17:00.
+- **Notas:** RN-05.
+
+### RF-11 — Vista de categoría y Bandeja de entrada
+
+- **Descripción:** el sistema debe mostrar lo pendiente de una categoría o de la Bandeja de entrada, con y sin fecha, y permitir marcarlo desde ahí; lo marcado desaparece de la lista.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-03, escenarios 5 y 6.
+- **Notas:** RN-28, RN-30.
+
+### RF-12 — Pendientes de días anteriores
+
+- **Descripción:** el sistema debe listar las ocurrencias de días pasados sin marcar y las tareas vencidas, agrupadas por día, de la más reciente a la más antigua, y permitir marcarlas.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-04, escenario 1. Además: sin nada pendiente, se muestra «todo al día».
+- **Notas:** RN-07, RN-08, RN-14.
+
+### RF-13 — Reprogramar una tarea vencida
+
+- **Descripción:** el sistema debe permitir dar una nueva fecha, de hoy en adelante, a una tarea vencida.
+- **Prioridad:** DESEABLE. *También se puede cambiar la fecha modificando la tarea (RF-18).*
+- **Criterio de aceptación:** CU-04, escenarios 2 y 3.
+- **Notas:** RN-15.
+
+### RF-14 — Marcar un día entero como no hecho
+
+- **Descripción:** el sistema debe permitir marcar como no hecho, de una vez, todo lo pendiente de un día pasado.
+- **Prioridad:** DESEABLE (atajo).
+- **Criterio de aceptación:** CU-04, escenario 4.
+
+### RF-15 — Consultar el historial
+
+- **Descripción:** el sistema debe mostrar, para un rango de fechas (por defecto, los últimos 7 días), cada hábito y tarea con su estado final, incluido «sin marcar».
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-05, escenarios 1, 3 y 4.
+- **Notas:** RN-16, RN-17.
+
+### RF-16 — Filtrar el historial
+
+- **Descripción:** el sistema debe permitir filtrar el historial por elemento, por estado o por categoría.
+- **Prioridad:** DESEABLE
+- **Criterio de aceptación:** CU-05, escenario 2.
+
+### RF-17 — Corregir desde el historial
+
+- **Descripción:** el sistema debe permitir cambiar el estado de un elemento pasado desde el historial.
+- **Prioridad:** DESEABLE. *Lo que quedó sin marcar ya se resuelve en RF-12.*
+- **Criterio de aceptación:** dado que hace dos semanas «Nadar» quedó como no hecho, cuando el usuario lo cambia a hecho desde el historial, entonces queda hecho y se guarda cuándo se corrigió.
+- **Notas:** RN-03, RN-04.
+
+### RF-18 — Modificar un hábito o una tarea
+
+- **Descripción:** el sistema debe permitir cambiar los datos de un hábito o de una tarea; un cambio de frecuencia solo afecta al futuro.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-06, escenarios 1, 2 y 4.
+- **Notas:** RN-19.
+
+### RF-19 — Archivar (eliminar) un hábito o una tarea
+
+- **Descripción:** eliminar es archivar: el elemento deja de aparecer y de generar ocurrencias, y su historial se conserva. Sin borrado definitivo en la versión 1.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-06, escenario 3.
+- **Notas:** RN-16, RN-18.
+
+### RF-20 — Crear categorías y asignarlas
+
+- **Descripción:** el sistema debe permitir crear una categoría con nombre único y asignarla, como máximo una, a hábitos y tareas.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-07, escenarios 1 y 2; CU-02, escenario 5.
+- **Notas:** RN-24, RN-25.
+
+### RF-21 — Eliminar una categoría
+
+- **Descripción:** el sistema debe permitir eliminar una categoría; lo que contiene pasa a la Bandeja de entrada, que no se puede eliminar.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** CU-07, escenarios 3 y 5.
+- **Notas:** RN-26, RN-28.
+
+### RF-22 — Renombrar una categoría
+
+- **Descripción:** el sistema debe permitir cambiar el nombre de una categoría.
+- **Prioridad:** DESEABLE
+- **Criterio de aceptación:** CU-07, escenario 4.
+- **Notas:** RN-24.
+
+## Requisitos no funcionales
+
+Cómo de bien tiene que hacerlo. Cada uno con **un número**, no con adjetivos.
+
+| Id | Categoría | Requisito | Cómo se comprueba |
+|---|---|---|---|
+| RNF-01 | Rendimiento | Con un año de datos (50 hábitos, 2.000 tareas, 20.000 ocurrencias), la vista Hoy se muestra en menos de 1 segundo y marcar algo se refleja en pantalla en menos de 300 ms | Test con datos sintéticos generados por un script |
+| RNF-02 | Seguridad | Sin iniciar sesión no se puede leer ni cambiar ningún dato: solo accede el dueño. Ningún secreto en el repositorio | Test de acceso sin sesión; escaneo de secretos en la integración continua |
+| RNF-03 | Accesibilidad | Contraste AA, todo se puede usar con teclado y los formularios tienen etiquetas | Auditoría automática sin errores graves |
+| RNF-04 | Datos | Sin objetivo de disponibilidad (uso personal), pero **ningún dato se pierde**: copia exportable y una restauración probada | Exportar y restaurar una vez antes del uso diario |
+| RNF-05 | Privacidad | Solo hay datos del dueño, y no salen a terceros salvo el proveedor de alojamiento y, en la versión 2, Google Calendar con su permiso | Revisión de servicios en la ADR del stack |
+| RNF-06 | Rapidez de uso | Desde Hoy, marcar algo cuesta **una** acción; crear una tarea con solo el nombre, escribirlo y confirmar | Prueba de extremo a extremo que cuenta las acciones |
+| RNF-07 | Fechas | Zona horaria Europe/Madrid; los cambios de hora no duplican ni pierden ocurrencias, ni mueven sus horas | Tests en los días de cambio de hora |
+| RNF-08 | Móvil | Se usa sin desplazamiento horizontal desde 360 px de ancho *(versión 2, DEC-19)* | Prueba de extremo a extremo a 360 px |
+
+Si un requisito no funcional no tiene número, todavía es una intención.

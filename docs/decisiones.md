@@ -1,0 +1,51 @@
+# Decisiones
+
+Todo lo que está esperando una decisión del humano, y lo ya cerrado, en un solo sitio. Existe porque el contexto de las conversaciones con los agentes se borra y las decisiones no pueden vivir en un chat.
+
+## Cómo se usa
+
+Cada decisión tiene opciones y una **recomendación**. El humano marca la casilla que elija (`[x]`) o escribe en **Respuesta**. Si una decisión no está madura, se deja en blanco.
+
+Cuando una decisión se cierra:
+
+1. Se aplica al documento donde vive de verdad.
+2. Se mueve a la tabla de cerradas.
+3. Si es costosa de cambiar, se escribe una [ADR](adr/README.md).
+
+**Este documento nunca es la fuente de la verdad**, solo el sitio donde se recogen las respuestas. Los identificadores `DEC-nn` no se reutilizan.
+
+**Decisiones de bolsillo** (reversibles y baratas) las toma el arquitecto o el orquestador y se anotan directamente en la tabla de cerradas, con la etiqueta *de bolsillo*.
+
+---
+
+## Abiertas
+
+*(Ninguna.)*
+
+---
+
+## Cerradas
+
+| # | Decisión | Resultado | Dónde quedó |
+|---|---|---|---|
+| DEC-01 | Flujo de git y política de merge | Todo por rama y PR contra `develop`. El **orquestador fusiona a `develop`** si pasan los tests y la revisión; los trabajadores nunca fusionan. **El paso de `develop` a `main` lo hace solo el humano.** A `main` solo llegan versiones estables y completas, publicadas cada cierto tiempo. Un worktree por encargo y PR sin apilar. | `AGENTS.md` (Flujo de git), `agentes/orquestador.md` (Política de merge, pendiente de revisar) |
+| DEC-02 | Seguimiento de tareas | **Jira activo**, proyecto `ADP` (team-managed, Kanban, acceso restringido). Estados: Por hacer, En curso, En revisión, Listo. El conector se configura antes del primer `/ejecutar-plan`. | `agentes/jira.md` |
+| DEC-03 | Tope de trabajadores en paralelo | 3 | `agentes/orquestador.md` (método, punto 6) |
+| DEC-08 | Alcance de la versión 1 | Tareas con y sin fecha, **hábitos recurrentes**, estado hecho/no hecho y vista del historial. **Fuera:** estadísticas interactivas y recordatorios (se dejan para después, diseñando los datos para poder añadirlos), otros usuarios e integración con Todoist. | `01-vision-y-alcance.md` |
+| DEC-09 | Plataforma y versión siguiente | Versión 1 **solo en ordenador**. La versión siguiente trae **móvil y conexión con Google Calendar, juntos**; la arquitectura de la 1 no debe impedirlos. | `01-vision-y-alcance.md`; a tener en cuenta en la sesión 5 (arquitectura) |
+| DEC-10 | Estados y tratamiento de lo no marcado | Tres estados: pendiente, hecha y **no hecha** (marcarla es una acción explícita). Las ocurrencias de **hábitos** no se acumulan: las de días pasados sin marcar salen de la vista de hoy y quedan como «sin marcar» en el historial, resolubles después. Las **tareas vencidas** siguen pendientes hasta decidir (hecha, no hecha o reprogramada); dónde se ven lo cambió DEC-17. Las tareas sin fecha no vencen. | `03-casos-de-uso.md` (RN-01 a RN-09) |
+| DEC-11 | Detalle de los hábitos (CU-01) | Frecuencias de la versión 1: todos los días, días de la semana, **cada N días** (desde la fecha de inicio) y **cada mes** (mismo día del mes; si no existe, el último). Momento del día: hora exacta **o** franja (mañana 09:00, tarde 15:00, noche 21:00; el hábito guarda la franja). **Duración opcional**; sin ella, Google Calendar usará 1 hora. | `03-casos-de-uso.md` (CU-01, RN-10 a RN-12 y RN-20 a RN-23) |
+| DEC-13 | Categorías en la versión 1 | **Sí, en su forma mínima**: nombre único, como máximo una por hábito o tarea, opcional; sin colores, jerarquías ni etiquetas múltiples. | `01-vision-y-alcance.md`, `03-casos-de-uso.md` (CU-07, RN-24 a RN-26) |
+| DEC-14 | Dinámica de planificación | **Modo tandas**: el arquitecto redacta varias sesiones de golpe con sus recomendaciones aplicadas y entrega una sola lista numerada de decisiones con valor por defecto; el humano contesta solo lo que cambia. Lectura completa en la revisión final. Los documentos de planificación van en la rama `docs/planificacion`, con un único PR a `develop` que se fusiona al aprobar el plan. | `agentes/arquitecto.md` (Modo tandas) |
+| DEC-07 | Fecha límite de la versión 1 | **Sin fecha límite.** El humano es estudiante y avanzará según su tiempo libre. No se ponen fechas salvo que él las pida expresamente. El freno al alcance es la lista de fuera de alcance y la lista de espera. | `01-vision-y-alcance.md` (Restricciones), `agentes/checklist-defaults.md` |
+| DEC-12 | Orquestador autónomo | **Autonomía por niveles**: el orquestador decide el cómo; consulta a un arquitecto automático de máximo razonamiento para el diseño; el humano decide el qué, el dinero y `main`. Con **puertas de aprobación** `requiere-plan` y `requiere-revisión`, un buzón de ideas, y el orquestador como **único interlocutor** del humano. El diseño concreto, en la sesión 6. | `agentes/orquestador.md` y `agentes/arquitecto.md` (sesión 6) |
+| DEC-15 | Vistas y marcado | Vista **Hoy** solo con lo de hoy y **nunca tareas sin fecha** (se retira el ajuste de categoría «mostrar en el día»). **Bandeja de entrada** para todo lo que no tiene categoría. Al marcar algo, sale de la lista con un **aviso poco invasivo y Deshacer**; en Hoy queda además en «Marcadas hoy», plegado. Se mantienen: marcar un día entero como no hecho, corregir desde el historial y eliminar = archivar, sin borrado definitivo en la versión 1. | `03-casos-de-uso.md` (RN-27 a RN-31, CU-02, CU-03, CU-05 a CU-07) |
+| DEC-17 | Tareas vencidas y ocurrencias independientes | Las tareas vencidas **salen de Hoy** y solo se ven en «pendientes de días anteriores» (modifica DEC-10). Cada ocurrencia de un hábito es independiente: no cumplir la de ayer no afecta a marcar la de hoy. | `03-casos-de-uso.md` (RN-08, RN-32, CU-03, CU-04) |
+| DEC-18 | Móvil y Google Play | Para el uso diario en el móvil, **web instalable** (gratis, sin tienda). Publicar en **Google Play** queda para el futuro, cuando el humano decida; acepta pagar los 25 USD entonces. | `01-vision-y-alcance.md`; condiciona DEC-16 |
+| DEC-16 | Stack | **Next.js + Supabase en Vercel**, en TypeScript, con los planes gratuitos (ADR-0001). | `04-arquitectura.md`, `adr/0001-stack.md`, `AGENTS.md` (Stack) |
+| DEC-19 | Dónde y qué es la versión 1 | **En internet** (Vercel y Supabase gratis) con inicio de sesión solo para el dueño; **solo ordenador** (se mantiene DEC-09: el móvil, en la versión 2). La versión 1 son las **14 funcionalidades imprescindibles**; las 8 deseables van justo después. | `01-vision-y-alcance.md`, `02-funcionalidades.md`, `05-plan.md` |
+| DEC-20 | Lista de defaults (sesión 6) | Recorrida punto por punto: cada uno aceptado, ajustado o descartado con su motivo. | `agentes/checklist-defaults.md` (Recorrido en este proyecto) |
+| DEC-21 | Propuestas de la tanda de sesiones 3 a 7 | **Aceptadas las diez** (2026-10-06): login con email y contraseña (ADR-0004); ocurrencias calculadas (ADR-0003); Supabase `pruebas` y `produccion`; puertas en T01 y T02; Sonnet para trabajadores y Opus para decidir; Codex y Copilot deshabilitados hasta aplicar sus ajustes; `git push` por HTTPS con `gh`; comando `/idea`; copia semanal; y los ajustes de Codex y Copilot de P01. | ADR-0003, ADR-0004, `05-plan.md`, `agentes/agentes-disponibles.md`, `.claude/commands/idea.md` |
+| DEC-04 | Agentes habilitados | **Claude, Codex y Copilot habilitados** tras P01 (2026-10-06). Codex: sin animaciones y con `--dangerously-bypass-approvals-and-sandbox`. Copilot: `~/orca/workspaces` de confianza, `--allow-all-tools --disable-mcp-server atlassian`, y un Enter si el encargo se queda aparcado. Trabajadores Claude con Sonnet 5.5. Una IA local gratuita queda sin decidir: no hace falta ahora. | `agentes/agentes-disponibles.md`, `agentes/orca.md` |
+| DEC-05 | Regla de legibilidad | Se mantiene. Los agentes escriben los nombres del código **siempre en inglés** y legible para humanos. | `AGENTS.md` (Legibilidad) |
+| DEC-06 | Idioma | **Nombres de código y mensajes de error en inglés. Comentarios, commits y documentación en español.** | `AGENTS.md` (Convenciones de código) |
