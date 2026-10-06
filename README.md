@@ -49,11 +49,36 @@ docker compose up --build app
 ```
 
 Supabase usa los puertos locales 54321 (API), 54322 (Postgres) y 54323 (Studio).
-La configuración procede de `supabase init`, con registro desactivado. No hay
-tablas de aplicación ni migraciones; las creará T02. La clave de `.env.example`
+La configuración procede de `supabase init`, con registro desactivado. Las
+migraciones de `supabase/migrations/` crean las tablas con sus políticas RLS;
+`supabase db reset` las aplica desde cero. La clave de `.env.example`
 es la clave anon pública del Supabase local, no una credencial de producción.
 Expo Go accede al servidor de Expo por la IP del ordenador; cuando T02 conecte
 la app a Supabase, la URL de Supabase en `.env` también deberá usar esa IP.
+
+## Usuario de desarrollo
+
+La app tiene un único usuario, el dueño, y el registro está **desactivado**: no
+existe pantalla de alta y el servidor rechaza `signUp` (`signup_disabled`). El
+usuario se crea con la API de administración del Supabase local, con Supabase
+arrancado:
+
+```sh
+DEV_USER_EMAIL=tu@email DEV_USER_PASSWORD=una-contraseña \
+  ./docker/app/run node scripts/create-development-user.mjs
+```
+
+El script lee la clave de servicio de `supabase status` en el momento: no la
+guarda en ningún fichero. Usa una contraseña de desarrollo, nunca la real, y no
+la escribas en el repositorio. Los datos del usuario se borran con
+`./docker/app/run npx supabase db reset`.
+
+Los tipos de `src/data/database.types.ts` se generan y se formatean así:
+
+```sh
+./docker/app/run npx supabase gen types typescript --local > src/data/database.types.ts
+./docker/app/run npx prettier --write src/data/database.types.ts
+```
 
 Para terminar, pulsa Ctrl+C en Expo y detén Supabase:
 
@@ -73,7 +98,10 @@ Para terminar, pulsa Ctrl+C en Expo y detén Supabase:
 ```
 
 La integración necesita Supabase arrancado y las variables de `.env`; comprueba
-que Auth responde y que no permite registro. Rechaza URLs que no sean locales.
+las restricciones de las tablas, que un usuario no ve ni cambia los datos de otro
+(RLS, con dos usuarios por tabla), que la sesión sobrevive a cerrar y abrir y que
+no permite registro. Los usuarios de prueba se crean con la API de administración,
+leyendo la clave de servicio de `supabase status` en tiempo de ejecución. Rechaza URLs que no sean locales.
 Jest prueba el botón con React Native Testing Library; la configuración de
 integración usa Node y el cliente real de Supabase. La exportación queda en `dist/`.
 `test:e2e` y el emulador con Maestro quedan pendientes de T15.
