@@ -65,18 +65,18 @@ Decidido en [ADR-0005](docs/adr/0005-stack-expo.md) (sustituye a la ADR-0001). S
 | Node.js | 24 (LTS), fijada en `.nvmrc` |
 | Expo SDK (con React Native y React que trae) | 56 |
 | Expo Router | La que trae el SDK |
-| TypeScript (modo `strict`) | T01 |
-| NativeWind y Tailwind CSS (la versión que pida NativeWind) | T01 |
-| React Native Reusables (componentes copiados en `src/components/ui`, sus `@rn-primitives/*` y `lucide-react-native`) | T01 |
-| `@supabase/supabase-js` | T01 |
-| Supabase CLI (`supabase`, dependencia de desarrollo) | T01 |
-| TanStack Query (`@tanstack/react-query`) | T01 |
-| Zod | T01 |
-| `@react-native-community/datetimepicker` (selector de fecha y hora en Android; DEC-25) | T01 |
-| Lo que pida la guía oficial de Supabase para Expo para guardar la sesión (DEC-25) | T01 |
-| Jest (`jest-expo`) y React Native Testing Library | T01 |
+| TypeScript (modo `strict`) | 6.0.3 |
+| NativeWind y Tailwind CSS (la versión que pida NativeWind) | NativeWind 4.2.7; Tailwind CSS 3.4.19 |
+| React Native Reusables (componentes copiados en `src/components/ui`, sus `@rn-primitives/*` y `lucide-react-native`) | Button y Text mínimos del registro NativeWind (385834c); portal 1.5.3, slot 1.5.2; lucide-react-native 1.52.0 |
+| `@supabase/supabase-js` | 2.117.2 |
+| Supabase CLI (`supabase`, dependencia de desarrollo) | 2.120.0 |
+| TanStack Query (`@tanstack/react-query`) | 5.104.1 |
+| Zod | 4.6.5 |
+| `@react-native-community/datetimepicker` (selector de fecha y hora en Android; DEC-25) | 9.1.0 |
+| Lo que pida la guía oficial de Supabase para Expo para guardar la sesión (DEC-25) | @react-native-async-storage/async-storage 2.2.0 |
+| Jest (`jest-expo`) y React Native Testing Library | Jest 29.7.0; jest-expo 56.0.5; RNTL 13.3.3 |
 | Maestro (dentro de la imagen de Docker del emulador, no es dependencia; DEC-26) | T15 |
-| ESLint y Prettier | T01 |
+| ESLint y Prettier | ESLint 9.39.5 (eslint-config-expo 56.0.4); Prettier 3.9.9 |
 
 **Dependencias aprobadas: exactamente las de esta tabla**, más las que ellas instalen por su cuenta y los paquetes `expo-*` que el SDK necesite para lo que pide el encargo (instalados con `npx expo install`, que elige la versión compatible). Cualquier otra necesita aprobación. El escaneo de secretos (gitleaks) corre en la integración continua, no es una dependencia.
 
@@ -101,23 +101,28 @@ e2e/           flujos de Maestro (extremo a extremo)
 
 ## Comandos
 
-Los crea la tarea T01; si cambian, se actualizan aquí.
+Los comandos se ejecutan desde la raíz del repositorio en Linux con Docker Engine y Docker Compose. `docker/app/run` configura el uid/gid del anfitrión y el grupo del socket de Docker y llama a `docker compose run --rm app`. La imagen se construye una vez; `node_modules` queda en el repositorio y pertenece al usuario.
 
-**Todo se ejecuta dentro de Docker** siempre que se pueda (DEC-26): T01 y T15 dejan estos comandos envueltos en contenedores y los reescriben aquí. Nada del proyecto se instala en el sistema del humano, salvo `adb` y el programa del emulador en `~/Android/Sdk`, que Orca necesita para su panel.
+**Todo se ejecuta dentro de Docker** siempre que se pueda (DEC-26). Nada del proyecto se instala en el sistema del humano, salvo `adb` y el programa del emulador en `~/Android/Sdk`, que Orca necesita para su panel (T15).
 
-Las herramientas de los servicios (`supabase`, `vercel` y `eas`) se usan con los tokens de DEC-33 y **con su telemetría apagada** (por ejemplo, `EXPO_NO_TELEMETRY=1` y `VERCEL_TELEMETRY_DISABLED=1`; para cada herramienta nueva, comprobar en su documentación cómo se apaga).
+Expo y Supabase CLI llevan `EXPO_NO_TELEMETRY=1`, `SUPABASE_TELEMETRY_DISABLED=1` y `DO_NOT_TRACK=1` en el contenedor. Las herramientas de los servicios (`supabase`, `vercel` y `eas`) se usan con los tokens de DEC-33 y con su telemetría apagada; para cada herramienta nueva, comprobar en su documentación cómo se apaga.
 
+```sh
+./docker/app/run build                             # construir la imagen de desarrollo
+./docker/app/run npm ci                            # instalar el lockfile dentro de Docker
+cp .env.example .env                              # variables públicas del Supabase local
+./docker/app/run npx supabase start                # base de datos local; requiere el socket Docker
+./docker/app/run npm run start                     # Expo Go por LAN, con QR y sin túnel
+./docker/app/run npm run web                       # Expo Go y web en http://localhost:8081
+./docker/app/run npm run lint                      # ESLint y comprobación de formato Prettier
+./docker/app/run npm run typecheck                 # TypeScript estricto
+./docker/app/run npm run test                      # tests unitarios y de componentes
+./docker/app/run npm run test:integration           # integración; Supabase arrancado y .env preparado
+./docker/app/run npx expo export --platform web    # exportación de la web en dist/
+./docker/app/run npx supabase stop                 # detener el Supabase local
 ```
-npm install                       instalar dependencias
-npx supabase start                base de datos local (necesita Docker)
-npx expo start                    la app en desarrollo (Expo Go en el móvil, emulador o web)
-npm run lint                      linter
-npm run typecheck                 comprobación de tipos
-npm run test                      pruebas unitarias y de componentes
-npm run test:integration          pruebas contra la base de datos local
-npm run test:e2e                  flujos de Maestro (necesita un emulador o un móvil conectado)
-npx expo export --platform web    compilación de la web
-```
+
+`npm run test:e2e` queda pendiente de T15 (emulador y Maestro). Para usar `docker compose` directamente con otro uid/gid, exporta `APP_UID=$(id -u)`, `APP_GID=$(id -g)` y `DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)` antes de construir o arrancar el servicio `app`.
 
 Antes de dar un encargo por terminado, los tests de la parte que has tocado tienen que pasar, y la integración continua lo repite en cada push y pull request. Las compilaciones de Android con EAS **no** se lanzan desde un encargo: solo al publicar una versión.
 

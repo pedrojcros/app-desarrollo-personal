@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [develop, main, 'pedrojcros/**']
+  pull_request:
+    branches: [develop]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-24.04
+    env:
+      EXPO_NO_TELEMETRY: '1'
+      SUPABASE_TELEMETRY_DISABLED: '1'
+      DO_NOT_TRACK: '1'
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: Construir entorno Docker
+        run: ./docker/app/run build
+      - name: Instalar dependencias fijadas
+        run: ./docker/app/run npm ci
+      - name: Preparar variables locales
+        run: cp .env.example .env
+      - name: Lint y formato
+        run: ./docker/app/run npm run lint
+      - name: Tipos
+        run: ./docker/app/run npm run typecheck
+      - name: Tests de componentes
+        run: ./docker/app/run npm run test
+      - name: Arrancar Supabase local
+        run: ./docker/app/run npx supabase start > /tmp/supabase-start.log 2>&1
+      - name: Integración con Supabase real
+        run: ./docker/app/run npm run test:integration
+      - name: Exportar web
+        run: ./docker/app/run npm run export:web
+      - name: Detener Supabase local
+        if: always()
+        run: ./docker/app/run npx supabase stop
+
+  secrets:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+      - name: Gitleaks
+        run: >-
+          docker run --rm
+          -v "$PWD:/repository:ro"
+          zricethezav/gitleaks:v8.24.3
+          git /repository --redact

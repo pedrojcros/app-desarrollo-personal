@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+# Conserva la ruta del anfitrión: Supabase monta ficheros en contenedores hermanos.
+project_directory=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
+cd "$project_directory"
+export PWD="$project_directory"
+export APP_UID=$(id -u)
+export APP_GID=$(id -g)
+export DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+
+if [ "${1:-}" = "build" ]; then
+  shift
+  exec docker compose build app "$@"
+fi
+
+exec docker compose run --rm app "$@"
