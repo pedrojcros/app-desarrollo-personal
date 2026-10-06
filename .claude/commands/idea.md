@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 description: Apunta una idea en el buzón (docs/buzon.md) para que la procese el orquestador.
 argument-hint: "<idea> [requiere-plan] [requiere-revisión]"
 ---

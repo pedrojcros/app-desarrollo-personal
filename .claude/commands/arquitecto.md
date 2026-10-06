@@ -1,4 +1,5 @@
 ---
+disable-model-invocation: true
 description: Arquitecto de software senior. Planifica el proyecto con el humano en varias sesiones, sin escribir código.
 argument-hint: "[tema de la sesión, opcional]"
 ---

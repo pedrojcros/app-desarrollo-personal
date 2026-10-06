@@ -64,7 +64,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-22**.
+  chat. Siguiente número libre: **DEC-23**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -90,6 +90,16 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Skills del proyecto y modelos según el tamaño (DEC-22)
+
+Se añaden las primeras skills, 12 de `addyosmani/agent-skills` (MIT),
+revisadas y elegidas porque encajan con el proyecto; otras 13 quedan fuera
+con su motivo (ver [la ficha](../.agents/skills/README.md)). Viven en
+`.agents/skills/`, donde las leen Codex y Copilot, y Claude por un enlace.
+Opus decide y elige skills; los trabajadores programan con el modelo
+adecuado a su tamaño. Los comandos de papel ya no los puede activar un agente
+por su cuenta.
 
 ### 2026-10-06 — Plan aprobado (sesión 8)
 

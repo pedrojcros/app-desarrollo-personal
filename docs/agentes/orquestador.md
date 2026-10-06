@@ -126,7 +126,18 @@ La tabla de [agentes-disponibles](agentes-disponibles.md) dice quién está habi
 
 Sé honesto con el ahorro: un trabajador de Claude arranca en frío y relee la documentación, así que ahorra **contexto tuyo**, no necesariamente tokens. El ahorro real está en repartir a agentes que se facturan aparte o con límites distintos. Cuidado con las cuentas gratuitas, que tienen límites bajos: si un agente se queda sin cuota, reasigna el encargo en vez de reintentarlo.
 
-**Modelos (DEC-12):** tú, Opus 5.5 al máximo, porque decides. Los trabajadores, Sonnet 5.5 (`--model claude-sonnet-5-5`), porque ejecutan. Opus para un trabajador solo como arquitecto automático o como segunda opinión en una revisión delicada.
+**Reparto del trabajo (DEC-12 y DEC-22).** Tú, Opus 5.5 al máximo, decides. No escribes encargos al milímetro: fijas lo que vale de verdad (contratos, criterios de hecho comprobables, ficheros reservados) y **qué skills** debe usar el trabajador. El «cómo se hace aquí» va en las [skills del proyecto](../../.agents/skills/README.md), que se escriben una vez y cargan todos. Revisas el resultado con `code-review-and-quality`.
+
+**Modelos según el tamaño del encargo:**
+
+| Encargo | Claude | Codex | Copilot |
+|---|---|---|---|
+| Pequeño y mecánico (S) | `--model claude-haiku-4-5-20251001` | Su modelo más barato, esfuerzo bajo | El suyo («Auto»): Orca no deja elegirlo |
+| Normal (M) | `--model claude-sonnet-5-5` | Su modelo por defecto, esfuerzo medio | Ídem |
+| Delicado (T02, T03, seguridad, lógica central) | `--model claude-sonnet-5-5`, más revisión de otro modelo (Opus 5.5 o Codex) | Esfuerzo alto | No para delicados |
+| Decidir y diseñar | Opus 5.5 al máximo: tú y el arquitecto automático | — | — |
+
+Los identificadores de modelo de Codex compruébalos en su ayuda o su configuración antes de usarlos; no los adivines.
 
 ### 6. Tope de paralelismo
 
