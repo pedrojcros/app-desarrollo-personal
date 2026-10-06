@@ -70,7 +70,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-34**.
+  chat. Siguiente número libre: **DEC-35**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -103,6 +103,14 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Tokens comprobados y plugins de los servicios (DEC-34)
+
+El humano creó las cuentas de Supabase (una organización vacía para los
+agentes), Vercel y Expo (un token de robot) y guardó sus tokens fuera del
+repositorio; los tres funcionan. De los plugins oficiales que recomendó Expo,
+solo se instala el de Supabase: los de Expo y Vercel envían telemetría desde
+sus hooks. Sus seis skills útiles se copian a demanda, sin hooks.
 
 ### 2026-10-06 — Plan replanificado aprobado y acceso de los agentes (DEC-33)
 

@@ -105,6 +105,8 @@ Los crea la tarea T01; si cambian, se actualizan aquí.
 
 **Todo se ejecuta dentro de Docker** siempre que se pueda (DEC-26): T01 y T15 dejan estos comandos envueltos en contenedores y los reescriben aquí. Nada del proyecto se instala en el sistema del humano, salvo `adb` y el programa del emulador en `~/Android/Sdk`, que Orca necesita para su panel.
 
+Las herramientas de los servicios (`supabase`, `vercel` y `eas`) se usan con los tokens de DEC-33 y **con su telemetría apagada** (por ejemplo, `EXPO_NO_TELEMETRY=1` y `VERCEL_TELEMETRY_DISABLED=1`; para cada herramienta nueva, comprobar en su documentación cómo se apaga).
+
 ```
 npm install                       instalar dependencias
 npx supabase start                base de datos local (necesita Docker)

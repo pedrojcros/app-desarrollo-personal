@@ -19,6 +19,10 @@ Mismas reglas que las automáticas: mandan `AGENTS.md` y el encargo, y nunca se 
 | `ci-cd-and-automation` | addyosmani/agent-skills | Integración continua y despliegue |
 | `shipping-and-launch` | addyosmani/agent-skills | Preparar la publicación de una versión |
 | `expo-dev-client`, `expo-upgrade`, `expo-examples` | expo/skills | Builds de desarrollo, actualizar el SDK de Expo, ejemplos oficiales |
+| `eas-app-stores` | expo/skills | Compilar el APK con EAS (T12 y H04). La parte de subir a Google Play, solo cuando el humano lo decida |
+| `eas-update` | expo/skills | Actualizar la app instalada por internet, sin reinstalar el APK. Para la versión 1.1, si el humano lo aprueba |
+| `vercel-cli`, `deployments-cicd`, `env-vars` | vercel/vercel-plugin | Desplegar la web en Vercel desde la integración continua, volver atrás y gestionar sus variables (T12), con la telemetría de `vercel` apagada (`VERCEL_TELEMETRY_DISABLED=1`) |
+| `access-protected-vercel-deployment` | vercel/vercel-plugin | Probar las webs de prueba de los PR, que van protegidas (T13) |
 
 ## Origen, licencias y cambios
 
@@ -30,5 +34,7 @@ Mismas reglas que las automáticas: mandan `AGENTS.md` y el encargo, y nunca se 
 | [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | `4e8504f` (2026-10-06) | Apache-2.0 | Solo `SKILL.md` y `reference/`; sin `scripts/` ni `agents/` |
 | [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) | `1401c8b` (2026-10-03) | MIT | Ninguno |
 | [expo/skills](https://github.com/expo/skills) | `d4f4840` (2026-10-05) | MIT | Quitada la sección final de envío de comentarios a Expo |
+| [expo/skills](https://github.com/expo/skills) (`eas-app-stores` y `eas-update`, la versión que fija el plugin oficial) | `cd75214` (2026-09-22) | MIT | Quitada la sección «Submitting Feedback» (`npx submit-expo-feedback`) |
+| [vercel/vercel-plugin](https://github.com/vercel/vercel-plugin) | `882e66c` (2026-09-21) | Apache-2.0 | Solo cuatro skills, sin los hooks del plugin (telemetría, perfil del proyecto y texto en las instrucciones); de `vercel-cli`, sin su copia `upstream/` |
 
 Los textos de las licencias están en [`.agents/LICENSES/`](../LICENSES/).
