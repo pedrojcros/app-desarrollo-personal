@@ -44,22 +44,20 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 *Actualizado: 2026-10-06.*
 
-- **Fase: replanificación para el móvil.** El plan vuelve a `EN BORRADOR` (DEC-24): una app con Expo para Android y la web, 15 tareas en 6 olas y P02 (el estilo, con prototipos y con el humano). Está en la rama `docs/replanificacion-expo`; su PR se abre cuando se fusione el #3 (skills móviles, DEC-23), porque no se apilan PR.
+- **Fase: replanificación para el móvil.** El plan vuelve a `EN BORRADOR` (DEC-24): una app con Expo para Android y la web, 15 tareas en 6 olas y P02 (el estilo, con prototipos y con el humano). Está en la rama `docs/replanificacion-expo`, con su PR contra `develop` en borrador hasta que se apruebe el plan. El #3 (skills móviles, DEC-23) ya está fusionado.
 - Estado del plan: `EN BORRADOR` (ver [05-plan](05-plan.md)). Le faltan DEC-26 (Docker) y la aprobación del humano; P02 solo bloquea T14.
 - Agentes: Claude, Codex y Copilot habilitados y probados con Orca (DEC-04).
 
 
 ## Lo siguiente
 
-1. El humano fusiona el PR #3 y el arquitecto abre el PR de `docs/replanificacion-expo` contra `develop`.
-2. El humano contesta DEC-26 (Docker: opción A o B).
-3. P02 con `/arquitecto`: el humano trae ejemplos de estilos y se itera con prototipos hasta elegir uno.
-4. El humano aprueba el plan y lanza `/ejecutar-plan` en una sesión nueva. Puede empezar antes de cerrar P02: solo T14 la espera.
+1. El humano contesta DEC-26 (Docker: opción A o B).
+2. P02 con `/arquitecto`: el humano trae ejemplos de estilos y se itera con prototipos hasta elegir uno.
+3. El humano aprueba el plan, se fusiona el PR de la replanificación y lanza `/ejecutar-plan` en una sesión nueva. Puede empezar antes de cerrar P02: solo T14 la espera.
 
 
 ## Pendiente del humano
 
-- Fusionar el PR #3: `gh pr merge 3 --merge --delete-branch`.
 - Contestar DEC-26 (Docker: A o B).
 - P02: buscar ejemplos visuales de estilos que le gusten.
 - Aprobar el plan replanificado.
