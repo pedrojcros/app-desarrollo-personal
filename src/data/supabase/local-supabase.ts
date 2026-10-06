@@ -52,7 +52,8 @@ function readLocalStatusValue(
     throw new Error(`Could not read ${name} from the local Supabase`);
   }
 
-  return valueLine.replace(`${name}=`, '').replaceAll('"', '');
+  const valueWithQuotes = valueLine.replace(`${name}=`, '');
+  return valueWithQuotes.replaceAll('"', '');
 }
 
 const clientOptions = {
@@ -61,14 +62,11 @@ const clientOptions = {
 
 export function createAdminClient(): SupabaseClient {
   const { url } = readLocalSupabaseSettings();
-  return createClient(
-    url,
-    readLocalStatusValue(
-      'SERVICE_ROLE_KEY',
-      process.env.SUPABASE_SERVICE_ROLE_KEY,
-    ),
-    clientOptions,
+  const serviceRoleKey = readLocalStatusValue(
+    'SERVICE_ROLE_KEY',
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
   );
+  return createClient(url, serviceRoleKey, clientOptions);
 }
 
 export function createAnonymousClient(): SupabaseClient {
@@ -89,21 +87,23 @@ export function signAccessToken(userId: string): string {
     process.env.SUPABASE_JWT_SECRET,
   );
   const issuedAt = Math.floor(Date.now() / 1000);
-  const header = encodeBase64Url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-  const payload = encodeBase64Url(
-    JSON.stringify({
-      aud: 'authenticated',
-      role: 'authenticated',
-      sub: userId,
-      iat: issuedAt,
-      exp: issuedAt + 3600,
-    }),
-  );
-  const signature = createHmac('sha256', secret)
-    .update(`${header}.${payload}`)
-    .digest();
+  const expiresAt = issuedAt + 3600;
+  const headerJson = JSON.stringify({ alg: 'HS256', typ: 'JWT' });
+  const payloadJson = JSON.stringify({
+    aud: 'authenticated',
+    role: 'authenticated',
+    sub: userId,
+    iat: issuedAt,
+    exp: expiresAt,
+  });
+  const header = encodeBase64Url(headerJson);
+  const payload = encodeBase64Url(payloadJson);
+  const signedContent = `${header}.${payload}`;
+  const hmac = createHmac('sha256', secret);
+  const signature = hmac.update(signedContent).digest();
+  const encodedSignature = encodeBase64Url(signature);
 
-  return `${header}.${payload}.${encodeBase64Url(signature)}`;
+  return `${signedContent}.${encodedSignature}`;
 }
 
 export function createClientWithAccessToken(
@@ -144,5 +144,19 @@ export async function deleteTestUser(
   adminClient: SupabaseClient,
   user: TestUser,
 ): Promise<void> {
-  await adminClient.auth.admin.deleteUser(user.id);
+  const deletion = await adminClient.auth.admin.deleteUser(user.id);
+  if (deletion.error) {
+    throw new Error(`Could not delete test user: ${deletion.error.message}`);
+  }
+}
+
+// Ejecuta SQL de solo lectura contra la base de datos local con la CLI de
+// Supabase. Sirve para mirar el catálogo de Postgres, que la API REST no expone.
+export function queryLocalDatabase(sql: string): Record<string, unknown>[] {
+  const output = execFileSync(
+    'npx',
+    ['supabase', 'db', 'query', '--local', '-o', 'json', sql],
+    { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
+  );
+  return JSON.parse(output);
 }

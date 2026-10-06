@@ -197,6 +197,21 @@ describe('Habit rules', () => {
     expect(response.error?.code).toBe(CHECK_VIOLATION);
   });
 
+  it('rejects weekdays frequency with a null weekdays value', async () => {
+    const response = await insertRule({
+      frequency: 'weekdays',
+      weekdays: null,
+    });
+
+    expect(response.error?.code).toBe(CHECK_VIOLATION);
+  });
+
+  it('rejects weekdays frequency with the weekdays field omitted', async () => {
+    const response = await insertRule({ frequency: 'weekdays' });
+
+    expect(response.error?.code).toBe(CHECK_VIOLATION);
+  });
+
   it('requires interval_days of at least 1 for every_n_days', async () => {
     const missing = await insertRule({ frequency: 'every_n_days' });
     const zero = await insertRule({

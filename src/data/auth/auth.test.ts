@@ -11,6 +11,9 @@ jest.mock('../supabase/client', () => ({
   },
 }));
 
+const fakePassword = 'x'.repeat(12);
+const wrongFakePassword = 'y'.repeat(12);
+
 const signInMock = jest.mocked(supabase.auth.signInWithPassword);
 const signOutMock = jest.mocked(supabase.auth.signOut);
 
@@ -20,7 +23,7 @@ describe('signInWithPassword', () => {
   });
 
   it('rejects a malformed email without calling Supabase', async () => {
-    const result = await signInWithPassword('not-an-email', 'a-password');
+    const result = await signInWithPassword('not-an-email', fakePassword);
 
     expect(result).toEqual({
       ok: false,
@@ -39,12 +42,15 @@ describe('signInWithPassword', () => {
   it('trims the email before signing in', async () => {
     signInMock.mockResolvedValue({ data: {}, error: null } as never);
 
-    const result = await signInWithPassword(' owner@example.com ', 'secret');
+    const result = await signInWithPassword(
+      ' owner@example.com ',
+      fakePassword,
+    );
 
     expect(result).toEqual({ ok: true, value: null });
     expect(signInMock).toHaveBeenCalledWith({
       email: 'owner@example.com',
-      password: 'secret',
+      password: fakePassword,
     });
   });
 
@@ -56,7 +62,10 @@ describe('signInWithPassword', () => {
     );
     signInMock.mockResolvedValue({ data: {}, error } as never);
 
-    const result = await signInWithPassword('owner@example.com', 'wrong');
+    const result = await signInWithPassword(
+      'owner@example.com',
+      wrongFakePassword,
+    );
 
     expect(result).toMatchObject({
       ok: false,
@@ -68,7 +77,7 @@ describe('signInWithPassword', () => {
     const error = new AuthRetryableFetchError('Failed to fetch', 0);
     signInMock.mockResolvedValue({ data: {}, error } as never);
 
-    const result = await signInWithPassword('owner@example.com', 'secret');
+    const result = await signInWithPassword('owner@example.com', fakePassword);
 
     expect(result).toMatchObject({
       ok: false,
@@ -79,7 +88,7 @@ describe('signInWithPassword', () => {
   it('reports any other failure as unknown_error', async () => {
     signInMock.mockRejectedValue(new Error('boom'));
 
-    const result = await signInWithPassword('owner@example.com', 'secret');
+    const result = await signInWithPassword('owner@example.com', fakePassword);
 
     expect(result).toMatchObject({
       ok: false,

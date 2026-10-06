@@ -2,7 +2,9 @@
 
 Aplicación personal de tareas y hábitos para Android y navegador. El esqueleto
 contiene cinco pestañas vacías: Hoy, Bandeja, Categorías, Pendientes e Historial.
-El acceso, los datos y el sistema visual se implementan en tareas posteriores.
+Ya tiene la base de datos con RLS, el cliente de Supabase y el acceso con email y
+contraseña (pantalla de login y protección de las pantallas); las pantallas de
+datos y el sistema visual se implementan en tareas posteriores.
 
 ## Arrancar en local
 
@@ -53,8 +55,9 @@ La configuración procede de `supabase init`, con registro desactivado. Las
 migraciones de `supabase/migrations/` crean las tablas con sus políticas RLS;
 `supabase db reset` las aplica desde cero. La clave de `.env.example`
 es la clave anon pública del Supabase local, no una credencial de producción.
-Expo Go accede al servidor de Expo por la IP del ordenador; cuando T02 conecte
-la app a Supabase, la URL de Supabase en `.env` también deberá usar esa IP.
+Expo Go accede al servidor de Expo por la IP del ordenador; como la app ya se
+conecta a Supabase, para probarla en el móvil la URL de Supabase en `.env`
+también debe usar esa IP.
 
 ## Usuario de desarrollo
 
@@ -64,11 +67,13 @@ usuario se crea con la API de administración del Supabase local, con Supabase
 arrancado:
 
 ```sh
-DEV_USER_EMAIL=tu@email DEV_USER_PASSWORD=una-contraseña \
-  ./docker/app/run node scripts/create-development-user.mjs
+./scripts/create-development-user.sh
 ```
 
-El script lee la clave de servicio de `supabase status` en el momento: no la
+El envoltorio pide el email y la contraseña por teclado (la contraseña no se
+muestra ni queda en el historial) y los pasa al contenedor; `docker/app/run`
+no reenvía las variables del anfitrión. También acepta `DEV_USER_EMAIL` y
+`DEV_USER_PASSWORD` ya definidas en el entorno. El script de Node lee la clave de servicio de `supabase status` en el momento: no la
 guarda en ningún fichero. Usa una contraseña de desarrollo, nunca la real, y no
 la escribas en el repositorio. Los datos del usuario se borran con
 `./docker/app/run npx supabase db reset`.
@@ -115,16 +120,16 @@ contenedor no abre aplicaciones gráficas del anfitrión.
 
 ## Estructura
 
-| Carpeta              | Contenido                                                             |
-| -------------------- | --------------------------------------------------------------------- |
-| `src/app/`           | Rutas de Expo Router y layouts                                        |
-| `src/components/ui/` | Button y Text mínimos adaptados de React Native Reusables             |
-| `src/theme/`         | CSS de NativeWind y ThemeProvider vacío para T14                      |
-| `src/domain/`        | Reservada para la lógica pura                                         |
-| `src/data/`          | Reservada para Supabase y TanStack Query; test de integración inicial |
-| `supabase/`          | Configuración local y carpeta vacía de migraciones                    |
-| `docker/app/`        | Imagen y envoltorio del entorno de desarrollo                         |
-| `docs/`              | Documentación y plan del proyecto                                     |
+| Carpeta              | Contenido                                                           |
+| -------------------- | ------------------------------------------------------------------- |
+| `src/app/`           | Rutas de Expo Router y layouts                                      |
+| `src/components/ui/` | Button y Text mínimos adaptados de React Native Reusables           |
+| `src/theme/`         | CSS de NativeWind y ThemeProvider vacío para T14                    |
+| `src/domain/`        | Reservada para la lógica pura                                       |
+| `src/data/`          | Cliente de Supabase, acceso, tipos generados y tests de integración |
+| `supabase/`          | Configuración local y migraciones (tablas y políticas RLS)          |
+| `docker/app/`        | Imagen y envoltorio del entorno de desarrollo                       |
+| `docs/`              | Documentación y plan del proyecto                                   |
 
 ## Fuentes de la configuración
 
@@ -133,7 +138,7 @@ contenedor no abre aplicaciones gráficas del anfitrión.
 - [NativeWind 4, Tailwind 3, Babel y Metro](https://www.nativewind.dev/docs/getting-started/installation).
 - [Instalación manual de React Native Reusables](https://github.com/founded-labs/react-native-reusables/blob/385834c2196f8a303cbc9057d1ac768f3bde0a3b/apps/docs/content/docs/installation/manual.mdx). Los componentes conservan la composición y el contexto de texto; las variantes y los tokens quedan para T14.
 - [Jest con Expo](https://docs.expo.dev/develop/unit-testing/). El renderer se fija a 19.2.3 mediante un override para coincidir con React y evitar que el peer de RNTL elija otra versión.
-- [Persistencia de sesión con AsyncStorage en Expo](https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native); T02 implementará el cliente y el acceso.
+- [Persistencia de sesión con AsyncStorage en Expo](https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native), que sigue el cliente de `src/data/supabase`.
 - [Telemetría de Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started#telemetry) y [telemetría de Expo CLI](https://docs.expo.dev/more/expo-cli/#telemetry).
 
 ## Documentación

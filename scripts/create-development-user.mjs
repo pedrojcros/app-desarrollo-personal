@@ -1,8 +1,8 @@
 // Crea (o actualiza) el usuario del dueño en el Supabase LOCAL.
 //
-// Uso (dentro de Docker, con Supabase arrancado):
-//   DEV_USER_EMAIL=tu@email DEV_USER_PASSWORD=una-contraseña \
-//     ./docker/app/run node scripts/create-development-user.mjs
+// Uso, con Supabase arrancado: `./scripts/create-development-user.sh`.
+// El envoltorio pasa las credenciales al contenedor (`docker/app/run` no
+// reenvía las variables del anfitrión).
 //
 // El registro público está desactivado, así que se usa la API de administración.
 // La clave de servicio se lee de `supabase status` en el momento: no se guarda
@@ -27,7 +27,8 @@ function readStatusValue(name) {
   if (!valueLine) {
     throw new Error(`Could not read ${name}: is Supabase running?`);
   }
-  return valueLine.replace(`${name}=`, '').replaceAll('"', '');
+  const valueWithQuotes = valueLine.replace(`${name}=`, '');
+  return valueWithQuotes.replaceAll('"', '');
 }
 
 const apiUrl = readStatusValue('API_URL');

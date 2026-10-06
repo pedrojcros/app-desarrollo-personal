@@ -12,6 +12,9 @@ import LoginScreen from '../app/login';
 
 jest.mock('@/data/auth', () => ({ signInWithPassword: jest.fn() }));
 
+const fakePassword = 'x'.repeat(12);
+const wrongFakePassword = 'y'.repeat(12);
+
 const signInWithPasswordMock = jest.mocked(signInWithPassword);
 
 function fillAndSubmit(email: string, password: string) {
@@ -29,12 +32,12 @@ describe('LoginScreen', () => {
     signInWithPasswordMock.mockResolvedValue({ ok: true, value: null });
     render(<LoginScreen />);
 
-    fillAndSubmit('owner@example.com', 'a-password');
+    fillAndSubmit('owner@example.com', fakePassword);
 
     await waitFor(() => {
       expect(signInWithPasswordMock).toHaveBeenCalledWith(
         'owner@example.com',
-        'a-password',
+        fakePassword,
       );
     });
     expect(screen.queryByRole('alert')).toBeNull();
@@ -47,7 +50,7 @@ describe('LoginScreen', () => {
     });
     render(<LoginScreen />);
 
-    fillAndSubmit('owner@example.com', 'wrong-password');
+    fillAndSubmit('owner@example.com', wrongFakePassword);
 
     expect(
       await screen.findByText('Email o contraseña incorrectos'),
@@ -62,7 +65,7 @@ describe('LoginScreen', () => {
     });
     render(<LoginScreen />);
 
-    fillAndSubmit('owner@example.com', 'a-password');
+    fillAndSubmit('owner@example.com', fakePassword);
 
     expect(
       await screen.findByText('No se ha podido conectar. Inténtalo de nuevo'),

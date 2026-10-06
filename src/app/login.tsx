@@ -32,6 +32,7 @@ export default function LoginScreen() {
     setIsSubmitting(false);
   }
 
+  // T14: colores y tipografía del sistema visual; aquí solo estructura neutra.
   return (
     <View className="flex-1 justify-center gap-4 p-6">
       <Text>Entrar</Text>
@@ -44,7 +45,7 @@ export default function LoginScreen() {
         keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
-        className="min-h-11 rounded border border-gray-400 px-3"
+        className="min-h-11 rounded border px-3"
       />
       <TextInput
         accessibilityLabel="Contraseña"
@@ -55,7 +56,7 @@ export default function LoginScreen() {
         value={password}
         onChangeText={setPassword}
         onSubmitEditing={submit}
-        className="min-h-11 rounded border border-gray-400 px-3"
+        className="min-h-11 rounded border px-3"
       />
       {errorMessage ? (
         <Text accessibilityRole="alert">{errorMessage}</Text>
@@ -64,9 +65,9 @@ export default function LoginScreen() {
         accessibilityLabel="Entrar"
         disabled={isSubmitting}
         onPress={submit}
-        className="min-h-11 rounded bg-black px-4"
+        className="min-h-11 rounded border px-4"
       >
-        <Text className="text-white">Entrar</Text>
+        <Text>Entrar</Text>
       </Button>
     </View>
   );
