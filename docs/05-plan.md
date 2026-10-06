@@ -40,7 +40,7 @@ Todas las casillas marcadas, o el orquestador se niega a ejecutar.
 - Una **tarea** es una unidad de valor que se puede probar entera. El orquestador la parte en uno o varios **encargos** para los agentes.
 - Los **identificadores `Tnn`** no se reutilizan. `Pnn` son tareas de preparación y `Hnn` tareas del humano.
 - Tamaño: **S** (menos de media jornada de agente), **M** (una jornada), **L** (se parte antes de ejecutar).
-- *Agente sugerido*: `claude` es un trabajador Claude con el modelo que toque por tamaño (DEC-22); `+revisión` pide una segunda opinión de otro modelo (Opus 5.5 o Codex). El orquestador puede dar lo mecánico a Codex o Copilot (ver [agentes disponibles](agentes/agentes-disponibles.md)).
+- *Agente sugerido*: **`codex` por defecto (DEC-27)**: por cada tres agentes de Codex, como mucho uno de Claude, y siempre después. `claude*` marca la tarea candidata a ese turno de Claude, con el modelo que toque por tamaño (DEC-22). `+revisión` pide una segunda opinión de otro modelo (Claude Opus 5.5, si escribió Codex), y cuenta como un turno de Claude. Ver [agentes disponibles](agentes/agentes-disponibles.md).
 - *Skills*: las que el encargo debe pedir; las marcadas «a demanda» van por su ruta en `.agents/skills-a-demanda/`.
 - *Puerta*: `requiere-plan` o `requiere-revisión` del humano (DEC-12); «—» si no tiene.
 - Una tarea solo puede lanzarse cuando todas sus dependencias están **fusionadas**, no solo hechas.
@@ -90,7 +90,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 - **Objetivo:** la app vacía pero arrancable en el móvil y en la web, **con todo el entorno dentro de Docker** (DEC-26): un `Dockerfile` de desarrollo sobre la imagen oficial de Node 24 y un `compose.yaml` con el servicio de la app en la red del anfitrión (para que el Expo Go del móvil lo vea), desde el que también se manejan la Supabase CLI y la base de datos local; Expo SDK 56 con TypeScript estricto y la estructura de `expo-project-structure` (rutas en `src/app`); Expo Router con pestañas vacías para Hoy, Bandeja, Categorías, Pendientes e Historial; NativeWind y React Native Reusables inicializados (componentes en `src/components/ui`); TanStack Query y Zod; las dependencias de DEC-25 (el selector de fecha y hora y lo que pida la guía oficial de Supabase para Expo para guardar la sesión), para que nadie más toque `package.json`; Jest (`jest-expo`) y React Native Testing Library con un test trivial; ESLint y Prettier; Supabase CLI con la base de datos local; `.nvmrc`, `.env.example` (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`); README con «cómo arrancar» y cómo abrir la app con Expo Go en la misma red (sin `--tunnel`, que pasa por un servicio de terceros); la telemetría de Expo apagada (`EXPO_NO_TELEMETRY=1`, prohibición 10); los comandos de `AGENTS.md`, lanzados dentro de los contenedores; e integración continua (lint, tipos, tests, integración con Supabase local, exportación web y gitleaks).
 - **Puntos de enganche para otras tareas:** `src/app/_layout.tsx` ya envuelve la app con un `ThemeProvider` vacío de `src/theme/provider.tsx`, que rellena T14 sin tocar el layout raíz. La protección de las pantallas la añade T02, la única tarea que puede tocar después `src/app/_layout.tsx`.
 - **Funcionalidades:** — (base de todas); RNF-08 · **Depende de:** H01 (hecha)
-- **Tamaño:** M · **Agente sugerido:** `claude`
+- **Tamaño:** M · **Agente sugerido:** `codex`
 - **Skills:** `expo-overview`, `expo-project-structure`, `expo-router`, `source-driven-development`, `flujo-git`, `codigo-legible`; a demanda `ci-cd-and-automation`.
 - **Contrato:** los comandos y la estructura de `AGENTS.md`; la tabla de stack, con las versiones reales que fije.
 - **Reserva:** `package.json` y su lockfile, `app.json` o `app.config.ts`, la configuración de Babel, Metro, Tailwind y NativeWind, `.github/workflows/`, `supabase/config.toml`, `src/app/_layout.tsx` y el layout de pestañas, el `src/components/ui/` inicial, `compose.yaml` y `docker/app/`.
@@ -101,7 +101,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** las tablas del [modelo de datos](04-arquitectura.md#modelo-de-datos) con sus restricciones y políticas RLS; inicio de sesión con email y contraseña ([ADR-0004](adr/0004-acceso-un-usuario.md)) desde la app, con la sesión guardada en el dispositivo según la guía oficial de Supabase para Expo; todas las pantallas protegidas salvo el login; registro desactivado; tipos de TypeScript generados de la base de datos.
 - **Funcionalidades:** base de todas; RNF-02 · **Depende de:** T01
-- **Tamaño:** M · **Agente sugerido:** `claude` `+revisión`
+- **Tamaño:** M · **Agente sugerido:** `codex` `+revisión`
 - **Skills:** `supabase-postgres-best-practices`, `security-and-hardening`, `source-driven-development`, `test-driven-development`.
 - **Contrato:** el modelo de datos de [04-arquitectura](04-arquitectura.md#modelo-de-datos) es el contrato del resto de tareas.
 - **Reserva:** **todas las migraciones de la versión 1** (`supabase/migrations/`); `src/data/supabase/` (el cliente); `src/data/auth/`; `src/data/database.types.ts`; `src/app/login.tsx`; y, solo para proteger las pantallas, `src/app/_layout.tsx`.
@@ -112,7 +112,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** en `src/domain`, una función pura que, para un hábito con sus versiones de regla, devuelve sus ocurrencias en un rango de fechas, con las cuatro frecuencias, y el orden del día por hora o franja ([ADR-0003](adr/0003-ocurrencias-calculadas.md)).
 - **Funcionalidades:** RF-02, RF-03 (orden); RNF-07 · **Depende de:** T01
-- **Tamaño:** M · **Agente sugerido:** `claude` `+revisión`
+- **Tamaño:** M · **Agente sugerido:** `codex` `+revisión`
 - **Skills:** `test-driven-development`, `api-and-interface-design`, `codigo-legible`.
 - **Contrato:** los tipos de `src/domain/types.ts`, que escribe el orquestador en el encargo.
 - **Reserva:** `src/domain/types.ts`, `src/domain/calendar-date.ts`, `src/domain/recurrence.ts`.
@@ -123,7 +123,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** llevar a la app el estilo aprobado en P02, **sin inventarlo**: tokens semánticos de color, tipografía, espaciado, radios, sombras y movimiento; aplicarlos a los componentes de React Native Reusables; una pantalla de catálogo (solo en desarrollo) con todos los componentes y sus estados; y en `docs/diseno.md`, cómo usar los tokens.
 - **Funcionalidades:** base visual de todas las pantallas; RNF-03 · **Depende de:** T01 y **P02**
-- **Tamaño:** M · **Agente sugerido:** `claude`
+- **Tamaño:** M · **Agente sugerido:** `claude*`
 - **Skills:** `expo-design-system`, `expo-native-ui`, `frontend-ui-engineering`; a demanda `better-colors`, `better-typography`, `better-layout`, `emil-design-eng`, `impeccable`.
 - **Reserva:** `src/theme/` (incluido `provider.tsx`), la sección de tokens de la configuración de Tailwind, el estilo de `src/components/ui/`, la ruta de catálogo `src/app/(dev)/`, y la sección de uso de `docs/diseno.md`.
 - **Hecho cuando:** el catálogo enseña cada componente en cada tema que se haya elegido y se parece al prototipo aprobado; todos los textos cumplen contraste AA; **el humano lo da por bueno** en su móvil.
@@ -133,7 +133,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** que los agentes prueben la app sin instalar nada en el sistema (DEC-26): una imagen propia con el emulador de Android (con KVM), una AVD y Maestro; otra con Chromium y el MCP de Chrome (versión fijada), y `.mcp.json` apuntando a ella; los dos servicios en `compose.yaml`; un flujo trivial de Maestro que abre la app en el Expo Go del emulador; y, en el README, cómo verlo en el panel de Orca, que usa `adb` y el programa del emulador de `~/Android/Sdk` (opción B de DEC-26).
 - **Funcionalidades:** RNF-08 (cómo se comprueba) · **Depende de:** T01
-- **Tamaño:** M · **Agente sugerido:** `claude`
+- **Tamaño:** M · **Agente sugerido:** `codex`
 - **Skills:** `android-emulator-qa`, `source-driven-development`, `verification-before-completion`; a demanda `browser-testing-with-devtools`.
 - **Reserva:** `docker/android/`, `docker/chrome-mcp/`, sus servicios en `compose.yaml`, `.mcp.json` y el flujo trivial de `e2e/`.
 - **Hecho cuando:** con un comando arranca el emulador en Docker y el flujo trivial de Maestro pasa contra la app que sirve el contenedor de T01; el MCP de Chrome abre la versión web desde su contenedor; las imágenes parten de imágenes oficiales con versiones fijadas. Si algo no puede ir en Docker, **parada**: se le pregunta al humano. Parte de [la prueba de DEC-26](agentes/prueba-emulador-docker.md).
@@ -143,7 +143,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** crear y eliminar categorías (lo que contienen pasa a la Bandeja de entrada); un selector de categoría reutilizable para los formularios.
 - **Funcionalidades:** RF-20 (crear), RF-21 · **Depende de:** T02, T14
-- **Tamaño:** S · **Agente sugerido:** `claude`
+- **Tamaño:** S · **Agente sugerido:** `codex`
 - **Skills:** `expo-router`, `expo-data-fetching`, `codigo-legible`, `test-driven-development`.
 - **Contrato:** el componente `CategorySelect` y las funciones y hooks de `src/data/categories.ts`, con las firmas que escribe el orquestador.
 - **Reserva:** `src/data/categories.ts`, `src/components/category-select/`, la pantalla de gestión en `src/app/(tabs)/categorias/index.tsx`.
@@ -154,7 +154,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** el formulario de hábito con las cuatro frecuencias, hora o franja y categoría; modificar (un cambio de frecuencia crea una versión nueva de la regla); archivar.
 - **Funcionalidades:** RF-01, RF-03, RF-18 y RF-19 (hábitos), RF-20 (asignar) · **Depende de:** T02, T03, T04, T14
-- **Tamaño:** M · **Agente sugerido:** `claude`
+- **Tamaño:** M · **Agente sugerido:** `codex`
 - **Skills:** `expo-native-ui`, `expo-data-fetching`, `codigo-legible`, `test-driven-development`. El selector de fecha y hora es el de DEC-25.
 - **Reserva:** `src/data/habits.ts`, `src/app/habitos/`.
 - **Hecho cuando:** pasan los escenarios 1, 5 y 6 de CU-01 y los de CU-06 aplicados a hábitos.
@@ -164,7 +164,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** el formulario de tarea (nombre, notas, fecha, hora y categoría; sin categoría, a la Bandeja); avisar si la fecha es pasada; modificar y archivar.
 - **Funcionalidades:** RF-05, RF-18 y RF-19 (tareas), RF-20 (asignar) · **Depende de:** T02, T04, T14
-- **Tamaño:** S · **Agente sugerido:** `claude`
+- **Tamaño:** S · **Agente sugerido:** `codex`
 - **Skills:** `expo-native-ui`, `expo-data-fetching`, `codigo-legible`, `test-driven-development`. El selector de fecha y hora es el de DEC-25.
 - **Reserva:** `src/data/tasks.ts`, `src/app/tareas/`.
 - **Hecho cuando:** pasan los escenarios 1 a 5 de CU-02 y los de CU-06 aplicados a tareas.
@@ -174,7 +174,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** las mutaciones para marcar hecho, no hecho o volver a pendiente (ocurrencias y tareas, guardando cuándo), **optimistas** con TanStack Query (se ven al instante y se revierten si Supabase falla), y el componente de aviso con «Deshacer» que usarán todas las vistas. Si el aviso necesita una librería, es una dependencia nueva: parada.
 - **Funcionalidades:** RF-06, RF-07 · **Depende de:** T02, T03, T14
-- **Tamaño:** S · **Agente sugerido:** `claude`
+- **Tamaño:** S · **Agente sugerido:** `codex`
 - **Skills:** `expo-data-fetching`, `expo-animation`, `test-driven-development`; a demanda `emil-design-eng`.
 - **Contrato:** las firmas de los hooks de marcado y del componente de aviso, que escribe el orquestador; los consumen T09, T10 y T11.
 - **Reserva:** `src/data/marks.ts`, `src/components/undo-toast/`.
@@ -185,7 +185,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** la pantalla de historial por rango (7 días por defecto), con el estado final de cada hábito y tarea, incluido «sin marcar».
 - **Funcionalidades:** RF-15 · **Depende de:** T02, T03, T14
-- **Tamaño:** M · **Agente sugerido:** `claude`
+- **Tamaño:** M · **Agente sugerido:** `codex`
 - **Skills:** `expo-data-fetching`, `vercel-react-native-skills`, `test-driven-development`.
 - **Reserva:** `src/domain/views/history.ts`, `src/data/history.ts`, `src/app/(tabs)/historial/`.
 - **Hecho cuando:** pasan los escenarios 1, 3, 4 y 5 de CU-05.
@@ -195,7 +195,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** lo pendiente de hoy (ocurrencias y tareas con fecha de hoy), ordenado por hora o franja, nunca sin fecha ni vencido; marcar con un toque, con aviso y «Deshacer»; mensaje de día libre.
 - **Funcionalidades:** RF-08; RNF-06 · **Depende de:** T03, T07
-- **Tamaño:** M · **Agente sugerido:** `claude`
+- **Tamaño:** M · **Agente sugerido:** `codex`
 - **Skills:** `expo-native-ui`, `vercel-react-native-skills`, `test-driven-development`.
 - **Reserva:** `src/domain/views/today.ts`, `src/app/(tabs)/hoy/`.
 - **Hecho cuando:** pasan los escenarios 1 a 6 y 10 de CU-03.
@@ -205,7 +205,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** lo pendiente de una categoría o de la Bandeja, con y sin fecha; marcar desde ahí (lo marcado desaparece) con aviso y «Deshacer».
 - **Funcionalidades:** RF-11 · **Depende de:** T04, T07
-- **Tamaño:** S · **Agente sugerido:** `claude`
+- **Tamaño:** S · **Agente sugerido:** `codex`
 - **Skills:** `expo-router`, `expo-native-ui`, `test-driven-development`.
 - **Reserva:** `src/domain/views/category.ts`, `src/app/(tabs)/bandeja/`, `src/app/categorias/[id].tsx`.
 - **Hecho cuando:** pasan los escenarios 5 y 6 de CU-03 en la vista de categoría.
@@ -215,7 +215,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** la lista de ocurrencias sin marcar y tareas vencidas, agrupada por día, de la más reciente a la más antigua, para marcarlas.
 - **Funcionalidades:** RF-12 · **Depende de:** T03, T07
-- **Tamaño:** M · **Agente sugerido:** `claude`
+- **Tamaño:** M · **Agente sugerido:** `codex`
 - **Skills:** `expo-native-ui`, `vercel-react-native-skills`, `test-driven-development`.
 - **Reserva:** `src/domain/views/past-pending.ts`, `src/app/(tabs)/pendientes/`.
 - **Hecho cuando:** pasa el escenario 1 de CU-04 y, sin nada pendiente, se muestra «todo al día».
@@ -225,7 +225,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** la web exportada en Vercel, con sus cabeceras de seguridad (`develop` y los PR contra Supabase `pruebas`; `main` contra `produccion`); `eas.json` con un perfil que genera el APK instalable (la primera compilación se hace al publicar, en H04); la integración continua aplica las migraciones a `pruebas` al fusionar en `develop`, y a `produccion` solo desde `main`; exportación semanal automática de los datos; el README explica cómo restaurar y cómo reactivar Supabase si se pausa.
 - **Funcionalidades:** RNF-04 · **Depende de:** T02 y **H02**
-- **Tamaño:** M · **Agente sugerido:** `claude`
+- **Tamaño:** M · **Agente sugerido:** `codex`
 - **Skills:** a demanda `ci-cd-and-automation`, `shipping-and-launch`; `source-driven-development` para `eas.json`.
 - **Reserva:** `.github/workflows/deploy-*.yml` y `.github/workflows/backup.yml` (T01 reserva el resto de flujos), `eas.json`, la configuración de Vercel, `scripts/backup/`.
 - **Hecho cuando:** un PR obtiene su web de prueba; una exportación se restaura en local con los mismos datos; `eas.json` sigue la documentación oficial de EAS (la primera compilación la lanza el humano en H04).
@@ -235,7 +235,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Objetivo:** flujos de Maestro de los caminos críticos en el emulador de Docker (T15); el script de datos sintéticos de un año; las comprobaciones de RNF-01, RNF-03, RNF-06 y RNF-08 (incluida la web con el MCP de Chrome).
 - **Funcionalidades:** RNF-01, RNF-03, RNF-06, RNF-08 · **Depende de:** T05, T06, T09, T10, T11 y T15
-- **Tamaño:** M · **Agente sugerido:** `claude`
+- **Tamaño:** M · **Agente sugerido:** `codex`
 - **Skills:** `android-emulator-qa`, `verification-before-completion`; a demanda `better-accessibility`, `browser-testing-with-devtools`, `performance-optimization`.
 - **Reserva:** `e2e/` (salvo el flujo trivial de T01), `scripts/seed/`.
 - **Hecho cuando:** los flujos pasan en el emulador y RNF-01, RNF-03, RNF-06 y RNF-08 se cumplen con sus números.

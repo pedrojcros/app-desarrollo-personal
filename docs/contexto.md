@@ -69,7 +69,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-27**.
+  chat. Siguiente número libre: **DEC-28**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -99,6 +99,14 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Primero Codex (DEC-27)
+
+Para no agotar su cuota de Claude, el humano pidió lanzar siempre primero
+agentes de Codex y, como mucho, uno de Claude por cada tres de Codex. Queda
+escrito en el orquestador, el arquitecto y el plan (las tareas pasan a
+`codex`). La primera ronda de prototipos de P02, con siete subagentes de
+Claude, ya estaba lanzada y se dejó terminar.
 
 ### 2026-10-06 — DEC-26 cerrada: Docker, con el panel de Orca (opción B)
 
