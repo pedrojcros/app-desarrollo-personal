@@ -27,6 +27,16 @@ orca skills get orca-cli            # worktrees, terminales, navegador de Orca
 | **Worker** | Un agente supervisado, con su terminal y normalmente su worktree |
 | **Gate** | Puerta de decisión que bloquea una tarea hasta que alguien la resuelve |
 
+## Vigilar a los trabajadores
+
+**Ningún trabajador se queda esperando.** Nada más lanzar trabajadores, deja corriendo en segundo plano, desde la raíz del repositorio:
+
+```bash
+python3 scripts/orca/supervise_workers.py --idle-minutes 8
+```
+
+Cada 20 segundos repasa la terminal de cada trabajador vivo: envía el Enter si el encargo se quedó escrito sin enviar (el campo `draft` de `orca terminal read`, dentro de `result.terminal`), concede a Copilot los permisos **de sesión** para rutas del proyecto o de su worktree, y **termina avisando** si alguien pide otra cosa (un permiso de Claude, una ruta de fuera) o lleva ocho minutos con la pantalla quieta. Termina también cuando no queda ningún trabajador vivo. Cada vez que termine, actúa y vuelve a lanzarlo. Lo pidió el humano el 2026-10-06, después de que un trabajador pasara diez minutos sin arrancar sin que nadie lo viera.
+
 ## Ciclo mínimo
 
 ```bash

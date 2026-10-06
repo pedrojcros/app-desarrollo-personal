@@ -95,6 +95,7 @@ src/app/       rutas y pantallas (Expo Router)
 src/components/ componentes compartidos (los de React Native Reusables, en src/components/ui)
 src/theme/     tokens del sistema visual
 supabase/      configuración local y migraciones
+scripts/orca/  herramientas de quien orquesta (el supervisor de trabajadores)
 e2e/           flujos de Maestro (extremo a extremo)
 ```
 

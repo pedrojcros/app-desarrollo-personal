@@ -181,6 +181,8 @@ Cuando se cierra una ola del plan o un hito, propón al humano publicar. No lo h
 
 ## Flujo de un encargo
 
+**Ningún trabajador se queda esperando.** Nada más lanzar, deja en marcha el supervisor (`scripts/orca/supervise_workers.py`, ver [orca](orca.md#vigilar-a-los-trabajadores)): envía el Enter a los encargos sin enviar, concede los permisos de sesión dentro del proyecto y te avisa de todo lo demás. El humano puede dejarte horas solo: a la vuelta no puede encontrar a nadie parado.
+
 1. **Elige la tarea** del plan respetando dependencias, y **crea o actualiza su ticket** según [jira](jira.md).
 2. **Escribe el encargo** con la [plantilla](plantilla-encargo.md), en `docs/agentes/encargos/NNN-titulo.md`. Que sea autosuficiente: pega los mensajes de error y los nombres exactos de los tests implicados, pon las restricciones explícitas («no toques el código de producción», «solo estos ficheros») y di qué debe devolver.
 3. **Lanza el trabajador** con `worker-start`. El texto íntegro del encargo va en `--spec`: el trabajador arranca en un worktree nuevo y **no verá un fichero que solo exista en el tuyo** sin commitear. El fichero del encargo sirve de registro. Con Copilot, comprueba a los 20 segundos que el encargo no se ha quedado aparcado (ver [orca](orca.md#trampas-conocidas)).
