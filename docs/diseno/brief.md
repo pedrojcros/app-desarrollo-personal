@@ -19,7 +19,7 @@ Contenido exacto (no inventes otro):
 - Fecha: martes 6 de octubre de 2026.
 - Sin hora: «Comprar proteína» (tarea, Personal), en un grupo «Sin hora», donde encaje mejor.
 - Mañana: «Llamar al dentista» (tarea, 10:00, Personal) y «Beber 2 L de agua» (hábito, Salud).
-- Tarde: «Ir al gimnasio» (hábito, 18:30, Salud).
+- Tarde: «Ir al gimnasio» (hábito, martes, jueves y sábado, 18:30, Salud).
 - Noche: «Entregar práctica de Redes» (tarea, 23:59, Universidad) y «Leer 20 minutos» (hábito, Personal).
 - Ya marcadas hoy, que no salen en la lista: «Meditar 10 min» (hecho) y «Repasar apuntes de Redes» (no hecho). Si enseñas el progreso del día: 2 de 8 marcadas.
 - Pendientes de días anteriores: 2.

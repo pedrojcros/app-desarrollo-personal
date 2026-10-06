@@ -2,6 +2,15 @@
 
 Lo que el humano dice que le gusta y lo que no, ronda a ronda. Es la memoria del bucle, porque las conversaciones se borran. Lo más reciente, arriba.
 
+## Ronda 2 (2026-10-06)
+
+- **Listas sin cajitas**, como el P5 de la ronda 1: filas sueltas, con una línea que las separa y sus botones de sí y no.
+- **Fecha de inicio con atajos**: no un «Hoy / Elegir fecha» literal, sino la forma más usable de elegirla rápido.
+- **Crear no es otra pantalla**: al pulsar +, una barra rápida encima de la pantalla actual, con el nombre listo para escribir y el teclado abierto, y menús cómodos a mano, teniendo en cuenta que el teclado ocupa parte de la pantalla.
+- **Contexto**: si estás en una categoría (por ejemplo, Mercadona), al pulsar + ya sale esa categoría.
+- **Secciones**: carpetas de categorías («Lista de la compra» > Mercadona); puede haber categorías sin sección; en la versión 1 (DEC-29).
+- **Tercer estilo: C**, el neobrutalismo pulido.
+
 ## Ronda 1 (2026-10-06)
 
 - **P1:** le gusta la pastilla que resalta «Hoy» en la barra de navegación de abajo.
