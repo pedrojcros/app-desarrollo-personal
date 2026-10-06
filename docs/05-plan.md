@@ -136,7 +136,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 - **Tamaño:** M · **Agente sugerido:** `claude`
 - **Skills:** `android-emulator-qa`, `source-driven-development`, `verification-before-completion`; a demanda `browser-testing-with-devtools`.
 - **Reserva:** `docker/android/`, `docker/chrome-mcp/`, sus servicios en `compose.yaml`, `.mcp.json` y el flujo trivial de `e2e/`.
-- **Hecho cuando:** con un comando arranca el emulador en Docker y el flujo trivial de Maestro pasa contra la app que sirve el contenedor de T01; el MCP de Chrome abre la versión web desde su contenedor; las imágenes parten de imágenes oficiales con versiones fijadas. Si algo no puede ir en Docker, **parada**: se le pregunta al humano.
+- **Hecho cuando:** con un comando arranca el emulador en Docker y el flujo trivial de Maestro pasa contra la app que sirve el contenedor de T01; el MCP de Chrome abre la versión web desde su contenedor; las imágenes parten de imágenes oficiales con versiones fijadas. Si algo no puede ir en Docker, **parada**: se le pregunta al humano. Parte de [la prueba de DEC-26](agentes/prueba-emulador-docker.md).
 - **Puerta:** — · **Ticket:** ADP-
 
 ### T04 — Gestión de categorías
