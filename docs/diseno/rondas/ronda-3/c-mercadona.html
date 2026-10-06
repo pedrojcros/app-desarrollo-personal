@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mercadona · Estilo C</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --background: #fffbef;
+      --surface: #ffffff;
+      --surface-soft: #f4efdf;
+      --ink: #111111;
+      --muted: #4a4a4a;
+      --accent: #ffe14d;
+      --university: #8ab4ff;
+      --health: #6ee7a8;
+      --personal: #ffb86b;
+      --home: #ff8fb1;
+      --line: rgba(17, 17, 17, 0.16);
+      --stroke: 1.5px solid var(--ink);
+      --shadow: 2px 2px 0 var(--ink);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      width: 100%;
+      min-width: 320px;
+      height: 100vh;
+      height: 100dvh;
+      margin: 0;
+      overflow: hidden;
+      background: var(--background);
+      color: var(--ink);
+      font-family: "Archivo", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { color: inherit; font: inherit; }
+    .icon { display: block; flex: none; }
+
+    .app {
+      position: relative;
+      display: flex;
+      width: min(100%, 480px);
+      height: 100%;
+      flex-direction: column;
+      margin: 0 auto;
+      padding: 18px 16px 0;
+      overflow: hidden;
+    }
+
+    /* Cabecera */
+    .page-header {
+      display: flex;
+      min-height: 76px;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 1px 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -1.4px;
+      line-height: 1.02;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+
+    .counter { display: grid; justify-items: end; gap: 6px; padding-top: 2px; }
+
+    .counter-badge {
+      padding: 3px 7px 4px;
+      border: var(--stroke);
+      background: var(--accent);
+      box-shadow: var(--shadow);
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      line-height: 1;
+    }
+
+    .counter-bar { display: flex; gap: 2px; }
+    .counter-bar i { width: 8px; height: 9px; border: 1px solid var(--ink); background: var(--surface); }
+    .counter-bar i.is-full { background: var(--ink); }
+
+    .counter-caption { color: var(--muted); font-size: 10px; font-weight: 500; }
+
+    /* Contenido con scroll */
+    .content {
+      min-height: 0;
+      flex: 1;
+      padding-bottom: 10px;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .content::-webkit-scrollbar { display: none; }
+
+    .group { margin-top: 6px; }
+
+    .group-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin: 0;
+      padding: 0 1px 6px;
+      border-bottom: var(--stroke);
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    /* Filas sin cajitas: solo una línea fina entre ellas */
+    .rows { display: block; }
+
+    .row {
+      display: flex;
+      min-height: 58px;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 0 3px 1px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .row.is-new { animation: flash 1.2s ease-out; }
+    @keyframes flash { from { background: var(--accent); } to { background: transparent; } }
+
+    .row-info { min-width: 0; flex: 1; }
+
+    .row-name {
+      display: block;
+      overflow: hidden;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .row-meta {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 5px;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      flex: 0 0 8px;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+      background: var(--surface);
+    }
+    .dot-university { background: var(--university); }
+    .dot-health { background: var(--health); }
+    .dot-personal { background: var(--personal); }
+    .dot-home { background: var(--home); }
+    .dot-accent { background: var(--accent); }
+
+    .row-actions { display: flex; align-items: center; }
+
+    .mark {
+      display: grid;
+      width: 44px;
+      height: 48px;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .mark span {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      place-items: center;
+      border: var(--stroke);
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow: 1px 1px 0 var(--ink);
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .mark.done[data-category="health"] span { background: var(--health); }
+    .mark.done[data-category="personal"] span { background: var(--personal); }
+    .mark.done[data-category="university"] span { background: var(--university); }
+    .mark.done[data-category="home"] span { background: var(--home); }
+    .mark.done[data-category="accent"] span { background: var(--accent); }
+    .mark.done[data-category="none"] span { background: var(--accent); }
+
+    .mark:active span { transform: translate(1px, 1px); box-shadow: none; }
+
+    .mark:focus-visible, .nav-link:focus-visible, .fab:focus-visible,
+    .undo-button:focus-visible, .button:focus-visible, .chip:focus-visible,
+    .seg:focus-visible, .send:focus-visible, .key:focus-visible,
+    .list-link:focus-visible, .back:focus-visible, .more-button:focus-visible {
+      outline: 3px solid var(--ink);
+      outline-offset: 2px;
+    }
+
+    /* Botón + */
+    .fab {
+      position: absolute;
+      z-index: 3;
+      right: 18px;
+      bottom: 137px;
+      display: grid;
+      width: 54px;
+      height: 54px;
+      place-items: center;
+      border: var(--stroke);
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 3px 3px 0 var(--ink);
+      cursor: pointer;
+    }
+
+    /* Aviso */
+    .toast {
+      display: flex;
+      min-height: 48px;
+      flex: 0 0 48px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 2px 0 10px;
+      padding: 0 6px 0 14px;
+      border: var(--stroke);
+      background: var(--ink);
+      box-shadow: var(--shadow);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .toast[hidden] { display: none; }
+    .toast-message { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .undo-button {
+      min-width: 70px;
+      min-height: 44px;
+      padding: 0 8px;
+      border: 0;
+      background: transparent;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      text-align: right;
+      cursor: pointer;
+    }
+
+    /* Navegación inferior */
+    .bottom-nav {
+      display: grid;
+      min-height: 69px;
+      flex: 0 0 69px;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      margin: 0 -16px;
+      padding: 4px 7px 7px;
+      border-top: var(--stroke);
+      background: var(--surface);
+    }
+
+    .nav-link {
+      display: flex;
+      min-width: 0;
+      min-height: 52px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: var(--muted);
+      font-size: 9.5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .nav-icon {
+      position: relative;
+      display: grid;
+      width: 40px;
+      height: 26px;
+      place-items: center;
+      border-radius: 999px;
+    }
+
+    .nav-link[aria-current="page"] { color: var(--ink); font-weight: 800; }
+    .nav-link[aria-current="page"] .nav-icon { background: var(--accent); box-shadow: 1px 1px 0 var(--ink); }
+
+    .nav-count {
+      position: absolute;
+      top: -5px;
+      right: -1px;
+      display: grid;
+      width: 16px;
+      height: 16px;
+      place-items: center;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+      background: var(--personal);
+      color: var(--ink);
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    /* Botones */
+    .button {
+      display: inline-flex;
+      min-height: 48px;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 12px;
+      border: var(--stroke);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.1px;
+      cursor: pointer;
+    }
+    .button.is-primary { background: var(--accent); }
+    .button:active { transform: translate(2px, 2px); box-shadow: none; }
+
+    @media (min-width: 400px) {
+      .app { padding-right: 20px; padding-left: 20px; }
+      .bottom-nav { margin-right: -20px; margin-left: -20px; }
+    }
+
+    .back {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      flex: none;
+      place-items: center;
+      margin: -4px 0 0 -10px;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+    .back span { display: grid; width: 34px; height: 34px; place-items: center; border: var(--stroke); border-radius: 50%; background: var(--surface); box-shadow: 1px 1px 0 var(--ink); }
+    .crumb { display: flex; align-items: center; gap: 3px; margin: 0 0 4px; color: var(--muted); font-size: 12px; font-weight: 600; }
+    .head-left { display: flex; align-items: flex-start; gap: 6px; min-width: 0; }
+    .pending-badge {
+      padding: 4px 8px 5px;
+      border: var(--stroke);
+      background: var(--health);
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .page-header.is-detail { min-height: 70px; padding-bottom: 8px; }
+
+    /* Añadir rápido */
+    .scrim { position: absolute; z-index: 5; inset: 0; background: rgba(17, 17, 17, 0.5); }
+
+    .quick {
+      position: absolute;
+      z-index: 6;
+      right: 0;
+      bottom: 290px;
+      left: 0;
+      padding: 10px 14px 6px;
+      border-top: var(--stroke);
+      background: var(--surface);
+      box-shadow: 0 -2px 0 var(--accent), 0 -4px 0 var(--ink);
+    }
+
+    .quick-top { display: flex; align-items: center; justify-content: space-between; height: 40px; }
+
+    .segmented {
+      display: flex;
+      padding: 3px;
+      border: var(--stroke);
+      background: var(--surface-soft);
+      gap: 3px;
+    }
+
+    .seg {
+      min-width: 76px;
+      height: 32px;
+      padding: 0 12px;
+      border: 1.5px solid transparent;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .seg.is-active { border-color: var(--ink); background: var(--accent); box-shadow: 1px 1px 0 var(--ink); font-weight: 800; }
+
+    .more-button {
+      display: inline-flex;
+      height: 44px;
+      align-items: center;
+      gap: 3px;
+      padding: 0 2px 0 8px;
+      border: 0;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .more-button[aria-expanded="true"] .icon { transform: rotate(180deg); }
+
+    .field-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+
+    .field {
+      display: flex;
+      height: 50px;
+      min-width: 0;
+      flex: 1;
+      align-items: center;
+      padding: 0 12px;
+      overflow: hidden;
+      border: var(--stroke);
+      background: var(--background);
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      white-space: pre;
+    }
+    .typed:empty::before { content: attr(data-placeholder); color: #6b6b6b; font-weight: 500; }
+    .caret { width: 2px; height: 24px; margin-left: 1px; background: var(--ink); animation: blink 1.06s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .send {
+      display: grid;
+      width: 50px;
+      height: 50px;
+      flex: none;
+      place-items: center;
+      border: var(--stroke);
+      background: var(--accent);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+    .send:active { transform: translate(2px, 2px); box-shadow: none; }
+    .send:disabled { background: var(--surface-soft); color: #8a8a8a; box-shadow: none; cursor: default; }
+
+    .more-row { display: flex; gap: 8px; padding-top: 6px; }
+    .more-row[hidden] { display: none; }
+
+    .chip-line { display: flex; align-items: center; height: 44px; min-width: 0; }
+    .chip-line.is-labeled .line-label { width: 56px; flex: none; color: var(--muted); font-size: 11px; font-weight: 700; }
+
+    .chips {
+      display: flex;
+      min-width: 0;
+      flex: 1;
+      align-items: center;
+      gap: 5px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+
+    .chip {
+      display: inline-flex;
+      height: 36px;
+      flex: none;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 9px;
+      border: var(--stroke);
+      background: var(--surface);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .chip.is-icon { width: 38px; padding: 0; }
+    .chip[aria-pressed="true"] { background: var(--accent); box-shadow: var(--shadow); font-weight: 800; }
+    .chip.is-category { max-width: 100%; justify-content: flex-start; background: var(--surface-soft); padding: 0 9px; }
+    .chip.is-category .section-name { color: var(--muted); font-weight: 600; }
+    .chip.is-category .path-arrow { color: var(--muted); }
+
+    .mode-habit { display: none; }
+    .quick[data-mode="habit"] .mode-habit { display: block; }
+    .quick[data-mode="habit"] .mode-task { display: none; }
+
+    /* Teclado de Android */
+    .keyboard {
+      position: absolute;
+      z-index: 7;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      height: 290px;
+      flex-direction: column;
+      padding: 0 3px 0;
+      background: #e8eaee;
+      font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
+      user-select: none;
+    }
+
+    .suggestions { display: flex; height: 42px; align-items: center; margin: 0 -3px; padding: 0 6px; }
+    .suggestion {
+      display: grid;
+      height: 36px;
+      flex: 1;
+      place-items: center;
+      border-right: 1px solid #c9ced6;
+      color: #202124;
+      font-size: 16px;
+    }
+    .suggestion:last-child { border-right: 0; }
+    .suggestion.is-main { font-weight: 600; }
+
+    .keys { display: flex; flex: 1; flex-direction: column; gap: 9px; padding-top: 6px; }
+    .key-row { display: flex; gap: 5px; height: 46px; }
+
+    .key {
+      display: grid;
+      min-width: 0;
+      flex: 1;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 1px 0 #b9bec7;
+      color: #202124;
+      font-family: inherit;
+      font-size: 21px;
+      font-weight: 400;
+      cursor: pointer;
+    }
+    .key:active { background: #d5d9e0; }
+    .key.is-special { background: #cfd4db; font-size: 15px; }
+    .key.is-wide { flex: 1.5; }
+    .key.is-space { flex: 5; font-size: 13px; color: #5f6368; }
+    .key.is-enter { flex: 1.5; border-radius: 22px; background: var(--accent); box-shadow: 0 1px 0 #b9a21f; }
+    .key.is-shift.is-on { background: #ffffff; }
+
+    .gesture-bar { display: grid; height: 30px; place-items: center; margin: 0 -3px; }
+    .gesture-bar i { width: 108px; height: 4px; border-radius: 2px; background: #202124; opacity: 0.8; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="page-header is-detail">
+      <div class="head-left">
+        <button class="back" type="button" aria-label="Volver a Categorías"><span><svg class="icon " width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></span></button>
+        <div>
+          <p class="crumb"><svg class="icon " width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>Lista de la compra</p>
+          <h1>Mercadona</h1>
+        </div>
+      </div>
+      <span class="pending-badge">3 pendientes</span>
+    </header>
+    <div class="content">
+      <section class="group" aria-label="Pendientes de Mercadona">
+        <div class="rows" data-slot="any"><article class="row " data-row><div class="row-info"><span class="row-name">Leche de avena</span><span class="row-meta"><span class="dot dot-health"></span>Tarea · Sin fecha</span></div><div class="row-actions"><button class="mark done" type="button" aria-label="Marcar Leche de avena como hecha" data-result="hecha" data-category="health"><span>✓</span></button><button class="mark" type="button" aria-label="Marcar Leche de avena como no hecha" data-result="no hecha"><span>×</span></button></div></article><article class="row " data-row><div class="row-info"><span class="row-name">Huevos</span><span class="row-meta"><span class="dot dot-health"></span>Tarea · Sin fecha</span></div><div class="row-actions"><button class="mark done" type="button" aria-label="Marcar Huevos como hecha" data-result="hecha" data-category="health"><span>✓</span></button><button class="mark" type="button" aria-label="Marcar Huevos como no hecha" data-result="no hecha"><span>×</span></button></div></article><article class="row " data-row><div class="row-info"><span class="row-name">Pan integral</span><span class="row-meta"><span class="dot dot-health"></span>Tarea · Sin fecha</span></div><div class="row-actions"><button class="mark done" type="button" aria-label="Marcar Pan integral como hecha" data-result="hecha" data-category="health"><span>✓</span></button><button class="mark" type="button" aria-label="Marcar Pan integral como no hecha" data-result="no hecha"><span>×</span></button></div></article></div>
+      </section>
+    </div>
+    <nav class="bottom-nav" aria-label="Navegación principal"><a class="nav-link" href="#"><span class="nav-icon"><svg class="icon " width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><path d="m3 6 1 1 2-2m-3 7 1 1 2-2m-3 7 1 1 2-2"/></svg></span>Hoy</a><a class="nav-link" href="#"><span class="nav-icon"><svg class="icon " width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></span>Bandeja</a><a class="nav-link" href="#" aria-current="page"><span class="nav-icon"><svg class="icon " width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Categorías</a><a class="nav-link" href="#"><span class="nav-icon"><svg class="icon " width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8M8 20h8M6 4h12v16H6z"/><path d="M9 8h6m-6 4h6m-6 4h4"/></svg><span class="nav-count">2</span></span>Pendientes</a><a class="nav-link" href="#"><span class="nav-icon"><svg class="icon " width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5m4-1v5l3 2"/></svg></span>Historial</a></nav>
+    <div class="scrim"></div>
+    <section class="quick" id="quick" data-mode="task" data-default-date="Sin fecha" aria-label="Añadir rápido">
+      <div class="quick-top">
+        <div class="segmented" role="group" aria-label="Qué añadir">
+          <button class="seg is-active" type="button" data-mode="task" aria-pressed="true">Tarea</button>
+          <button class="seg" type="button" data-mode="habit" aria-pressed="false">Hábito</button>
+        </div>
+        <button class="more-button" id="more-button" type="button" aria-expanded="false" aria-controls="more-row">Más <svg class="icon " width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+      </div>
+      <div class="field-row">
+        <div class="field" role="textbox" aria-label="Nombre"><span class="typed" id="typed" data-placeholder="Nombre de la tarea">Plátanos</span><span class="caret" aria-hidden="true"></span></div>
+        <button class="send" id="send" type="button" aria-label="Añadir"><svg class="icon " width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg></button>
+      </div>
+      <div class="more-row" id="more-row" hidden>
+        <button class="chip" type="button" aria-pressed="false" data-group="extra" data-value="note"><svg class="icon " width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Nota</button>
+        <button class="chip" type="button" aria-pressed="false" data-group="extra" data-value="time"><svg class="icon " width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Hora exacta</button>
+      </div>
+      <div class="mode-task"><div class="chip-line"><div class="chips"><button class="chip" type="button" aria-pressed="false" data-group="date" data-value="Hoy">Hoy</button><button class="chip" type="button" aria-pressed="false" data-group="date" data-value="Mañana">Mañana</button><button class="chip" type="button" aria-pressed="false" data-group="date" data-value="Lunes">Lunes</button><button class="chip is-icon" type="button" aria-pressed="false" aria-label="Elegir otra fecha" data-group="date" data-value="calendar"><svg class="icon " width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></button><button class="chip" type="button" aria-pressed="true" data-group="date" data-value="Sin fecha">Sin fecha</button></div></div></div>
+      <div class="mode-habit"><div class="chip-line is-labeled"><span class="line-label">Repite</span><div class="chips"><button class="chip" type="button" aria-pressed="true" data-group="frequency" data-value="A diario">A diario</button><button class="chip" type="button" aria-pressed="false" data-group="frequency" data-value="L X V">L X V</button><button class="chip" type="button" aria-pressed="false" data-group="frequency" data-value="Cada 2 días">Cada 2 días</button><button class="chip" type="button" aria-pressed="false" data-group="frequency" data-value="Cada mes">Cada mes</button></div></div><div class="chip-line is-labeled"><span class="line-label">Cuándo</span><div class="chips"><button class="chip" type="button" aria-pressed="true" data-group="when" data-value="morning">Mañana</button><button class="chip" type="button" aria-pressed="false" data-group="when" data-value="afternoon">Tarde</button><button class="chip" type="button" aria-pressed="false" data-group="when" data-value="night">Noche</button><button class="chip" type="button" aria-pressed="false" data-group="when" data-value="time"><svg class="icon " width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Hora</button></div></div><div class="chip-line is-labeled"><span class="line-label">Empieza</span><div class="chips"><button class="chip" type="button" aria-pressed="true" data-group="start" data-value="Hoy">Hoy</button><button class="chip" type="button" aria-pressed="false" data-group="start" data-value="Mañana">Mañana</button><button class="chip" type="button" aria-pressed="false" data-group="start" data-value="Lunes">Lunes</button><button class="chip is-icon" type="button" aria-pressed="false" aria-label="Elegir otra fecha" data-group="start" data-value="calendar"><svg class="icon " width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></button></div></div></div>
+      <div class="chip-line"><button class="chip is-category" type="button" data-category-chip data-name="Mercadona" data-dot="dot-health" data-color="health" aria-label="Categoría: Lista de la compra › Mercadona"><span class="dot dot-health"></span><span class="section-name">Lista de la compra</span><span class="path-arrow">›</span>Mercadona<svg class="icon " width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div>
+    </section>
+    <div class="keyboard" aria-label="Teclado">
+      <div class="suggestions"><span class="suggestion">Plátanos</span><span class="suggestion is-main">plátanos</span><span class="suggestion">Plátano</span></div>
+      <div class="keys">
+        <div class="key-row"><button class="key" type="button" data-key="q">q</button><button class="key" type="button" data-key="w">w</button><button class="key" type="button" data-key="e">e</button><button class="key" type="button" data-key="r">r</button><button class="key" type="button" data-key="t">t</button><button class="key" type="button" data-key="y">y</button><button class="key" type="button" data-key="u">u</button><button class="key" type="button" data-key="i">i</button><button class="key" type="button" data-key="o">o</button><button class="key" type="button" data-key="p">p</button></div>
+        <div class="key-row"><button class="key" type="button" data-key="a">a</button><button class="key" type="button" data-key="s">s</button><button class="key" type="button" data-key="d">d</button><button class="key" type="button" data-key="f">f</button><button class="key" type="button" data-key="g">g</button><button class="key" type="button" data-key="h">h</button><button class="key" type="button" data-key="j">j</button><button class="key" type="button" data-key="k">k</button><button class="key" type="button" data-key="l">l</button><button class="key" type="button" data-key="ñ">ñ</button></div>
+        <div class="key-row">
+          <button class="key is-special is-wide is-shift" type="button" data-action="shift" aria-label="Mayúsculas"><svg class="icon " width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18v-6H5l7-7 7 7h-4v6z"/></svg></button>
+          <button class="key" type="button" data-key="z">z</button><button class="key" type="button" data-key="x">x</button><button class="key" type="button" data-key="c">c</button><button class="key" type="button" data-key="v">v</button><button class="key" type="button" data-key="b">b</button><button class="key" type="button" data-key="n">n</button><button class="key" type="button" data-key="m">m</button>
+          <button class="key is-special is-wide" type="button" data-action="backspace" aria-label="Borrar"><svg class="icon " width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 5a2 2 0 0 0-1.344.519l-6.328 5.74a1 1 0 0 0 0 1.481l6.328 5.741A2 2 0 0 0 10 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/><path d="m12 9 6 6M18 9l-6 6"/></svg></button>
+        </div>
+        <div class="key-row">
+          <button class="key is-special is-wide" type="button" data-key="" aria-label="Números y símbolos">?123</button>
+          <button class="key" type="button" data-key=",">,</button>
+          <button class="key" type="button" aria-label="Emojis"><svg class="icon " width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg></button>
+          <button class="key is-space" type="button" data-key=" ">Español</button>
+          <button class="key" type="button" data-key=".">.</button>
+          <button class="key is-enter" type="button" data-action="send" aria-label="Añadir"><svg class="icon " width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg></button>
+        </div>
+      </div>
+      <div class="gesture-bar"><i></i></div>
+    </div>
+  </main>
+  <script>
+    const quick = document.querySelector("#quick");
+    const typedText = document.querySelector("#typed");
+    const sendButton = document.querySelector("#send");
+    const moreButton = document.querySelector("#more-button");
+    const moreRow = document.querySelector("#more-row");
+    const shiftKey = document.querySelector("[data-action='shift']");
+    const letterKeys = document.querySelectorAll(".key[data-key]");
+    let text = typedText.textContent;
+    let shiftLocked = false;
+
+    function shiftIsOn() {
+      return shiftLocked || text.length === 0;
+    }
+
+    function render() {
+      typedText.textContent = text;
+      sendButton.disabled = text.trim().length === 0;
+      const upper = shiftIsOn();
+      shiftKey.classList.toggle("is-on", upper);
+      letterKeys.forEach((key) => {
+        const letter = key.dataset.key;
+        if (letter.length === 1 && letter !== " " && /\p{L}/u.test(letter)) {
+          key.textContent = upper ? letter.toUpperCase() : letter;
+        }
+      });
+    }
+
+    function typeCharacter(character) {
+      const isLetter = /\p{L}/u.test(character);
+      text += isLetter && shiftIsOn() ? character.toUpperCase() : character;
+      shiftLocked = false;
+      render();
+    }
+
+    function currentLabel(group) {
+      const selected = quick.querySelector(`.chip[data-group="${group}"][aria-pressed="true"]`);
+      return selected ? selected.dataset.value : "";
+    }
+
+    function slotFor(mode) {
+      if (mode !== "habit") return "none";
+      const when = currentLabel("when");
+      return when === "time" ? "none" : when;
+    }
+
+    function addRow() {
+      const name = text.trim();
+      if (!name) return;
+      const mode = quick.dataset.mode;
+      const category = document.querySelector("[data-category-chip]");
+      const kind = mode === "habit" ? "Hábito" : "Tarea";
+      const dateGroup = mode === "habit" ? "start" : "date";
+      const date = currentLabel(dateGroup);
+      const showDate = date && date !== quick.dataset.defaultDate && date !== "calendar";
+      const parts = [];
+      if (showDate) parts.push(`${date} · `);
+      parts.push(`<span class="dot ${category.dataset.dot}"></span>${category.dataset.name} · ${kind}`);
+
+      const rowElement = document.createElement("article");
+      rowElement.className = "row is-new";
+      rowElement.dataset.row = "";
+      rowElement.innerHTML =
+        `<div class="row-info"><span class="row-name"></span><span class="row-meta">${parts.join("")}</span></div>` +
+        `<div class="row-actions">` +
+        `<button class="mark done" type="button" aria-label="Marcar como hecha" data-category="${category.dataset.color}"><span>✓</span></button>` +
+        `<button class="mark" type="button" aria-label="Marcar como no hecha"><span>×</span></button></div>`;
+      rowElement.querySelector(".row-name").textContent = name;
+
+      const list = document.querySelector(`[data-slot="${slotFor(mode)}"]`) || document.querySelector("[data-slot]");
+      list.appendChild(rowElement);
+      rowElement.scrollIntoView({ block: "nearest" });
+
+      text = "";
+      render();
+    }
+
+    document.querySelectorAll(".seg").forEach((button) => {
+      button.addEventListener("click", () => {
+        quick.dataset.mode = button.dataset.mode;
+        document.querySelectorAll(".seg").forEach((other) => {
+          const isActive = other === button;
+          other.classList.toggle("is-active", isActive);
+          other.setAttribute("aria-pressed", String(isActive));
+        });
+        typedText.dataset.placeholder = button.dataset.mode === "habit" ? "Nombre del hábito" : "Nombre de la tarea";
+      });
+    });
+
+    quick.querySelectorAll(".chip[data-group]").forEach((chipButton) => {
+      chipButton.addEventListener("click", () => {
+        const group = chipButton.dataset.group;
+        if (group === "extra") {
+          const isPressed = chipButton.getAttribute("aria-pressed") === "true";
+          chipButton.setAttribute("aria-pressed", String(!isPressed));
+          return;
+        }
+        quick.querySelectorAll(`.chip[data-group="${group}"]`).forEach((other) => {
+          other.setAttribute("aria-pressed", String(other === chipButton));
+        });
+      });
+    });
+
+    moreButton.addEventListener("click", () => {
+      const willOpen = moreRow.hidden;
+      moreRow.hidden = !willOpen;
+      moreButton.setAttribute("aria-expanded", String(willOpen));
+    });
+
+    letterKeys.forEach((key) => {
+      key.addEventListener("click", () => {
+        if (key.dataset.key === "") return;
+        typeCharacter(key.dataset.key);
+      });
+    });
+
+    shiftKey.addEventListener("click", () => {
+      shiftLocked = !shiftLocked;
+      render();
+    });
+
+    document.querySelector("[data-action='backspace']").addEventListener("click", () => {
+      text = text.slice(0, -1);
+      render();
+    });
+
+    document.querySelector("[data-action='send']").addEventListener("click", addRow);
+    sendButton.addEventListener("click", addRow);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      if (event.key === "Enter") {
+        addRow();
+      } else if (event.key === "Backspace") {
+        text = text.slice(0, -1);
+        render();
+      } else if (event.key.length === 1) {
+        text += event.key;
+        render();
+      }
+    });
+
+    render();
+  </script>
+</body>
+</html>

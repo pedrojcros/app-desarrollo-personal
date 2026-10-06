@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Mercadona · Negro</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;650;700&display=swap" rel="stylesheet"><style>
+:root{--background:#0E1813;--surface:#15221B;--raised:#1C2C23;--border:#27392F;--text:#E9F1EB;--muted:#93A89A;--accent:#E8C468;--negative:#D9776A;--personal:#EFA66A;--health:#7AD39A;--university:#8DB8F2;--home:#F2A7A0}*{box-sizing:border-box}body{margin:0;background:var(--background);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px}button,input,select,textarea{font:inherit}button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}button{cursor:pointer;color:inherit;border:0;background:none}a{color:inherit;text-decoration:none}svg{width:22px;height:22px;flex-shrink:0}button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}header{padding:26px 20px 15px}.eyebrow{font-size:12px;color:var(--muted);margin:0 0 8px}h1{font-size:32px;letter-spacing:-1.2px;line-height:1.15;margin:0;font-weight:650}.title-line{display:flex;align-items:center;justify-content:space-between}.count{font-size:12px;color:var(--accent);letter-spacing:.1px}main{padding:0 20px 150px}.section-title{display:flex;align-items:center;gap:12px;font-size:10px;letter-spacing:1.7px;color:var(--muted);font-weight:600;margin:16px 0 2px}.section-title:after{content:'';flex:1;height:1px;background:var(--border)}.row{display:flex;align-items:center;min-height:61px;border-bottom:1px solid var(--border);gap:4px}.task-text{flex:1;min-width:0;padding:9px 0}.task-name{display:block;font-size:14px;font-weight:500;line-height:20px;letter-spacing:-.15px}.meta{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:10px;margin-top:4px}.dot{width:5px;height:5px;border-radius:50%;background:var(--category);display:inline-block}.mark{width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.mark.yes span{display:flex;align-items:center;justify-content:center;width:29px;height:29px;border-radius:50%;background:var(--category);color:var(--background)}.mark svg{width:18px;height:18px}.mark.no{color:var(--negative)}.floating{position:fixed;bottom:146px;right:20px;display:flex;align-items:center;justify-content:center;width:52px;height:52px;background:var(--accent);color:var(--background);border-radius:18px;box-shadow:0 6px 18px #0003}.floating svg{width:26px;height:26px}.toast{position:fixed;left:20px;right:20px;bottom:87px;height:48px;border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;gap:9px;padding:0 12px;background:var(--raised);font-size:11px}.toast>svg{width:16px;color:var(--health)}.toast strong{color:var(--accent);font-size:11px}.toast button{margin-left:auto;min-height:44px}.navigation{position:fixed;bottom:0;left:0;right:0;height:74px;display:flex;background:var(--surface);border-top:1px solid var(--border);padding:8px 5px 7px;z-index:2}.navigation a{flex:1;display:flex;align-items:center;flex-direction:column;font-size:9px;color:var(--muted);gap:4px;min-width:0}.nav-icon{position:relative;display:flex;justify-content:center;align-items:center;height:30px;width:48px;border-radius:18px}.active{color:var(--accent)!important}.active .nav-icon{background:var(--raised)}.badge{position:absolute;top:-1px;right:7px;background:var(--accent);color:var(--background);font-size:9px;width:13px;height:13px;border-radius:50%;font-weight:700;text-align:center}.category-row{display:flex;align-items:center;gap:12px;min-height:62px;border-bottom:1px solid var(--border)}.category-icon{height:36px;width:36px;border-radius:10px;background:var(--raised);display:flex;align-items:center;justify-content:center;color:var(--category)}.category-row .label{flex:1;font-size:15px}.category-row .number{color:var(--muted);font-size:12px}.category-row>svg{width:15px;color:var(--muted)}.category-heading{margin:26px 0 5px;display:flex;gap:9px;align-items:center;font-size:12px;font-weight:500;color:var(--muted)}.category-heading svg{width:17px;height:17px}.creation-actions{display:flex;gap:8px;margin-top:25px}.creation-actions button{min-height:44px;flex:1;border:1px solid var(--border);border-radius:10px;display:flex;gap:7px;align-items:center;justify-content:center;font-size:12px}.creation-actions button:last-child{background:var(--accent);color:var(--background);border-color:var(--accent)}.creation-actions svg{width:17px}.back{min-height:44px;display:flex;gap:6px;align-items:center;color:var(--muted);font-size:11px;margin-top:-13px;margin-bottom:10px}.back svg{width:17px}.subtitle{color:var(--muted);font-size:12px;margin:10px 0 0}.composer-screen main{padding-bottom:560px}.composer-screen header{padding-bottom:8px}.composer-screen .navigation,.composer-screen .toast,.composer-screen .floating{display:none}.composer{position:fixed;bottom:290px;left:0;right:0;background:var(--surface);border-top:1px solid #3C5143;border-radius:20px 20px 0 0;padding:8px 16px 12px;z-index:5;box-shadow:0 -12px 28px #0002}.handle{height:3px;width:30px;background:#405448;border-radius:4px;margin:0 auto 10px}.compose-title{display:flex;align-items:center;gap:8px;height:45px}.compose-title input{width:100%;min-width:0;background:none;border:0;color:var(--text);font-size:21px;letter-spacing:-.5px;outline:0;caret-color:var(--accent)}.send{background:var(--accent);color:var(--background);height:44px;width:44px;flex-shrink:0;border-radius:13px;display:flex;align-items:center;justify-content:center}.input-wrap{position:relative;flex:1;min-width:0}.cursor{position:absolute;top:4px;height:24px;width:2px;background:var(--accent);pointer-events:none}.type-line{display:flex;justify-content:space-between;align-items:center;margin-top:10px}.segmented{display:flex;gap:2px;background:var(--background);padding:3px;border-radius:9px}.segmented button{font-size:12px;min-height:38px;padding:0 14px;border-radius:7px;color:var(--muted)}.segmented button.selected{background:var(--raised);color:var(--accent)}.more{min-height:44px;font-size:12px;display:flex;align-items:center;gap:4px;color:var(--muted)}.more svg{width:17px}.date-options{display:flex;gap:4px;align-items:center;margin-top:6px}.date-options button{padding:0 9px;min-height:44px;font-size:11px;white-space:nowrap;border-radius:8px;color:var(--muted)}.date-options button.selected{background:var(--raised);color:var(--accent)}.date-options .calendar{width:40px;padding:0;display:flex;align-items:center;justify-content:center}.calendar svg{width:17px}.category-select{display:flex;align-items:center;border-top:1px solid var(--border);margin-top:6px;gap:7px;min-height:44px;color:var(--muted)}.category-select>svg{width:16px}.category-select select{width:100%;color:var(--text);font-size:11px;background:var(--surface);border:0;min-height:44px;outline:0}.habit-options{display:flex;gap:6px;margin-top:6px}.habit-options select{background:var(--raised);border:1px solid var(--border);color:var(--text);border-radius:8px;min-height:44px;min-width:0;flex:1;padding:0 8px;font-size:12px}.start-label{color:var(--muted);font-size:10px;padding-top:8px}.extra{display:flex;gap:6px;margin-top:6px}.extra input{background:var(--raised);color:var(--text);border:1px solid var(--border);border-radius:8px;min-height:44px;min-width:0;width:50%;padding:8px}.keyboard{height:290px;position:fixed;bottom:0;left:0;right:0;background:#202622;z-index:6;padding:0 5px}.suggestions{height:43px;display:flex;align-items:center;justify-content:space-evenly;font-size:14px;color:#D9E2DC}.suggestions span+span{border-left:1px solid #465149;padding-left:24px}.key-row{display:flex;gap:4px;justify-content:center;margin-bottom:6px}.key-row button{height:43px;flex:1;padding:0;background:#36423A;border-radius:5px;font-size:18px;box-shadow:0 1px 1px #0005;color:#E9F1EB;max-width:40px}.key-row.third{padding:0 2px}.key-row.third button.wide{max-width:44px;background:#2B362F;font-size:16px;flex:1.4}.key-row.bottom button{font-size:13px;background:#2B362F;max-width:none}.key-row.bottom .space{flex:4;background:#36423A;font-size:12px}.key-row.bottom .enter{background:#536B5A}.keyboard-footer{display:flex;align-items:center;justify-content:space-between;padding:1px 18px;color:var(--muted);height:35px}.keyboard-footer svg{height:17px;width:17px}.home-bar{width:105px;height:4px;background:#CCD5CF;border-radius:3px;position:absolute;bottom:6px;left:50%;transform:translateX(-50%)}[hidden]{display:none!important}.temporary-notice{font-size:11px;color:var(--accent);margin-top:8px;min-height:14px}@media(min-width:400px){header{padding-top:32px}.row{min-height:72px}.composer{padding-left:20px;padding-right:20px}.key-row button{max-width:none}.task-name{font-size:15px}}@media(prefers-reduced-motion:no-preference){.cursor{animation:blink 1s step-end infinite}@keyframes blink{50%{opacity:0}}}
+.mercadona-screen header{padding:12px 20px 6px}.mercadona-screen .back{margin-top:-8px;margin-bottom:0}.mercadona-screen h1{font-size:29px}.mercadona-screen .row{min-height:52px}.mercadona-screen .section-title{margin-top:10px}</style></head><body class="composer-screen mercadona-screen"><header><a class="back" href="b-categorias.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>Lista de la compra</a><div class="title-line"><h1>Mercadona</h1><span class="count">3 pendientes</span></div></header><main id="task-list"><h2 class="section-title">SIN FECHA</h2><div class="row" style="--category:var(--health)"><div class="task-text"><span class="task-name">Leche de avena</span><span class="meta"><i class="dot"></i>Sin fecha · Tarea</span></div><button class="mark yes" aria-label="Marcar Leche de avena como hecho"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span></button><button class="mark no" aria-label="Marcar Leche de avena como no hecho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="row" style="--category:var(--health)"><div class="task-text"><span class="task-name">Huevos</span><span class="meta"><i class="dot"></i>Sin fecha · Tarea</span></div><button class="mark yes" aria-label="Marcar Huevos como hecho"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span></button><button class="mark no" aria-label="Marcar Huevos como no hecho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="row" style="--category:var(--health)"><div class="task-text"><span class="task-name">Pan integral</span><span class="meta"><i class="dot"></i>Sin fecha · Tarea</span></div><button class="mark yes" aria-label="Marcar Pan integral como hecho"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg></span></button><button class="mark no" aria-label="Marcar Pan integral como no hecho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div></main><nav class="navigation" aria-label="Navegación principal"><a href="b-hoy.html" class=""><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></span>Hoy</a><a href="b-categorias.html#bandeja" class=""><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 4-2 15h20L20 4ZM2 13h6l2 3h4l2-3h6"/></svg></span>Bandeja</a><a href="b-categorias.html" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Categorías</a><a href="#pendientes" class=""><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="badge">2</span></span>Pendientes</a><a href="../ronda-2/b-historial.html" class=""><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10a9 9 0 1 1 2 8M3 4v6h6M12 7v5l-3 2"/></svg></span>Historial</a></nav><form class="composer" id="composer"><div class="handle"></div><div class="compose-title"><div class="input-wrap"><input id="task-name" aria-label="Nombre de la tarea o hábito" autocomplete="off" value="Plátanos"><span class="cursor" style="left:85px"></span></div><button class="send" type="submit" aria-label="Añadir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5m-6 6 6-6 6 6"/></svg></button></div><div class="type-line"><div class="segmented" aria-label="Tipo"><button type="button" data-mode="task" class="selected" aria-pressed="true">Tarea</button><button type="button" data-mode="habit" aria-pressed="false">Hábito</button></div><button type="button" class="more" id="more" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>Más</button></div><div class="habit-options" hidden><select aria-label="Frecuencia"><option>A diario</option><option>L X V</option><option>M J S</option><option>Cada 2 días</option><option>Cada mes</option></select><select aria-label="Cuándo"><option>Mañana</option><option>Tarde</option><option>Noche</option><option>A una hora</option></select></div><div class="start-label" hidden>Fecha de inicio</div><div class="date-options" aria-label="Fecha"><button type="button" data-date="Sin fecha" class="selected" aria-pressed="true">Sin fecha</button><button type="button" data-date="Hoy" class="" aria-pressed="false">Hoy</button><button type="button" data-date="Mañana" class="" aria-pressed="false">Mañana</button><button type="button" data-date="Lunes" class="" aria-pressed="false">Lunes</button><button type="button" class="calendar" id="calendar" aria-label="Elegir otra fecha"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18"/></svg></button></div><input style="color-scheme:dark;min-height:44px;width:100%;background:var(--raised);color:var(--text);border:1px solid var(--border);border-radius:8px" type="date" id="custom-date" aria-label="Otra fecha" hidden><div class="extra" hidden><input aria-label="Notas" placeholder="Notas"><input aria-label="Hora exacta" type="time"></div><div class="category-select"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20V5h7l2 3h9v12Z"/></svg><select id="category" aria-label="Categoría"><option>Sin categoría · Bandeja</option><option selected>Lista de la compra › Mercadona</option><option>Lista de la compra › Lidl</option><option>Universidad</option><option>Salud</option><option>Personal</option><option>Casa</option></select></div></form><div class="keyboard" aria-label="Teclado Android en español"><div class="suggestions"><span>Plátanos</span><span>Plátanos</span><span>plátano</span></div><div class="key-row "><button data-key="q" tabindex="-1">q</button><button data-key="w" tabindex="-1">w</button><button data-key="e" tabindex="-1">e</button><button data-key="r" tabindex="-1">r</button><button data-key="t" tabindex="-1">t</button><button data-key="y" tabindex="-1">y</button><button data-key="u" tabindex="-1">u</button><button data-key="i" tabindex="-1">i</button><button data-key="o" tabindex="-1">o</button><button data-key="p" tabindex="-1">p</button></div><div class="key-row "><button data-key="a" tabindex="-1">a</button><button data-key="s" tabindex="-1">s</button><button data-key="d" tabindex="-1">d</button><button data-key="f" tabindex="-1">f</button><button data-key="g" tabindex="-1">g</button><button data-key="h" tabindex="-1">h</button><button data-key="j" tabindex="-1">j</button><button data-key="k" tabindex="-1">k</button><button data-key="l" tabindex="-1">l</button><button data-key="ñ" tabindex="-1">ñ</button></div><div class="key-row third"><button class="wide" aria-label="Mayúsculas" data-key="shift">⇧</button><button data-key="z" tabindex="-1">z</button><button data-key="x" tabindex="-1">x</button><button data-key="c" tabindex="-1">c</button><button data-key="v" tabindex="-1">v</button><button data-key="b" tabindex="-1">b</button><button data-key="n" tabindex="-1">n</button><button data-key="m" tabindex="-1">m</button><button class="wide" aria-label="Borrar" data-key="delete">⌫</button></div><div class="key-row bottom"><button data-key="numbers">?123</button><button data-key=",">,</button><button class="space" data-key=" ">Español</button><button data-key=".">.</button><button class="enter" data-key="send" aria-label="Enviar">↵</button></div><div class="keyboard-footer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.1M10 9h.1M14 9h.1M18 9h.1M6 13h.1M10 13h.1M14 13h.1M18 13h.1M7 16h10"/></svg></div><div class="home-bar"></div></div><script>
+const taskList = document.getElementById('task-list');
+let lastMarked = null;
+let markedCount = 2;
+function updateProgress() {
+ const progress = document.getElementById('progress');
+ if (progress) progress.textContent = markedCount + ' de 8 marcadas';
+}
+document.addEventListener('click', function(event) {
+ const markButton = event.target.closest('.mark');
+ if (!markButton) return;
+ const taskRow = markButton.closest('.row');
+ lastMarked = {row: taskRow, parent: taskRow.parentElement, next: taskRow.nextSibling};
+ taskRow.remove();
+ markedCount += 1;
+ updateProgress();
+ const toast = document.getElementById('toast-message');
+ if (toast) {
+  toast.textContent = markButton.classList.contains('yes') ? 'Marcada como hecha' : 'Marcada como no hecha';
+  document.querySelector('.toast').hidden = false;
+ }
+});
+const undoButton = document.getElementById('undo');
+if (undoButton) undoButton.addEventListener('click', function() {
+ if (lastMarked) {
+  lastMarked.parent.insertBefore(lastMarked.row, lastMarked.next);
+  lastMarked = null;
+ } else {
+  const restoredRow = document.createElement('div');
+  restoredRow.className = 'row';
+  restoredRow.style.setProperty('--category', 'var(--health)');
+  restoredRow.innerHTML = '<div class="task-text"><span class="task-name">Meditar 10 min</span><span class="meta"><i class="dot"></i>Salud · Hábito</span></div>';
+  appendMarkButtons(restoredRow, 'Meditar 10 min');
+  taskList.querySelector('section:nth-child(2)').append(restoredRow);
+ }
+ markedCount = Math.max(0, markedCount - 1);
+ updateProgress();
+ document.querySelector('.toast').hidden = true;
+});
+function appendMarkButtons(taskRow, title) {
+ for (const outcome of ['yes', 'no']) {
+  const markButton = document.createElement('button');
+  markButton.type = 'button';
+  markButton.className = 'mark ' + outcome;
+  markButton.setAttribute('aria-label', 'Marcar ' + title + (outcome === 'yes' ? ' como hecho' : ' como no hecho'));
+  markButton.innerHTML = outcome === 'yes' ? '<span>✓</span>' : '✕';
+  taskRow.append(markButton);
+ }
+}
+const composer = document.getElementById('composer');
+if (composer) {
+ const nameInput = document.getElementById('task-name');
+ const cursor = document.querySelector('.cursor');
+ let mode = 'task';
+ let selectedDate = document.querySelector('[data-date].selected').dataset.date;
+ function hideCursor() { cursor.hidden = true; }
+ nameInput.addEventListener('input', hideCursor);
+ nameInput.addEventListener('focus', hideCursor);
+ nameInput.focus({preventScroll: true});
+ nameInput.setSelectionRange(nameInput.value.length, nameInput.value.length);
+ cursor.hidden = false;
+ document.querySelector('[aria-label="Cuándo"]').addEventListener('change', function(event) {
+  if (event.target.value !== 'A una hora') return;
+  document.querySelector('.extra').hidden = false;
+  document.getElementById('more').setAttribute('aria-expanded', 'true');
+  document.querySelector('[aria-label="Hora exacta"]').focus();
+ });
+ for (const modeButton of document.querySelectorAll('[data-mode]')) {
+  modeButton.addEventListener('click', function() {
+   mode = modeButton.dataset.mode;
+   for (const otherButton of document.querySelectorAll('[data-mode]')) {
+    const selected = otherButton === modeButton;
+    otherButton.classList.toggle('selected', selected);
+    otherButton.setAttribute('aria-pressed', String(selected));
+   }
+   document.querySelector('.habit-options').hidden = mode !== 'habit';
+   document.querySelector('.start-label').hidden = mode !== 'habit';
+   document.querySelector('[data-date="Sin fecha"]').hidden = mode === 'habit';
+   if (mode === 'habit' && selectedDate === 'Sin fecha') document.querySelector('[data-date="Hoy"]').click();
+  });
+ }
+ for (const dateButton of document.querySelectorAll('[data-date]')) {
+  dateButton.addEventListener('click', function() {
+   selectedDate = dateButton.dataset.date;
+   document.getElementById('calendar').classList.remove('selected');
+   for (const otherButton of document.querySelectorAll('[data-date]')) {
+    const selected = otherButton === dateButton;
+    otherButton.classList.toggle('selected', selected);
+    otherButton.setAttribute('aria-pressed', String(selected));
+   }
+  });
+ }
+ document.getElementById('calendar').addEventListener('click', function() {
+  const dateInput = document.getElementById('custom-date');
+  dateInput.hidden = !dateInput.hidden;
+ });
+ document.getElementById('custom-date').addEventListener('change', function(event) {
+  selectedDate = event.target.value;
+  for (const dateButton of document.querySelectorAll('[data-date]')) {
+   dateButton.classList.remove('selected');
+   dateButton.setAttribute('aria-pressed', 'false');
+  }
+  document.getElementById('calendar').classList.add('selected');
+ });
+ document.getElementById('more').addEventListener('click', function(event) {
+  const extra = document.querySelector('.extra');
+  extra.hidden = !extra.hidden;
+  event.currentTarget.setAttribute('aria-expanded', String(!extra.hidden));
+ });
+ composer.addEventListener('submit', function(event) {
+  event.preventDefault();
+  const title = nameInput.value.trim();
+  if (!title) { nameInput.focus(); return; }
+  const category = document.getElementById('category').value;
+  const taskRow = document.createElement('div');
+  taskRow.className = 'row';
+  taskRow.style.setProperty('--category', 'var(--accent)');
+  const text = document.createElement('div');
+  text.className = 'task-text';
+  const name = document.createElement('span');
+  name.className = 'task-name';
+  name.textContent = title;
+  const metadata = document.createElement('span');
+  metadata.className = 'meta';
+  metadata.textContent = selectedDate + ' · ' + category + ' · ' + (mode === 'task' ? 'Tarea' : 'Hábito');
+  text.append(name, metadata);
+  taskRow.append(text);
+  appendMarkButtons(taskRow, title);
+  const destination = taskList.querySelector('section') || taskList;
+  const heading = destination.querySelector('h2');
+  if (heading) heading.after(taskRow);
+  else destination.prepend(taskRow);
+  const pendingCount = document.querySelector('header .count');
+  if (pendingCount && !document.getElementById('progress')) pendingCount.textContent = taskList.querySelectorAll('.row').length + ' pendientes';
+  nameInput.value = '';
+  nameInput.placeholder = 'Añadir otra…';
+  nameInput.focus();
+  hideCursor();
+ });
+ for (const key of document.querySelectorAll('[data-key]')) {
+  key.addEventListener('click', function() {
+   const value = key.dataset.key;
+   if (value === 'send') { composer.requestSubmit(); return; }
+   if (value === 'shift') {
+    for (const letterKey of document.querySelectorAll('[data-key]')) {
+     if (letterKey.dataset.key.length === 1) letterKey.dataset.key = letterKey.dataset.key.toUpperCase();
+     if (letterKey.dataset.key.length === 1) letterKey.textContent = letterKey.dataset.key;
+    }
+    return;
+   }
+   if (value === 'numbers') {
+    const digits = '1234567890';
+    const firstRow = document.querySelector('.key-row');
+    for (const [index, digitKey] of Array.from(firstRow.children).entries()) {
+     digitKey.dataset.key = digits[index];
+     digitKey.textContent = digits[index];
+    }
+    return;
+   }
+   if (value === 'delete') nameInput.value = nameInput.value.slice(0, -1);
+   else nameInput.value += value;
+   hideCursor();
+   nameInput.focus();
+  });
+ }
+}
+for (const creationButton of document.querySelectorAll('[data-create]')) {
+ creationButton.addEventListener('click', function() {
+  const title = window.prompt(creationButton.dataset.create === 'section' ? 'Nombre de la sección' : 'Nombre de la categoría');
+  if (!title || !title.trim()) return;
+  const item = document.createElement(creationButton.dataset.create === 'section' ? 'h2' : 'div');
+  item.className = creationButton.dataset.create === 'section' ? 'category-heading' : 'category-row';
+  item.textContent = title.trim();
+  document.querySelector('.creation-actions').before(item);
+ });
+}
+</script></body></html>
