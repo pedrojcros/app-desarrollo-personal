@@ -45,25 +45,23 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 *Actualizado: 2026-10-06.*
 
 - **Fase: replanificación para el móvil.** El plan vuelve a `EN BORRADOR` (DEC-24): una app con Expo para Android y la web, 15 tareas en 6 olas y P02 (el estilo, con prototipos y con el humano). Está en la rama `docs/replanificacion-expo`, con su PR contra `develop` en borrador hasta que se apruebe el plan. El #3 (skills móviles, DEC-23) ya está fusionado.
-- Estado del plan: `EN BORRADOR` (ver [05-plan](05-plan.md)). Le faltan DEC-26 (Docker) y la aprobación del humano; P02 solo bloquea T14.
+- Estado del plan: `EN BORRADOR` (ver [05-plan](05-plan.md)). Le falta la aprobación del humano; P02, en marcha, solo bloquea T14.
 - Agentes: Claude, Codex y Copilot habilitados y probados con Orca (DEC-04).
 
 
 ## Lo siguiente
 
-1. El humano contesta DEC-26 (Docker: opción A o B).
-2. P02 con `/arquitecto`: el humano trae ejemplos de estilos y se itera con prototipos hasta elegir uno.
-3. El humano aprueba el plan, se fusiona el PR de la replanificación y lanza `/ejecutar-plan` en una sesión nueva. Puede empezar antes de cerrar P02: solo T14 la espera.
+1. P02, en marcha en la rama `docs/estilo-p02`: el humano trae ideas y se itera con prototipos hasta elegir uno.
+2. El humano aprueba el plan, se fusiona el PR de la replanificación y lanza `/ejecutar-plan` en una sesión nueva. Puede empezar antes de cerrar P02: solo T14 la espera.
 
 
 ## Pendiente del humano
 
-- Contestar DEC-26 (Docker: A o B).
 - P02: buscar ejemplos visuales de estilos que le gusten.
 - Aprobar el plan replanificado.
 - H05: instalar Expo Go en el móvil.
 - H02: crear las cuentas de Vercel, Supabase y Expo antes de la ola 4.
-- Si se aprueba DEC-26, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
+- Cuando T15 esté fusionada, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
 - El ticket `ADP-1` es de prueba y se puede borrar a mano.
 
 
@@ -94,13 +92,21 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 | Sesiones de los agentes y de `gh` | Configuración de cada máquina | Iniciar sesión otra vez |
 | Configuración de Orca y del MCP de Jira | Cada máquina | Repetir [la comprobación](agentes/jira.md#comprobación-en-un-equipo-nuevo) |
 | Herramientas (lenguajes, Docker, Orca) | El sistema | Instalar las versiones de `AGENTS.md` |
-| Imágenes de Docker y, si DEC-26 queda en B, `~/Android/Sdk` (`adb` y el emulador) | El sistema | Reconstruirlas con los Dockerfiles del repositorio (T01 y T15) |
+| Imágenes de Docker y `~/Android/Sdk` (`adb` y el emulador, para el panel de Orca) | El sistema | Reconstruir las imágenes con los Dockerfiles del repositorio (T01 y T15) e instalar esas dos herramientas (DEC-26) |
 
 ---
 
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — DEC-26 cerrada: Docker, con el panel de Orca (opción B)
+
+De vuelta del gimnasio, el humano eligió la opción B: todo lo del proyecto en
+Docker y, en el ordenador, solo `adb` y el programa del emulador, para que Orca
+lo enseñe en su panel. Empieza P02, el bucle de estilo: el humano trae ideas,
+subagentes con Sonnet generan los prototipos y el arquitecto los revisa (rama
+`docs/estilo-p02`).
 
 ### 2026-10-06 — Replanificación para el móvil (DEC-24 y DEC-25) y Docker (DEC-26, abierta)
 

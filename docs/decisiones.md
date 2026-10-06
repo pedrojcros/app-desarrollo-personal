@@ -20,24 +20,7 @@ Cuando una decisión se cierra:
 
 ## Abiertas
 
-### DEC-26 — Docker para todo lo que se pueda
-
-El humano lo pidió el 2026-10-06: «prefiero que uses Docker en el 100 % de cosas que se pueda». El principio está decidido; falta el «ok» a cómo se aplica.
-
-**Propuesta del arquitecto:**
-
-1. **Va en Docker:** Node y todo lo del proyecto (instalar, el servidor de Expo, lint, tipos y tests), Supabase local (ya lo estaba), el emulador de Android con Maestro, y el navegador del MCP de Chrome junto con el propio MCP. Las imágenes se construyen con Dockerfiles del repositorio a partir de imágenes oficiales (Node, Debian), con versiones fijadas. Ninguna imagen de terceros sin aprobación.
-2. **Se queda fuera porque no se puede o no tiene sentido:** Docker mismo; Orca y los agentes (Claude, Codex y Copilot), que son quienes manejan los contenedores; Expo Go en tu móvil; y los servicios en la nube (Supabase, Vercel y EAS).
-3. **El emulador:** corre en Docker. Lo único que se decide es si Orca puede enseñarlo en su panel (ver la prueba y las opciones A y B, abajo).
-4. **Cambios en el plan:** T01 monta el entorno en Docker, una tarea nueva (T15) monta el emulador y el navegador, y H05 se queda en instalar Expo Go en el móvil. El Chromium del sistema dejaría de hacer falta para el MCP.
-
-**Prueba del 2026-10-06:** el emulador de Android corre dentro de Docker (imagen propia sobre Debian, de 10 GB, con Android 16) y arranca en unos 50 segundos. Orca **lo ve y se conecta a él** si en el ordenador están las herramientas de Android que Orca exige: `adb` y el programa del emulador (unos 900 MB en `~/Android/Sdk`, sin imágenes del sistema). Solo con `adb`, Orca dice que no hay SDK. Comprobado que Orca lo lista y se conecta; el panel en pantalla no se ha visto. Detalle y Dockerfile en [la prueba](agentes/prueba-emulador-docker.md).
-
-- [ ] **A. Docker al 100 %:** nada de Android en el ordenador. Sin el panel de Orca: el emulador se ve en una ventana o en el navegador, y los agentes lo manejan con Maestro y `adb` dentro del contenedor.
-- [ ] **B. Docker y 900 MB de Android en el ordenador** (recomendado): todo lo pesado va en Docker (sistema, AVD, Maestro), y lo ves y manejas desde el panel de Orca, como espera la skill `android-emulator-qa`.
-- [ ] Cambios:
-
-**Respuesta:**
+*(Ninguna.)*
 
 ---
 
@@ -68,5 +51,6 @@ El humano lo pidió el 2026-10-06: «prefiero que uses Docker en el 100 % de cos
 | DEC-23 | Skills móviles y herramientas de los agentes | Skills automáticas en `.agents/skills/` (22: propias de git y código legible, superpowers para tests, depuración y comprobar antes de decir «hecho», Expo oficiales, Vercel React Native, Supabase Postgres, `android-emulator-qa` y las de addyosmani que siguen) y **a demanda** en `.agents/skills-a-demanda/` (diseño, revisión, publicación y `brainstorming` para `/idea`). A las de Expo se les quita el envío de comentarios a Expo; `impeccable`, solo su guía escrita. MCP de Chrome aislado, sin ventana y sin enviar datos a Google. `find-skills` enlazada para Claude y los comandos de papel desactivados en Copilot. | `.agents/skills/README.md`, `.agents/skills-a-demanda/README.md`, `AGENTS.md` (Skills, prohibición 10), `agentes/orca.md`, `agentes/orquestador.md` |
 | DEC-24 | Móvil primero (opción B) | **Una sola app con Expo (React Native)**: Android primero, instalable con su APK, y la misma app en el navegador del ordenador; iPhone, más adelante. Interfaz con NativeWind y React Native Reusables; Supabase igual; TanStack Query; pruebas con Jest y Maestro. **Recordatorios**: lo primero después de la versión 1 (1.1). El plan vuelve a borrador para aprobarlo de nuevo. Modifica DEC-16 y DEC-19. | `adr/0005-stack-expo.md`, `04-arquitectura.md`, `AGENTS.md`, `01-vision-y-alcance.md`, `05-plan.md` |
 | DEC-25 | Dependencias previstas, uso sin conexión y estilo | Aprobadas ya, para que el orquestador no se pare a mitad: el selector de fecha y hora `@react-native-community/datetimepicker` (en la web, el del navegador) y los paquetes que pida la guía oficial de Supabase para Expo para guardar la sesión. La versión 1 **necesita internet**: sin modo sin conexión (D-01). El **estilo visual** se busca en un bucle con el humano (él trae ejemplos y dice qué le gusta, el arquitecto hace prototipos, él elige y pide cambios, y se repite) hasta aprobar uno (P02); no se programa ningún estilo antes. | `AGENTS.md` (Stack), `05-plan.md` (P02, T01, T14), `04-arquitectura.md`, `06-riesgos.md` (D-01), `01-vision-y-alcance.md` |
+| DEC-26 | Docker para todo lo que se pueda | **Opción B** (2026-10-06): todo lo del proyecto en Docker (Node y sus herramientas, Supabase local, el emulador de Android con Maestro y el navegador del MCP de Chrome), con imágenes propias a partir de imágenes oficiales y versiones fijadas. En el ordenador solo quedan `adb` y el programa del emulador (unos 900 MB en `~/Android/Sdk`), para que el panel de Orca enseñe el emulador. Fuera de Docker: Docker, Orca y los agentes, Expo Go en el móvil y los servicios en la nube. Lo pidió el humano: «Docker en el 100 % de cosas que se pueda». | `AGENTS.md` (Stack y Comandos), `05-plan.md` (T01, T15), `04-arquitectura.md` (Despliegue), [la prueba](agentes/prueba-emulador-docker.md) |
 | DEC-05 | Regla de legibilidad | Se mantiene. Los agentes escriben los nombres del código **siempre en inglés** y legible para humanos. | `AGENTS.md` (Legibilidad) |
 | DEC-06 | Idioma | **Nombres de código y mensajes de error en inglés. Comentarios, commits y documentación en español.** | `AGENTS.md` (Convenciones de código) |

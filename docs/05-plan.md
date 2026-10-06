@@ -23,7 +23,7 @@ Todas las casillas marcadas, o el orquestador se niega a ejecutar.
 - [x] Cada funcionalidad IMPRESCINDIBLE está cubierta por al menos una tarea (trazabilidad abajo)
 - [x] Las ADR de las decisiones de arquitectura caras de cambiar están escritas (0002 a 0005; la 0001, sustituida)
 - [x] `AGENTS.md` tiene stack, prohibiciones, comandos y convenciones rellenados (ninguna casilla `RELLENAR`)
-- [ ] Las decisiones del humano que bloquean tareas están cerradas en [decisiones](decisiones.md) (DEC-21, DEC-24 y DEC-25, sí; **falta DEC-26**, Docker; el estilo visual se decide en P02 y solo bloquea T14)
+- [x] Las decisiones del humano que bloquean tareas están cerradas en [decisiones](decisiones.md) (DEC-21 y DEC-24 a DEC-26; el estilo visual se decide en P02 y solo bloquea T14)
 - [x] La [lista de defaults](agentes/checklist-defaults.md) está recorrida: cada punto aceptado, ajustado o descartado con motivo
 - [x] Los riesgos principales tienen mitigación **y** contingencia
 - [x] La primera tarea es el esqueleto, a cargo de un solo agente
@@ -131,7 +131,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 ### T15 — Emulador y navegador en Docker
 
-- **Objetivo:** que los agentes prueben la app sin instalar nada en el sistema (DEC-26): una imagen propia con el emulador de Android (con KVM), una AVD y Maestro; otra con Chromium y el MCP de Chrome (versión fijada), y `.mcp.json` apuntando a ella; los dos servicios en `compose.yaml`; un flujo trivial de Maestro que abre la app en el Expo Go del emulador; y, en el README, cómo ver la pantalla del emulador.
+- **Objetivo:** que los agentes prueben la app sin instalar nada en el sistema (DEC-26): una imagen propia con el emulador de Android (con KVM), una AVD y Maestro; otra con Chromium y el MCP de Chrome (versión fijada), y `.mcp.json` apuntando a ella; los dos servicios en `compose.yaml`; un flujo trivial de Maestro que abre la app en el Expo Go del emulador; y, en el README, cómo verlo en el panel de Orca, que usa `adb` y el programa del emulador de `~/Android/Sdk` (opción B de DEC-26).
 - **Funcionalidades:** RNF-08 (cómo se comprueba) · **Depende de:** T01
 - **Tamaño:** M · **Agente sugerido:** `claude`
 - **Skills:** `android-emulator-qa`, `source-driven-development`, `verification-before-completion`; a demanda `browser-testing-with-devtools`.

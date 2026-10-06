@@ -75,7 +75,7 @@ Decidido en [ADR-0005](docs/adr/0005-stack-expo.md) (sustituye a la ADR-0001). S
 | `@react-native-community/datetimepicker` (selector de fecha y hora en Android; DEC-25) | T01 |
 | Lo que pida la guía oficial de Supabase para Expo para guardar la sesión (DEC-25) | T01 |
 | Jest (`jest-expo`) y React Native Testing Library | T01 |
-| Maestro (herramienta del sistema, no dependencia) | T01 |
+| Maestro (dentro de la imagen de Docker del emulador, no es dependencia; DEC-26) | T15 |
 | ESLint y Prettier | T01 |
 
 **Dependencias aprobadas: exactamente las de esta tabla**, más las que ellas instalen por su cuenta y los paquetes `expo-*` que el SDK necesite para lo que pide el encargo (instalados con `npx expo install`, que elige la versión compatible). Cualquier otra necesita aprobación. El escaneo de secretos (gitleaks) corre en la integración continua, no es una dependencia.
@@ -102,7 +102,7 @@ e2e/           flujos de Maestro (extremo a extremo)
 
 Los crea la tarea T01; si cambian, se actualizan aquí.
 
-**Todo se ejecuta dentro de Docker** siempre que se pueda (DEC-26): T01 y T15 dejan estos comandos envueltos en contenedores y los reescriben aquí. Nada del proyecto se instala en el sistema del humano.
+**Todo se ejecuta dentro de Docker** siempre que se pueda (DEC-26): T01 y T15 dejan estos comandos envueltos en contenedores y los reescriben aquí. Nada del proyecto se instala en el sistema del humano, salvo `adb` y el programa del emulador en `~/Android/Sdk`, que Orca necesita para su panel.
 
 ```
 npm install                       instalar dependencias
