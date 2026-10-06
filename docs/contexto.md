@@ -44,21 +44,20 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 *Actualizado: 2026-10-06.*
 
-- **Fase: replanificación para el móvil.** El plan vuelve a `EN BORRADOR` (DEC-24): una app con Expo para Android y la web, 16 tareas en 6 olas y P02 (el estilo, con prototipos y con el humano). Está en la rama `docs/replanificacion-expo`, con su PR contra `develop` en borrador hasta que se apruebe el plan. El #3 (skills móviles, DEC-23) ya está fusionado.
-- Estado del plan: `EN BORRADOR` (ver [05-plan](05-plan.md)). Le falta la aprobación del humano; P02, en marcha, solo bloquea T14.
-- Agentes: Claude, Codex y Copilot habilitados y probados con Orca (DEC-04).
+- **Fase: replanificación para el móvil, a punto de aprobar.** El plan (DEC-24) es una app con Expo para Android y la web: 16 tareas en 6 olas. Está en el PR #4 (`docs/replanificacion-expo`), en borrador hasta que el humano lo apruebe.
+- **P02, el estilo, cerrada** (DEC-32): tres temas y la estructura de la ronda 4, en `docs/diseno.md`, en la rama `docs/estilo-p02` y su PR.
+- Agentes: Claude, Codex y Copilot habilitados y probados con Orca (DEC-04), con el ciclo de cuotas de DEC-27 y el supervisor de trabajadores.
 
 
 ## Lo siguiente
 
-1. P02, en marcha en la rama `docs/estilo-p02`: el humano trae ideas y se itera con prototipos hasta elegir uno.
-2. El humano aprueba el plan, se fusiona el PR de la replanificación y lanza `/ejecutar-plan` en una sesión nueva. Puede empezar antes de cerrar P02: solo T14 la espera.
+1. El humano aprueba el plan con sus palabras; el arquitecto lo marca `APROBADO` y se fusionan el PR #4 y el del estilo.
+2. `/ejecutar-plan` en una sesión nueva: empieza por T01, el esqueleto, todo en Docker.
 
 
 ## Pendiente del humano
 
-- P02: buscar ejemplos visuales de estilos que le gusten.
-- Aprobar el plan replanificado.
+- Aprobar el plan replanificado y fusionar el PR #4 y el del estilo.
 - H05: instalar Expo Go en el móvil.
 - H02: crear las cuentas de Vercel, Supabase y Expo antes de la ola 4.
 - Cuando T15 esté fusionada, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
@@ -69,7 +68,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-32**.
+  chat. Siguiente número libre: **DEC-33**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -101,6 +100,15 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — P02 cerrada: estilo y temas (DEC-32)
+
+Cuatro rondas de prototipos con el humano (ver `docs/diseno/ideas.md`):
+listas sin cajitas, Hoy con la fecha pequeña y 8 cuadritos de progreso, el
+añadir rápido sobre el teclado, desplegables hacia arriba y categorías con
+secciones. Tres temas, blanco, negro y tercer estilo, que siguen al móvil y se
+pueden fijar en Ajustes (RF-23, nueva, en T14). El humano: «Es una buena
+estructura inicial, ya la iremos puliendo con el uso».
 
 ### 2026-10-06 — Categoría > sección (DEC-31)
 

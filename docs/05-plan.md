@@ -83,6 +83,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 - **Depende de:** nada. Puede ir en paralelo con la ola 0.
 - **Salida:** el prototipo elegido en `docs/diseno/` y sus decisiones (colores, tipografía, espaciado, forma de los componentes, movimiento) en `docs/diseno.md`.
 - **Hecho cuando:** el humano aprueba un prototipo con sus palabras.
+- **Hecha (2026-10-06):** el humano aprobó la estructura de la ronda 4: «Es una buena estructura inicial, ya la iremos puliendo con el uso». Las decisiones, en `docs/diseno.md` (DEC-32).
 - **Puerta:** es del humano · **Ticket:** ADP-
 
 ### T01 — Esqueleto del proyecto (Expo)
@@ -121,12 +122,12 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 ### T14 — Sistema visual
 
-- **Objetivo:** llevar a la app el estilo aprobado en P02, **sin inventarlo**: tokens semánticos de color, tipografía, espaciado, radios, sombras y movimiento; aplicarlos a los componentes de React Native Reusables; una pantalla de catálogo (solo en desarrollo) con todos los componentes y sus estados; y en `docs/diseno.md`, cómo usar los tokens.
-- **Funcionalidades:** base visual de todas las pantallas; RNF-03 · **Depende de:** T01 y **P02**
+- **Objetivo:** llevar a la app el estilo aprobado en P02, **sin inventarlo**: tokens semánticos de color, tipografía, espaciado, radios, sombras y movimiento; aplicarlos a los componentes de React Native Reusables; una pantalla de catálogo (solo en desarrollo) con todos los componentes y sus estados; y en `docs/diseno.md`, cómo usar los tokens. Los **tres temas** (blanco, negro y tercer estilo; DEC-32): por defecto, el del modo del móvil; en una pantalla pequeña de **Ajustes** se fija uno, y la elección se guarda en el dispositivo.
+- **Funcionalidades:** base visual de todas las pantallas; RF-23; RNF-03 · **Depende de:** T01 y **P02**
 - **Tamaño:** M · **Agente sugerido:** `claude*`
 - **Skills:** `expo-design-system`, `expo-native-ui`, `frontend-ui-engineering`; a demanda `better-colors`, `better-typography`, `better-layout`, `emil-design-eng`, `impeccable`.
-- **Reserva:** `src/theme/` (incluido `provider.tsx`), la sección de tokens de la configuración de Tailwind, el estilo de `src/components/ui/`, la ruta de catálogo `src/app/(dev)/`, y la sección de uso de `docs/diseno.md`.
-- **Hecho cuando:** el catálogo enseña cada componente en cada tema que se haya elegido y se parece al prototipo aprobado; todos los textos cumplen contraste AA; **el humano lo da por bueno** en su móvil.
+- **Reserva:** `src/theme/` (incluido `provider.tsx`), la sección de tokens de la configuración de Tailwind, el estilo de `src/components/ui/`, la ruta de catálogo `src/app/(dev)/`, los Ajustes (`src/app/ajustes.tsx`), y la sección de uso de `docs/diseno.md`.
+- **Hecho cuando:** el catálogo enseña cada componente en los tres temas y se parece al prototipo aprobado; con el móvil en oscuro sale el negro, y en Ajustes se puede fijar otro, que se mantiene al cerrar la app; todos los textos cumplen contraste AA; **el humano lo da por bueno** en su móvil.
 - **Puerta:** `requiere-revisión` (el humano compara con su prototipo) · **Ticket:** ADP-
 
 ### T15 — Emulador y navegador en Docker
@@ -270,6 +271,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 | RF-19 | T05, T06 |
 | RF-20 | T04, T05, T06 |
 | RF-21 | T04 |
+| RF-23 | T14 |
 | RNF-01, RNF-03, RNF-06 | T13 (RNF-03 también T14; RNF-06 también T16) |
 | RNF-02 | T02 |
 | RNF-04 | T12 |

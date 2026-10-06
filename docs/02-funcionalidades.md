@@ -2,7 +2,7 @@
 
 Registro de funcionalidades (`RF`) y requisitos no funcionales (`RNF`). Es el contrato de **qué hace** el sistema; el plan en [05-plan](05-plan.md) dice cómo y cuándo se construye.
 
-*Estado: **confirmado** por el humano el 2026-10-06: la versión 1 son las 14 imprescindibles; las deseables van justo después (DEC-19).*
+*Estado: **confirmado** por el humano el 2026-10-06: la versión 1 son las imprescindibles (15 desde que DEC-32 añadió RF-23, el tema); las deseables van justo después (DEC-19).*
 
 ## Cómo se escribe una funcionalidad
 
@@ -39,6 +39,7 @@ Registro de funcionalidades (`RF`) y requisitos no funcionales (`RNF`). Es el co
 | RF-20 | Crear categorías con secciones y asignarlas | IMPRESCINDIBLE | CU-07, CU-01, CU-02 | | |
 | RF-21 | Eliminar una categoría | IMPRESCINDIBLE | CU-07 | | |
 | RF-22 | Renombrar una categoría | DESEABLE | CU-07 | | |
+| RF-23 | Elegir el tema | IMPRESCINDIBLE | — | | |
 
 El estado de construcción **no** se apunta aquí: vive en las tareas (ver [agentes/jira](agentes/jira.md)).
 
@@ -195,6 +196,13 @@ El estado de construcción **no** se apunta aquí: vive en las tareas (ver [agen
 - **Prioridad:** DESEABLE
 - **Criterio de aceptación:** CU-07, escenario 4.
 - **Notas:** RN-24.
+
+### RF-23 — Elegir el tema
+
+- **Descripción:** el sistema debe tener tres temas: blanco, negro y el tercer estilo. Por defecto sigue el modo del móvil (claro, blanco; oscuro, negro); en Ajustes se puede fijar cualquiera de los tres, y la elección se guarda en el dispositivo.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** con el móvil en modo oscuro y sin elegir nada, la app sale en negro; al fijar el tercer estilo en Ajustes, sale en ese estilo aunque el móvil cambie de modo, también al cerrar y abrir la app.
+- **Notas:** DEC-32; el aspecto de cada tema está en `docs/diseno.md`.
 
 ## Requisitos no funcionales
 

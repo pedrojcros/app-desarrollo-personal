@@ -37,7 +37,7 @@ Quién **no** es usuario de esta primera versión: cualquier otra persona. Puede
 
 ## Alcance de la versión 1
 
-Las 14 funcionalidades imprescindibles están en [02-funcionalidades](02-funcionalidades.md); las 8 deseables van justo después (DEC-19). Perímetro:
+Las 15 funcionalidades imprescindibles están en [02-funcionalidades](02-funcionalidades.md); las 8 deseables van justo después (DEC-19). Perímetro:
 
 - Crear, editar y borrar tareas (con fecha y sin fecha) y hábitos recurrentes. Frecuencias: todos los días, días de la semana, cada N días y cada mes. Momento del día opcional (hora exacta o franja) y duración opcional.
 - Estado de cada ocurrencia: pendiente, **hecha** o **no hecha**.
