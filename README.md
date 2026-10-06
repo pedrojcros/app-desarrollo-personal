@@ -61,6 +61,71 @@ Para terminar, pulsa Ctrl+C en Expo y detén Supabase:
 ./docker/app/run npx supabase stop
 ```
 
+## Emulador y navegador
+
+Construye las imágenes una vez (Linux x86_64 con `/dev/kvm` accesible):
+
+```sh
+docker compose build android-emulator chrome-mcp
+```
+
+Arranca el emulador y espera a que Android y Expo Go estén preparados:
+
+```sh
+docker compose up -d --pull never --wait android-emulator
+```
+
+Comprueba su visibilidad desde el ordenador; `adb` y el programa del emulador
+de `~/Android/Sdk` ya deben estar instalados para el panel de Orca (DEC-26,
+opción B). No instales Node, Maestro ni Chromium en el anfitrión:
+
+```sh
+~/Android/Sdk/platform-tools/adb devices
+orca emulator devices
+docker compose exec -T android-emulator adb -s emulator-5554 shell getprop sys.boot_completed
+```
+
+Los dos primeros deben listar `emulator-5554`; el último debe responder `1`.
+Selecciona ese dispositivo en el panel de emulador de Orca. Sirve la app en un
+terminal y, desde otro, lanza el flujo que abre Expo Go y comprueba «Hoy»:
+
+```sh
+./docker/app/run npm run start
+./docker/app/run npm run test:e2e
+```
+
+Si 8081 está ocupado, usa `./docker/app/run npm run start -- --port 8090` y
+`./docker/app/run env EXPO_PORT=8090 npm run test:e2e`. El valor por defecto es
+8081; el flujo llega al anfitrión mediante `10.0.2.2`. Los resultados de
+Maestro quedan en `/tmp/maestro-results` dentro del contenedor. Para detener
+el emulador: `docker compose stop android-emulator`.
+
+La entrada `chrome-devtools` de `.mcp.json` arranca su contenedor por stdio
+con `docker compose run --rm --pull never -T -i chrome-mcp`. El MCP lanza
+Chromium al abrir una página; prueba `http://localhost:8081/hoy` (o el puerto
+elegido) después de servir la web con `./docker/app/run npm run web`.
+Ejecuta el cliente MCP desde la raíz del repositorio. Si Codex tiene una
+entrada global propia, configura allí el mismo comando de `.mcp.json`.
+Cada sesión usa un perfil temporal, sin ventana, estadísticas ni CrUX.
+Chromium corre como usuario sin privilegios; su sandbox interno se desactiva
+porque Docker bloquea los namespaces que necesita. El contenedor del navegador
+no monta el repositorio ni el socket Docker. Puedes comprobar el MCP real con
+`./docker/app/run node docker/chrome-mcp/check.mjs` (admite `env EXPO_PORT=8090`).
+
+Versiones fijadas: Debian trixie por digest, Android 36 Google APIs x86_64
+revisión 7, cmdline-tools 23.0 (16111833), emulador 37.2.12, platform-tools
+37.0.1, Maestro 2.11.0 y Expo Go 56.0.4; navegador sobre Node 24.14.0,
+Chromium Debian 154.0.8037.92 y MCP 1.10.1. Todas las descargas Android,
+Maestro y Expo Go verifican sus checksums; el APK viene de la
+[release oficial de Expo](https://github.com/expo/expo-go-releases/releases/tag/Expo-Go-56.0.4).
+El SDK usa los [archivos oficiales de Google](https://developer.android.com/studio).
+Maestro lleva [las analíticas desactivadas](https://docs.maestro.dev/maestro-cli/environment-variables)
+y su API apunta a un puerto local cerrado para impedir también los informes
+de errores; no se usa Maestro Cloud. El
+[MCP desactiva estadísticas y CrUX](https://github.com/ChromeDevTools/chrome-devtools-mcp#usage-statistics).
+Las imágenes propias tienen `pull_policy: never`: si faltan, constrúyelas.
+El emulador requiere KVM y se comprueba localmente, sin añadirlo a la CI.
+
 ## Comprobaciones
 
 ```sh
@@ -76,7 +141,8 @@ La integración necesita Supabase arrancado y las variables de `.env`; comprueba
 que Auth responde y que no permite registro. Rechaza URLs que no sean locales.
 Jest prueba el botón con React Native Testing Library; la configuración de
 integración usa Node y el cliente real de Supabase. La exportación queda en `dist/`.
-`test:e2e` y el emulador con Maestro quedan pendientes de T15.
+`./docker/app/run npm run test:e2e` comprueba el arranque en Expo Go; necesita
+el emulador preparado y Expo servido, como se explica arriba.
 
 La CI repite lint, formato, tipos, tests, integración y exportación dentro de
 Docker. Gitleaks escanea el historial con su imagen fijada, sin licencia de pago

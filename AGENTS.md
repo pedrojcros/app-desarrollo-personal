@@ -75,7 +75,7 @@ Decidido en [ADR-0005](docs/adr/0005-stack-expo.md) (sustituye a la ADR-0001). S
 | `@react-native-community/datetimepicker` (selector de fecha y hora en Android; DEC-25) | 9.1.0 |
 | Lo que pida la guía oficial de Supabase para Expo para guardar la sesión (DEC-25) | @react-native-async-storage/async-storage 2.2.0 |
 | Jest (`jest-expo`) y React Native Testing Library | Jest 29.7.0; jest-expo 56.0.5; RNTL 13.3.3 |
-| Maestro (dentro de la imagen de Docker del emulador, no es dependencia; DEC-26) | T15 |
+| Maestro (dentro de la imagen de Docker del emulador, no es dependencia; DEC-26) | 2.11.0 |
 | ESLint y Prettier | ESLint 9.39.5 (eslint-config-expo 56.0.4); Prettier 3.9.9 |
 
 **Dependencias aprobadas: exactamente las de esta tabla**, más las que ellas instalen por su cuenta y los paquetes `expo-*` que el SDK necesite para lo que pide el encargo (instalados con `npx expo install`, que elige la versión compatible). Cualquier otra necesita aprobación. El escaneo de secretos (gitleaks) corre en la integración continua, no es una dependencia.
@@ -122,7 +122,7 @@ cp .env.example .env                              # variables públicas del Supa
 ./docker/app/run npx supabase stop                 # detener el Supabase local
 ```
 
-`npm run test:e2e` queda pendiente de T15 (emulador y Maestro). Para usar `docker compose` directamente con otro uid/gid, exporta `APP_UID=$(id -u)`, `APP_GID=$(id -g)` y `DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)` antes de construir o arrancar el servicio `app`.
+`./docker/app/run npm run test:e2e` lanza Maestro en el emulador de Docker contra Expo en el puerto 8081; `./docker/app/run env EXPO_PORT=8090 npm run test:e2e` permite elegir otro. Arranca antes Expo y `docker compose up -d --pull never --wait android-emulator` (ver README). Para usar `docker compose` directamente con otro uid/gid, exporta `APP_UID=$(id -u)`, `APP_GID=$(id -g)` y `DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)` antes de construir o arrancar el servicio `app`.
 
 Antes de dar un encargo por terminado, los tests de la parte que has tocado tienen que pasar, y la integración continua lo repite en cada push y pull request. Las compilaciones de Android con EAS **no** se lanzan desde un encargo: solo al publicar una versión.
 

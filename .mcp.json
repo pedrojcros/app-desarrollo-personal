@@ -6,16 +6,16 @@
     },
     "chrome-devtools": {
       "type": "stdio",
-      "command": "npx",
+      "command": "docker",
       "args": [
-        "-y",
-        "chrome-devtools-mcp@1.10.1",
-        "--isolated",
-        "--headless",
-        "--executablePath",
-        "/usr/bin/chromium",
-        "--no-usage-statistics",
-        "--no-performance-crux"
+        "compose",
+        "run",
+        "--rm",
+        "--pull",
+        "never",
+        "-T",
+        "-i",
+        "chrome-mcp"
       ],
       "env": {}
     }
