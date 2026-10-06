@@ -1,0 +1,15 @@
+title = "Project secret scanning"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "jwt"
+
+# La clave anon local es pública; cualquier otro JWT sigue pasando por el escáner.
+[[rules.allowlists]]
+description = "Clave anon pública del Supabase local en su plantilla"
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^\.env\.example$''']
+regexes = ['''^eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9\.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0$''']
