@@ -42,6 +42,47 @@ Los colores de categoría son los de las categorías de ejemplo; al crear una ca
 - **Historial:** una cuadrícula con una fila por hábito o tarea y una columna por día, con ✓, ✗ y «sin marcar»; la celda vacía es un día que no tocaba; debajo, el porcentaje de cada día.
 - **Accesibilidad:** contraste AA y zonas de toque de 44 px (RNF-03).
 
+## Cómo usar los tokens
+
+Los tokens viven en `src/theme/tokens.ts` y los tres temas se aplican con `ThemeScope` (`src/theme/theme-scope.tsx`); `ThemeProvider` lo usa una vez en la raíz de la app. Las pantallas y los componentes **nunca llevan un color, un tamaño o una letra sueltos**.
+
+**Colores: clases de NativeWind por función.** Cada token de la tabla de arriba es una variable CSS que cambia con el tema, y `tailwind.config.js` las expone como colores:
+
+| Para | Clases |
+|---|---|
+| Fondo de pantalla, superficie, superficie 2 | `bg-background`, `bg-surface`, `bg-raised` |
+| Líneas | `border-border` |
+| Texto, texto suave, acento | `text-foreground`, `text-muted-foreground`, `text-accent-text` |
+| Botón principal y su texto | `bg-accent`, `text-accent-foreground` |
+| Pastilla de la pestaña activa | `bg-accent-soft` |
+| Hecho, no hecho | `bg-done`, `text-not-done` |
+| Categorías | `bg-category-shopping`, `-university`, `-health`, `-personal`, `-home` (con `text-on-category` encima) |
+| Aviso inferior | `bg-inverse`, `text-inverse-foreground`, `text-inverse-accent` |
+| Contador de pestaña | `bg-badge`, `text-badge-foreground` |
+
+Se pueden usar con transparencia (`bg-accent/20`). Un color de categoría nuevo es una clase escrita entera en `src/components/ui/category-classes.ts` (Tailwind no ve las clases construidas con plantillas de texto). Los tokens que la tabla no nombra (`accent-foreground`, `accent-soft`, `accent-text`, `done`, `on-category`, `inverse*`, `badge*`) salen de los prototipos de la ronda 4.
+
+**Tipografía:** `Text` (`src/components/ui/text.tsx`) con `variant` (`title`, `heading`, `headline`, `body`, `callout`, `eyebrow`, `caption`, `label`) y `weight` (`regular`, `medium`, `semibold`, `bold`). Elige solo la letra del tema (Fraunces e Inter, DM Sans o Archivo) y los tamaños de `fontSize` en `tailwind.config.js`. **Espaciado:** el de Tailwind, múltiplos de 4 (`p-4`, `gap-3`). Las zonas de toque miden al menos `min-h-11`/`h-11` (44 pt).
+
+**Forma y letra, por código:** lo que no se puede escribir con variables CSS (grosor de borde, radios, sombras, tamaño de las marcas y el nombre de cada fuente) está en `themeShapes` y `themeFonts`, y se lee con el hook:
+
+```tsx
+const { themeName, preference, setPreference, colors, fonts, shape } = useTheme();
+```
+
+`colors` da el valor real para lo que no acepta clases (iconos, `placeholderTextColor`, cabeceras de navegación); en los iconos, usa `Icon` de `src/components/ui/icon.tsx`.
+
+**Cambiar de tema:** `setPreference('automatic' | 'white' | 'black' | 'bold')`. «Automático» sigue al modo del móvil; la elección se guarda en el dispositivo (`src/theme/preference-storage.ts`; en la web, `localStorage`). Ajustes ya lo ofrece con `ThemeSelector`.
+
+**Añadir un componente:**
+
+1. Créalo en `src/components/ui/` con clases de los tokens y, para forma y sombras, `useTheme().shape`.
+2. Si tiene estados (pulsado, deshabilitado, error), usa `usePressed` y acepta una prop que los fuerce, para poder enseñarlos.
+3. Añádelo con sus estados a `src/components/catalog/theme-panel.tsx` y míralo en los tres temas en `/catalog` (solo en desarrollo; también desde Ajustes).
+4. Si añade un color, ponlo en los tres temas de `tokens.ts` y en la lista de `tailwind.config.js` (un test comprueba que coinciden) y en los pares de `src/theme/contrast.test.ts`: el test falla si algún texto baja de 4,5:1 (3:1 para iconos y formas).
+
+**Fuentes:** ficheros locales en `assets/fonts/` (licencia OFL, ver su README), cargados con `expo-font` en `ThemeProvider`, que mantiene la pantalla de arranque hasta tenerlas.
+
 ## Pendiente de pulir con el uso
 
 Las pantallas que no se han dibujado (Bandeja, Pendientes, Ajustes y el formulario completo de «Más») siguen estas mismas reglas. Se verán en la siguiente versión del diseño.
