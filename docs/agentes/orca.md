@@ -27,6 +27,16 @@ orca skills get orca-cli            # worktrees, terminales, navegador de Orca
 | **Worker** | Un agente supervisado, con su terminal y normalmente su worktree |
 | **Gate** | Puerta de decisión que bloquea una tarea hasta que alguien la resuelve |
 
+## Vigilar a los trabajadores
+
+**Ningún trabajador se queda esperando.** Nada más lanzar trabajadores, deja corriendo en segundo plano, desde la raíz del repositorio:
+
+```bash
+python3 scripts/orca/supervise_workers.py --idle-minutes 8
+```
+
+Cada 20 segundos repasa la terminal de cada trabajador vivo: envía el Enter si el encargo se quedó escrito sin enviar (el campo `draft` de `orca terminal read`, dentro de `result.terminal`), concede a Copilot los permisos **de sesión** para rutas del proyecto o de su worktree, y **termina avisando** si alguien pide otra cosa (un permiso de Claude, una ruta de fuera) o lleva ocho minutos con la pantalla quieta. Termina también cuando no queda ningún trabajador vivo. Cada vez que termine, actúa y vuelve a lanzarlo. Lo pidió el humano el 2026-10-06, después de que un trabajador pasara diez minutos sin arrancar sin que nadie lo viera.
+
 ## Ciclo mínimo
 
 ```bash
@@ -104,6 +114,7 @@ Comando: `npx -y chrome-devtools-mcp@1.10.1 --isolated --headless --executablePa
 - **Codex no pasa `agent_readiness` (P01, 2026-10-06).** Sus animaciones impiden que la terminal quede en calma. Arreglo: `[tui] animations = false` en la configuración de Codex que usa Orca (aplicado el 2026-10-06 en `~/.codex/config.toml` y en `~/.config/orca/codex-runtime-home/home/config.toml`). Incidencia [stablyai/orca#25007](https://github.com/stablyai/orca/issues/25007).
 - **El sandbox de Codex bloquea el CLI de Orca**, que habla por un socket en `~/.config/orca/`. Sin aprobación previa, cada `orca orchestration ...` del trabajador pide permiso y el trabajador se queda parado. Arreglo aplicado: argumento por defecto `--dangerously-bypass-approvals-and-sandbox`.
 - **Copilot pregunta si confía en cada carpeta nueva** (cada worktree lo es) y pide permiso para cada comando. Arreglo aplicado: `~/orca/workspaces` en `trustedFolders` de `~/.copilot/config.json` (Orca intenta hacerlo solo, pero falla si ese fichero lleva comentarios: [#25142](https://github.com/stablyai/orca/pull/25142)) y argumentos `--allow-all-tools --disable-mcp-server atlassian` (los trabajadores no usan Jira).
-- **Copilot: el encargo puede quedarse aparcado** (`[Paste #1 - N lines]` en su cuadro de entrada) aunque `worker-start` responda `input_accepted`: Orca lo pega antes de que Copilot esté listo y el Enter se pierde ([#17741](https://github.com/stablyai/orca/issues/17741)). **Qué hacer:** unos 20 segundos después de lanzar un Copilot, lee su pantalla (`orca terminal read --terminal <handle> --screen --json`); si ves `[Paste #`, envía un solo Enter (`orca terminal send --terminal <handle> --enter --json`). El encargo ya está entero en el cuadro, con sus identificadores, así que el trabajador puede terminar con `worker_done` normalmente.
+- **Copilot, y a veces Claude: el encargo puede quedarse aparcado** (`[Paste #1 - N lines]` en su cuadro de entrada) aunque `worker-start` responda `input_accepted`: Orca lo pega antes de que Copilot esté listo y el Enter se pierde ([#17741](https://github.com/stablyai/orca/issues/17741)). **Qué hacer:** unos 20 segundos después de lanzar un Copilot, lee su pantalla (`orca terminal read --terminal <handle> --screen --json`); si ves `[Paste #`, envía un solo Enter (`orca terminal send --terminal <handle> --enter --json`). El encargo ya está entero en el cuadro, con sus identificadores, así que el trabajador puede terminar con `worker_done` normalmente. Con Claude se ve como `turn_start_unobserved` en la respuesta de `worker-start` y con el encargo entero en el campo `draft` de `orca terminal read`; se arregla igual, con un Enter (visto el 2026-10-06).
+- **Encargos con rutas fuera del worktree del trabajador:** Codex no pregunta (va sin sandbox), pero Copilot y Claude piden permiso por cada ruta y se quedan esperando a alguien. Escribe en el encargo rutas relativas a su propio worktree y, si el resultado no se integra por PR (prototipos, informes), cópialo tú al terminar. Si aun así preguntan, elige siempre la opción que vale **solo para esa sesión**: nunca la que cambia la configuración del humano (visto el 2026-10-06).
 - Los argumentos por defecto de cada agente están en Orca, Settings → Agents. Se guardan en `~/.config/orca/profiles/local-default/profile-state.db` (`orca-data.json` es antiguo). En este equipo: Codex `--dangerously-bypass-approvals-and-sandbox`, Copilot `--allow-all-tools --disable-mcp-server atlassian`, Claude vacío.
 - *(Añade aquí lo que cueste tiempo.)*

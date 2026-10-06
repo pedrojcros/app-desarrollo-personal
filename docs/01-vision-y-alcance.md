@@ -2,7 +2,7 @@
 
 Qué se construye, para quién y por qué. También, y sobre todo, **qué no**.
 
-*Estado: **suscrito por el humano** al aprobar el plan, el 2026-10-06 (DEC-08, DEC-09 y DEC-19).*
+*Estado: **suscrito por el humano** al aprobar el plan, el 2026-10-06 (DEC-08, DEC-09 y DEC-19). **Replanificado para móvil primero** el mismo día (DEC-24): espera la nueva aprobación del plan.*
 
 ## El problema
 
@@ -31,27 +31,26 @@ Quién **no** es usuario de esta primera versión: cualquier otra persona. Puede
 - [ ] Se pueden crear tareas y hábitos, y marcar cada uno como **hecho** o **no hecho** (no solo hecho).
 - [ ] Un hábito recurrente genera su ocurrencia en cada día o semana que toca, sin crearla a mano.
 - [ ] El historial de lo hecho y lo no hecho se puede consultar en alguna pantalla.
-- [ ] Funciona en el ordenador. La versión 1 **no** exige móvil.
+- [ ] Funciona instalada en el móvil Android y también en el navegador del ordenador.
 
 *(Criterios iniciales del humano. Se irán añadiendo casos de uso según se use la aplicación.)*
 
 ## Alcance de la versión 1
 
-Las 14 funcionalidades imprescindibles están en [02-funcionalidades](02-funcionalidades.md); las 8 deseables van justo después (DEC-19). Perímetro:
+Las 15 funcionalidades imprescindibles están en [02-funcionalidades](02-funcionalidades.md); las 8 deseables van justo después (DEC-19). Perímetro:
 
 - Crear, editar y borrar tareas (con fecha y sin fecha) y hábitos recurrentes. Frecuencias: todos los días, días de la semana, cada N días y cada mes. Momento del día opcional (hora exacta o franja) y duración opcional.
 - Estado de cada ocurrencia: pendiente, **hecha** o **no hecha**.
 - Categorías mínimas para agrupar hábitos y tareas («Compra», «Universidad»): nombre único, una por elemento, opcional (DEC-13).
 - Vistas: **Hoy** (solo lo de hoy, nunca tareas sin fecha), **Bandeja de entrada** (lo que no tiene categoría), cada categoría, pendientes de días anteriores e historial (DEC-15).
 
-**Plataforma de la versión 1:** web para el ordenador, alojada gratis en internet (Vercel y Supabase) con inicio de sesión solo para el dueño (DEC-16, DEC-19). El móvil llega en la versión siguiente (ver abajo), así que la versión 1 se diseña para que añadirlo no obligue a rehacerla.
+**Plataforma de la versión 1:** **app para Android**, instalable con su APK sin pasar por Google Play, y la misma app en el **navegador del ordenador**. Datos en Supabase, con inicio de sesión solo para el dueño (DEC-24, [ADR-0005](adr/0005-stack-expo.md)). iPhone, más adelante.
 
-## Versión siguiente (confirmada, no se construye ahora)
+## Después de la versión 1 (confirmado, no se construye ahora)
 
-Estas dos cosas **irán de la mano** en la versión siguiente y condicionan el diseño de la 1:
-
-- **Uso en el móvil como web instalable** (gratis, sin tienda). Publicar en Google Play queda para cuando el humano lo decida (DEC-18).
-- **Conexión con Google Calendar**: la aplicación crea eventos en el calendario (por ejemplo, la sesión de natación de los miércoles o la entrega de una práctica).
+- **Versión 1.1 — Recordatorios** en el propio móvil, locales y sin servidor: «en 4 días entregas la práctica» (DEC-24). Es lo primero después de la versión 1.
+- **Versión 2 — Conexión con Google Calendar**: la aplicación crea eventos en el calendario (por ejemplo, la sesión de natación de los miércoles o la entrega de una práctica).
+- **Google Play**: cuando el humano lo decida (DEC-18).
 
 ## Fuera de alcance
 
@@ -61,10 +60,12 @@ Estas dos cosas **irán de la mano** en la versión siguiente y condicionan el d
 |---|---|---|
 | Otros usuarios, cuentas, compartir | Es una herramienta personal; evita autenticación y privacidad ajena | Cuando el autor quiera compartirla |
 | Estadísticas e interfaces interactivas del progreso | Valiosas, pero el historial tiene que existir antes | Primera versión posterior a la 1 |
-| Recordatorios y avisos («en 4 días entregas X») | Exigen notificaciones fuera de la aplicación, que es una decisión de arquitectura cara | Después de la 1, con su propia ADR |
+| Recordatorios y avisos («en 4 días entregas X») | Con la app nativa son locales y baratos, pero se dejan fuera para no inflar la versión 1 | **Versión 1.1**, lo primero después de la 1 |
 | Integración con Todoist | Dependencia de un tercero que se quiere abandonar | Solo si hace falta migrar datos |
-| Conexión con Google Calendar y uso en el móvil | Se hacen juntos; **sí están previstos para la versión siguiente** (el móvil como web instalable, DEC-18) | Versión 2 |
-| Publicación en Google Play | Cuesta 25 USD y exige una prueba con 12 personas; la web instalable cubre el uso diario | Cuando el humano lo decida |
+| Conexión con Google Calendar | Exige cuenta de Google y permisos de su API | Versión 2 |
+| Uso sin conexión (marcar sin cobertura) | La versión 1 necesita internet: sin conexión se ve lo ya cargado, pero no se puede marcar (DEC-25) | Si el uso diario lo pide (D-01 en [06-riesgos](06-riesgos.md)) |
+| iPhone | Compilar para iPhone exige un Mac o servicios de pago | Cuando el humano lo decida |
+| Publicación en Google Play | Cuesta 25 USD y exige una prueba con 12 personas; el APK instalable cubre el uso diario | Cuando el humano lo decida |
 
 Todo lo que llegue y no esté en el alcance va a una lista de espera, no a tareas.
 
@@ -76,7 +77,7 @@ Lo que no se elige, viene dado: plazo, presupuesto, equipo, tecnología impuesta
 |---|---|
 | Plazo | **Sin fecha límite** (DEC-07): el autor es estudiante y avanza según su tiempo libre. Solo se fijan fechas si él lo pide |
 | Presupuesto | **Coste cero**: solo servicios gratuitos. Google Play (25 USD, una vez) solo cuando el humano decida publicar (DEC-18) |
-| Tecnología | Next.js, Supabase y Vercel en sus planes gratuitos (DEC-16, [ADR-0001](adr/0001-stack.md)) |
+| Tecnología | Expo (React Native) y Supabase, con Vercel para la web, en sus planes gratuitos (DEC-24, [ADR-0005](adr/0005-stack-expo.md)) |
 | Equipo | Una persona más agentes de IA coordinados con Orca. El proyecto también sirve para aprender ese flujo y Jira |
 | Normativa y datos personales | Solo datos del propio autor. Sin terceros |
 
@@ -88,4 +89,4 @@ Ideas que han aparecido y quedan para después de la versión 1.
 |---|---|---|
 | Recordatorios con antelación para entregas de la universidad | Humano | 2026-10-05 |
 | Estadísticas e interfaces interactivas del progreso | Humano | 2026-10-05 |
-| Web instalable en el móvil y conexión con Google Calendar (versión siguiente, juntos); Google Play más adelante | Humano | 2026-10-05 |
+| Conexión con Google Calendar (versión 2) y Google Play (cuando el humano decida) | Humano | 2026-10-05 |

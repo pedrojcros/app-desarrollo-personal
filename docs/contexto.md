@@ -44,27 +44,33 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 *Actualizado: 2026-10-06.*
 
-- **Fase: ejecución, a punto de empezar.** El plan está **aprobado** (2026-10-06): 13 tareas en 6 olas para la versión 1, con Next.js, Supabase y Vercel (ADR-0001 a 0004). La planificación entra en `develop` con un PR.
+- **Fase: ejecución, a punto de empezar.** El plan replanificado está **aprobado** (2026-10-06, «APRUEBO EL PLAN»): una app con Expo para Android y la web, 16 tareas en 6 olas, todo el desarrollo en Docker. Está en el PR #4; el estilo (P02, DEC-32), en el PR #5.
 - Estado del plan: `APROBADO` (ver [05-plan](05-plan.md)).
-- Agentes: Claude, Codex y Copilot habilitados y probados con Orca (DEC-04).
+- Agentes: Claude, Codex y Copilot con Orca, con el ciclo de cuotas (DEC-27) y el supervisor de trabajadores. Tendrán acceso a Vercel, Supabase y Expo (DEC-33).
+
 
 ## Lo siguiente
 
-1. Abrir una sesión **nueva** de Claude Code en el proyecto, con Opus 5.5 y el esfuerzo más alto, y lanzar `/ejecutar-plan`. Empieza por la ola 0: T01, el esqueleto.
-2. Antes de la ola 4 (T12), H02: el humano crea las cuentas de Vercel y Supabase con la guía del orquestador.
+1. El humano crea las cuentas y los tokens de Vercel, Supabase y Expo y los guarda en `~/.config/app-desarrollo-personal/secretos.env` (H02, DEC-33).
+2. Se fusionan los PR #4 y #5.
+3. `/ejecutar-plan` en una sesión **nueva**, con Opus 5.5 y el esfuerzo más alto: empieza por T01, el esqueleto, todo en Docker.
+
 
 ## Pendiente del humano
 
-- Lanzar `/ejecutar-plan` cuando quiera.
-- Revisar T01 y T02 cuando el orquestador lo pida (puertas `requiere-revisión`).
-- H02: crear las cuentas de Vercel y Supabase antes de la ola 4.
+- H02: crear las cuentas y los tokens (DEC-33), con la guía del arquitecto.
+- Fusionar los PR #4 y #5, y lanzar `/ejecutar-plan`.
+- Revisar T01, T02 y T14 cuando el orquestador lo pida (puertas `requiere-revisión`).
+- H05: instalar Expo Go en el móvil.
+- Cuando T15 esté fusionada, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
 - El ticket `ADP-1` es de prueba y se puede borrar a mano.
+
 
 ## Cómo se trabaja aquí
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-24**.
+  chat. Siguiente número libre: **DEC-34**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -73,8 +79,13 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 *(Cosas que costaron tiempo y no deben costarlo dos veces.)*
 
 - **Codex lanzado por Orca no recibía encargos**: sus animaciones impiden que Orca lo vea «listo». Arreglo: `tui.animations = false`. Ver [agentes/orca](agentes/orca.md#trampas-conocidas).
-- **Codex y Copilot necesitan ajustes para trabajar solos** (sandbox, permisos, carpeta de confianza), y **a Copilot se le puede quedar el encargo aparcado**: todo, con su arreglo, en [agentes/orca](agentes/orca.md#trampas-conocidas).
+- **Codex y Copilot necesitan ajustes para trabajar solos** (sandbox, permisos, carpeta de confianza), y **a Copilot, y a veces a Claude, se les puede quedar el encargo aparcado**: todo, con su arreglo, en [agentes/orca](agentes/orca.md#trampas-conocidas).
+- **Un trabajador puede quedarse parado sin que nadie lo vea** (encargo sin enviar, un permiso): con trabajadores en marcha, siempre el supervisor en segundo plano. Ver [agentes/orca](agentes/orca.md#vigilar-a-los-trabajadores).
+- **Un encargo con rutas fuera del worktree del trabajador deja parados a Copilot y a Claude** pidiendo permiso; Codex no pregunta. Rutas relativas a su worktree. Ver [agentes/orca](agentes/orca.md#trampas-conocidas).
 - **`git push` por SSH falla** en las sesiones de los agentes (no pueden pedir la frase de la clave). Resuelto: el remoto va por HTTPS con `gh` (H01).
+- **`sudo` no funciona con `!` en Claude Code**: no hay terminal para pedir la contraseña. Los comandos con `sudo`, en una terminal normal de Orca.
+- **SDK de Android**: `sdkmanager` (cmdline-tools 23) escribe los paquetes con `/`, pero `avdmanager` todavía los pide con `;`.
+- **`docker run` con una imagen propia que no existe la busca en Docker Hub**, donde podría haber otra con el mismo nombre: siempre `--pull never`.
 
 ## Lo que no viaja con el repositorio
 
@@ -84,12 +95,101 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 | Sesiones de los agentes y de `gh` | Configuración de cada máquina | Iniciar sesión otra vez |
 | Configuración de Orca y del MCP de Jira | Cada máquina | Repetir [la comprobación](agentes/jira.md#comprobación-en-un-equipo-nuevo) |
 | Herramientas (lenguajes, Docker, Orca) | El sistema | Instalar las versiones de `AGENTS.md` |
+| Tokens de Vercel, Supabase y Expo (DEC-33) | `~/.config/app-desarrollo-personal/secretos.env` | Copiarlos o crear unos nuevos en cada servicio |
+| Imágenes de Docker y `~/Android/Sdk` (`adb` y el emulador, para el panel de Orca) | El sistema | Reconstruir las imágenes con los Dockerfiles del repositorio (T01 y T15) e instalar esas dos herramientas (DEC-26) |
 
 ---
 
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-06 — Plan replanificado aprobado y acceso de los agentes (DEC-33)
+
+El humano aprobó el plan con las palabras «APRUEBO EL PLAN». Además pidió dar a
+los agentes acceso total a Vercel, Supabase y Expo, también a producción, para
+que lo hagan todo: él crea las cuentas y los tokens, y la prohibición 7 pasa a
+exigir una copia de seguridad antes de tocar producción (DEC-33). Lo siguiente
+es fusionar los PR #4 y #5 y lanzar `/ejecutar-plan` en una sesión nueva.
+
+### 2026-10-06 — P02 cerrada: estilo y temas (DEC-32)
+
+Cuatro rondas de prototipos con el humano (ver `docs/diseno/ideas.md`):
+listas sin cajitas, Hoy con la fecha pequeña y 8 cuadritos de progreso, el
+añadir rápido sobre el teclado, desplegables hacia arriba y categorías con
+secciones. Tres temas, blanco, negro y tercer estilo, que siguen al móvil y se
+pueden fijar en Ajustes (RF-23, nueva, en T14). El humano: «Es una buena
+estructura inicial, ya la iremos puliendo con el uso».
+
+### 2026-10-06 — Categoría > sección (DEC-31)
+
+Viendo la ronda 3 de estilo, el humano propuso invertir los nombres: la
+categoría es el contenedor («Lista de la compra») y la sección, una parte
+(«Mercadona»), como en Todoist. Las tareas van en la categoría o en una
+sección, y las categorías ganan icono y color (el color por categoría ya se
+usaba en el diseño, pero no estaba en el modelo de datos).
+
+### 2026-10-06 — Secciones (DEC-29) y crear deprisa (DEC-30)
+
+En la ronda 2 de estilo, el humano pidió carpetas para las categorías
+(«Lista de la compra» > Mercadona) y crear sin cambiar de pantalla: una barra
+rápida sobre el teclado que toma la categoría y la fecha de donde estás. Las
+secciones entran en la versión 1 (T04 crece) y la barra es una tarea nueva,
+T16, después de T05 y T06. Tercer estilo elegido: el neobrutalismo pulido.
+
+### 2026-10-06 — Supervisor de trabajadores
+
+En la ronda 2 de estilo, el trabajador E (Claude) pasó unos diez minutos con
+el encargo escrito sin enviar, y Copilot, parado en un permiso, mientras el
+arquitecto creía que trabajaban. El humano pidió que no vuelva a pasar, porque
+quiere poder dejar horas trabajando a los agentes. Se añade
+`scripts/orca/supervise_workers.py`, que se deja corriendo siempre que haya
+trabajadores, y la regla en el método del orquestador.
+
+### 2026-10-06 — Tope solo en código (DEC-28)
+
+El humano pidió lanzar a la vez lo que no depende de nada: el tope de tres
+trabajadores queda solo para el código, que hay que integrar. En la ronda 2 de
+estilo, el arquitecto volvió a saltarse el turno de Claude: se paró E en Codex
+y se relanzó con Claude, y DEC-27 aclara que un turno saltado se devuelve.
+
+### 2026-10-06 — Ciclo de cuotas de los agentes (DEC-27, revisada) y ronda 1 de estilo
+
+Los siete subagentes de Claude de la ronda 1 se cortaron al agotarse la
+sesión del humano; dejaron cuatro prototipos y la hoja de paletas, y Codex
+hizo los otros dos. Al humano le gustaron más los de Codex, «más pulidos y
+profesionales». DEC-27 pasa a ser un ciclo: dos de Codex, uno de Claude y uno
+de Copilot, con excepción para tareas que necesiten un modelo concreto.
+
+### 2026-10-06 — Primero Codex (DEC-27)
+
+Para no agotar su cuota de Claude, el humano pidió lanzar siempre primero
+agentes de Codex y, como mucho, uno de Claude por cada tres de Codex. Queda
+escrito en el orquestador, el arquitecto y el plan (las tareas pasan a
+`codex`). La primera ronda de prototipos de P02, con siete subagentes de
+Claude, ya estaba lanzada y se dejó terminar.
+
+### 2026-10-06 — DEC-26 cerrada: Docker, con el panel de Orca (opción B)
+
+De vuelta del gimnasio, el humano eligió la opción B: todo lo del proyecto en
+Docker y, en el ordenador, solo `adb` y el programa del emulador, para que Orca
+lo enseñe en su panel. Empieza P02, el bucle de estilo: el humano trae ideas,
+subagentes con Sonnet generan los prototipos y el arquitecto los revisa (rama
+`docs/estilo-p02`).
+
+### 2026-10-06 — Replanificación para el móvil (DEC-24 y DEC-25) y Docker (DEC-26, abierta)
+
+Con la opción B (DEC-24), el arquitecto rehízo la arquitectura
+([ADR-0005](adr/0005-stack-expo.md)), los requisitos, los riesgos y el
+[plan](05-plan.md), que vuelve a `EN BORRADOR`: 15 tareas, con dos nuevas
+(T14, el sistema visual, y T15, el emulador y el navegador en Docker), y P02,
+el bucle de estilo con el humano. Antes de irse al gimnasio, el humano aprobó
+dos dependencias y decidió que la versión 1 necesita internet y que el estilo
+se busca con prototipos antes de programarlo (DEC-25). Después pidió Docker
+«en el 100 % de lo que se pueda» (DEC-26): se paró la instalación local del
+SDK de Android y se probó el emulador dentro de Docker. Funciona, y Orca lo ve
+si en el ordenador quedan `adb` y el programa del emulador (lo único que queda
+de la instalación local: 884 MB en `~/Android`).
 
 ### 2026-10-06 — Skills móviles, navegador y herramientas (DEC-23)
 

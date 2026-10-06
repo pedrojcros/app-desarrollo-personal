@@ -2,7 +2,7 @@
 
 Registro de funcionalidades (`RF`) y requisitos no funcionales (`RNF`). Es el contrato de **qué hace** el sistema; el plan en [05-plan](05-plan.md) dice cómo y cuándo se construye.
 
-*Estado: **confirmado** por el humano el 2026-10-06: la versión 1 son las 14 imprescindibles; las deseables van justo después (DEC-19).*
+*Estado: **confirmado** por el humano el 2026-10-06: la versión 1 son las imprescindibles (15 desde que DEC-32 añadió RF-23, el tema); las deseables van justo después (DEC-19).*
 
 ## Cómo se escribe una funcionalidad
 
@@ -36,9 +36,10 @@ Registro de funcionalidades (`RF`) y requisitos no funcionales (`RNF`). Es el co
 | RF-17 | Corregir desde el historial | DESEABLE | CU-05 | | |
 | RF-18 | Modificar un hábito o una tarea | IMPRESCINDIBLE | CU-06 | | |
 | RF-19 | Archivar (eliminar) un hábito o una tarea | IMPRESCINDIBLE | CU-06 | | |
-| RF-20 | Crear categorías y asignarlas | IMPRESCINDIBLE | CU-07, CU-01, CU-02 | | |
+| RF-20 | Crear categorías con secciones y asignarlas | IMPRESCINDIBLE | CU-07, CU-01, CU-02 | | |
 | RF-21 | Eliminar una categoría | IMPRESCINDIBLE | CU-07 | | |
 | RF-22 | Renombrar una categoría | DESEABLE | CU-07 | | |
+| RF-23 | Elegir el tema | IMPRESCINDIBLE | — | | |
 
 El estado de construcción **no** se apunta aquí: vive en las tareas (ver [agentes/jira](agentes/jira.md)).
 
@@ -177,9 +178,9 @@ El estado de construcción **no** se apunta aquí: vive en las tareas (ver [agen
 
 ### RF-20 — Crear categorías y asignarlas
 
-- **Descripción:** el sistema debe permitir crear una categoría con nombre único y asignarla, como máximo una, a hábitos y tareas.
+- **Descripción:** el sistema debe permitir crear una categoría con nombre único y asignarla, como máximo una, a hábitos y tareas. Cada categoría tiene un icono y un color, y puede dividirse en **secciones** (por ejemplo, «Lista de la compra» en «Mercadona» y «Lidl»); una tarea o un hábito va en la categoría o en una de sus secciones. Las secciones se crean y se eliminan; al eliminar una, lo que contiene queda en la categoría, sin sección (DEC-29 y DEC-31).
 - **Prioridad:** IMPRESCINDIBLE
-- **Criterio de aceptación:** CU-07, escenarios 1 y 2; CU-02, escenario 5.
+- **Criterio de aceptación:** CU-07, escenarios 1, 2, 6 y 7; CU-02, escenario 5.
 - **Notas:** RN-24, RN-25.
 
 ### RF-21 — Eliminar una categoría
@@ -196,19 +197,26 @@ El estado de construcción **no** se apunta aquí: vive en las tareas (ver [agen
 - **Criterio de aceptación:** CU-07, escenario 4.
 - **Notas:** RN-24.
 
+### RF-23 — Elegir el tema
+
+- **Descripción:** el sistema debe tener tres temas: blanco, negro y el tercer estilo. Por defecto sigue el modo del móvil (claro, blanco; oscuro, negro); en Ajustes se puede fijar cualquiera de los tres, y la elección se guarda en el dispositivo.
+- **Prioridad:** IMPRESCINDIBLE
+- **Criterio de aceptación:** con el móvil en modo oscuro y sin elegir nada, la app sale en negro; al fijar el tercer estilo en Ajustes, sale en ese estilo aunque el móvil cambie de modo, también al cerrar y abrir la app.
+- **Notas:** DEC-32; el aspecto de cada tema está en `docs/diseno.md`.
+
 ## Requisitos no funcionales
 
 Cómo de bien tiene que hacerlo. Cada uno con **un número**, no con adjetivos.
 
 | Id | Categoría | Requisito | Cómo se comprueba |
 |---|---|---|---|
-| RNF-01 | Rendimiento | Con un año de datos (50 hábitos, 2.000 tareas, 20.000 ocurrencias), la vista Hoy se muestra en menos de 1 segundo y marcar algo se refleja en pantalla en menos de 300 ms | Test con datos sintéticos generados por un script |
+| RNF-01 | Rendimiento | Con un año de datos (50 hábitos, 2.000 tareas, 20.000 ocurrencias), la vista Hoy se muestra en menos de 1 segundo en un móvil Android de gama media, y marcar algo se refleja en pantalla en menos de 300 ms | Test con datos sintéticos generados por un script |
 | RNF-02 | Seguridad | Sin iniciar sesión no se puede leer ni cambiar ningún dato: solo accede el dueño. Ningún secreto en el repositorio | Test de acceso sin sesión; escaneo de secretos en la integración continua |
-| RNF-03 | Accesibilidad | Contraste AA, todo se puede usar con teclado y los formularios tienen etiquetas | Auditoría automática sin errores graves |
+| RNF-03 | Accesibilidad | Contraste AA, etiquetas de accesibilidad en todo lo que se pulsa, zonas de toque de al menos 44 puntos y, en la web, todo usable con teclado | Revisión con `better-accessibility`; en la web, auditoría automática sin errores graves |
 | RNF-04 | Datos | Sin objetivo de disponibilidad (uso personal), pero **ningún dato se pierde**: copia exportable y una restauración probada | Exportar y restaurar una vez antes del uso diario |
 | RNF-05 | Privacidad | Solo hay datos del dueño, y no salen a terceros salvo el proveedor de alojamiento y, en la versión 2, Google Calendar con su permiso | Revisión de servicios en la ADR del stack |
 | RNF-06 | Rapidez de uso | Desde Hoy, marcar algo cuesta **una** acción; crear una tarea con solo el nombre, escribirlo y confirmar | Prueba de extremo a extremo que cuenta las acciones |
-| RNF-07 | Fechas | Zona horaria Europe/Madrid; los cambios de hora no duplican ni pierden ocurrencias, ni mueven sus horas | Tests en los días de cambio de hora |
-| RNF-08 | Móvil | Se usa sin desplazamiento horizontal desde 360 px de ancho *(versión 2, DEC-19)* | Prueba de extremo a extremo a 360 px |
+| RNF-07 | Fechas | Zona horaria del dispositivo (para el dueño, Europe/Madrid); los cambios de hora no duplican ni pierden ocurrencias, ni mueven sus horas | Tests en los días de cambio de hora |
+| RNF-08 | Móvil | Funciona instalada en las versiones de Android que soporta el SDK de Expo fijado, en pantallas desde 360 dp de ancho; la misma app se usa en el navegador del ordenador sin romperse *(versión 1, DEC-24)* | Flujos de Maestro en el emulador; prueba de la web con el MCP de Chrome |
 
 Si un requisito no funcional no tiene número, todavía es una intención.

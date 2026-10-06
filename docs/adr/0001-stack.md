@@ -1,6 +1,6 @@
 # ADR-0001: Stack — Next.js, Supabase y Vercel
 
-- **Estado:** Aceptada (DEC-16)
+- **Estado:** Sustituida por [ADR-0005](0005-stack-expo.md) (DEC-24)
 - **Fecha:** 2026-10-06
 - **Decisores:** el humano, a propuesta del arquitecto
 
