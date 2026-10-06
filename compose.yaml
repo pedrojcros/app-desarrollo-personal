@@ -1,0 +1,24 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+      args:
+        APP_UID: ${APP_UID:-1000}
+        APP_GID: ${APP_GID:-1000}
+    user: '${APP_UID:-1000}:${APP_GID:-1000}'
+    group_add:
+      - '${DOCKER_GID:-0}'
+    network_mode: host
+    working_dir: ${PWD}
+    volumes:
+      - ${PWD}:${PWD}
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      BROWSER: none
+      REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
+      EXPO_NO_TELEMETRY: '1'
+      SUPABASE_TELEMETRY_DISABLED: '1'
+      DO_NOT_TRACK: '1'
+    stdin_open: true
+    tty: true

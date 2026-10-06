@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "Desarrollo personal",
+    "slug": "app-desarrollo-personal",
+    "scheme": "desarrollo-personal",
+    "version": "0.1.0",
+    "userInterfaceStyle": "automatic",
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-splash-screen",
+      "@react-native-community/datetimepicker"
+    ],
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    }
+  }
+}
