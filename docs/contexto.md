@@ -42,11 +42,12 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-06.*
+*Actualizado: 2026-10-07.*
 
-- **Fase: ejecución, a punto de empezar.** El plan replanificado está **aprobado** (2026-10-06, «APRUEBO EL PLAN»): una app con Expo para Android y la web, 16 tareas en 6 olas, todo el desarrollo en Docker. Está en el PR #4; el estilo (P02, DEC-32), en el PR #5.
-- Estado del plan: `APROBADO` (ver [05-plan](05-plan.md)).
-- Agentes: Claude, Codex y Copilot con Orca, con el ciclo de cuotas (DEC-27) y el supervisor de trabajadores. Tendrán acceso a Vercel, Supabase y Expo (DEC-33), con los tokens ya comprobados. Ciclo de DEC-27: el último trabajador lanzado fue Claude (el arreglo del tema C en P02), así que **el siguiente le toca a Copilot**.
+- **Fase: ejecución nocturna en marcha** (`/ejecutar-plan`, el humano duerme y pidió trabajar solo toda la noche). Plan `APROBADO`; tickets de Jira creados (T01 = ADP-2 … T13 = ADP-17).
+- **Ola 0:** T01 (esqueleto Expo en Docker) en manos de un trabajador de **Codex**, rama `ADP-2-esqueleto-expo`. El humano autorizó **fusionar T01 esta noche sin su revisión** si pasan todas sus comprobaciones; la revisará por la mañana. Las puertas de T02 y T14 se respetan: se dejan listas para su revisión, sin fusionar.
+- **Reparto de agentes (DEC-35):** Claude y Codex **por igual**, alternando; Copilot, fuera. Sustituye al ciclo de DEC-27.
+- Lo que necesite una decisión del humano se apunta en el [buzón](buzon.md) y se sigue con lo demás.
 
 
 ## Lo siguiente
@@ -70,7 +71,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-35**.
+  chat. Siguiente número libre: **DEC-36**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -103,6 +104,10 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-07 — Empieza la ejecución nocturna (DEC-35)
+
+El humano lanzó `/ejecutar-plan` y se fue a dormir: trabajar solo toda la noche, con el supervisor siempre en marcha, fusionando T01 sin su revisión si todo pasa (la revisará por la mañana) y respetando las puertas de T02 y T14. Se crearon los 16 tickets de Jira (ADP-2 a ADP-17) y se lanzó T01 con Codex (encargo [001](agentes/encargos/001-esqueleto-expo.md)). Durante la ejecución el humano pidió repartir **Claude y Codex por igual**, sin Copilot, porque tiene tokens de sobra: queda en DEC-35, que sustituye al ciclo de DEC-27.
 
 ### 2026-10-06 — Tokens comprobados y plugins de los servicios (DEC-34)
 
