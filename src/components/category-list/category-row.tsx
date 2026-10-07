@@ -10,8 +10,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
+import { useRenameCategory, type Category } from '@/data/categories';
 import { useCreateSection, type Section } from '@/data/sections';
-import type { Category } from '@/data/categories';
 import { describeSaveError } from '@/domain/category-messages';
 
 import { NameForm } from './name-form';
@@ -123,10 +123,38 @@ export function CategoryRow({
   onDeleteSection,
 }: CategoryRowProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [name, setName] = useState(category.name);
+  const [errorMessage, setErrorMessage] = useState<string>();
+  const renameCategory = useRenameCategory();
   const chevron = isExpanded ? ChevronDown : ChevronRight;
   const toggleLabel = isExpanded
     ? `Recoger ${category.name}`
     : `Desplegar ${category.name}`;
+
+  function openRenameForm(): void {
+    setName(category.name);
+    setErrorMessage(undefined);
+    setIsRenaming(true);
+  }
+
+  function closeRenameForm(): void {
+    setName(category.name);
+    setErrorMessage(undefined);
+    setIsRenaming(false);
+  }
+
+  function submitRename(): void {
+    setErrorMessage(undefined);
+    renameCategory.mutate(
+      { categoryId: category.id, name },
+      {
+        onSuccess: closeRenameForm,
+        onError: (error) =>
+          setErrorMessage(describeSaveError(error.code, 'categoría')),
+      },
+    );
+  }
 
   return (
     <View className="border-b border-border">
@@ -163,11 +191,33 @@ export function CategoryRow({
             </Text>
           </View>
         </Pressable>
+        <Pressable
+          role="button"
+          accessibilityLabel={`Renombrar ${category.name}`}
+          onPress={openRenameForm}
+          className="min-h-11 justify-center px-2"
+        >
+          <Text>Renombrar</Text>
+        </Pressable>
         <DeleteButton
           label={`Eliminar la categoría ${category.name}`}
           onPress={() => onDeleteCategory(category)}
         />
       </View>
+      {isRenaming ? (
+        <View className="px-3 pb-3">
+          <NameForm
+            label="Nombre de la categoría"
+            submitLabel="Guardar"
+            name={name}
+            errorMessage={errorMessage}
+            isSaving={renameCategory.isPending}
+            onChangeName={setName}
+            onSubmit={submitRename}
+            onCancel={closeRenameForm}
+          />
+        </View>
+      ) : null}
       {isExpanded ? (
         <View className="gap-1 pb-3">
           {category.sections.map((section) => (

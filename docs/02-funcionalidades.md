@@ -38,10 +38,10 @@ Registro de funcionalidades (`RF`) y requisitos no funcionales (`RNF`). Es el co
 | RF-19 | Archivar (eliminar) un hábito o una tarea | IMPRESCINDIBLE | CU-06 | | |
 | RF-20 | Crear categorías con secciones y asignarlas | IMPRESCINDIBLE | CU-07, CU-01, CU-02 | | |
 | RF-21 | Eliminar una categoría | IMPRESCINDIBLE | CU-07 | | |
-| RF-22 | Renombrar una categoría | DESEABLE | CU-07 | | |
+| RF-22 | Renombrar una categoría | DESEABLE · **HECHO** | CU-07 | | |
 | RF-23 | Elegir el tema | IMPRESCINDIBLE | — | | |
 
-El estado de construcción **no** se apunta aquí: vive en las tareas (ver [agentes/jira](agentes/jira.md)).
+El estado de construcción **no** se apunta aquí, salvo que un encargo pida expresamente marcar una funcionalidad como hecha.
 
 ## Funcionalidades
 

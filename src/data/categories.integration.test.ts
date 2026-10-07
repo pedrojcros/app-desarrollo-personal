@@ -7,6 +7,7 @@ import {
   createCategory,
   deleteCategory,
   fetchCategories,
+  renameCategory,
   type Category,
 } from './categories';
 import { countSectionContents, createSection, deleteSection } from './sections';
@@ -146,6 +147,80 @@ describe('CU-07 scenario 2: repeated name', () => {
 
     expect(result.ok).toBe(true);
     await deleteTestUser(adminClient, otherUser);
+  });
+});
+
+describe('CU-07 scenario 4: rename a category', () => {
+  it('renames the category and keeps its tasks assigned', async () => {
+    const nameSuffix = randomUUID();
+    const purchaseName = `Compra ${nameSuffix}`;
+    const supermarketName = `Supermercado ${nameSuffix}`;
+    const purchase = await createCategoryOrThrow(purchaseName);
+    const taskIds = await insertTasks(2, { categoryId: purchase.id });
+
+    const renamed = await renameCategory(purchase.id, supermarketName);
+
+    expect(renamed).toEqual({ ok: true, value: null });
+    const categories = await fetchCategories();
+    expect(
+      categories.ok &&
+        categories.value.find((category) => category.id === purchase.id)?.name,
+    ).toBe(supermarketName);
+    const places = await readTaskPlaces(taskIds);
+    expect(places).toHaveLength(2);
+    for (const place of places) {
+      expect(place.category_id).toBe(purchase.id);
+    }
+  });
+
+  it('rejects a name that duplicates another category with different capitalization', async () => {
+    const nameSuffix = randomUUID();
+    const purchaseName = `Compra ${nameSuffix}`;
+    const supermarketName = `Supermercado ${nameSuffix}`;
+    const purchase = await createCategoryOrThrow(purchaseName);
+    await createCategoryOrThrow(supermarketName);
+
+    const renamed = await renameCategory(
+      purchase.id,
+      supermarketName.toLowerCase(),
+    );
+
+    expect(renamed).toMatchObject({
+      ok: false,
+      error: { code: 'duplicate_name' },
+    });
+    const categories = await fetchCategories();
+    expect(
+      categories.ok &&
+        categories.value.find((category) => category.id === purchase.id)?.name,
+    ).toBe(purchaseName);
+  });
+
+  it('rejects an empty name and preserves the current category name', async () => {
+    const nameSuffix = randomUUID();
+    const purchaseName = `Compra ${nameSuffix}`;
+    const purchase = await createCategoryOrThrow(purchaseName);
+
+    const renamed = await renameCategory(purchase.id, '  ');
+    const categories = await fetchCategories();
+
+    expect(renamed).toMatchObject({
+      ok: false,
+      error: { code: 'invalid_input' },
+    });
+    expect(
+      categories.ok &&
+        categories.value.find((category) => category.id === purchase.id)?.name,
+    ).toBe(purchaseName);
+  });
+
+  it('reports not_found when the category does not exist', async () => {
+    const renamed = await renameCategory(randomUUID(), 'Supermercado');
+
+    expect(renamed).toMatchObject({
+      ok: false,
+      error: { code: 'not_found' },
+    });
   });
 });
 
