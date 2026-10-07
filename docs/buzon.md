@@ -28,6 +28,8 @@ Para pedir control sobre una idea, añade al final:
 
 - 2026-10-07 — **Decidido por el orquestador (revísalo cuando quieras):** (1) T03: la primera versión de la regla de un hábito empieza siempre en su fecha de inicio y no puede haber dos versiones con la misma fecha (lo pedía la revisión de Opus). (2) T05: cambiar la frecuencia vale desde hoy (o desde el inicio si aún no empezó); dos cambios el mismo día no crean dos versiones; la fecha de inicio solo se cambia si el hábito no ha empezado (RN-19). (3) La web no permite `eval` (CSP): Zod va sin JIT en vez de abrir `unsafe-eval`. (4) Vercel publicó su primer despliegue como producción (cosa del servicio la primera vez): apunta a la base de pruebas y la de producción sigue vacía hasta que publiques. (5) Las capturas del catálogo de T14 tienen aún los colores antiguos.
 
+- 2026-10-07 — **Más decisiones del orquestador (revísalas cuando quieras):** (1) En la vista de una categoría, de cada hábito sale la ocurrencia de hoy si toca y está pendiente (las tareas, todas las pendientes, con y sin fecha). (2) En «Pendientes» no salen los hábitos archivados. (3) Las migraciones se aplican con `--include-all` porque dos ramas en paralelo las fusionaron en otro orden que sus fechas (eso rompió el primer despliegue a pruebas; ya está encargado el arreglo).
+
 ## Procesadas
 
 | Fecha | Idea | Qué se hizo |

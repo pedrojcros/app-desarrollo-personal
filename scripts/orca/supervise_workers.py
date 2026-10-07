@@ -54,7 +54,10 @@ def list_live_workers():
     workers = response.get('result', {}).get('workers', [])
     live_workers = []
     for worker in workers:
-        is_active = worker.get('terminalState') == 'active'
+        # Un trabajador relanzado en una terminal reutilizada (por ejemplo, tras
+        # reiniciarse Orca) figura como «retained», pero sigue trabajando.
+        terminal_state = worker.get('terminalState')
+        is_active = terminal_state in ('active', 'retained')
         projection = worker.get('projection') or {}
         is_in_progress = projection.get('outcome') == 'in_progress'
         if is_active and is_in_progress:
