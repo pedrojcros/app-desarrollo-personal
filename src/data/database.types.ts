@@ -279,8 +279,52 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      create_habit: {
+        Args: {
+          p_category_id?: string;
+          p_frequency: Database['public']['Enums']['habit_frequency'];
+          p_interval_days?: number;
+          p_name: string;
+          p_section_id?: string;
+          p_start_date: string;
+          p_time_of_day?: string;
+          p_time_slot?: Database['public']['Enums']['habit_time_slot'];
+          p_weekdays?: number[];
+        };
+        Returns: string;
+      };
       delete_category: {
         Args: { target_category_id: string };
+        Returns: undefined;
+      };
+      move_habit_start_date: {
+        Args: { p_habit_id: string; p_new_start_date: string; p_today: string };
+        Returns: undefined;
+      };
+      set_habit_rule: {
+        Args: {
+          p_frequency: Database['public']['Enums']['habit_frequency'];
+          p_habit_id: string;
+          p_interval_days?: number;
+          p_valid_from: string;
+          p_weekdays?: number[];
+        };
+        Returns: undefined;
+      };
+      update_habit: {
+        Args: {
+          p_category_id?: string;
+          p_frequency?: Database['public']['Enums']['habit_frequency'];
+          p_habit_id: string;
+          p_interval_days?: number;
+          p_name: string;
+          p_new_start_date?: string;
+          p_section_id?: string;
+          p_time_of_day?: string;
+          p_time_slot?: Database['public']['Enums']['habit_time_slot'];
+          p_today: string;
+          p_weekdays?: number[];
+        };
         Returns: undefined;
       };
     };
