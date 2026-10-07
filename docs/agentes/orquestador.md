@@ -41,6 +41,8 @@ Decides sin preguntar:
 
 ### Paradas obligatorias
 
+> **Cambio de DEC-36 (2026-10-07):** el humano deja al orquestador trabajando solo y con control total sobre `develop`. Las **puertas `requiere-revisión` ya no impiden fusionar a `develop`**: si tu revisión a esfuerzo máximo y la CI son favorables, fusionas, lo anotas en el [buzón](../buzon.md) para que el humano lo revise después y, si no le convence, se corrige con otro encargo. Las puertas `requiere-plan` siguen igual. **Lo que no debes suponer** (producto, seguridad, diseño no escrito), se lo preguntas al humano o, si no está, lo apuntas en el buzón y avanzas con lo demás.
+
 Paras y preguntas al humano antes de:
 
 - Hacer merge a `develop` cuando el PR **no** cumple todos los criterios de la [política de merge](#política-de-merge).
@@ -52,7 +54,7 @@ Paras y preguntas al humano antes de:
 - Resolver una contradicción entre la documentación y el código.
 - Gastar fuera de lo previsto: lanzar más trabajadores que el tope, o usar un agente de pago que el plan no contemplaba.
 - Empezar una tarea con puerta `requiere-plan` sin que el humano haya aprobado su plan.
-- Dar por cerrada o fusionar una tarea con puerta `requiere-revisión` sin el visto bueno del humano.
+- ~~Dar por cerrada o fusionar una tarea con puerta `requiere-revisión` sin el visto bueno del humano.~~ *(Sustituido por DEC-36: se fusiona tras tu revisión y se anota para que el humano la revise después.)*
 
 Mientras esperas una respuesta, **no te quedes parado**: sigue con todo lo que no dependa de ella. Registra la pregunta como puerta de decisión (`gate-create`, ver [orca](orca.md)) y avanza por otra rama del grafo de tareas.
 
@@ -163,7 +165,7 @@ Ideas de la skill `dispatching-parallel-agents`, aplicadas con Orca en lugar de 
 
 **`develop` es la rama de integración y `main` solo lleva versiones estables y completas.**
 
-- **A `develop` fusionas tú**, el orquestador, solo los PR que cumplen *todo* esto: CI en verde, tus tests locales en verde, revisión pasada (con la lista de más abajo), nada de la lista de paradas obligatorias, y que no sean la tarea T01 (el esqueleto), que revisa y fusiona el humano línea a línea. Borra la rama al fusionar e informa al humano de cada fusión en tu resumen.
+- **A `develop` fusionas tú**, el orquestador, solo los PR que cumplen *todo* esto: CI en verde, tus tests locales en verde, revisión pasada (con la lista de más abajo), nada de la lista de paradas obligatorias, y, hasta DEC-36, que no sean tareas con puerta de revisión del humano (T01, T02, T14), que ahora también fusionas tú tras tu revisión. Borra la rama al fusionar e informa al humano de cada fusión en tu resumen.
 - **Si un PR no cumple alguno de los criterios**, no fusionas: lo dejas listo con un resumen de tres líneas y se lo presentas al humano. Mientras tanto, avanzas con lo que no dependa de ese merge.
 - **Los trabajadores nunca fusionan.**
 - **A `main` nunca vas tú.** El paso de `develop` a `main` lo hace el humano, cada cierto tiempo y solo cuando `develop` es una versión estable y completa.

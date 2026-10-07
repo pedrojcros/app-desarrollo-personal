@@ -72,7 +72,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-36**.
+  chat. Siguiente número libre: **DEC-37**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -109,6 +109,10 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-07 — Control total del orquestador sobre `develop` (DEC-36)
+
+Al volver de la noche, el humano aclaró lo que quiere: dejar al orquestador **a esfuerzo máximo, trabajando solo**, y encontrar **la versión acordada en `develop`**, usándolo a él solo para lo que el orquestador no debe suponer. Queda en DEC-36: el orquestador fusiona a `develop` también las tareas con puerta de revisión (T02, T14), tras su propia revisión; `main`, los secretos, el dinero, las ADR y el alcance siguen siendo del humano. Además se vio que la noche anterior se trabajó con **Sonnet 5.5 a esfuerzo medio** en vez de Opus 5.5 al máximo: el orquestador no puede cambiárselo él mismo, lo cambia el humano al abrir la sesión.
 
 ### 2026-10-07 — Ola 0 y casi toda la ola 1 (noche de ejecución)
 
