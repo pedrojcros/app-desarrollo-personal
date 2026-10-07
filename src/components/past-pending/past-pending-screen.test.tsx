@@ -23,6 +23,7 @@ import type { PropsWithChildren } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { UndoToastProvider } from '@/components/undo-toast';
+import { useRescheduleTask } from '@/data/tasks';
 import { usePastPending, usePastPendingCount } from '@/data/past-pending';
 import { queryKeys } from '@/data/query-keys';
 import { succeed } from '@/data/result';
@@ -48,6 +49,10 @@ jest.mock('@/data/set-mark-status', () => ({
   restoreMarkStatus: jest.fn(),
 }));
 jest.mock('@/data/supabase/client', () => ({ supabase: {} }));
+jest.mock('@/data/tasks', () => ({ useRescheduleTask: jest.fn() }));
+jest.mock('@react-native-community/datetimepicker', () => ({
+  DateTimePickerAndroid: { open: jest.fn() },
+}));
 
 const today = '2026-10-07';
 const flossThreeDaysAgo: ViewItem = {
@@ -70,8 +75,14 @@ const invoiceYesterday: ViewItem = {
   sectionId: null,
   markedAt: null,
 };
+const mealPrepYesterday: ViewItem = {
+  ...invoiceYesterday,
+  target: { kind: 'task', taskId: 'meal-prep' },
+  name: 'Preparar comida',
+};
 const usePastPendingMock = jest.mocked(usePastPending);
 const retry = jest.fn();
+const rescheduleMutate = jest.fn();
 let queryClient: QueryClient;
 
 beforeEach(() => {
@@ -94,6 +105,10 @@ beforeEach(() => {
     .mocked(setMarkStatus)
     .mockResolvedValue(succeed({ markedAt: '2026-10-07T10:00:00Z' }));
   jest.mocked(restoreMarkStatus).mockResolvedValue(succeed({ markedAt: null }));
+  jest.mocked(useRescheduleTask).mockReturnValue({
+    mutate: rescheduleMutate,
+    isPending: false,
+  } as never);
 });
 afterEach(() => queryClient.clear());
 
@@ -209,6 +224,132 @@ describe('Past pending screen', () => {
       pathname: scenario.pathname,
       params: { id: scenario.id },
     });
+  });
+});
+
+describe('Reschedule an overdue task (RF-13)', () => {
+  it('offers Reschedule on tasks only', () => {
+    renderScreen([invoiceYesterday, flossThreeDaysAgo]);
+    expect(
+      screen.getByRole('button', { name: 'Reprogramar Factura' }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole('button', { name: 'Reprogramar Hilo dental' }),
+    ).toBeNull();
+  });
+
+  it('asks the new date and saves it for that task', () => {
+    renderScreen([invoiceYesterday]);
+    fireEvent.press(
+      screen.getByRole('button', { name: 'Reprogramar Factura' }),
+    );
+    fireEvent.press(screen.getByRole('button', { name: 'Mañana' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Guardar' }));
+    expect(rescheduleMutate).toHaveBeenCalledWith(
+      { taskId: 'invoice', newDueDate: expect.any(String) },
+      expect.anything(),
+    );
+  });
+
+  it('closes the dialog when the task is saved', () => {
+    rescheduleMutate.mockImplementation(((
+      _variables: unknown,
+      options: { onSuccess: () => void },
+    ) => options.onSuccess()) as never);
+    renderScreen([invoiceYesterday]);
+    fireEvent.press(
+      screen.getByRole('button', { name: 'Reprogramar Factura' }),
+    );
+    fireEvent.press(screen.getByRole('button', { name: 'Guardar' }));
+    expect(screen.queryByRole('button', { name: 'Guardar' })).toBeNull();
+  });
+
+  it('keeps the dialog open with a message when saving fails', () => {
+    rescheduleMutate.mockImplementation(((
+      _variables: unknown,
+      options: { onError: () => void },
+    ) => options.onError()) as never);
+    renderScreen([invoiceYesterday]);
+    fireEvent.press(
+      screen.getByRole('button', { name: 'Reprogramar Factura' }),
+    );
+    fireEvent.press(screen.getByRole('button', { name: 'Guardar' }));
+    expect(
+      screen.getByText('No se ha podido reprogramar. Inténtalo de nuevo.'),
+    ).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Guardar' })).toBeTruthy();
+  });
+
+  it('leaves the task untouched when the dialog is cancelled', () => {
+    renderScreen([invoiceYesterday]);
+    fireEvent.press(
+      screen.getByRole('button', { name: 'Reprogramar Factura' }),
+    );
+    fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(rescheduleMutate).not.toHaveBeenCalled();
+    expect(screen.getByText('Factura')).toBeTruthy();
+  });
+});
+
+describe('Mark a whole day as not done (RF-14)', () => {
+  // Dos guardados y un diálogo por medio: en la CI, más de 1 s (el valor por defecto).
+  const SLOW_RENDER_TIMEOUT = 5000;
+  const markDayButton = 'Todo no hecho: Ayer';
+
+  it('has one action per day header', () => {
+    renderScreen([flossThreeDaysAgo, invoiceYesterday]);
+    expect(
+      screen.getByRole('button', { name: 'Todo no hecho: Ayer' }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole('button', {
+        name: 'Todo no hecho: Domingo, 4 de octubre',
+      }),
+    ).toBeTruthy();
+  });
+
+  it('asks for confirmation and saves nothing when cancelled', () => {
+    renderScreen([invoiceYesterday, mealPrepYesterday]);
+    fireEvent.press(screen.getByRole('button', { name: markDayButton }));
+    expect(
+      screen.getByText(
+        'Se marcarán como no hechas las 2 cosas pendientes de ese día.',
+      ),
+    ).toBeTruthy();
+    fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(setMarkStatus).not.toHaveBeenCalled();
+    expect(screen.getByText('Factura')).toBeTruthy();
+  });
+
+  it('marks everything pending that day with a single notice', async () => {
+    renderScreen([invoiceYesterday, mealPrepYesterday, flossThreeDaysAgo]);
+    fireEvent.press(screen.getByRole('button', { name: markDayButton }));
+    fireEvent.press(
+      screen.getByRole('button', { name: 'Marcar como no hecho' }),
+    );
+    await waitFor(() => expect(screen.queryByText('Factura')).toBeNull(), {
+      timeout: SLOW_RENDER_TIMEOUT,
+    });
+    expect(screen.queryByText('Preparar comida')).toBeNull();
+    expect(screen.getByText('Hilo dental')).toBeTruthy();
+    expect(setMarkStatus).toHaveBeenCalledTimes(2);
+    expect(screen.getAllByText('2 marcadas como no hechas')).toHaveLength(1);
+  });
+
+  it('brings the whole day back with Undo', async () => {
+    renderScreen([invoiceYesterday, mealPrepYesterday]);
+    fireEvent.press(screen.getByRole('button', { name: markDayButton }));
+    fireEvent.press(
+      screen.getByRole('button', { name: 'Marcar como no hecho' }),
+    );
+    await waitFor(() => expect(screen.queryByText('Factura')).toBeNull(), {
+      timeout: SLOW_RENDER_TIMEOUT,
+    });
+    fireEvent.press(screen.getByRole('button', { name: 'Deshacer' }));
+    await waitFor(() => expect(screen.getByText('Factura')).toBeTruthy(), {
+      timeout: SLOW_RENDER_TIMEOUT,
+    });
+    expect(screen.getByText('Preparar comida')).toBeTruthy();
   });
 });
 

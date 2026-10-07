@@ -28,6 +28,39 @@ function renderInTheme(
 }
 
 describe('ListRow', () => {
+  it('shows an optional secondary action next to the marks', () => {
+    const handleSecondary = jest.fn();
+    renderInTheme(
+      <ListRow
+        title="Factura"
+        meta="Tarea"
+        onMarkDone={jest.fn()}
+        onMarkNotDone={jest.fn()}
+        secondaryAction={{
+          label: 'Reprogramar Factura',
+          icon: Sun,
+          onPress: handleSecondary,
+        }}
+      />,
+    );
+    fireEvent.press(
+      screen.getByRole('button', { name: 'Reprogramar Factura' }),
+    );
+    expect(handleSecondary).toHaveBeenCalled();
+  });
+
+  it('shows no secondary action unless one is given', () => {
+    renderInTheme(
+      <ListRow
+        title="Factura"
+        meta="Tarea"
+        onMarkDone={jest.fn()}
+        onMarkNotDone={jest.fn()}
+      />,
+    );
+    expect(screen.getAllByRole('button')).toHaveLength(2);
+  });
+
   it('marks done and not done with their own buttons', () => {
     const handleDone = jest.fn();
     const handleNotDone = jest.fn();

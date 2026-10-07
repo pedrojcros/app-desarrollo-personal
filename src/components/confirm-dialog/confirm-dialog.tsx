@@ -18,7 +18,10 @@ type ConfirmDialogProps = {
 };
 
 // Escape en la web y «atrás» en Android cancelan, como un diálogo nativo.
-function useCancelOnDismissKey(visible: boolean, onCancel: () => void): void {
+export function useCancelOnDismissKey(
+  visible: boolean,
+  onCancel: () => void,
+): void {
   useEffect(() => {
     if (!visible) {
       return;

@@ -1,4 +1,4 @@
-import { Check, X } from 'lucide-react-native';
+import { Check, X, type LucideIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 
@@ -10,6 +10,13 @@ import { Icon } from './icon';
 import { Text } from './text';
 import { usePressed } from './use-pressed';
 
+// Acción extra opcional junto a las marcas (por ejemplo, «Reprogramar»).
+export type ListRowSecondaryAction = {
+  label: string;
+  icon: LucideIcon;
+  onPress: () => void;
+};
+
 type ListRowProps = {
   title: string;
   // Texto de debajo del título: «10:00 · Personal · Tarea».
@@ -19,6 +26,7 @@ type ListRowProps = {
   onPress?: () => void;
   onMarkDone: () => void;
   onMarkNotDone: () => void;
+  secondaryAction?: ListRowSecondaryAction;
   disabled?: boolean;
   // Fuerza el estado pulsado de las marcas (catálogo y tests).
   donePressed?: boolean;
@@ -126,6 +134,7 @@ export function ListRow({
   onPress,
   onMarkDone,
   onMarkNotDone,
+  secondaryAction,
   disabled,
   donePressed,
   notDonePressed,
@@ -155,6 +164,15 @@ export function ListRow({
           <Text variant="caption">{meta}</Text>
         </View>
       </TitleContainer>
+      {secondaryAction !== undefined ? (
+        <MarkButton
+          label={secondaryAction.label}
+          onPress={secondaryAction.onPress}
+          disabled={disabled}
+        >
+          <Icon icon={secondaryAction.icon} color="muted-foreground" />
+        </MarkButton>
+      ) : null}
       <MarkButton
         label={`Marcar ${title} como hecho`}
         onPress={onMarkDone}

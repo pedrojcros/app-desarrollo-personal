@@ -135,12 +135,14 @@ El estado de construcción **no** se apunta aquí: vive en las tareas (ver [agen
 - **Prioridad:** DESEABLE. *También se puede cambiar la fecha modificando la tarea (RF-18).*
 - **Criterio de aceptación:** CU-04, escenarios 2 y 3.
 - **Notas:** RN-15.
+- **Estado:** hecho en ADP-18 (encargo 031). Cada tarea vencida de Pendientes tiene «Reprogramar» (atajos Hoy y Mañana, selector de fecha); conserva la hora.
 
 ### RF-14 — Marcar un día entero como no hecho
 
 - **Descripción:** el sistema debe permitir marcar como no hecho, de una vez, todo lo pendiente de un día pasado.
 - **Prioridad:** DESEABLE (atajo).
 - **Criterio de aceptación:** CU-04, escenario 4.
+- **Estado:** hecho en ADP-18 (encargo 031). Cada cabecera de día de Pendientes tiene «Todo no hecho», con confirmación y un solo aviso con «Deshacer».
 
 ### RF-15 — Consultar el historial
 

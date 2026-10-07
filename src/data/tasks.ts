@@ -7,6 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { z } from 'zod';
 
+import { getCalendarDateInTimeZone } from '../domain/calendar-date';
 import type { Task } from '../domain/entities';
 import type { CalendarDate } from '../domain/types';
 
@@ -169,6 +170,49 @@ export async function updateTask(
   }
 }
 
+const rescheduleInputSchema = z.object({
+  taskId: z.uuid(),
+  newDueDate: z.iso.date(),
+  today: z.iso.date(),
+});
+
+/** Cambia solo la fecha: la hora y todo lo demás de la tarea se quedan como estaban. */
+export async function rescheduleTask(
+  taskId: string,
+  newDueDate: CalendarDate,
+  today: CalendarDate,
+): Promise<DataResult<null>> {
+  const parsedInput = rescheduleInputSchema.safeParse({
+    taskId,
+    newDueDate,
+    today,
+  });
+  if (!parsedInput.success) {
+    return describeInvalidInput(parsedInput.error);
+  }
+  // Las fechas YYYY-MM-DD se ordenan igual como texto que como calendario.
+  if (parsedInput.data.newDueDate < parsedInput.data.today) {
+    return fail('past_date', 'The new due date must be today or later');
+  }
+  try {
+    const response = await supabase
+      .from('tasks')
+      .update({ due_date: parsedInput.data.newDueDate })
+      .eq('id', parsedInput.data.taskId)
+      .is('archived_at', null)
+      .select('id');
+    if (response.error) {
+      return describePostgrestFailure(response.error, response.status);
+    }
+    if (response.data.length === 0) {
+      return fail('not_found', 'The task does not exist');
+    }
+    return succeed(null);
+  } catch (error) {
+    return describeThrownFailure(error);
+  }
+}
+
 /** Archivar conserva el historial (RN-18): no hay borrado definitivo. */
 export async function archiveTask(taskId: string): Promise<DataResult<null>> {
   const parsedId = z.uuid().safeParse(taskId);
@@ -250,6 +294,30 @@ export function useArchiveTask(): UseMutationResult<
       Promise.all([
         queryClient.invalidateQueries({ queryKey: queryKeys.views() }),
         queryClient.removeQueries({ queryKey: taskKeys.task(taskId) }),
+      ]),
+  });
+}
+
+type RescheduleTaskVariables = { taskId: string; newDueDate: CalendarDate };
+
+export function useRescheduleTask(): UseMutationResult<
+  null,
+  DataResultError,
+  RescheduleTaskVariables
+> {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ taskId, newDueDate }: RescheduleTaskVariables) => {
+      // «Hoy» se calcula al guardar, no al pintar: la pantalla puede llevar abierta desde ayer.
+      const today = getCalendarDateInTimeZone(new Date(), getDeviceTimeZone());
+      return unwrapResult(await rescheduleTask(taskId, newDueDate, today));
+    },
+    onSuccess: (_value, variables) =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.views() }),
+        queryClient.invalidateQueries({
+          queryKey: taskKeys.task(variables.taskId),
+        }),
       ]),
   });
 }
