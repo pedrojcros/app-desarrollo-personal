@@ -49,7 +49,8 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
   - T12, despliegue (Codex, `ctx_71b6b0739d09`, encargo 011): proyectos de Supabase `pruebas` y `produccion`, Vercel (alias `app-desarrollo-personal-three.vercel.app`), EAS, copias cifradas.
   - T04, categorías (Claude, `ctx_485c4c6607ac`, encargo 012): casi terminada; tenía que traer `develop` y aplicar su migración con `migration up --include-all`.
   - T07, marcar y «Deshacer» (Codex, `ctx_8896f164f46e`, encargo 013): sigue lo que empezó un trabajador de Claude.
-- **En cola:** T08, historial (Codex, encargo 014, ya escrito), en cuanto haya un hueco (tope de 3 en código).
+- T08, historial (Codex, `ctx_e67f830b7ec7`, encargo 014): en marcha desde las 10:10.
+- **Pausa por cuotas (2026-10-07, 10:20 a 13:54):** Codex se quedó sin cuota con los tres trabajadores a medias y Claude iba por el 80 %. El humano eligió **esperar a Codex**. Lo empezado quedó en sus worktrees (T07 y T08 con cambios sin commitear: no se liberan hasta terminar). Al volver, cada trabajador sigue con un «continúa» en su terminal.
 - **Reparto (DEC-38):** tres de Codex por cada uno de Claude. La cuota de 5 horas de Claude estaba al 79 %.
 - Decisiones del humano para las olas 2 a 5: DEC-37. Lo que decidió el orquestador y conviene revisar: en el [buzón](buzon.md).
 
@@ -85,6 +86,7 @@ Para retomar en otra sesión (`/ejecutar-plan`, Opus 5.5 al máximo), en este or
 
 *(Cosas que costaron tiempo y no deben costarlo dos veces.)*
 
+- **Codex sin cuota**: el trabajador se para con «You've hit your usage limit… try again at HH:MM» y un menú que ofrece cambiar a un modelo más barato. Se contesta «2» (mantener el modelo; el modelo solo lo cambia el humano) y, a la hora indicada, se le escribe en su terminal que continúe. Tres Codex a la vez agotan su cuota en unas tres horas.
 - **El Supabase local es compartido entre worktrees** (mismo `project_id`): se arranca una vez y lo usan todos. Una migración de una rama aún sin fusionar se aplica con `supabase migration up --include-all` y queda aplicada para todos, así que un test de otra rama puede fallar en local aunque pase en la CI (base limpia). Nadie hace `db reset`, `stop` ni `start` sin el orquestador.
 - **Un trabajador de Claude con Haiku pide permiso para cada orden** (no tiene el modo automático): no usar Haiku para trabajadores.
 - **Un trabajador puede commitear después de mandar `worker_done`**: antes de liberar su terminal, mirar `git status` en su worktree. Liberar un trabajador puede borrar su worktree.
