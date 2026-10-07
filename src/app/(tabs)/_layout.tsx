@@ -13,15 +13,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/ui/icon';
 import { TabIcon } from '@/components/ui/tab-icon';
+import { usePastPendingCount } from '@/data/past-pending';
+import { useToday } from '@/data/use-today';
 import { useTheme } from '@/theme/theme-context';
 
-// T11 sustituirá esto por el número real de pendientes.
 // Alto de la barra del diseño (74), sin la zona segura de abajo.
 const tabBarHeight = 74;
-
-function usePendingCount(): number {
-  return 0;
-}
 
 function SettingsButton() {
   return (
@@ -40,7 +37,8 @@ function SettingsButton() {
 export default function TabsLayout() {
   const { colors, fonts, shape } = useTheme();
   const insets = useSafeAreaInsets();
-  const pendingCount = usePendingCount();
+  const today = useToday();
+  const pendingCount = usePastPendingCount(today);
 
   function tabIcon(icon: LucideIcon, badgeCount?: number) {
     return function renderTabIcon({ focused }: { focused: boolean }) {
