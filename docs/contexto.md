@@ -47,7 +47,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 - **Fase: ejecución, ola 3.** En `develop`: T01, T02, T03, T04, T07, T08, T12, T14, T15, la base común de vistas y el arreglo de migraciones. El despliegue a pruebas desde `develop` funciona. Jira al día.
 - **Trabajando** (Run de Orca `run_fe8fef684013`, todos con Codex): T05, hábitos (`ctx_d2b28bea0feb`, encargo 016); T09, Hoy (`ctx_d749509ba726`, encargo 018); T10, categoría y Bandeja (`ctx_52d120b8400d`, encargo 019). Los tres se relanzaron tras los reinicios de la tarde, en sus mismas carpetas.
 - **Escritos y sin lanzar:** 017 (T06, tareas) y 020 (T11, pendientes). Faltan T16 (añadir rápido) y T13 (caminos críticos).
-- **Ahorro de tokens (DEC-39):** dos trabajadores a la vez, esfuerzo alto para el orquestador, sesión nueva por ola, encargos cortos y el modelo de Codex según el encargo. Reparto: tres de Codex por cada uno de Claude (DEC-38).
+- **Ahorro de tokens (DEC-39):** puestos fijos (dos de Codex, uno de Claude y uno de Copilot solo para lo pequeño), esfuerzo alto para el orquestador, sesión nueva por ola, encargos cortos y el modelo de Codex según el encargo. Ahora corren tres Codex, lanzados antes de la regla: el próximo hueco es para Claude o para Copilot.
 
 
 ## Lo siguiente
@@ -55,7 +55,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto), en este orden:
 
 1. Con el supervisor en marcha, atender a T05, T09 y T10 (`orca orchestration check --run run_fe8fef684013`), revisar sus PR y fusionarlos (DEC-36). T09 se fusiona después de T05 porque enlaza con sus fichas de hábito y de tarea (y con las de T06).
-2. Lanzar T06 y T11 (encargos 017 y 020) sin pasar de **dos trabajadores a la vez**.
+2. Lanzar T06 y T11 (encargos 017 y 020) respetando los **puestos fijos** (dos Codex, un Claude y un Copilot solo para lo pequeño).
 3. Escribir y lanzar T16 (añadir rápido) cuando estén T05 y T06, y después T13 (caminos críticos).
 4. Encargar la mejora del supervisor (DEC-39, punto 7) a Codex.
 5. Al cerrar la versión 1: proponer al humano publicar `develop` en `main` con la comprobación del orquestador (el humano crea su usuario de producción, DEC-37).

@@ -117,7 +117,7 @@ Si un encargo necesita "y además", son dos.
 
 ### 5. Elige el agente
 
-**Vigente desde DEC-38 (2026-10-07): tres de Codex por cada uno de Claude (Codex, Codex, Codex, Claude), Copilot fuera del reparto; con la cuota de Claude alta, ningún Claude nuevo. El orquestador también gasta Claude: revisiones a Codex y estado guardado a menudo. Lo que sigue sobre el ciclo con Copilot queda en suspenso.** **Ciclo de cuotas (DEC-27).** Cada agente gasta una cuota distinta, y la de Claude es la que se agota. Orden: **dos de Codex, uno de Claude y uno de Copilot**, y vuelta a empezar; pueden ir a la vez, dentro del tope de paralelismo. **Se sigue en ese orden, sin saltarse ningún turno**: el de Claude no se le da a Copilot, ni el de ninguno a otro. Si por error se salta uno, devuélvelo en el siguiente lanzamiento. Si a Codex se le acaba la cuota, usa Claude. **Excepción:** si una tarea necesita sí o sí un agente o un modelo concreto (por ejemplo, GPT Astra u Opus 5.5 al máximo, porque es importante), sáltate el ciclo y anota el motivo en el informe. Cuenta todo lo que se lanza: trabajadores de Orca y subagentes.
+**Vigente desde DEC-39 (2026-10-07): puestos fijos. Como mucho dos trabajadores de Codex, uno de Claude y uno de Copilot a la vez; el de Copilot, solo para encargos pequeños y mecánicos. Con la cuota de Claude alta, su puesto se queda vacío. El orquestador también gasta Claude: revisiones a Codex y estado guardado a menudo. Lo que sigue sobre el ciclo con Copilot (DEC-27) queda en suspenso.** **Ciclo de cuotas (DEC-27).** Cada agente gasta una cuota distinta, y la de Claude es la que se agota. Orden: **dos de Codex, uno de Claude y uno de Copilot**, y vuelta a empezar; pueden ir a la vez, dentro del tope de paralelismo. **Se sigue en ese orden, sin saltarse ningún turno**: el de Claude no se le da a Copilot, ni el de ninguno a otro. Si por error se salta uno, devuélvelo en el siguiente lanzamiento. Si a Codex se le acaba la cuota, usa Claude. **Excepción:** si una tarea necesita sí o sí un agente o un modelo concreto (por ejemplo, GPT Astra u Opus 5.5 al máximo, porque es importante), sáltate el ciclo y anota el motivo en el informe. Cuenta todo lo que se lanza: trabajadores de Orca y subagentes.
 
 La tabla de [agentes-disponibles](agentes-disponibles.md) dice quién está habilitado y para qué sirve cada uno. Criterio general:
 
@@ -136,8 +136,8 @@ Sé honesto con el ahorro: un trabajador de Claude arranca en frío y relee la d
 
 | Encargo | Claude | Codex | Copilot |
 |---|---|---|---|
-| Pequeño y mecánico (S) | `--model claude-sonnet-5-5` (Haiku no: pide permiso por cada orden) | `--model gpt-6-luna` (DEC-39) | El suyo («Auto»): Orca no deja elegirlo |
-| Normal (M) | `--model claude-sonnet-5-5` | `--model gpt-6.1-sol` (DEC-39) | Ídem |
+| Pequeño y mecánico (S) | `--model claude-sonnet-5-5` (Haiku no: pide permiso por cada orden) | `--model gpt-6-luna` (DEC-39) | **Su puesto es para estos** (DEC-39): el suyo, «Auto», del nivel de Luna, con su propia cuota |
+| Normal (M) | `--model claude-sonnet-5-5` | `--model gpt-6.1-sol` (DEC-39) | No (DEC-39) |
 | Delicado (T02, T03, seguridad, lógica central) | `--model claude-sonnet-5-5`, más revisión de otro modelo (Opus 5.5 o Codex) | `--model gpt-6.1-sol` (DEC-39) | No para delicados |
 | Decidir y diseñar | Opus 5.5: esfuerzo alto en el día a día y máximo solo al planificar o revisar algo delicado (DEC-39) | — | — |
 
@@ -147,7 +147,7 @@ Los identificadores de modelo de Codex compruébalos en su ayuda o su configurac
 
 ### 6. Tope de paralelismo
 
-**En código, como máximo dos trabajadores a la vez** (DEC-39; antes tres, DEC-28; el humano puede cambiar la cifra aquí: `TOPE = 2`). Más allá, la revisión se convierte en el cuello de botella y los conflictos de integración se comen lo ganado. **Lo que no se integra** (prototipos, revisiones, investigaciones) **no tiene tope**: si no depende de nada, se lanza todo a la vez. Un worktree por encargo, siempre.
+**En código, puestos fijos** (DEC-39; antes tres sin reparto, DEC-28): **dos de Codex, uno de Claude y uno de Copilot**, este solo para encargos pequeños y mecánicos. El humano puede cambiarlo aquí: `PUESTOS = 2 Codex + 1 Claude + 1 Copilot`. Más allá, la revisión se convierte en el cuello de botella y los conflictos de integración se comen lo ganado. **Lo que no se integra** (prototipos, revisiones, investigaciones) **no tiene tope**: si no depende de nada, se lanza todo a la vez. Un worktree por encargo, siempre.
 
 ### 7. Orden de integración
 
