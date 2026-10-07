@@ -31,7 +31,7 @@ RECENT_LINE_COUNT = 15
 CAPACITY_RETRY_INTERVAL = datetime.timedelta(minutes=5)
 QUOTA_RESUME_DELAY = datetime.timedelta(minutes=1)
 MODEL_CAPACITY_MESSAGE = 'Selected model is at capacity'
-USAGE_LIMIT_MESSAGE = "You've hit your usage limit"
+USAGE_LIMIT_MESSAGE = 'hit your usage limit'
 ENGLISH_MONTH_NUMBERS = {
     'jan': 1,
     'january': 1,

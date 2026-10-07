@@ -157,13 +157,21 @@ class SupervisorCurrentSituationTests(unittest.TestCase):
 
     def test_quota_without_menu_waits_and_resumes_after_delay(self):
         screen_text = (
-            "You've hit your usage limit. Upgrade to Pro "
+            "■ You’ve hit your usage limit. Upgrade to Pro "
             "(https://chatgpt.com/explore/pro), visit https://chatgpt.com/settings/\n"
-            "usage to purchase more credits or try again at Oct 8th, 2026 2:09 AM."
+            "usage to purchase more credits or try again at Oct 8th, 2026 2:09 AM.\n"
+            "› Ask Codex to do anything"
         )
         self.run_round(screen_text, START)
         waiting_outcome = self.run_round(screen_text, START + ONE_ROUND)
         self.assertEqual(waiting_outcome.status, supervise_workers.CodexStatus.ACTED)
+        self.assertEqual(self.sent_texts(), [])
+
+        retry_time = self.worker_states['dispatch-1']['quota_retry_time']
+        self.assertEqual(retry_time, datetime.datetime(2026, 10, 8, 2, 9))
+        waiting_time = datetime.datetime(2026, 10, 8, 2, 9)
+        waiting_outcome = self.run_round(screen_text, waiting_time)
+        self.assertEqual(waiting_outcome.status, supervise_workers.CodexStatus.WAITING)
         self.assertEqual(self.sent_texts(), [])
 
         resume_time = datetime.datetime(2026, 10, 8, 2, 10)
