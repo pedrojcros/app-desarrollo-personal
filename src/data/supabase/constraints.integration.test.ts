@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from '@jest/globals';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import {
+  waitForLocalSchema,
   createAdminClient,
   createAnonymousClient,
   createTestUser,
@@ -40,6 +41,7 @@ async function insertId(
 }
 
 beforeAll(async () => {
+  await waitForLocalSchema();
   adminClient = createAdminClient();
   user = await createTestUser(adminClient);
   otherUser = await createTestUser(adminClient);
@@ -55,7 +57,7 @@ beforeAll(async () => {
     name: 'Stretch',
     start_date: '2026-10-01',
   });
-});
+}, 35000);
 
 afterAll(async () => {
   await deleteTestUser(adminClient, user);

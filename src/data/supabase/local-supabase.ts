@@ -2,7 +2,7 @@
 // La clave de servicio se lee en tiempo de ejecución y no se guarda en ningún fichero.
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { execFileSync } from 'node:child_process';
-import { createHmac, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 
 const LOCAL_HOSTS = ['localhost', '127.0.0.1', '[::1]'];
 
@@ -74,48 +74,6 @@ export function createAnonymousClient(): SupabaseClient {
   return createClient(url, anonKey, clientOptions);
 }
 
-function encodeBase64Url(value: Buffer | string): string {
-  return Buffer.from(value).toString('base64url');
-}
-
-// El inicio de sesión por email está desactivado en la configuración local (ver
-// el PR), así que el token de acceso se firma con el secreto JWT local, igual
-// que lo haría el servidor de autenticación.
-export function signAccessToken(userId: string): string {
-  const secret = readLocalStatusValue(
-    'JWT_SECRET',
-    process.env.SUPABASE_JWT_SECRET,
-  );
-  const issuedAt = Math.floor(Date.now() / 1000);
-  const expiresAt = issuedAt + 3600;
-  const headerJson = JSON.stringify({ alg: 'HS256', typ: 'JWT' });
-  const payloadJson = JSON.stringify({
-    aud: 'authenticated',
-    role: 'authenticated',
-    sub: userId,
-    iat: issuedAt,
-    exp: expiresAt,
-  });
-  const header = encodeBase64Url(headerJson);
-  const payload = encodeBase64Url(payloadJson);
-  const signedContent = `${header}.${payload}`;
-  const hmac = createHmac('sha256', secret);
-  const signature = hmac.update(signedContent).digest();
-  const encodedSignature = encodeBase64Url(signature);
-
-  return `${signedContent}.${encodedSignature}`;
-}
-
-export function createClientWithAccessToken(
-  accessToken: string,
-): SupabaseClient {
-  const { url, anonKey } = readLocalSupabaseSettings();
-  return createClient(url, anonKey, {
-    ...clientOptions,
-    global: { headers: { Authorization: `Bearer ${accessToken}` } },
-  });
-}
-
 // Crea un usuario con email confirmado mediante la API de administración (el
 // registro público está desactivado) y devuelve un cliente que actúa como él.
 export async function createTestUser(
@@ -134,7 +92,12 @@ export async function createTestUser(
   }
 
   const userId = creation.data.user.id;
-  const client = createClientWithAccessToken(signAccessToken(userId));
+  const client = createAnonymousClient();
+  const signIn = await client.auth.signInWithPassword({ email, password });
+  if (signIn.error) {
+    await deleteTestUser(adminClient, { id: userId, email, password, client });
+    throw signIn.error;
+  }
 
   return { id: userId, email, password, client };
 }
@@ -159,4 +122,41 @@ export function queryLocalDatabase(sql: string): Record<string, unknown>[] {
     { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
   );
   return JSON.parse(output);
+}
+
+// Tras db reset, PostgREST puede seguir viendo el esquema anterior. La espera
+// comprueba las seis tablas antes de crear fixtures; nunca repite un test.
+export async function waitForLocalSchema(): Promise<void> {
+  const adminClient = createAdminClient();
+  const tables = [
+    'categories',
+    'sections',
+    'habits',
+    'habit_rules',
+    'habit_marks',
+    'tasks',
+  ];
+  const deadline = Date.now() + 30000;
+  for (const table of tables) {
+    let lastError = '';
+    while (Date.now() < deadline) {
+      const remainingTime = deadline - Date.now();
+      const response = await adminClient
+        .from(table)
+        .select('user_id', { head: true })
+        .limit(0)
+        .abortSignal(AbortSignal.timeout(Math.max(1, remainingTime)));
+      if (!response.error) {
+        lastError = '';
+        break;
+      }
+      lastError = response.error.message;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    if (lastError || Date.now() >= deadline) {
+      throw new Error(
+        `Local schema did not become ready for ${table}: ${lastError}`,
+      );
+    }
+  }
 }

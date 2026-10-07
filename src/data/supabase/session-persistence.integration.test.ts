@@ -6,12 +6,12 @@ import {
   type AppSupabaseClient,
 } from './create-client';
 import {
+  waitForLocalSchema,
   createAdminClient,
   createAnonymousClient,
   createTestUser,
   deleteTestUser,
   readLocalSupabaseSettings,
-  signAccessToken,
   type TestUser,
 } from './local-supabase';
 
@@ -44,20 +44,19 @@ let adminClient: SupabaseClient;
 let user: TestUser;
 
 beforeAll(async () => {
+  await waitForLocalSchema();
   adminClient = createAdminClient();
   user = await createTestUser(adminClient);
-});
+}, 35000);
 
 afterAll(async () => {
   await deleteTestUser(adminClient, user);
 });
 
 async function signIn(client: AppSupabaseClient) {
-  // El inicio de sesión por email no está activo en local (ver el PR): se
-  // entra con un token firmado, que sigue el mismo camino de guardado.
-  const response = await client.auth.setSession({
-    access_token: signAccessToken(user.id),
-    refresh_token: 'refresh-token-for-tests',
+  const response = await client.auth.signInWithPassword({
+    email: user.email,
+    password: user.password,
   });
   expect(response.error).toBeNull();
 }
@@ -94,11 +93,7 @@ describe('Session storage', () => {
   });
 });
 
-// PENDIENTE DEL HUMANO: con `[auth.email] enable_signup = false` el Supabase
-// local rechaza el inicio de sesión ("Email logins are disabled"). Al aprobar
-// poner `enable_signup = true` en [auth.email] (el alta sigue cerrada por
-// [auth]), cambiar `describe.skip` por `describe` y comprobar que pasan.
-describe.skip('Email sign-in (blocked until [auth.email] is enabled)', () => {
+describe('Email sign-in', () => {
   it('signs in with the right password', async () => {
     const client = openApp(createMemoryStorage());
 
@@ -123,12 +118,48 @@ describe.skip('Email sign-in (blocked until [auth.email] is enabled)', () => {
     expect(restored.data.session?.user.id).toBe(user.id);
   });
 
+  it('refreshes a restored real session and persists the renewed tokens', async () => {
+    const storage = createMemoryStorage();
+    await signIn(openApp(storage));
+    const reopened = openApp(storage);
+    const original = await reopened.auth.getSession();
+    const refreshed = await reopened.auth.refreshSession();
+
+    expect(refreshed.error).toBeNull();
+    expect(refreshed.data.session?.user.id).toBe(user.id);
+    expect(refreshed.data.session?.refresh_token).toEqual(expect.any(String));
+    expect(refreshed.data.session?.refresh_token).not.toBe(
+      original.data.session?.refresh_token,
+    );
+    const restored = await openApp(storage).auth.getSession();
+    expect(restored.data.session?.access_token).toBe(
+      refreshed.data.session?.access_token,
+    );
+    expect(restored.data.session?.refresh_token).toBe(
+      refreshed.data.session?.refresh_token,
+    );
+    const verified = await reopened.auth.getUser();
+    expect(verified.error).toBeNull();
+    expect(verified.data.user?.id).toBe(user.id);
+  });
+
+  it('keeps public signup disabled in the server settings', async () => {
+    const { url, anonKey } = readLocalSupabaseSettings();
+    const response = await fetch(`${url}/auth/v1/settings`, {
+      headers: { apikey: anonKey },
+    });
+    expect(response.ok).toBe(true);
+    const settings = await response.json();
+    expect(settings.disable_signup).toBe(true);
+    expect(settings.external.email).toBe(true);
+  });
+
   it('rejects a wrong password with the invalid_credentials code', async () => {
     const client = openApp(createMemoryStorage());
 
     const response = await client.auth.signInWithPassword({
       email: user.email,
-      password: 'not-the-password',
+      password: 'x'.repeat(12),
     });
 
     expect(response.error?.code).toBe('invalid_credentials');
@@ -139,7 +170,7 @@ describe.skip('Email sign-in (blocked until [auth.email] is enabled)', () => {
 
     const response = await anonymousClient.auth.signUp({
       email: 'stranger@example.test',
-      password: 'a-long-enough-password',
+      password: 'x'.repeat(12),
     });
 
     expect(response.error?.code).toBe('signup_disabled');

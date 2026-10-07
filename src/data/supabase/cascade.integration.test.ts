@@ -1,7 +1,8 @@
-import { describe, expect, it } from '@jest/globals';
+import { beforeAll, describe, expect, it } from '@jest/globals';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import {
+  waitForLocalSchema,
   createAdminClient,
   createTestUser,
   deleteTestUser,
@@ -46,6 +47,8 @@ async function countRows(
   expect(response.error).toBeNull();
   return response.count ?? 0;
 }
+
+beforeAll(waitForLocalSchema, 35000);
 
 describe('Cascading deletes', () => {
   it('removes the rows of all six tables when the user is deleted', async () => {

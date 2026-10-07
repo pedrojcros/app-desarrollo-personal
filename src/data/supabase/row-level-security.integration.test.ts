@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 
 import {
+  waitForLocalSchema,
   createAdminClient,
   createAnonymousClient,
   createTestUser,
@@ -116,10 +117,11 @@ async function readRowAsAdmin(table: TableName, row: Row): Promise<Row | null> {
 }
 
 beforeAll(async () => {
+  await waitForLocalSchema();
   adminClient = createAdminClient();
   owner = await createTestUser(adminClient);
   intruder = await createTestUser(adminClient);
-});
+}, 35000);
 
 afterAll(async () => {
   await deleteTestUser(adminClient, owner);
