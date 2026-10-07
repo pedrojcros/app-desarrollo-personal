@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { ChevronDown, ChevronRight, Trash2 } from 'lucide-react-native';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
@@ -135,9 +136,21 @@ export function CategoryRow({
           aria-expanded={isExpanded}
           accessibilityLabel={toggleLabel}
           onPress={() => setIsExpanded(!isExpanded)}
-          className="min-h-14 flex-1 flex-row items-center gap-3"
+          className="h-14 w-11 items-center justify-center"
         >
           <Icon icon={chevron} color="muted-foreground" size={18} />
+        </Pressable>
+        <Pressable
+          role="button"
+          accessibilityLabel={`Abrir ${category.name}`}
+          onPress={() =>
+            router.push({
+              pathname: '/categorias/[id]',
+              params: { id: category.id },
+            })
+          }
+          className="min-h-14 flex-1 flex-row items-center gap-3"
+        >
           <CategoryIcon
             name={category.icon}
             size={22}
