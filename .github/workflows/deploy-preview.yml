@@ -31,12 +31,14 @@ jobs:
     needs: backup-changes
     if: needs.backup-changes.outputs.changed == 'true'
     uses: ./.github/workflows/backup.yml
+    secrets: inherit
     with:
       environment: pruebas
       retention_days: 1
   deploy:
     if: github.event.pull_request.head.repo.full_name == github.repository
     uses: ./.github/workflows/deploy-web.yml
+    secrets: inherit
     with:
       environment: pruebas
   comment:
