@@ -16,6 +16,7 @@ type ListRowProps = {
   meta: string;
   // Lo de la Bandeja de entrada no tiene categoría: usa los colores del acento.
   category?: CategoryColor;
+  onPress?: () => void;
   onMarkDone: () => void;
   onMarkNotDone: () => void;
   disabled?: boolean;
@@ -122,6 +123,7 @@ export function ListRow({
   title,
   meta,
   category,
+  onPress,
   onMarkDone,
   onMarkNotDone,
   disabled,
@@ -129,12 +131,20 @@ export function ListRow({
   notDonePressed,
 }: ListRowProps) {
   const rowOpacityClassName = disabled ? 'opacity-50' : '';
+  const TitleContainer = onPress === undefined ? View : Pressable;
+  const titleRole = onPress === undefined ? undefined : 'button';
+  const titleLabel = onPress === undefined ? undefined : `Abrir ${title}`;
 
   return (
     <View
       className={`min-h-[60px] flex-row items-center gap-0.5 border-b border-border ${rowOpacityClassName}`}
     >
-      <View className="flex-1 py-2">
+      <TitleContainer
+        className="min-h-11 flex-1 justify-center py-2"
+        role={titleRole}
+        accessibilityLabel={titleLabel}
+        onPress={onPress}
+      >
         <Text weight="semibold">{title}</Text>
         <View className="mt-0.5 flex-row items-center gap-1.5">
           {category !== undefined ? (
@@ -144,7 +154,7 @@ export function ListRow({
           ) : null}
           <Text variant="caption">{meta}</Text>
         </View>
-      </View>
+      </TitleContainer>
       <MarkButton
         label={`Marcar ${title} como hecho`}
         onPress={onMarkDone}

@@ -1,5 +1,5 @@
-import { View } from 'react-native';
+import { CategoryViewScreen } from '@/components/category-view/category-view-screen';
 
 export default function InboxScreen() {
-  return <View className="flex-1" />;
+  return <CategoryViewScreen categoryId={null} />;
 }
