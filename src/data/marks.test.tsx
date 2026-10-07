@@ -144,7 +144,7 @@ const categoryKey = queryKeys.categoryView(null);
 
 // Lee de la caché sin pedir nada a nadie (enabled: false), como lo haría una vista.
 function ItemList({ queryKey }: { queryKey: readonly string[] }) {
-  const { markItem } = useMarkItem();
+  const { markItem, markItems } = useMarkItem();
   const query = useQuery<ViewData>({
     queryKey,
     queryFn: () => Promise.reject(new Error('Not used in this test')),
@@ -153,6 +153,10 @@ function ItemList({ queryKey }: { queryKey: readonly string[] }) {
   const items = query.data?.items ?? [];
   return (
     <>
+      <Button
+        title="all not done"
+        onPress={() => markItems(items, 'not_done')}
+      />
       {items.map((item) => (
         <ItemRow key={item.name} item={item} markItem={markItem} />
       ))}
@@ -437,4 +441,88 @@ it('keeps a newer state of the same item when an older save fails', async () => 
   expect(screen.getByText(/^Leche:not_done:20/)).toBeTruthy();
   await respondToSave(1, successResponse);
   expect(screen.getByText(/^Leche:not_done:20/)).toBeTruthy();
+});
+
+describe('useMarkItem, markItems (CU-04, scenario 4)', () => {
+  it('marks every item and shows a single notice with Undo', async () => {
+    renderWithCaches({ today: [milk, bread] });
+
+    await pressButton('all not done');
+
+    expect(screen.getByText(/^Leche:not_done:20/)).toBeTruthy();
+    expect(screen.getByText(/^Pan:not_done:20/)).toBeTruthy();
+    expect(screen.getAllByText('2 marcadas como no hechas')).toHaveLength(1);
+    expect(screen.getAllByText('Deshacer')).toHaveLength(1);
+    expect(mockPendingSaves).toHaveLength(2);
+    await respondToSave(0, successResponse);
+    await respondToSave(1, successResponse);
+  });
+
+  it('brings every item back to pending with Undo, without a new notice', async () => {
+    renderWithCaches({ today: [milk, bread] });
+    await pressButton('all not done');
+    await respondToSave(0, successResponse);
+    await respondToSave(1, successResponse);
+
+    await pressButton('Deshacer');
+
+    expect(screen.getByText('Leche:pending:none')).toBeTruthy();
+    expect(screen.getByText('Pan:pending:none')).toBeTruthy();
+    expect(screen.queryByText('Deshacer')).toBeNull();
+    await respondToSave(2, successResponse);
+    await respondToSave(3, successResponse);
+  });
+
+  it('returns only the failed item to pending and says so (CU-04, E2)', async () => {
+    renderWithCaches({ today: [milk, bread] });
+    await pressButton('all not done');
+
+    await respondToSave(0, successResponse);
+    await respondToSave(1, failureResponse);
+
+    expect(screen.getByText(/^Leche:not_done:20/)).toBeTruthy();
+    expect(screen.getByText('Pan:pending:none')).toBeTruthy();
+    expect(
+      screen.getByText(
+        '1 de 2 marcadas como no hechas. El resto no se ha podido guardar.',
+      ),
+    ).toBeTruthy();
+  });
+
+  it('undoes only the items that were saved after a partial failure', async () => {
+    renderWithCaches({ today: [milk, bread] });
+    await pressButton('all not done');
+    await respondToSave(0, successResponse);
+    await respondToSave(1, failureResponse);
+
+    await pressButton('Deshacer');
+
+    expect(mockPendingSaves).toHaveLength(3);
+    expect(screen.getByText('Leche:pending:none')).toBeTruthy();
+    await respondToSave(2, successResponse);
+  });
+
+  it('shows the plain error without Undo when nothing could be saved', async () => {
+    renderWithCaches({ today: [milk, bread] });
+    await pressButton('all not done');
+
+    await respondToSave(0, failureResponse);
+    await respondToSave(1, failureResponse);
+
+    expect(
+      screen.getByText('No se ha podido guardar. Inténtalo de nuevo.'),
+    ).toBeTruthy();
+    expect(screen.queryByText('Deshacer')).toBeNull();
+  });
+
+  it('refuses the whole batch when it contains a future occurrence', async () => {
+    renderWithCaches({ today: [toothbrushYesterday, toothbrushTomorrow] });
+
+    await pressButton('all not done');
+
+    expect(mockPendingSaves).toHaveLength(0);
+    expect(
+      screen.getByText('Todavía no se puede marcar: ese día no ha llegado.'),
+    ).toBeTruthy();
+  });
 });

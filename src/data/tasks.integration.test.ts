@@ -14,6 +14,7 @@ import {
   archiveTask,
   createTask,
   fetchTask,
+  rescheduleTask,
   updateTask,
   type TaskInput,
 } from './tasks';
@@ -286,5 +287,70 @@ describe('CU-06 scenario 4: empty name', () => {
     expect(result.ok).toBe(false);
     const task = await fetchTaskOrThrow(taskId);
     expect(task.name).toBe('Intacta');
+  });
+});
+
+describe('CU-04 scenario 2: reschedule an overdue task', () => {
+  it('moves it to the new date, keeps the time and leaves it pending', async () => {
+    const taskId = await createTaskOrThrow(
+      buildInput({ dueDate: '2026-10-06', dueTime: '18:30' }),
+    );
+
+    const result = await rescheduleTask(taskId, '2026-10-08', '2026-10-07');
+
+    expect(result).toEqual({ ok: true, value: null });
+    const task = await fetchTaskOrThrow(taskId);
+    expect(task.status).toBe('pending');
+    expect(task.dueDate).toBe('2026-10-08');
+    expect(task.dueTime).toBe('18:30');
+  });
+
+  it('accepts today as the new date', async () => {
+    const taskId = await createTaskOrThrow(
+      buildInput({ dueDate: '2026-10-01' }),
+    );
+
+    const result = await rescheduleTask(taskId, '2026-10-07', '2026-10-07');
+
+    expect(result.ok).toBe(true);
+  });
+});
+
+describe('CU-04 scenario 3: reschedule to the past', () => {
+  it('is refused with past_date and the task does not change', async () => {
+    const taskId = await createTaskOrThrow(
+      buildInput({ dueDate: '2026-10-01', dueTime: '09:00' }),
+    );
+
+    const result = await rescheduleTask(taskId, '2026-10-06', '2026-10-07');
+
+    expect(result).toMatchObject({ ok: false, error: { code: 'past_date' } });
+    const task = await fetchTaskOrThrow(taskId);
+    expect(task.dueDate).toBe('2026-10-01');
+    expect(task.dueTime).toBe('09:00');
+  });
+
+  it('rejects a malformed date as invalid_input', async () => {
+    const taskId = await createTaskOrThrow(
+      buildInput({ dueDate: '2026-10-01' }),
+    );
+
+    const result = await rescheduleTask(taskId, 'mañana', '2026-10-07');
+
+    expect(result).toMatchObject({
+      ok: false,
+      error: { code: 'invalid_input' },
+    });
+  });
+
+  it('reports not_found for an archived task', async () => {
+    const taskId = await createTaskOrThrow(
+      buildInput({ dueDate: '2026-10-01' }),
+    );
+    await archiveTask(taskId);
+
+    const result = await rescheduleTask(taskId, '2026-10-08', '2026-10-07');
+
+    expect(result).toMatchObject({ ok: false, error: { code: 'not_found' } });
   });
 });

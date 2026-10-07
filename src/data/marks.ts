@@ -32,6 +32,8 @@ export { setMarkStatus };
 
 interface StatusChange {
   restorePreviousInstant?: boolean;
+  // En un lote, el aviso de fallo lo da el lote entero, no cada elemento.
+  reportsFailureItself?: boolean;
   target: MarkTarget;
   status: ItemStatus;
   markedAt: string | null;
@@ -148,6 +150,33 @@ function describeSavedStatus(status: ItemStatus): string {
   return 'Devuelta a pendiente';
 }
 
+const PLURAL_STATUS_DESCRIPTIONS: Record<ItemStatus, string> = {
+  done: 'marcadas como hechas',
+  not_done: 'marcadas como no hechas',
+  pending: 'devueltas a pendiente',
+};
+const SINGULAR_STATUS_DESCRIPTIONS: Record<ItemStatus, string> = {
+  done: 'marcada como hecha',
+  not_done: 'marcada como no hecha',
+  pending: 'devuelta a pendiente',
+};
+
+function describeBatchStatus(status: ItemStatus, count: number): string {
+  if (count === 1) {
+    return `1 ${SINGULAR_STATUS_DESCRIPTIONS[status]}`;
+  }
+  return `${count} ${PLURAL_STATUS_DESCRIPTIONS[status]}`;
+}
+
+function describePartialBatch(
+  status: ItemStatus,
+  savedCount: number,
+  totalCount: number,
+): string {
+  const description = PLURAL_STATUS_DESCRIPTIONS[status];
+  return `${savedCount} de ${totalCount} ${description}. El resto no se ha podido guardar.`;
+}
+
 const FUTURE_DATE_MESSAGE =
   'Todavía no se puede marcar: ese día no ha llegado.';
 const SAVE_FAILED_MESSAGE = 'No se ha podido guardar. Inténtalo de nuevo.';
@@ -162,6 +191,7 @@ function describeFailureForUser(error: unknown): string {
 /** Lo que usan las vistas: marcar un elemento que tienen en pantalla. */
 export function useMarkItem(): {
   markItem: (item: ViewItem, status: ItemStatus) => void;
+  markItems: (items: ViewItem[], status: ItemStatus) => void;
   isMarking: boolean;
 } {
   const queryClient = useQueryClient();
@@ -203,7 +233,9 @@ export function useMarkItem(): {
           sequence.savedMarkedAt,
         );
       }
-      showNotice({ message: describeFailureForUser(error) });
+      if (!change.reportsFailureItself) {
+        showNotice({ message: describeFailureForUser(error) });
+      }
     },
     onSettled: (value, error, change, sequence) => {
       if (sequence?.latest === change) {
@@ -220,12 +252,7 @@ export function useMarkItem(): {
     },
   });
 
-  function markItem(item: ViewItem, status: ItemStatus): void {
-    if (isFutureOccurrence(item.target, today)) {
-      showNotice({ message: FUTURE_DATE_MESSAGE });
-      return;
-    }
-
+  function buildChanges(item: ViewItem, status: ItemStatus) {
     const instant = new Date();
     const markedAt = status === 'pending' ? null : instant.toISOString();
     const change: StatusChange = {
@@ -243,6 +270,16 @@ export function useMarkItem(): {
       previousStatus: status,
       previousMarkedAt: markedAt,
     };
+    return { change, undoChange };
+  }
+
+  function markItem(item: ViewItem, status: ItemStatus): void {
+    if (isFutureOccurrence(item.target, today)) {
+      showNotice({ message: FUTURE_DATE_MESSAGE });
+      return;
+    }
+
+    const { change, undoChange } = buildChanges(item, status);
     // Deshacer es otro cambio normal, pero sin un nuevo aviso con «Deshacer».
     showNotice({
       message: describeSavedStatus(status),
@@ -252,5 +289,63 @@ export function useMarkItem(): {
     mutation.mutate(change);
   }
 
-  return { markItem, isMarking: markingCount > 0 };
+  // Un solo aviso para todo el lote. Cada elemento sigue la misma secuencia de
+  // guardado que `markItem`, así que el orden y los parches de caché no cambian.
+  function markItems(items: ViewItem[], status: ItemStatus): void {
+    if (items.length === 0) {
+      return;
+    }
+    const hasFutureItem = items.some((item) =>
+      isFutureOccurrence(item.target, today),
+    );
+    if (hasFutureItem) {
+      showNotice({ message: FUTURE_DATE_MESSAGE });
+      return;
+    }
+
+    const entries = items.map((item) => buildChanges(item, status));
+    showNotice({
+      message: describeBatchStatus(status, items.length),
+      actionLabel: 'Deshacer',
+      onAction: () => undoEntries(entries),
+    });
+    void saveBatch(entries, status);
+  }
+
+  function undoEntries(entries: { undoChange: StatusChange }[]): void {
+    for (const entry of entries) {
+      mutation.mutate(entry.undoChange);
+    }
+  }
+
+  async function saveBatch(
+    entries: { change: StatusChange; undoChange: StatusChange }[],
+    status: ItemStatus,
+  ): Promise<void> {
+    const saves = entries.map((entry) =>
+      mutation.mutateAsync({ ...entry.change, reportsFailureItself: true }),
+    );
+    const outcomes = await Promise.allSettled(saves);
+    const savedEntries = entries.filter(
+      (entry, index) => outcomes[index].status === 'fulfilled',
+    );
+    if (savedEntries.length === entries.length) {
+      return;
+    }
+    if (savedEntries.length === 0) {
+      showNotice({ message: SAVE_FAILED_MESSAGE });
+      return;
+    }
+    showNotice({
+      message: describePartialBatch(
+        status,
+        savedEntries.length,
+        entries.length,
+      ),
+      actionLabel: 'Deshacer',
+      onAction: () => undoEntries(savedEntries),
+    });
+  }
+
+  return { markItem, markItems, isMarking: markingCount > 0 };
 }
