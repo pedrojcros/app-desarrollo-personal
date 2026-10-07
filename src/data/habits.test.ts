@@ -70,16 +70,15 @@ it.each([
   expect(mockRpc).not.toHaveBeenCalled();
 });
 
-it('keeps a future first rule at the future start date', async () => {
-  const single = jest.fn<() => Promise<unknown>>().mockResolvedValue({
-    data: { start_date: '2026-11-01' },
-    error: null,
-    status: 200,
-  });
+it('passes the device date to SQL without reading the habit first', async () => {
   const query = {
     select: jest.fn().mockReturnThis(),
     eq: jest.fn().mockReturnThis(),
-    maybeSingle: single,
+    maybeSingle: jest.fn<() => Promise<unknown>>().mockResolvedValue({
+      data: { start_date: '2026-11-01' },
+      error: null,
+      status: 200,
+    }),
   };
   mockFrom.mockReturnValue(query as never);
   mockRpc.mockResolvedValue({ data: null, error: null, status: 200 } as never);
@@ -88,11 +87,15 @@ it('keeps a future first rule at the future start date', async () => {
     { frequency: 'weekdays', weekdays: [3], intervalDays: null },
     '2026-10-07',
   );
-  expect(result.ok).toBe(true);
-  expect(mockRpc).toHaveBeenCalledWith(
-    'set_habit_rule',
-    expect.objectContaining({ p_valid_from: '2026-11-01' }),
-  );
+  expect(result).toEqual({ ok: true, value: null });
+  expect(mockRpc).toHaveBeenCalledWith('set_habit_rule', {
+    p_habit_id: habitId,
+    p_today: '2026-10-07',
+    p_frequency: 'weekdays',
+    p_weekdays: [3],
+    p_interval_days: undefined,
+  });
+  expect(mockFrom).not.toHaveBeenCalled();
 });
 
 it('maps already_started and passes the device date for moving', async () => {

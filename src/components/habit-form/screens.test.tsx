@@ -170,3 +170,34 @@ it('returns to Hoy after a save opened through a direct URL with no navigation h
     expect(router.replace).toHaveBeenCalledWith('/(tabs)/hoy'),
   );
 });
+
+it('shows a recoverable error instead of opening an edit form without rules', () => {
+  jest
+    .mocked(useLocalSearchParams)
+    .mockReturnValue({ id: '11111111-1111-4111-8111-111111111111' });
+  jest.mocked(useHabit).mockReturnValue({
+    data: {
+      id: '11111111-1111-4111-8111-111111111111',
+      name: 'Leer',
+      categoryId: null,
+      sectionId: null,
+      startDate: '2026-10-01',
+      timeOfDay: null,
+      timeSlot: null,
+      durationMinutes: null,
+      archivedOn: null,
+      ruleVersions: [],
+    },
+    refetch: jest.fn(),
+  } as never);
+  render(
+    <ThemeScope themeName="white">
+      <EditHabitScreen />
+    </ThemeScope>,
+  );
+  expect(screen.getByRole('alert')).toHaveTextContent(
+    'No se pudo cargar la frecuencia del hábito.',
+  );
+  expect(screen.getByRole('button', { name: 'Reintentar' })).toBeEnabled();
+  expect(screen.queryByText('Submit draft')).toBeNull();
+});

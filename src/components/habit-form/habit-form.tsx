@@ -125,6 +125,7 @@ export function HabitForm({
       />
       <ScheduleFields
         value={value}
+        startsChangeToday={startDateLocked}
         intervalText={intervalText}
         onIntervalChange={setIntervalText}
         errors={errors}

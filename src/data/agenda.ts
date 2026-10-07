@@ -43,7 +43,7 @@ function mapRuleRow(row: Tables<'habit_rules'>): HabitRuleVersion {
   };
 }
 
-function mapHabitRow(row: HabitRowWithRules, timeZone: string): Habit {
+export function mapHabitRow(row: HabitRowWithRules, timeZone: string): Habit {
   const ruleVersions = row.habit_rules.map(mapRuleRow);
   return {
     id: row.id,

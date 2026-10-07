@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { parseCalendarDate } from '@/domain/calendar-date';
 import type { Habit } from '@/domain/entities';
+import { findRuleInForce } from '@/domain/recurrence';
+import type { CalendarDate, HabitRuleVersion } from '@/domain/types';
 import type { HabitInput } from '@/data/habits';
 
 export function readHabitRouteDefaults(
@@ -34,8 +36,22 @@ export function readHabitRouteDefaults(
   return defaults;
 }
 
-export function habitToFormValue(habit: Habit): HabitInput {
-  const rule = habit.ruleVersions[habit.ruleVersions.length - 1];
+export function habitToFormValue(
+  habit: Habit,
+  today: CalendarDate,
+): HabitInput | null {
+  const sortedRules = [...habit.ruleVersions];
+  sortedRules.sort((first, second) =>
+    first.validFrom.localeCompare(second.validFrom),
+  );
+  // Antes del inicio se edita la primera regla; después, la vigente hoy.
+  const effectiveDate = today > habit.startDate ? today : habit.startDate;
+  let rule: HabitRuleVersion;
+  try {
+    rule = findRuleInForce(sortedRules, effectiveDate);
+  } catch {
+    return null;
+  }
   return {
     name: habit.name,
     categoryId: habit.categoryId,
