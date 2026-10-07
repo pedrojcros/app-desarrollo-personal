@@ -12,6 +12,7 @@
     "lint": "eslint . && prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "jest --config jest.config.js --runInBand",
+    "test:zones": "TZ=Europe/Madrid jest --config jest.config.js --runInBand src/domain && TZ=America/Los_Angeles jest --config jest.config.js --runInBand src/domain",
     "test:integration": "node --env-file-if-exists=.env node_modules/jest/bin/jest.js --config jest.integration.config.js --runInBand",
     "export:web": "expo export --platform web",
     "test:e2e": "sh docker/android/test"

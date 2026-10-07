@@ -117,6 +117,7 @@ cp .env.example .env                              # variables públicas del Supa
 ./docker/app/run npm run lint                      # ESLint y comprobación de formato Prettier
 ./docker/app/run npm run typecheck                 # TypeScript estricto
 ./docker/app/run npm run test                      # tests unitarios y de componentes
+./docker/app/run npm run test:zones                # tests de src/domain con TZ=Europe/Madrid y TZ=America/Los_Angeles
 ./docker/app/run npm run test:integration           # integración; Supabase arrancado y .env preparado
 ./docker/app/run npx expo export --platform web    # exportación de la web en dist/
 ./docker/app/run npx supabase stop                 # detener el Supabase local
