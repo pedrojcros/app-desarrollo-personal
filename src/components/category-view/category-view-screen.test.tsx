@@ -31,6 +31,11 @@ import { ThemeScope } from '@/theme/theme-scope';
 
 import { CategoryViewScreen } from './category-view-screen';
 
+const mockOpenQuickAdd = jest.fn();
+jest.mock('@/components/quick-add', () => ({
+  useQuickAdd: () => ({ open: mockOpenQuickAdd }),
+}));
+
 jest.mock('expo-router', () => ({ router: { push: jest.fn() } }));
 jest.mock('@/data/categories', () => ({ useCategories: jest.fn() }));
 jest.mock('@/data/category-view', () => ({ useCategoryView: jest.fn() }));
@@ -261,4 +266,14 @@ describe('Category and Inbox screens', () => {
       expect(router.push).toHaveBeenCalledWith({ pathname, params: { id } });
     },
   );
+});
+
+it('opens quick add in an empty section without a date', () => {
+  renderView();
+  fireEvent.press(screen.getByLabelText('Añadir en Mercadona'));
+  expect(mockOpenQuickAdd).toHaveBeenCalledWith({
+    dueDate: null,
+    categoryId: 'shopping',
+    sectionId: 'mercadona',
+  });
 });

@@ -8,13 +8,17 @@ import { useToday } from '@/data/use-today';
 
 export default function NewHabitScreen() {
   const parameters = useLocalSearchParams<{
+    name?: string;
     categoryId?: string;
     sectionId?: string;
     startDate?: string;
   }>();
   const today = useToday();
   const mutation = useCreateHabit();
-  const initialValue = readHabitRouteDefaults(parameters, today);
+  const initialValue = {
+    ...readHabitRouteDefaults(parameters, today),
+    name: parameters.name ?? '',
+  };
 
   async function save(input: HabitInput): Promise<void> {
     await mutation.mutateAsync(input);

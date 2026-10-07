@@ -12,6 +12,7 @@ import { parseCalendarDate } from '@/domain/calendar-date';
 import type { CalendarDate } from '@/domain/types';
 
 type NewTaskParams = {
+  name?: string;
   categoryId?: string;
   sectionId?: string;
   dueDate?: string;
@@ -37,6 +38,7 @@ export default function NewTaskScreen() {
   const [saveError, setSaveError] = useState<string>();
   const initialValues = {
     ...EMPTY_TASK_FORM_VALUES,
+    name: params.name ?? '',
     categoryId: params.categoryId ?? null,
     sectionId: params.sectionId ?? null,
     dueDate: readDueDate(params.dueDate),

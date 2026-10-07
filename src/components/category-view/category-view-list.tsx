@@ -1,3 +1,9 @@
+import { Plus } from 'lucide-react-native';
+import { useQuickAdd } from '@/components/quick-add';
+import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
+import { getQuickAddDefaults } from '@/domain/quick-add';
+import { useToday } from '@/data/use-today';
 import { router } from 'expo-router';
 import { SectionList, View } from 'react-native';
 
@@ -14,6 +20,7 @@ type CategoryViewListProps = {
   items: ViewItem[];
   sections: Section[];
   color?: CategoryColor;
+  categoryId?: string | null;
 };
 
 function openItem(item: ViewItem): void {
@@ -45,18 +52,54 @@ export function CategoryViewList({
   items,
   sections,
   color,
+  categoryId = null,
 }: CategoryViewListProps) {
+  const { open } = useQuickAdd();
+  const today = useToday();
   const { markItem } = useMarkItem();
   // T07 conserva las marcas en caché para poder restaurarlas al pulsar Deshacer.
   const pendingItems = items.filter((item) => item.status === 'pending');
   const groups = groupBySection(pendingItems, sections);
-  const listSections = groups.map((group) => {
-    const section = sections.find(
-      (candidate) => candidate.id === group.sectionId,
+  const sortedSections = [...sections];
+  sortedSections.sort((first, second) =>
+    first.name.localeCompare(second.name, 'es'),
+  );
+  const listSections: {
+    key: string;
+    sectionId: string | null;
+    title: string;
+    data: ViewItem[];
+  }[] = sortedSections.map((section) => {
+    const group = groups.find(
+      (candidate) => candidate.sectionId === section.id,
     );
-    const title = section?.name ?? 'Sin sección';
-    return { key: group.sectionId ?? 'unsectioned', title, data: group.items };
+    return {
+      key: section.id,
+      sectionId: section.id,
+      title: section.name,
+      data: group?.items ?? [],
+    };
   });
+  const unsectionedGroup = groups.find((group) => group.sectionId === null);
+  if (unsectionedGroup !== undefined) {
+    listSections.push({
+      key: 'unsectioned',
+      sectionId: null,
+      title: 'Sin sección',
+      data: unsectionedGroup.items,
+    });
+  }
+
+  function addToSection(sectionId: string | null): void {
+    if (categoryId === null || sectionId === null) {
+      return;
+    }
+    const defaults = getQuickAddDefaults(
+      { kind: 'section', categoryId, sectionId },
+      today,
+    );
+    open(defaults);
+  }
 
   return (
     <SectionList
@@ -65,14 +108,32 @@ export function CategoryViewList({
       contentInsetAdjustmentBehavior="automatic"
       stickySectionHeadersEnabled={false}
       className="flex-1"
-      ListEmptyComponent={
-        <Text className="py-6">No hay nada pendiente aquí.</Text>
+      ListHeaderComponent={
+        pendingItems.length === 0 ? (
+          <Text className="py-6">No hay nada pendiente aquí.</Text>
+        ) : null
       }
       renderSectionHeader={({ section }) => {
         if (sections.length === 0) {
           return null;
         }
-        return <SectionTitle title={section.title} />;
+        return (
+          <View className="flex-row items-center gap-2">
+            <View className="flex-1">
+              <SectionTitle title={section.title} />
+            </View>
+            {categoryId !== null && section.sectionId !== null ? (
+              <Button
+                size="icon"
+                variant="ghost"
+                accessibilityLabel={`Añadir en ${section.title}`}
+                onPress={() => addToSection(section.sectionId)}
+              >
+                <Icon icon={Plus} color="accent-text" />
+              </Button>
+            ) : null}
+          </View>
+        );
       }}
       renderItem={({ item }) => (
         <ListRow
