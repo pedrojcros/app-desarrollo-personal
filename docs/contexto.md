@@ -42,12 +42,13 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-07, 16:00.*
+*Actualizado: 2026-10-07, 16:45.*
 
-- **Fase: ejecución, ola 3.** En `develop`: T01, T02, T03, T04, T07, T08, T12, T14, T15, la base común de vistas y el arreglo de migraciones. El despliegue a pruebas desde `develop` funciona. Jira al día.
-- **Trabajando** (Run de Orca `run_fe8fef684013`, todos con Codex): T05, hábitos (`ctx_d2b28bea0feb`, encargo 016); T09, Hoy (`ctx_d749509ba726`, encargo 018); T10, categoría y Bandeja (`ctx_52d120b8400d`, encargo 019). Los tres se relanzaron tras los reinicios de la tarde, en sus mismas carpetas.
+- **Fase: ejecución, ola 3.** En `develop`: T01, T02, T03, T04, T07, T08, T10, T12, T14, T15, la base común de vistas y el arreglo de migraciones. El despliegue a pruebas desde `develop` funciona.
+- **Pausadas hasta las 18:55** (Codex sin cuota): T05, hábitos, y T09, Hoy, con su trabajo sin commitear en sus carpetas (`ADP-8-habitos`, `ADP-12-vista-hoy`). Al volver la cuota, se retoman con una **orden corta** (DEC-39, punto 8).
+- **Jira se mueve solo (DEC-40):** el flujo de GitHub pasa las tarjetas a «En revisión» y a «Listo»; el orquestador, a «En curso» con la etiqueta del agente, con `scripts/jira/jira.py`.
 - **Escritos y sin lanzar:** 017 (T06, tareas) y 020 (T11, pendientes). Faltan T16 (añadir rápido) y T13 (caminos críticos).
-- **Ahorro de tokens (DEC-39):** puestos fijos (dos de Codex, uno de Claude y uno de Copilot solo para lo pequeño), esfuerzo alto para el orquestador, sesión nueva por ola, encargos cortos y el modelo de Codex según el encargo. Ahora corren tres Codex, lanzados antes de la regla: el próximo hueco es para Claude o para Copilot.
+- **Ahorro de tokens (DEC-39):** puestos fijos (dos Codex, un Claude, un Copilot solo para lo pequeño), sesión nueva por ola, encargos cortos, modelo de Codex según el encargo y relanzamientos con orden corta.
 
 
 ## Lo siguiente
@@ -73,7 +74,7 @@ Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto), 
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-40**.
+  chat. Siguiente número libre: **DEC-41**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
