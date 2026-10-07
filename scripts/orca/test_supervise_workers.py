@@ -31,9 +31,9 @@ class SupervisorScreenTests(unittest.TestCase):
         self.assertFalse(detect_usage_limit(screen_text))
         self.assertIsNone(parse_retry_time(screen_text, datetime.datetime(2026, 10, 7, 16, 0)))
 
-    def test_requires_menu_option_to_keep_current_model(self):
+    def test_detects_usage_limit_without_menu_option(self):
         screen_text = "You've hit your usage limit. Try again at 18:55"
-        self.assertFalse(detect_usage_limit(screen_text))
+        self.assertTrue(detect_usage_limit(screen_text))
 
     def test_reads_24_hour_retry_time(self):
         current_time = datetime.datetime(2026, 10, 7, 16, 0)
@@ -44,6 +44,41 @@ class SupervisorScreenTests(unittest.TestCase):
         current_time = datetime.datetime(2026, 10, 7, 16, 0)
         retry_time = parse_retry_time("You've hit your usage limit. Try again at 6:55 PM", current_time)
         self.assertEqual(retry_time, datetime.datetime(2026, 10, 7, 18, 55))
+
+    def test_reads_retry_time_with_ordinal_date_and_line_break_in_url(self):
+        screen_text = (
+            "You've hit your usage limit. Upgrade to Pro "
+            "(https://chatgpt.com/explore/pro), visit https://chatgpt.com/settings/\n"
+            "usage to purchase more credits or try again at Oct 8th, 2026 2:09 AM."
+        )
+        retry_time = parse_retry_time(screen_text, START)
+        self.assertEqual(retry_time, datetime.datetime(2026, 10, 8, 2, 9))
+
+    def test_reads_retry_time_with_full_month_and_24_hour_clock(self):
+        retry_time = parse_retry_time(
+            "Try again at October 8, 2026 14:09",
+            START,
+        )
+        self.assertEqual(retry_time, datetime.datetime(2026, 10, 8, 14, 9))
+
+    def test_keeps_explicit_retry_date_even_when_it_has_passed(self):
+        current_time = datetime.datetime(2026, 10, 8, 16, 0)
+        retry_time = parse_retry_time(
+            "Try again at Oct 8th, 2026 2:09 AM",
+            current_time,
+        )
+        self.assertEqual(retry_time, datetime.datetime(2026, 10, 8, 2, 9))
+
+    def test_reads_english_month_abbreviations_and_ordinal_suffixes(self):
+        retry_cases = (
+            ('Try again at Jan 1st, 2026 14:09', datetime.datetime(2026, 1, 1, 14, 9)),
+            ('Try again at Feb 2nd, 2026 14:09', datetime.datetime(2026, 2, 2, 14, 9)),
+            ('Try again at Mar 3rd, 2026 14:09', datetime.datetime(2026, 3, 3, 14, 9)),
+            ('Try again at Sept 4th, 2026 14:09', datetime.datetime(2026, 9, 4, 14, 9)),
+        )
+        for retry_text, expected_time in retry_cases:
+            with self.subTest(retry_text=retry_text):
+                self.assertEqual(parse_retry_time(retry_text, START), expected_time)
 
     def test_moves_passed_retry_time_to_tomorrow(self):
         current_time = datetime.datetime(2026, 10, 7, 19, 0)
@@ -102,6 +137,39 @@ class SupervisorCurrentSituationTests(unittest.TestCase):
         outcome = self.wait_for_quota_and_resume()
         self.assertEqual(outcome.status, supervise_workers.CodexStatus.ACTED)
         self.assertEqual(self.worker_states['dispatch-1'], {})
+
+    def test_quota_with_menu_selects_model_and_resumes_after_delay(self):
+        screen_text = QUOTA_SCREEN.format(time='18:55')
+        self.run_round(screen_text, START)
+        self.run_round(screen_text, START + ONE_ROUND)
+        outcome = self.run_round(
+            screen_text,
+            datetime.datetime(2026, 10, 7, 18, 56),
+        )
+        self.assertEqual(outcome.status, supervise_workers.CodexStatus.ACTED)
+        self.assertEqual(
+            self.sent_texts(),
+            [
+                ('terminal-1', '--text', '2'),
+                ('terminal-1', '--text', 'continúa'),
+            ],
+        )
+
+    def test_quota_without_menu_waits_and_resumes_after_delay(self):
+        screen_text = (
+            "You've hit your usage limit. Upgrade to Pro "
+            "(https://chatgpt.com/explore/pro), visit https://chatgpt.com/settings/\n"
+            "usage to purchase more credits or try again at Oct 8th, 2026 2:09 AM."
+        )
+        self.run_round(screen_text, START)
+        waiting_outcome = self.run_round(screen_text, START + ONE_ROUND)
+        self.assertEqual(waiting_outcome.status, supervise_workers.CodexStatus.ACTED)
+        self.assertEqual(self.sent_texts(), [])
+
+        resume_time = datetime.datetime(2026, 10, 8, 2, 10)
+        outcome = self.run_round(screen_text, resume_time)
+        self.assertEqual(outcome.status, supervise_workers.CodexStatus.ACTED)
+        self.assertEqual(self.sent_texts(), [('terminal-1', '--text', 'continúa')])
 
     def test_new_quota_is_detected_after_resuming(self):
         self.wait_for_quota_and_resume()
