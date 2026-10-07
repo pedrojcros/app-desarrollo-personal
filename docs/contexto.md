@@ -42,21 +42,21 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-07, 22:35.*
+*Actualizado: 2026-10-07, 23:40.*
 
-- **Fase: ejecución, olas 3 y 4 casi cerradas.** En `develop`: T01 a T12 y T14 y T15 (esta noche, T05 hábitos, T06 tareas, T09 Hoy y T11 Pendientes), más el supervisor que reanuda solo a Codex (encargos 023 y 025).
-- **En marcha** (puestos de DEC-39: dos Codex y un Claude): la corrección de T05 (encargo 024, Codex Sol alto: una sola función SQL para cambiar la regla de un hábito), T16 añadir rápido (022, Codex Sol) y la primera parte de T13 (026, Claude Sonnet: datos sintéticos de un año y RNF-01).
-- **Lo pesado, de uno en uno:** los trabajadores ejecutan integración, zonas, exportación y Expo con `flock /tmp/adp-pesado.lock` (con tres a la vez, el portátil llegó a carga 67).
-- **Jira se mueve solo (DEC-40)**; el orquestador pone «En curso» y la etiqueta del agente con `scripts/jira/jira.py`.
+- **Fase: ejecución, ola 5 (T13), la última de la versión 1.** En `develop` están todas las tareas de producto: T01 a T12, T14, T15 y T16 (añadir rápido), la corrección de las reglas de hábito (024), la primera parte de T13 (datos sintéticos de un año; RNF-01 medido: Hoy 5 ms, Pendientes 130 ms) y el supervisor autónomo. `develop` pasa entera: 483 tests unitarios y 202 de integración.
+- **En marcha:** T13b, flujos de Maestro de los caminos críticos con RNF-06 y RNF-08 (encargo 028, Codex Luna), y T13c, accesibilidad y web con RNF-03 (029, Codex Sol), en paralelo y sin ficheros en común.
+- **Reparto (pendiente de confirmar como DEC-41):** el humano pide partir más las tareas, con lo mecánico para Luna y lo denso para Sol; propuesta en la conversación del 2026-10-07 por la noche.
+- **Lo pesado, de uno en uno:** `flock /tmp/adp-pesado.lock` para integración, zonas, exportación, Expo, el emulador y el navegador.
 
 
 ## Lo siguiente
 
 Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto), en este orden:
 
-1. Con el supervisor en marcha, atender a los trabajadores (`orca orchestration check --run run_fe8fef684013`), revisar sus PR y fusionarlos (DEC-36): corrección de T05 (024), T16 (022) y T13a (026).
-2. Cuando T16 esté fusionada, escribir y lanzar la segunda parte de T13: flujos de Maestro de los caminos críticos, RNF-03, RNF-06 y RNF-08.
-3. Al cerrar T13 (versión 1 completa): proponer al humano publicar `develop` en `main` con la comprobación del orquestador (el humano crea su usuario de producción, DEC-37).
+1. Con el supervisor en marcha, atender a los trabajadores de 028 y 029 (`orca orchestration check --run run_fe8fef684013`), revisar sus PR y fusionarlos (DEC-36). Lo grande que 029 deje como propuesta se convierte en encargos nuevos.
+2. Con T13 fusionada, la versión 1 está completa: proponer al humano publicar `develop` en `main` con la comprobación del orquestador (el humano crea su usuario de producción, DEC-37).
+3. Deuda anotada: en T16, ficheros sin separación entre bloques y un hook (`useQuickAddDraft`) que devuelve 20 valores; el error de guardar un hábito desde el añadir rápido no distingue el código.
 
 
 ## Pendiente del humano
@@ -101,6 +101,7 @@ Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto), 
 - **SDK de Android**: `sdkmanager` (cmdline-tools 23) escribe los paquetes con `/`, pero `avdmanager` todavía los pide con `;`.
 - **Orca borra el worktree de un trabajador al liquidarlo o fusionar su PR** (pasó con T05 y T09): no cuentes con reutilizar su carpeta ni su terminal para una corrección; lánzala en un worktree nuevo desde `develop`.
 - **Una pregunta de un trabajador (`ask`) solo llega si el orquestador está esperando con `check --wait`**: si se queda revisando un rato largo, el trabajador espera parado (T16 esperó 30 minutos). Entre revisión y revisión, vuelve a `check`.
+- **`worker-start --base-branch develop` usa el `develop` local**, que no avanza al fusionar en GitHub: el trabajador arranca sin lo último (pasó con 028 y 029). Antes de lanzar, `git fetch origin && git branch -f develop origin/develop` (o `--base-branch origin/develop`).
 - **`docker run` con una imagen propia que no existe la busca en Docker Hub**, donde podría haber otra con el mismo nombre: siempre `--pull never`.
 
 ## Lo que no viaja con el repositorio
