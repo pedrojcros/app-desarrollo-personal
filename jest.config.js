@@ -12,6 +12,7 @@ module.exports = {
   // lucide solo publica ESM para React Native, y Jest necesita su versión CJS.
   // AsyncStorage no tiene módulo nativo en Jest: se usa su simulación oficial.
   moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
     '^lucide-react-native$':
       '<rootDir>/node_modules/lucide-react-native/dist/cjs/lucide-react-native.js',
     '^@react-native-async-storage/async-storage$':
