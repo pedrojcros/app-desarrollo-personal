@@ -10,11 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { useCategories, type Category } from '@/data/categories';
+import type { Section } from '@/data/sections';
 
 type CategoryListProps = {
   categories: Category[];
   onDeleteCategory: (category: Category) => void;
-  onDeleteSection: Parameters<typeof CategoryRow>[0]['onDeleteSection'];
+  onDeleteSection: (category: Category, section: Section) => void;
 };
 
 function CategoryList({
