@@ -184,6 +184,168 @@ conocida en `.env.example`; cualquier otro JWT se sigue comprobando.
 Expo y Supabase CLI llevan la telemetría desactivada; el
 contenedor no abre aplicaciones gráficas del anfitrión.
 
+## Despliegue
+
+Los servicios son gratuitos. Supabase tiene dos proyectos en Fráncfort
+(`eu-central-1`): `app-desarrollo-personal-pruebas` y
+`app-desarrollo-personal-produccion`. Los dos tienen el alta pública desactivada
+y permiten entrar con email y contraseña. Solo el humano crea su usuario real.
+
+| Rama o acción                    | Base de datos | Publicación                                                                           |
+| -------------------------------- | ------------- | ------------------------------------------------------------------------------------- |
+| PR contra `develop`              | Pruebas       | Vista previa protegida de Vercel; URL en un comentario del PR                         |
+| Push a `develop`                 | Pruebas       | Migraciones y web; alias estable `https://app-desarrollo-personal-pruebas.vercel.app` |
+| Push a `main` (solo el humano)   | Producción    | Copia cifrada conservada, migraciones y web con `vercel --prod`                       |
+| EAS `preview` (solo al publicar) | Producción    | APK instalable; ninguna compilación se lanza por abrir un PR                          |
+
+Vercel publica únicamente la exportación estática de Expo, construida en Actions.
+`vercel.mjs` conserva las rutas HTML existentes y sirve `index.html` para las
+rutas dinámicas que Expo Router resuelve en el navegador (por ejemplo
+`/categorias/[id]`). Por eso se puede recargar una URL sin recibir un 404 del
+alojamiento. La CSP limita las conexiones al Supabase del entorno y permite los
+scripts inline de Expo por su hash. React Native Web necesita estilos inline.
+Zod valida sin JIT para que tampoco intente generar código con `eval`.
+Las vistas previas conservan la protección de Vercel Authentication.
+
+El proyecto Vercel es `app-desarrollo-personal`, en el equipo
+`agentes-app-desarrollo-personal`; su dominio de producción asignado es
+`https://app-desarrollo-personal-three.vercel.app`. Vercel promocionó el primer
+despliegue de preparación automáticamente; apunta a **pruebas** y está protegido.
+El primer push humano a `main` lo sustituirá por la web de producción.
+
+### Configuración por entorno
+
+Los entornos de GitHub `pruebas` y `produccion` contienen los secretos
+`SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `VERCEL_TOKEN`, `EXPO_TOKEN` y
+`BACKUP_PASSPHRASE`. `produccion` solo permite la rama `main`.
+Sus variables públicas son `SUPABASE_PROJECT_REF`, `EXPO_PUBLIC_SUPABASE_URL`,
+`EXPO_PUBLIC_SUPABASE_ANON_KEY`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`.
+No se guardan sus valores en git. EAS tiene las dos variables `EXPO_PUBLIC_*`
+de producción en su entorno `production`; `eas.json` las selecciona para el APK.
+Las versiones de las herramientas están fijadas: Vercel CLI 62.7.0 y EAS CLI
+24.11.0, ejecutadas con telemetría desactivada y sin instalarlas en el anfitrión.
+
+Si un despliegue falla, Actions se detiene. En producción, un error de volcado,
+cifrado o subida del artefacto impide ejecutar las migraciones. Los despliegues
+y las copias de cada base se serializan para evitar que una migración se
+intercale en una copia. Para volver a la web anterior se usa el panel de Vercel
+(Deployments → despliegue anterior → Instant Rollback); las migraciones se
+corrigen con una nueva migración, nunca editando una aplicada.
+
+### Copias cifradas
+
+`backup.yml` copia producción los domingos a las 03:17 UTC. También permite
+`workflow_dispatch` con `produccion` o `pruebas`; producción exige ejecutarlo
+desde `main`. **Los cron y el botón manual solo estarán activos cuando el
+humano publique estos ficheros en la rama por defecto, `main`.** Hasta entonces
+producción permanece sin migraciones ni datos de la aplicación.
+
+El archivo `backup-<entorno>-<run_id>` de Actions contiene únicamente un
+`database.tar.gz.gpg`, cifrado con GPG AES256 y retenido 90 días (DEC-37).
+Cada despliegue de producción conserva además su copia previa durante 90 días.
+La validación de un PR que modifica los scripts o flujos de copia copia solo
+**pruebas** y conserva ese artefacto **un día**.
+
+El archivo incluye esquema de la aplicación, esquema gestionado de Auth y
+Storage, datos (también usuarios y sesiones de Auth) e historial de migraciones. Antes de la primera migración, la ausencia de historial se comprueba mediante una consulta de solo lectura y sus dos ficheros quedan vacíos de SQL.
+El script elimina el SQL temporal al terminar. No incluye archivos binarios de
+Storage ni configuración de los servicios; la aplicación no utiliza Storage.
+Conservar `BACKUP_PASSPHRASE` en `~/.config/app-desarrollo-personal/secretos.env`
+(permisos 600) permite recuperar los datos aunque no se pueda entrar a GitHub.
+
+### Restaurar una copia en una base local aislada
+
+Este procedimiento se ha comprobado dentro del Postgres del Supabase local,
+sin cambiar su base compartida `postgres`, detener servicios ni hacer `db reset`.
+La base restaurada es para inspeccionar y comparar los datos; la aplicación
+local sigue conectada a `postgres`. Coordina antes cualquier recuperación sobre
+una base que ya contenga datos; producción requiere una copia recién hecha.
+
+1. Elige en Actions una ejecución correcta de «Copia cifrada» o la validación
+   de un PR. Copia su identificador y el nombre del artefacto. Prepara un
+   directorio privado fuera del repositorio y descarga allí el archivo:
+
+   ```sh
+   umask 077
+   restore_directory=$(mktemp -d)
+   gh run download RUN_ID --name NOMBRE_DEL_ARTEFACTO --dir "$restore_directory"
+   ```
+
+2. Carga la clave sin imprimirla y descifra. La clave se envía por stdin;
+   no uses `set -x`, `--debug` ni la pases como argumento:
+
+   ```sh
+   set -a
+   . "$HOME/.config/app-desarrollo-personal/secretos.env"
+   set +a
+   printf '%s' "$BACKUP_PASSPHRASE" | gpg --batch --pinentry-mode loopback --passphrase-fd 0 --decrypt --output "$restore_directory/backup.tar.gz" "$restore_directory/database.tar.gz.gpg"
+   tar -xzf "$restore_directory/backup.tar.gz" -C "$restore_directory"
+   unset BACKUP_PASSPHRASE
+   ```
+
+3. Identifica el contenedor con `docker ps` (en este proyecto,
+   `supabase_db_ADP-2-esqueleto-expo`). El nombre de la base elegida debe estar
+   libre: si `CREATE DATABASE` falla, para, no borres la que ya existe.
+   El usuario `supabase_admin` es necesario para restaurar los propietarios
+   internos. Crea las piezas que Supabase provisiona fuera del volcado:
+
+   ```sh
+   database_container=supabase_db_ADP-2-esqueleto-expo
+   docker exec "$database_container" psql -U supabase_admin -d postgres -v ON_ERROR_STOP=1 -c 'CREATE DATABASE adp_restore'
+   docker exec "$database_container" psql -U supabase_admin -d adp_restore -v ON_ERROR_STOP=1 -c 'CREATE SCHEMA extensions; CREATE SCHEMA vault; CREATE EXTENSION "uuid-ossp" WITH SCHEMA extensions; CREATE EXTENSION pgcrypto WITH SCHEMA extensions; CREATE PUBLICATION supabase_realtime'
+   ```
+
+4. Restaura todo en una transacción que falla ante el primer error. El esquema
+   gestionado se usa solo en esta **base vacía**; un Supabase ya provisionado
+   tiene sus tablas internas y necesita una recuperación coordinada compatible
+   con sus versiones de Auth y Storage.
+
+   ```sh
+   cat "$restore_directory/managed-schema.sql" "$restore_directory/schema.sql" "$restore_directory/history-schema.sql" "$restore_directory/data.sql" "$restore_directory/history-data.sql" | docker exec -i "$database_container" psql -U supabase_admin -d adp_restore --single-transaction --variable ON_ERROR_STOP=1
+   ```
+
+5. Compara los recuentos de `auth.users`, `public.categories`, `public.sections`,
+   `public.habits`, `public.habit_rules`, `public.habit_marks` y `public.tasks`
+   con los de origen, y los contenidos de las filas. Por ejemplo:
+
+   ```sh
+   docker exec "$database_container" psql -U supabase_admin -d adp_restore -c 'SELECT count(*) FROM public.tasks'
+   ```
+
+6. Después de verificar, elimina **solo la base aislada que acabas de crear**
+   y el directorio temporal. El SQL descifrado contiene datos privados:
+
+   ```sh
+   docker exec "$database_container" psql -U supabase_admin -d postgres -v ON_ERROR_STOP=1 -c 'DROP DATABASE adp_restore'
+   rm -rf -- "$restore_directory"
+   ```
+
+### Reactivar Supabase tras una pausa
+
+Si Supabase pausa un proyecto gratuito por inactividad (R-07), entra en su
+panel, selecciona `app-desarrollo-personal-pruebas` o
+`app-desarrollo-personal-produccion` y pulsa **Restore project**. Espera hasta
+que vuelva a estar activo, comprueba que el inicio de sesión funciona y reintenta
+el flujo fallido desde Actions. No crees otro proyecto ni ejecutes un reset.
+Si el panel indica que la ventana de recuperación ha terminado, conserva la
+última copia cifrada y coordina una restauración antes de modificar nada.
+
+### Crear el usuario real de producción
+
+Solo el humano: abre `app-desarrollo-personal-produccion` en Supabase y ve a
+**Authentication → Users → Add user → Create new user**. Introduce su email y
+una contraseña privada y activa **Auto Confirm User**. Después de publicar
+`main`, entra con esas credenciales desde la web de producción o el APK.
+No compartas la contraseña con ningún agente ni la guardes en el repositorio.
+El alta pública seguirá desactivada (DEC-37, punto 4).
+
+Fuentes oficiales: [Expo en Vercel](https://docs.expo.dev/guides/publishing-websites/#vercel),
+[configuración programática de Vercel](https://vercel.com/docs/project-configuration/vercel-ts),
+[copias y restauración de Supabase](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore),
+[perfil APK de EAS](https://docs.expo.dev/build-reference/apk/),
+[entornos de EAS](https://docs.expo.dev/eas/environment-variables/)
+y [entornos protegidos de GitHub](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments).
+
 ## Estructura
 
 | Carpeta              | Contenido                                                           |

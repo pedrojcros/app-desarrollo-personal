@@ -1,3 +1,5 @@
+import '../zod-config';
+
 import { AppState, Platform } from 'react-native';
 
 import { createAppSupabaseClient } from './create-client';

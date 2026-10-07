@@ -27,3 +27,5 @@ supabase/.temp/
 supabase/.branches/
 android/
 ios/
+.vercel/
+.backup/

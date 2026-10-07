@@ -1,0 +1,71 @@
+name: Vista previa del PR
+
+on:
+  pull_request:
+    branches: [develop]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  backup-changes:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    outputs:
+      changed: ${{ steps.files.outputs.changed }}
+    steps:
+      - uses: actions/github-script@v7.0.1
+        id: files
+        with:
+          script: |
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            const changed = files.some((file) => file.filename.startsWith('scripts/backup/') || file.filename === '.github/workflows/backup.yml' || file.filename === '.github/workflows/deploy-preview.yml');
+            core.setOutput('changed', changed);
+  backup-validation:
+    needs: backup-changes
+    if: needs.backup-changes.outputs.changed == 'true'
+    uses: ./.github/workflows/backup.yml
+    secrets: inherit
+    with:
+      environment: pruebas
+      retention_days: 1
+  deploy:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    uses: ./.github/workflows/deploy-web.yml
+    secrets: inherit
+    with:
+      environment: pruebas
+  comment:
+    needs: deploy
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/github-script@v7.0.1
+        env:
+          DEPLOYMENT_URL: ${{ needs.deploy.outputs.url }}
+        with:
+          script: |
+            const marker = '<!-- adp-vercel-preview -->';
+            const body = `${marker}\nVista previa contra Supabase de **pruebas**: ${process.env.DEPLOYMENT_URL}`;
+            const parameters = {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            };
+            const comments = await github.paginate(github.rest.issues.listComments, parameters);
+            const previousComment = comments.find((comment) => comment.user.type === 'Bot' && comment.body.includes(marker));
+            if (previousComment) {
+              await github.rest.issues.updateComment({
+                owner: parameters.owner,
+                repo: parameters.repo,
+                comment_id: previousComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({ ...parameters, body });
+            }

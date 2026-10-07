@@ -15,6 +15,11 @@
     "web": {
       "bundler": "metro",
       "output": "static"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1f3bf29d-e451-4267-b441-6e133d21a224"
+      }
     }
   }
 }
