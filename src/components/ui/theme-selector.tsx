@@ -57,6 +57,7 @@ function ThemeOption({
   return (
     <Pressable
       role="radio"
+      aria-checked={isSelected}
       accessibilityState={{ checked: isSelected }}
       onPress={onSelect}
       className={`min-h-14 flex-row items-center gap-3 border-b border-border px-3 ${selectedClassName}`}
@@ -68,7 +69,14 @@ function ThemeOption({
       )}
       <View className="flex-1">
         <Text weight={isSelected ? 'semibold' : 'regular'}>{label}</Text>
-        {description ? <Text variant="caption">{description}</Text> : null}
+        {description ? (
+          <Text
+            variant="caption"
+            className={isSelected ? 'text-foreground' : undefined}
+          >
+            {description}
+          </Text>
+        ) : null}
       </View>
       {isSelected ? <Icon icon={Check} color="accent-text" size={20} /> : null}
     </Pressable>

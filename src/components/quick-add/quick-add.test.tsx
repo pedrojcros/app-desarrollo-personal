@@ -203,3 +203,16 @@ it('does not offer an undated habit and validates its name limit', () => {
   ).toBeVisible();
   expect(mockCreateHabit).not.toHaveBeenCalled();
 });
+
+it('names the quick-add dialog for assistive technology', () => {
+  openBar();
+  expect(screen.getByLabelText('Añadir rápido')).toBeTruthy();
+});
+
+it('names the frequency options as a radio group', () => {
+  openBar();
+  fireEvent.press(screen.getByRole('radio', { name: 'Hábito' }));
+  fireEvent.press(screen.getByLabelText('Frecuencia'));
+  const namedElements = screen.getAllByLabelText('Frecuencia');
+  expect(namedElements.length).toBeGreaterThan(1);
+});

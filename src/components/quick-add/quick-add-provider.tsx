@@ -60,6 +60,7 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
       {children}
       {defaults !== null ? (
         <Modal
+          accessibilityLabel="Añadir rápido"
           transparent
           visible
           onRequestClose={close}

@@ -127,6 +127,8 @@ describe('ThemeSelector', () => {
 
     const blackOption = screen.getByRole('radio', { name: /Negro/ });
     expect(blackOption).toBeChecked();
+    const whiteOption = screen.getByRole('radio', { name: /Blanco/ });
+    expect(whiteOption).not.toBeChecked();
 
     fireEvent.press(screen.getByRole('radio', { name: /Tercer estilo/ }));
     fireEvent.press(screen.getByRole('radio', { name: /Automático/ }));

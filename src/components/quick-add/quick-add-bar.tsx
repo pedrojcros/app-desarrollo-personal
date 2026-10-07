@@ -49,7 +49,7 @@ export function QuickAddBar({
           placeholder="¿Qué quieres añadir?"
           placeholderTextColor={colors['muted-foreground']}
           selectionColor={colors['accent-text']}
-          className="min-h-12 min-w-0 flex-1 text-title text-foreground"
+          className="min-h-12 min-w-0 flex-1 text-title text-foreground placeholder:text-muted-foreground"
           style={{ fontFamily: fonts.heading }}
           value={name}
           editable={!disabled}
