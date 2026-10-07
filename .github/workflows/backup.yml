@@ -56,8 +56,10 @@ jobs:
       - name: Exportar y cifrar
         run: |
           mkdir -p .backup
-          export APP_UID=$(id -u) APP_GID=$(id -g)
-          export DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+          APP_UID=$(id -u)
+          APP_GID=$(id -g)
+          DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+          export APP_UID APP_GID DOCKER_GID
           docker compose run --rm -e SUPABASE_PROJECT_REF -e SUPABASE_ACCESS_TOKEN -e SUPABASE_DB_PASSWORD -e BACKUP_PASSPHRASE app sh scripts/backup/create.sh .backup/database.tar.gz.gpg
       - uses: actions/upload-artifact@v4.6.2
         with:
