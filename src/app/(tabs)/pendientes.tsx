@@ -1,5 +1,5 @@
-import { View } from 'react-native';
+import { PastPendingScreen } from '@/components/past-pending/past-pending-screen';
 
 export default function PendingScreen() {
-  return <View className="flex-1" />;
+  return <PastPendingScreen />;
 }
