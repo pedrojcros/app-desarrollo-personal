@@ -12,6 +12,8 @@
 | Depende de | T02, T03, T14 y la base común de vistas (encargo 010), fusionadas en `develop` |
 | Reservado para este encargo | `src/domain/views/history.ts` y sus tests; `src/data/history.ts` y sus tests; `src/components/history-grid/`; `src/components/date-field/` (la usarán T05, T06 y T16); la pantalla `src/app/(tabs)/historial.tsx` |
 
+> **Permiso de publicación:** puedes hacer `git push` de tu rama y abrir el PR contra `develop` (lo pide este encargo, por encima del aviso genérico de tu preámbulo). Nunca hagas merge.
+
 ## Antes de empezar
 
 Lee `AGENTS.md` entero (capas: `src/domain` sin React, Expo ni Supabase; regla de legibilidad: nombres en inglés **sin abreviaturas**, comentarios y commits en español; **todo en Docker** con `./docker/app/run ...`). Lee CU-05 y RN-16, RN-17 y RN-33 en `docs/03-casos-de-uso.md`, RF-15 en `docs/02-funcionalidades.md`, el Historial en `docs/diseno.md` (cuadrícula: una fila por hábito o tarea, una columna por día, ✓, ✗ y «sin marcar», celda vacía si ese día no tocaba, y debajo el porcentaje de cada día; prototipo en `docs/diseno/rondas/ronda-2/index.html`), la decisión **DEC-37** (punto 6: **porcentaje = hechas sobre todo lo que tocaba ese día**), y la base común que ya está en `develop`: `src/domain/items.ts`, `src/domain/entities.ts`, `src/domain/habit-occurrences.ts`, `src/data/agenda.ts`, `src/data/query-keys.ts`, `src/data/use-today.ts`, `src/data/time-zone.ts` y `src/data/result.ts`.

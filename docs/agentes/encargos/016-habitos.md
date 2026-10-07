@@ -12,6 +12,8 @@
 | Depende de | T02, T03 (con su corrección), T04, T08 (el selector de fecha y hora) y T14, fusionadas en `develop` |
 | Reservado para este encargo | la migración `supabase/migrations/20261007140000_habit_functions.sql`; `src/data/database.types.ts` (regenerado); `src/data/habits.ts` y sus tests; `src/app/habitos/` (incluido su `_layout.tsx`); `src/components/habit-form/` |
 
+> **Permiso de publicación:** puedes hacer `git push` de tu rama y abrir el PR contra `develop` (lo pide este encargo, por encima del aviso genérico de tu preámbulo). Nunca hagas merge.
+
 ## Antes de empezar
 
 Lee `AGENTS.md` entero (capas, Zod antes de cada escritura, errores `{ ok, value }`/`{ ok: false, error }`, regla de legibilidad: nombres en inglés **sin abreviaturas**, comentarios y commits en español; **todo en Docker** con `./docker/app/run ...`). Lee CU-01 y CU-06 (RN-10 a RN-12, RN-18 a RN-23) en `docs/03-casos-de-uso.md`, RF-01, RF-03, RF-18, RF-19 y RF-20 en `docs/02-funcionalidades.md`, [ADR-0003](../../adr/0003-ocurrencias-calculadas.md), `docs/diseno.md` y lo que ya existe en `develop`: el motor (`src/domain/recurrence.ts`: **la primera versión de la regla debe empezar en `startDate` y no puede haber dos con el mismo `validFrom`**; la base de datos tiene `unique (habit_id, valid_from)`), la base común (`src/domain/entities.ts`, `src/data/agenda.ts`, `src/data/query-keys.ts`, `src/data/use-today.ts`), `CategorySelect` y `ConfirmDialog` (T04), `DateField` y `TimeField` (T08) y los componentes de `src/components/ui/`.
