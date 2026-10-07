@@ -135,21 +135,21 @@ export function useQuickAddDraft(
     }
   }
   function openMore(): void {
-    const params: Record<string, string> = { name };
+    const routeParameters: Record<string, string> = { name };
     if (place.categoryId !== null) {
-      params.categoryId = place.categoryId;
+      routeParameters.categoryId = place.categoryId;
     }
     if (place.sectionId !== null) {
-      params.sectionId = place.sectionId;
+      routeParameters.sectionId = place.sectionId;
     }
     if (kind === 'habit') {
-      params.startDate = startDate;
-      router.push({ pathname: '/habitos/nuevo', params });
+      routeParameters.startDate = startDate;
+      router.push({ pathname: '/habitos/nuevo', params: routeParameters });
     } else {
       if (dueDate !== null) {
-        params.dueDate = dueDate;
+        routeParameters.dueDate = dueDate;
       }
-      router.push({ pathname: '/tareas/nueva', params });
+      router.push({ pathname: '/tareas/nueva', params: routeParameters });
     }
     close();
   }
