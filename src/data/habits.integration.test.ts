@@ -233,3 +233,49 @@ it('edits a future start and changes its single initial rule without creating in
     ),
   ).toEqual(['2026-11-03', '2026-12-03']);
 });
+
+it('changing to the current rule preserves its versions and interval anchor', async () => {
+  const created = unwrapResult(
+    await createHabit({
+      ...input,
+      startDate: '2026-10-01',
+      frequency: 'every_n_days',
+      intervalDays: 3,
+    }),
+  );
+  const before = unwrapResult(await fetchHabit(created.id, 'Europe/Madrid'));
+  const changed = await changeHabitRule(
+    created.id,
+    {
+      frequency: 'every_n_days',
+      weekdays: [],
+      intervalDays: 3,
+    },
+    today,
+  );
+  expect(unwrapResult(changed)).toBeNull();
+  const after = unwrapResult(await fetchHabit(created.id, 'Europe/Madrid'));
+  expect(after.ruleVersions).toEqual(before.ruleVersions);
+});
+
+it('cannot archive twice or move the existing archive date', async () => {
+  const created = unwrapResult(await createHabit(input));
+  expect(unwrapResult(await archiveHabit(created.id))).toBeNull();
+  const before = await owner.client
+    .from('habits')
+    .select('archived_at')
+    .eq('id', created.id)
+    .single();
+  expect(before.error).toBeNull();
+  expect(await archiveHabit(created.id)).toMatchObject({
+    ok: false,
+    error: { code: 'not_found' },
+  });
+  const after = await owner.client
+    .from('habits')
+    .select('archived_at')
+    .eq('id', created.id)
+    .single();
+  expect(after.error).toBeNull();
+  expect(after.data).toEqual(before.data);
+});

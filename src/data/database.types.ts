@@ -306,7 +306,7 @@ export type Database = {
           p_frequency: Database['public']['Enums']['habit_frequency'];
           p_habit_id: string;
           p_interval_days?: number;
-          p_valid_from: string;
+          p_today: string;
           p_weekdays?: number[];
         };
         Returns: undefined;
