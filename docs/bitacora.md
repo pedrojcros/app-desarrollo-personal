@@ -4,6 +4,10 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-07 — Noche (2): T16 y la corrección de T05 en `develop`; empieza T13
+
+Se fusionaron la corrección de las reglas de hábito (una sola función SQL que no reescribe el pasado ni crea versiones repetidas), los datos sintéticos de un año con la medida de RNF-01 (muy por debajo de los límites), un arreglo de `.pyc` subidos por error (Copilot) y T16, el añadir rápido. El humano avisó de que se gastaba demasiado `gpt-6.1-sol` y, después, de que pasar todo a Luna tampoco era la idea: pidió partir más las tareas, con lo mecánico para Luna y lo denso para Sol. T13b y T13c ya salen así.
+
 ### 2026-10-07 — Noche: T05, T06, T09 y T11 fusionadas; supervisor autónomo
 
 Con la cuota de Codex de vuelta, el humano pidió dos Codex y un Claude. T05 y T09 se retomaron con una orden corta en sus carpetas (DEC-39, punto 8) y T06 y T11 las hizo Claude Sonnet; las cuatro se fusionaron tras pasar el orquestador sus tests. T05 pasó además una revisión de Opus (sin críticos, cuatro importantes en el cambio de regla de un hábito), que se corrige aparte (encargo 024) para no bloquear T16. El supervisor ya reanuda solo a Codex cuando el modelo se satura o se acaba la cuota (encargos 023 y 025; la primera versión se rechazó porque leía avisos viejos del historial de la pantalla). Con tres trabajadores compilando a la vez el portátil llegó a carga 67, así que lo pesado va ahora con un candado compartido (`flock /tmp/adp-pesado.lock`). T13 se parte en dos: datos sintéticos y RNF-01 ya (026), Maestro y el resto tras T16.
