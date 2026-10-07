@@ -8,8 +8,8 @@
 |---|---|
 | Tarea del plan | `T06` en `docs/05-plan.md` |
 | Ticket | `ADP-9` (solo informativo: no lo toques) |
-| Agente | codex (esfuerzo medio) |
-| Skills a usar | `expo-native-ui`, `expo-data-fetching`, `test-driven-development`, `frontend-ui-engineering`, `codigo-legible`, `flujo-git` (en `.agents/skills/`) |
+| Agente | codex, `--model gpt-6.1-sol` (DEC-39) |
+| Skills a usar | `expo-data-fetching`, `test-driven-development`, `codigo-legible` (en `.agents/skills/`) |
 | Rama y worktree | `ADP-9-tareas`, desde `develop`, tu propio worktree |
 | Depende de | T02, T04, T08 (el selector de fecha y hora) y T14, fusionadas en `develop` |
 | Reservado para este encargo | `src/data/tasks.ts` y sus tests; `src/app/tareas/` (incluido su `_layout.tsx`); `src/components/task-form/` |

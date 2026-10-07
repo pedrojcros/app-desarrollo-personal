@@ -136,16 +136,18 @@ Sé honesto con el ahorro: un trabajador de Claude arranca en frío y relee la d
 
 | Encargo | Claude | Codex | Copilot |
 |---|---|---|---|
-| Pequeño y mecánico (S) | `--model claude-haiku-4-5-20251001` | Su modelo más barato, esfuerzo bajo | El suyo («Auto»): Orca no deja elegirlo |
-| Normal (M) | `--model claude-sonnet-5-5` | Su modelo por defecto, esfuerzo medio | Ídem |
-| Delicado (T02, T03, seguridad, lógica central) | `--model claude-sonnet-5-5`, más revisión de otro modelo (Opus 5.5 o Codex) | Esfuerzo alto | No para delicados |
-| Decidir y diseñar | Opus 5.5 al máximo: tú y el arquitecto automático | — | — |
+| Pequeño y mecánico (S) | `--model claude-sonnet-5-5` (Haiku no: pide permiso por cada orden) | `--model gpt-6-luna` (DEC-39) | El suyo («Auto»): Orca no deja elegirlo |
+| Normal (M) | `--model claude-sonnet-5-5` | `--model gpt-6.1-sol` (DEC-39) | Ídem |
+| Delicado (T02, T03, seguridad, lógica central) | `--model claude-sonnet-5-5`, más revisión de otro modelo (Opus 5.5 o Codex) | `--model gpt-6.1-sol` (DEC-39) | No para delicados |
+| Decidir y diseñar | Opus 5.5: esfuerzo alto en el día a día y máximo solo al planificar o revisar algo delicado (DEC-39) | — | — |
 
-Los identificadores de modelo de Codex compruébalos en su ayuda o su configuración antes de usarlos; no los adivines.
+Los identificadores de modelo de Codex compruébalos en su ayuda o su configuración antes de usarlos; no los adivines. Vistos el 2026-10-07: `gpt-6.1-sol` (el que usa por defecto) y `gpt-6-luna` (el barato, que ofrece Codex al acercarse al límite). Si un encargo con `gpt-6-luna` sale mal, se repite con `gpt-6.1-sol` y se anota.
+
+**Encargos cortos (DEC-39).** Cada trabajador arranca leyendo todo lo que le pides: pide **2 o 3 skills**, las que de verdad necesita, y **secciones concretas** de los documentos en vez de documentos enteros. Cada relanzamiento vuelve a pagar esa lectura: evita los fallos que obligan a relanzar.
 
 ### 6. Tope de paralelismo
 
-**En código, como máximo tres trabajadores a la vez** (DEC-28; el humano puede cambiar la cifra aquí: `TOPE = 3`). Más allá, la revisión se convierte en el cuello de botella y los conflictos de integración se comen lo ganado. **Lo que no se integra** (prototipos, revisiones, investigaciones) **no tiene tope**: si no depende de nada, se lanza todo a la vez. Un worktree por encargo, siempre.
+**En código, como máximo dos trabajadores a la vez** (DEC-39; antes tres, DEC-28; el humano puede cambiar la cifra aquí: `TOPE = 2`). Más allá, la revisión se convierte en el cuello de botella y los conflictos de integración se comen lo ganado. **Lo que no se integra** (prototipos, revisiones, investigaciones) **no tiene tope**: si no depende de nada, se lanza todo a la vez. Un worktree por encargo, siempre.
 
 ### 7. Orden de integración
 
@@ -239,6 +241,7 @@ Hoy el humano no ha pedido programar nada él mismo. Si lo pide, se apunta aquí
 ## Al terminar la sesión
 
 - Todos los trabajadores están liberados o retenidos a propósito (`worker-list --terminal-state reclaimable` no devuelve nada).
-- [Contexto](../contexto.md) tiene la entrada de bitácora y los apartados *Ahora mismo* y *Lo siguiente* al día.
+- La [bitácora](../bitacora.md) tiene la entrada de la sesión y [contexto](../contexto.md), los apartados *Ahora mismo* y *Lo siguiente* al día.
+- **Al cerrar una ola, propón al humano abrir una sesión nueva de orquestador** (DEC-39): una conversación larga hace que cada paso cueste más.
 - Jira refleja el estado real.
 - Le dices al humano, en cinco líneas: qué está hecho, qué PR le esperan, qué decisiones necesitas de él y qué lanzarías a continuación.

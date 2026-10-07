@@ -172,6 +172,6 @@ Las **automáticas** viven en `.agents/skills/` (Claude las lee por el enlace `.
 ## Documentación
 
 - Si tu cambio hace que algo de `docs/` deje de ser cierto, **actualízalo en el mismo commit**. Solo los documentos que indique tu encargo; si hace falta tocar otro, dilo.
-- **El estado y la traza del proyecto viven en [docs/contexto.md](docs/contexto.md).** Al cerrar algo relevante (una tarea, una decisión, un cambio de rumbo, un problema que costó tiempo) se añade una entrada al principio de su bitácora y se actualiza su estado, en el mismo commit.
+- **El estado del proyecto vive en [docs/contexto.md](docs/contexto.md) y su traza en [docs/bitacora.md](docs/bitacora.md).** Al cerrar algo relevante (una tarea, una decisión, un cambio de rumbo, un problema que costó tiempo) se añade una entrada al principio de la bitácora y se actualiza el estado, en el mismo commit.
 - **Las decisiones viven en [docs/decisiones.md](docs/decisiones.md)**, nunca en el chat: el contexto de una conversación se borra.
 - Qué leer según el tipo de tarea: [docs/README.md](docs/README.md).

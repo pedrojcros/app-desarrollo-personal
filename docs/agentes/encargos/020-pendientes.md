@@ -8,8 +8,8 @@
 |---|---|
 | Tarea del plan | `T11` en `docs/05-plan.md` |
 | Ticket | `ADP-14` (solo informativo: no lo toques) |
-| Agente | codex (esfuerzo medio-alto) |
-| Skills a usar | `expo-native-ui`, `vercel-react-native-skills`, `test-driven-development`, `frontend-ui-engineering`, `codigo-legible`, `flujo-git` (en `.agents/skills/`) |
+| Agente | codex, `--model gpt-6.1-sol` (DEC-39) |
+| Skills a usar | `test-driven-development`, `vercel-react-native-skills`, `codigo-legible` (en `.agents/skills/`) |
 | Rama y worktree | `ADP-14-pendientes`, desde `develop`, tu propio worktree |
 | Depende de | T03, T07 y la base común de vistas, fusionadas en `develop` |
 | Reservado para este encargo | `src/domain/views/past-pending.ts` y sus tests; `src/data/past-pending.ts` y sus tests; `src/components/past-pending/`; la pantalla `src/app/(tabs)/pendientes.tsx`; en `src/app/(tabs)/_layout.tsx` **solo** pasar el contador a la pestaña «Pendientes» |
