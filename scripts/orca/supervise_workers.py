@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Supervisa a los trabajadores de Orca para que ninguno se quede parado.
+"""Supervisa a los trabajadores de Orca y resuelve esperas conocidas de Codex.
 
 Cada pocos segundos repasa la terminal de cada trabajador vivo:
 
 - si el encargo se quedó escrito sin enviar (el borrador de Claude o el «[Paste #» de Copilot), envía el Enter;
 - si Copilot pide permiso para rutas del proyecto o de su worktree, lo concede solo para esa sesión;
+- si Codex encuentra el modelo saturado o agota la cuota, lo reanuda cuando corresponde;
 - si alguien pide otra cosa, o lleva demasiados minutos con la pantalla quieta, avisa y termina.
 
 También termina cuando ya no queda ningún trabajador vivo. Está pensado para correr en
@@ -14,6 +15,7 @@ Uso: python3 scripts/orca/supervise_workers.py [--idle-minutes 8]
 """
 
 import argparse
+import datetime
 import hashlib
 import json
 import re
@@ -22,6 +24,11 @@ import time
 
 CHECK_INTERVAL_SECONDS = 20
 MAXIMUM_ENTER_ATTEMPTS = 3
+CAPACITY_RETRY_LIMIT = 3
+CAPACITY_RETRY_INTERVAL = datetime.timedelta(minutes=5)
+QUOTA_RESUME_DELAY = datetime.timedelta(minutes=1)
+MODEL_CAPACITY_MESSAGE = 'Selected model is at capacity'
+USAGE_LIMIT_MESSAGE = "You've hit your usage limit"
 COPILOT_PERMISSION_QUESTION = 'Do you want to allow this?'
 COPILOT_PARKED_PASTE = '[Paste #'
 CLAUDE_PERMISSION_MARKERS = (
@@ -88,6 +95,99 @@ def screen_text(terminal):
     if isinstance(tail, str):
         return tail
     return '\n'.join(str(line) for line in tail)
+
+
+def detect_model_capacity(text):
+    return MODEL_CAPACITY_MESSAGE in text
+
+
+def detect_usage_limit(text):
+    has_usage_limit = USAGE_LIMIT_MESSAGE in text
+    has_retry_time = re.search(r'try again at\s+\d{1,2}:\d{2}(?:\s*[AP]M)?', text, re.IGNORECASE)
+    has_keep_model_option = re.search(r'^\s*2[.)]\s+.*model', text, re.IGNORECASE | re.MULTILINE)
+    return has_usage_limit and has_retry_time is not None and has_keep_model_option is not None
+
+
+def parse_retry_time(text, current_time):
+    time_match = re.search(r'try again at\s+(\d{1,2}:\d{2}(?:\s*[AP]M)?)', text, re.IGNORECASE)
+    if time_match is None:
+        return None
+    time_text = time_match.group(1).upper().replace(' ', '')
+    time_format = '%I:%M%p' if 'AM' in time_text or 'PM' in time_text else '%H:%M'
+    try:
+        retry_clock = datetime.datetime.strptime(time_text, time_format).time()
+    except ValueError:
+        return None
+    retry_time = datetime.datetime.combine(current_time.date(), retry_clock)
+    if retry_time <= current_time:
+        retry_time += datetime.timedelta(days=1)
+    return retry_time
+
+
+def should_retry_capacity(current_time, last_retry_time, retry_count):
+    if retry_count >= CAPACITY_RETRY_LIMIT:
+        return False
+    if last_retry_time is None:
+        return True
+    return current_time - last_retry_time >= CAPACITY_RETRY_INTERVAL
+
+
+def is_worker_waiting_for_quota(current_time, retry_time):
+    return current_time < retry_time + QUOTA_RESUME_DELAY
+
+
+def continue_worker(worker, action_description):
+    handle = worker['agentTerminalHandle']
+    send_to_terminal(handle, '--text', 'continúa')
+    send_to_terminal(handle, '--enter')
+    print(time.strftime('%H:%M:%S'), worker_description(worker), action_description, flush=True)
+
+
+def handle_codex_wait(worker, text, worker_states, current_time):
+    dispatch = worker['dispatchId']
+    worker_state = worker_states.setdefault(dispatch, {})
+    quota_retry_time = worker_state.get('quota_retry_time')
+    if quota_retry_time is not None:
+        if worker_state.get('quota_resumed'):
+            if USAGE_LIMIT_MESSAGE in text:
+                return 'handled'
+            worker_state.pop('quota_retry_time')
+            worker_state.pop('quota_resumed')
+        elif is_worker_waiting_for_quota(current_time, quota_retry_time):
+            return 'waiting'
+        else:
+            continue_worker(worker, f'cuota recuperada; continúa ({quota_retry_time:%H:%M})')
+            worker_state['quota_resumed'] = True
+            return 'waiting'
+
+    if detect_usage_limit(text):
+        retry_time = parse_retry_time(text, current_time)
+        if retry_time is None:
+            return f'{worker_description(worker)} muestra el límite de cuota sin una hora legible'
+        worker_state['quota_retry_time'] = retry_time
+        send_to_terminal(worker['agentTerminalHandle'], '--text', '2')
+        send_to_terminal(worker['agentTerminalHandle'], '--enter')
+        print(time.strftime('%H:%M:%S'), worker_description(worker), f'mantiene el modelo y espera hasta {retry_time:%H:%M}', flush=True)
+        return 'waiting'
+    if USAGE_LIMIT_MESSAGE in text:
+        return f'{worker_description(worker)} muestra el límite de cuota sin una hora o menú reconocible'
+
+    if detect_model_capacity(text):
+        retry_count = worker_state.get('capacity_retry_count', 0)
+        last_retry_time = worker_state.get('capacity_last_retry_time')
+        if not should_retry_capacity(current_time, last_retry_time, retry_count):
+            if retry_count < CAPACITY_RETRY_LIMIT:
+                return 'handled'
+            if current_time - last_retry_time < CAPACITY_RETRY_INTERVAL:
+                return 'handled'
+            return f'{worker_description(worker)} agotó {CAPACITY_RETRY_LIMIT} reintentos por saturación del modelo'
+        worker_state['capacity_retry_count'] = retry_count + 1
+        worker_state['capacity_last_retry_time'] = current_time
+        continue_worker(worker, f'modelo saturado; continúa (intento {retry_count + 1}/{CAPACITY_RETRY_LIMIT})')
+        return 'handled'
+    worker_state['capacity_retry_count'] = 0
+    worker_state['capacity_last_retry_time'] = None
+    return None
 
 
 def send_to_terminal(handle, *arguments):
@@ -169,7 +269,7 @@ def check_idle(worker, text, screen_history, idle_minutes):
     return f'{worker_description(worker)} lleva {round(idle_seconds / 60)} minutos con la pantalla quieta'
 
 
-def supervise_worker(worker, repository_root, screen_history, enter_attempts, idle_minutes):
+def supervise_worker(worker, repository_root, screen_history, enter_attempts, idle_minutes, worker_states):
     handle = worker.get('agentTerminalHandle')
     if not handle:
         return None
@@ -178,6 +278,12 @@ def supervise_worker(worker, repository_root, screen_history, enter_attempts, id
     if draft_problem or has_unsent_assignment(terminal):
         return draft_problem
     text = screen_text(terminal)
+    codex_wait = handle_codex_wait(worker, text, worker_states, datetime.datetime.now())
+    if codex_wait == 'waiting' or codex_wait == 'handled':
+        screen_history.pop(worker['dispatchId'], None)
+        return None
+    if codex_wait:
+        return codex_wait
     allowed_roots = (repository_root, worktree_path(worker))
     permission_problem = answer_copilot_permission(worker, text, allowed_roots)
     if permission_problem:
@@ -192,13 +298,14 @@ def main():
     repository_root = find_repository_root()
     screen_history = {}
     enter_attempts = {}
+    worker_states = {}
     while True:
         workers = list_live_workers()
         if not workers:
             print('No quedan trabajadores vivos: termino.', flush=True)
             return
         for worker in workers:
-            problem = supervise_worker(worker, repository_root, screen_history, enter_attempts, arguments.idle_minutes)
+            problem = supervise_worker(worker, repository_root, screen_history, enter_attempts, arguments.idle_minutes, worker_states)
             if problem:
                 print(time.strftime('%H:%M:%S'), 'AVISO:', problem, flush=True)
                 return
