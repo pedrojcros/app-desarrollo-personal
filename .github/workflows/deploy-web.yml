@@ -81,7 +81,8 @@ jobs:
           APP_GID=$(id -g)
           DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
           export APP_UID APP_GID DOCKER_GID
-          docker compose run --rm -e SUPABASE_ACCESS_TOKEN -e SUPABASE_DB_PASSWORD -e SUPABASE_PROJECT_REF app sh -eu -c 'npx --no-install supabase link --project-ref "$SUPABASE_PROJECT_REF"; npx --no-install supabase db push --yes'
+          # Las migraciones independientes de ramas paralelas pueden fusionarse en distinto orden que sus fechas.
+          docker compose run --rm -e SUPABASE_ACCESS_TOKEN -e SUPABASE_DB_PASSWORD -e SUPABASE_PROJECT_REF app sh -eu -c 'npx --no-install supabase link --project-ref "$SUPABASE_PROJECT_REF"; npx --no-install supabase db push --include-all --yes'
       - name: Exportar web y preparar Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}

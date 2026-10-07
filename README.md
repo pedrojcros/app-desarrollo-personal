@@ -186,6 +186,8 @@ contenedor no abre aplicaciones gráficas del anfitrión.
 
 ## Despliegue
 
+En pruebas y producción, `supabase db push --include-all` aplica también migraciones independientes de ramas paralelas fusionadas en distinto orden que sus fechas.
+
 Los servicios son gratuitos. Supabase tiene dos proyectos en Fráncfort
 (`eu-central-1`): `app-desarrollo-personal-pruebas` y
 `app-desarrollo-personal-produccion`. Los dos tienen el alta pública desactivada
