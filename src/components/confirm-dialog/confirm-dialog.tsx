@@ -11,7 +11,7 @@ type ConfirmDialogProps = {
   message: string;
   confirmLabel: string;
   cancelLabel?: string;
-  /** La confirmación borra o quita algo: se pinta con el color de «no hecho». */
+  /** La confirmación borra o quita algo: el botón se pinta oscuro, distinto del normal. */
   destructive?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
@@ -77,10 +77,13 @@ export function ConfirmDialog({
     borderColor: colors.border,
     boxShadow: shape.smallShadow,
   };
-  // El color de «no hecho» cambia de claridad según el tema: el texto toma el
-  // del fondo para que siempre contraste con él.
-  const confirmClassName = destructive ? 'bg-not-done' : undefined;
-  const confirmTextClassName = destructive ? 'text-background' : undefined;
+  // «No hecho» tiene poco contraste con el texto en algunos temas (3,4:1 en el
+  // blanco): el botón destructivo usa los colores de «inverso», que siempre lo
+  // cumplen, y se distingue del normal por ser el único oscuro.
+  const confirmClassName = destructive ? 'bg-inverse' : undefined;
+  const confirmTextClassName = destructive
+    ? 'text-inverse-foreground'
+    : undefined;
 
   return (
     <View className="absolute inset-0 z-10 items-center justify-center bg-inverse/60 px-4">
