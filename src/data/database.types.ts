@@ -279,7 +279,10 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      delete_category: {
+        Args: { target_category_id: string };
+        Returns: undefined;
+      };
     };
     Enums: {
       habit_frequency: 'daily' | 'weekdays' | 'every_n_days' | 'monthly';
