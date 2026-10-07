@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+# Se ejecuta desde app: su cliente Docker controla el contenedor hermano sin instalar Maestro en Node.
+exec docker compose exec -T android-emulator \
+  maestro --device emulator-5554 test \
+  -e EXPO_PORT="${EXPO_PORT:-8081}" \
+  --test-output-dir /tmp/maestro-results /workspace/e2e/smoke.yaml

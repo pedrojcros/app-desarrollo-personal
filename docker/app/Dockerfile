@@ -5,6 +5,7 @@ ARG APP_UID=1000
 ARG APP_GID=1000
 
 COPY --from=docker-cli /usr/local/bin/docker /usr/local/bin/docker
+COPY --from=docker-cli /usr/local/libexec/docker/cli-plugins/docker-compose /usr/local/libexec/docker/cli-plugins/docker-compose
 
 RUN groupmod --gid "${APP_GID}" node \
     && usermod --uid "${APP_UID}" node \
