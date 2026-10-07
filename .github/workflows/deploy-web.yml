@@ -42,6 +42,10 @@ jobs:
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4.2.2
+      - name: Comprobar acceso a Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: test -n "$VERCEL_TOKEN"
       - name: Construir entorno Docker
         run: ./docker/app/run build
       - name: Instalar lockfile

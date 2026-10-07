@@ -42,6 +42,11 @@ jobs:
       BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
     steps:
       - uses: actions/checkout@v4.2.2
+      - name: Comprobar acceso al entorno
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN"
+          test -n "$SUPABASE_DB_PASSWORD"
+          test -n "$BACKUP_PASSPHRASE"
       - name: Construir entorno Docker
         run: ./docker/app/run build
       - name: Instalar lockfile

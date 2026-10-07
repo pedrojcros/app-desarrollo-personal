@@ -204,6 +204,7 @@ rutas dinámicas que Expo Router resuelve en el navegador (por ejemplo
 `/categorias/[id]`). Por eso se puede recargar una URL sin recibir un 404 del
 alojamiento. La CSP limita las conexiones al Supabase del entorno y permite los
 scripts inline de Expo por su hash. React Native Web necesita estilos inline.
+Zod valida sin JIT para que tampoco intente generar código con `eval`.
 Las vistas previas conservan la protección de Vercel Authentication.
 
 El proyecto Vercel es `app-desarrollo-personal`, en el equipo
