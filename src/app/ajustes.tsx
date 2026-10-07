@@ -1,6 +1,7 @@
 import { Link, Stack } from 'expo-router';
 import { ScrollView, View } from 'react-native';
 
+import { SignOutButton } from '@/components/sign-out-button';
 import { SectionTitle } from '@/components/ui/section-title';
 import { Text } from '@/components/ui/text';
 import { ThemeSelector } from '@/components/ui/theme-selector';
@@ -29,6 +30,12 @@ export default function SettingsScreen() {
           Por defecto sigue al modo del móvil: claro, Blanco; oscuro, Negro.
         </Text>
         <ThemeSelector />
+        <View className="mt-6">
+          <SectionTitle title="Cuenta" />
+          <View className="mt-3">
+            <SignOutButton />
+          </View>
+        </View>
         {__DEV__ ? (
           <View className="mt-6">
             <SectionTitle title="Desarrollo" />
