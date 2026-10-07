@@ -124,6 +124,20 @@ function buildContrastPairs(): ContrastPair[] {
     exemptThemes: { bold: 'el cuadrito lleva borde negro de 1,5 px' },
   });
 
+  pairs.push({
+    foreground: 'accent-foreground',
+    background: 'accent',
+    minimumRatio: graphicRatio,
+    usage: '✓ de una fila sin categoría',
+  });
+  pairs.push({
+    foreground: 'accent',
+    background: 'background',
+    minimumRatio: graphicRatio,
+    usage: 'círculo de una fila sin categoría sobre el fondo',
+    exemptThemes: { bold: outlinedCategoryReason },
+  });
+
   for (const category of categoryTokens) {
     pairs.push({
       foreground: 'on-category',

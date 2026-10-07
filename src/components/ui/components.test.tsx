@@ -50,6 +50,24 @@ describe('ListRow', () => {
     expect(handleNotDone).toHaveBeenCalledTimes(1);
   });
 
+  it('works without a category, as the inbox rows do', () => {
+    const handleDone = jest.fn();
+    renderInTheme(
+      <ListRow
+        title="Pedir cita en el banco"
+        meta="Tarea"
+        onMarkDone={handleDone}
+        onMarkNotDone={jest.fn()}
+      />,
+    );
+
+    fireEvent.press(
+      screen.getByLabelText('Marcar Pedir cita en el banco como hecho'),
+    );
+
+    expect(handleDone).toHaveBeenCalledTimes(1);
+  });
+
   it('does not mark anything when disabled', () => {
     const handleDone = jest.fn();
     renderInTheme(

@@ -14,7 +14,8 @@ type ListRowProps = {
   title: string;
   // Texto de debajo del título: «10:00 · Personal · Tarea».
   meta: string;
-  category: CategoryColor;
+  // Lo de la Bandeja de entrada no tiene categoría: usa los colores del acento.
+  category?: CategoryColor;
   onMarkDone: () => void;
   onMarkNotDone: () => void;
   disabled?: boolean;
@@ -57,7 +58,7 @@ function MarkButton({
   );
 }
 
-function DoneDisc({ category }: { category: CategoryColor }) {
+function DoneDisc({ category }: { category?: CategoryColor }) {
   const { shape, colors } = useTheme();
   const discStyle = {
     width: shape.markSize,
@@ -68,12 +69,18 @@ function DoneDisc({ category }: { category: CategoryColor }) {
     boxShadow: shape.smallShadow,
   };
 
+  const hasCategory = category !== undefined;
+  const discColorClassName = hasCategory
+    ? categoryBackgroundClasses[category]
+    : 'bg-accent';
+  const checkColor = hasCategory ? 'on-category' : 'accent-foreground';
+
   return (
     <View
-      className={`items-center justify-center ${categoryBackgroundClasses[category]}`}
+      className={`items-center justify-center ${discColorClassName}`}
       style={discStyle}
     >
-      <Icon icon={Check} color="on-category" size={18} strokeWidth={2.4} />
+      <Icon icon={Check} color={checkColor} size={18} strokeWidth={2.4} />
     </View>
   );
 }
@@ -130,9 +137,11 @@ export function ListRow({
       <View className="flex-1 py-2">
         <Text weight="semibold">{title}</Text>
         <View className="mt-0.5 flex-row items-center gap-1.5">
-          <View
-            className={`h-1.5 w-1.5 rounded-full ${categoryBackgroundClasses[category]}`}
-          />
+          {category !== undefined ? (
+            <View
+              className={`h-1.5 w-1.5 rounded-full ${categoryBackgroundClasses[category]}`}
+            />
+          ) : null}
           <Text variant="caption">{meta}</Text>
         </View>
       </View>

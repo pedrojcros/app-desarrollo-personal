@@ -160,6 +160,15 @@ function ListRowStates() {
         onMarkNotDone={doNothing}
       />
       <View className="mt-3">
+        <StateLabel>Sin categoría (Bandeja de entrada)</StateLabel>
+      </View>
+      <ListRow
+        title="Pedir cita en el banco"
+        meta="Tarea"
+        onMarkDone={doNothing}
+        onMarkNotDone={doNothing}
+      />
+      <View className="mt-3">
         <StateLabel>Pulsado (✓ y ✗)</StateLabel>
       </View>
       <ListRow
