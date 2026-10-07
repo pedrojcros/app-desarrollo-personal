@@ -34,10 +34,12 @@ Cada ticket lleva en la descripción el identificador del plan (`RF-03`, `T07`) 
 
 | Momento | Estado en Jira |
 |---|---|
-| Tarea creada desde el plan | Por hacer |
-| Se lanza el primer trabajador | En curso |
-| El PR está abierto y el orquestador lo está revisando (o esperando los tests) | En revisión |
-| El PR está fusionado | Listo |
+| Tarea creada desde el plan | Por hacer (la crea el orquestador) |
+| Se lanza el trabajador | En curso **y etiqueta del agente** (`codex`, `claude` o `copilot`): el orquestador, con el script |
+| El trabajador sube su rama | En curso, si seguía en «Por hacer»: **automático** (flujo `jira.yml`) |
+| Se abre el PR | En revisión, con comentario y enlace: **automático** |
+| Se fusiona el PR | Listo, con comentario: **automático** |
+| Pausada (cuota, cierre inesperado) o esperando al humano | Comentario de por qué; etiqueta `bloqueada` si espera al humano: el orquestador |
 | Está bloqueada por una decisión | Bloqueada (o etiqueta `bloqueada`) y comentario con el enlace a la DEC |
 
 Tipos de incidencia reales de `ADP` (leídos con el MCP el 2026-10-05, nombres en español): `Epic`, `Historia`, `Tarea`, `Error` y `Subtask`. Conexión: MCP `atlassian` (`https://mcp.atlassian.com/v1/mcp/authv2`), sitio `pedrojcros.atlassian.net`, permisos solo de Jira.
@@ -54,6 +56,14 @@ Transiciones reales de `ADP` (son globales: desde cualquier estado se puede ir a
 | En revisión | 2 | En revisión (categoría En curso) |
 
 «En revisión» se añadió el 2026-10-05 (estado `10007`, categoría En curso) y Jira ya ofrece su transición. Está comprobado que existe en la lista de transiciones; todavía no se ha movido un ticket a ese estado.
+
+## Automático (DEC-40)
+
+Para que el humano vea el tablero **en tiempo real** sin que cueste tokens:
+
+- **`scripts/jira/jira.py`** (solo biblioteca estándar): `move ADP-12 en-curso|en-revision|listo|por-hacer`, `agent ADP-12 codex|claude|copilot` (una sola etiqueta de agente), `comment ADP-12 "texto"` y `status ADP-12`. Una línea de salida por orden; nunca muestra el token. Es lo que usa el orquestador en vez del MCP, que devuelve respuestas enormes.
+- **`.github/workflows/jira.yml`**: mueve las tarjetas solo con lo que pasa en GitHub (ver la tabla de arriba), leyendo la clave `ADP-…` de la rama o del título del PR.
+- **El token** es del humano, con permisos limitados (`read:jira-work` y `write:jira-work`): vive en `secretos.env` (`JIRA_API_TOKEN`) y en los secretos de GitHub (`JIRA_API_TOKEN`, `JIRA_EMAIL`; variable `JIRA_CLOUD_ID`). Con este tipo de token la API se llama por `https://api.atlassian.com/ex/jira/<cloudId>/…`; la dirección `pedrojcros.atlassian.net` no funciona.
 
 ## Convenciones
 

@@ -4,6 +4,10 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-07 — Jira en tiempo real (DEC-40) y más cierres inesperados
+
+El humano pidió ver en el tablero qué hace cada agente sin esfuerzo extra. Creó un token de Atlassian con permisos limitados, Copilot escribió `scripts/jira/jira.py` y el flujo `jira.yml` (PR #26), y desde ahora las tarjetas se mueven solas al abrir y fusionar PR, con una etiqueta por agente. Fusionadas T10 y DEC-39. La sesión del orquestador se cerró sola varias veces por falta de CPU y memoria, y cada cierre se llevó a los trabajadores, que al relanzarse releían todo: eso agotó la cuota de Codex. Se añadió a DEC-39 el relanzamiento con orden corta y se pausaron T05 y T09 hasta que vuelva la cuota.
+
 ### 2026-10-07 — Tarde: cuotas, reinicios y ahorro de tokens (DEC-39)
 
 Codex se quedó sin cuota de 10:20 a 13:54 con tres trabajadores a medias y el humano eligió esperar; a la vuelta, los trabajadores siguieron donde lo dejaron. Se fusionaron T12 (despliegue; se corrigió la contraseña de producción, que estaba vacía), T07, T08 y el arreglo `--include-all` de las migraciones, y el despliegue a pruebas desde `develop` ya funciona. Orca se reinició y cerró a los trabajadores, el comprobador del modo automático estuvo caído unos minutos y el modelo de Codex se saturó: varios trabajadores se pararon sin que nadie lo viera. El humano dio permisos permanentes de solo vigilancia (en `.claude/settings.local.json`) y aprobó siete medidas para gastar menos (DEC-39): esfuerzo alto, una sesión nueva por ola, esta bitácora aparte, encargos cortos, puestos fijos de trabajadores (dos de Codex, uno de Claude y uno de Copilot solo para lo pequeño, porque en «Auto» usa un modelo del nivel de Luna con su propia cuota), el modelo de Codex según el encargo y un supervisor que resuelve solo lo sencillo.
