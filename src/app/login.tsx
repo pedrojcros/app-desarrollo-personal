@@ -4,6 +4,7 @@ import { TextInput, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { signInWithPassword, type AuthErrorCode } from '@/data/auth';
+import { useTheme } from '@/theme/theme-context';
 
 const MESSAGE_BY_ERROR_CODE: Record<AuthErrorCode, string> = {
   invalid_input: 'Escribe tu email y tu contraseña',
@@ -13,6 +14,7 @@ const MESSAGE_BY_ERROR_CODE: Record<AuthErrorCode, string> = {
 };
 
 export default function LoginScreen() {
+  const { colors } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -39,6 +41,7 @@ export default function LoginScreen() {
       <TextInput
         accessibilityLabel="Email"
         placeholder="Email"
+        placeholderTextColor={colors['muted-foreground']}
         autoCapitalize="none"
         autoComplete="email"
         autoCorrect={false}
@@ -46,10 +49,12 @@ export default function LoginScreen() {
         value={email}
         onChangeText={setEmail}
         className="min-h-11 rounded border px-3"
+        style={{ color: colors.foreground }}
       />
       <TextInput
         accessibilityLabel="Contraseña"
         placeholder="Contraseña"
+        placeholderTextColor={colors['muted-foreground']}
         autoCapitalize="none"
         autoComplete="current-password"
         secureTextEntry
@@ -57,6 +62,7 @@ export default function LoginScreen() {
         onChangeText={setPassword}
         onSubmitEditing={submit}
         className="min-h-11 rounded border px-3"
+        style={{ color: colors.foreground }}
       />
       {errorMessage ? (
         <Text accessibilityRole="alert">{errorMessage}</Text>

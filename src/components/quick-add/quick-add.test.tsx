@@ -216,3 +216,13 @@ it('names the frequency options as a radio group', () => {
   const namedElements = screen.getAllByLabelText('Frecuencia');
   expect(namedElements.length).toBeGreaterThan(1);
 });
+
+it('paints the empty name field with the muted colour and the typed one with the foreground', () => {
+  openBar();
+  const nameField = screen.getByLabelText('Nombre');
+  expect(nameField).toHaveStyle({
+    color: themeColors.white['muted-foreground'],
+  });
+  fireEvent.changeText(nameField, 'Leer');
+  expect(nameField).toHaveStyle({ color: themeColors.white.foreground });
+});

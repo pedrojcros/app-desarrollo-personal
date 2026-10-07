@@ -39,6 +39,10 @@ export function QuickAddBar({
     submit,
     openMore,
   } = useQuickAddDraft(defaults, close);
+  // El preflight de Tailwind pinta de gris el campo vacío en la web y no llega
+  // al contraste mínimo; el color en línea lo corrige.
+  const nameColor =
+    name === '' ? colors['muted-foreground'] : colors.foreground;
   return (
     <View className="gap-3 bg-surface p-4">
       <View className="flex-row items-center gap-3">
@@ -49,8 +53,8 @@ export function QuickAddBar({
           placeholder="¿Qué quieres añadir?"
           placeholderTextColor={colors['muted-foreground']}
           selectionColor={colors['accent-text']}
-          className="min-h-12 min-w-0 flex-1 text-title text-foreground placeholder:text-muted-foreground"
-          style={{ fontFamily: fonts.heading }}
+          className="min-h-12 min-w-0 flex-1 text-title text-foreground"
+          style={{ fontFamily: fonts.heading, color: nameColor }}
           value={name}
           editable={!disabled}
           onChangeText={setName}
