@@ -101,6 +101,7 @@ Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto), 
 - **SDK de Android**: `sdkmanager` (cmdline-tools 23) escribe los paquetes con `/`, pero `avdmanager` todavía los pide con `;`.
 - **Orca borra el worktree de un trabajador al liquidarlo o fusionar su PR** (pasó con T05 y T09): no cuentes con reutilizar su carpeta ni su terminal para una corrección; lánzala en un worktree nuevo desde `develop`.
 - **Una pregunta de un trabajador (`ask`) solo llega si el orquestador está esperando con `check --wait`**: si se queda revisando un rato largo, el trabajador espera parado (T16 esperó 30 minutos). Entre revisión y revisión, vuelve a `check`.
+- **`worker-start --base-branch develop` usa el `develop` local**, que no avanza al fusionar en GitHub: el trabajador arranca sin lo último (pasó con 028 y 029). Antes de lanzar, `git fetch origin && git branch -f develop origin/develop` (o `--base-branch origin/develop`).
 - **`docker run` con una imagen propia que no existe la busca en Docker Hub**, donde podría haber otra con el mismo nombre: siempre `--pull never`.
 
 ## Lo que no viaja con el repositorio
