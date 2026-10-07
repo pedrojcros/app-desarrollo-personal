@@ -292,6 +292,8 @@ describe('Reschedule an overdue task (RF-13)', () => {
 });
 
 describe('Mark a whole day as not done (RF-14)', () => {
+  // Dos guardados y un diálogo por medio: en la CI, más de 1 s (el valor por defecto).
+  const SLOW_RENDER_TIMEOUT = 5000;
   const markDayButton = 'Todo no hecho: Ayer';
 
   it('has one action per day header', () => {
@@ -325,7 +327,9 @@ describe('Mark a whole day as not done (RF-14)', () => {
     fireEvent.press(
       screen.getByRole('button', { name: 'Marcar como no hecho' }),
     );
-    await waitFor(() => expect(screen.queryByText('Factura')).toBeNull());
+    await waitFor(() => expect(screen.queryByText('Factura')).toBeNull(), {
+      timeout: SLOW_RENDER_TIMEOUT,
+    });
     expect(screen.queryByText('Preparar comida')).toBeNull();
     expect(screen.getByText('Hilo dental')).toBeTruthy();
     expect(setMarkStatus).toHaveBeenCalledTimes(2);
@@ -338,9 +342,13 @@ describe('Mark a whole day as not done (RF-14)', () => {
     fireEvent.press(
       screen.getByRole('button', { name: 'Marcar como no hecho' }),
     );
-    await waitFor(() => expect(screen.queryByText('Factura')).toBeNull());
+    await waitFor(() => expect(screen.queryByText('Factura')).toBeNull(), {
+      timeout: SLOW_RENDER_TIMEOUT,
+    });
     fireEvent.press(screen.getByRole('button', { name: 'Deshacer' }));
-    await waitFor(() => expect(screen.getByText('Factura')).toBeTruthy());
+    await waitFor(() => expect(screen.getByText('Factura')).toBeTruthy(), {
+      timeout: SLOW_RENDER_TIMEOUT,
+    });
     expect(screen.getByText('Preparar comida')).toBeTruthy();
   });
 });
