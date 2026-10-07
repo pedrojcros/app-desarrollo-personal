@@ -4,6 +4,7 @@ import { compareOccurrencesForDay, getOccurrencesInRange } from './recurrence';
 import type {
   HabitRuleVersion,
   HabitSchedule,
+  IsoWeekday,
   Occurrence,
   TimeSlot,
 } from './types';
@@ -55,16 +56,21 @@ describe('recurrence', () => {
     ]);
   });
 
-  test('clipping to startDate does not restart the rule interval', () => {
+  test('an interval counts from the start date, which is also the first version', () => {
     const schedule = createSchedule({
       startDate: '2026-01-03',
       ruleVersions: [
-        createRule({ frequency: 'every_n_days', intervalDays: 3 }),
+        createRule({
+          validFrom: '2026-01-03',
+          frequency: 'every_n_days',
+          intervalDays: 3,
+        }),
       ],
     });
-    expect(occurrenceDates(schedule, '2026-01-01', '2026-01-07')).toEqual([
-      '2026-01-04',
-      '2026-01-07',
+    expect(occurrenceDates(schedule, '2026-01-01', '2026-01-10')).toEqual([
+      '2026-01-03',
+      '2026-01-06',
+      '2026-01-09',
     ]);
   });
 
@@ -249,17 +255,11 @@ describe('recurrence', () => {
     },
   );
 
-  test('does not generate dates before either start or the first version', () => {
-    expect(
-      occurrenceDates(
-        createSchedule({ startDate: '2026-01-05' }),
-        '2026-01-01',
-        '2026-01-06',
-      ),
-    ).toEqual(['2026-01-05', '2026-01-06']);
+  test('does not generate dates before the start date', () => {
     expect(
       occurrenceDates(
         createSchedule({
+          startDate: '2026-01-05',
           ruleVersions: [createRule({ validFrom: '2026-01-05' })],
         }),
         '2026-01-01',
@@ -268,7 +268,10 @@ describe('recurrence', () => {
     ).toEqual(['2026-01-05', '2026-01-06']);
     expect(
       occurrenceDates(
-        createSchedule({ startDate: '2027-01-01' }),
+        createSchedule({
+          startDate: '2027-01-01',
+          ruleVersions: [createRule({ validFrom: '2027-01-01' })],
+        }),
         '2026-01-01',
         '2026-12-31',
       ),
@@ -288,30 +291,164 @@ describe('recurrence', () => {
     expect(occurrenceDates(schedule, '2026-01-01', '2026-01-01')).toEqual([]);
   });
 
+  function expectInvalidSchedule(
+    schedule: HabitSchedule,
+    message: string,
+  ): void {
+    expect(() =>
+      getOccurrencesInRange(schedule, '2026-01-01', '2026-01-10'),
+    ).toThrow(new Error(message));
+  }
+
   test.each([0, -1, 1.5, NaN, Infinity, null])(
     'rejects invalid interval %s',
     (intervalDays) => {
       const schedule = createSchedule({
         ruleVersions: [createRule({ frequency: 'every_n_days', intervalDays })],
       });
-      expect(() =>
-        getOccurrencesInRange(schedule, '2026-01-01', '2026-01-10'),
-      ).toThrow(Error);
+      expectInvalidSchedule(
+        schedule,
+        'Interval days must be an integer greater than zero',
+      );
     },
   );
 
-  test('rejects missing rules, empty weekdays and simultaneous time choices', () => {
-    const schedules = [
+  test('rejects a schedule without rule versions', () => {
+    expectInvalidSchedule(
       createSchedule({ ruleVersions: [] }),
-      createSchedule({ ruleVersions: [createRule({ frequency: 'weekdays' })] }),
+      'A habit must have at least one rule version',
+    );
+  });
+
+  test('rejects a time of day together with a time slot', () => {
+    expectInvalidSchedule(
       createSchedule({ timeOfDay: '17:00', timeSlot: 'night' }),
+      'A habit cannot have both a time of day and a time slot',
+    );
+  });
+
+  test.each(['24:00', '9:00', '12:60', '12:5', '', 'noon', '12:00:00'])(
+    'rejects the time of day %j',
+    (timeOfDay) => {
+      expectInvalidSchedule(
+        createSchedule({ timeOfDay }),
+        'Time of day must be a valid HH:MM time',
+      );
+    },
+  );
+
+  test.each(['00:00', '09:05', '23:59'])(
+    'accepts the time of day %s',
+    (timeOfDay) => {
+      const occurrences = getOccurrencesInRange(
+        createSchedule({ timeOfDay }),
+        '2026-01-01',
+        '2026-01-01',
+      );
+      expect(occurrences[0].sortTime).toBe(timeOfDay);
+    },
+  );
+
+  test.each(['noon', '', 'toString'])(
+    'rejects the time slot %j',
+    (timeSlot) => {
+      expectInvalidSchedule(
+        createSchedule({ timeSlot: timeSlot as TimeSlot }),
+        'Time slot must be morning, afternoon or night',
+      );
+    },
+  );
+
+  test('rejects an unknown frequency', () => {
+    const schedule = createSchedule({
+      ruleVersions: [
+        createRule({ frequency: 'yearly' as HabitRuleVersion['frequency'] }),
+      ],
+    });
+    expectInvalidSchedule(schedule, 'Unknown frequency: yearly');
+  });
+
+  test('rejects weekday rules without weekdays', () => {
+    const schedule = createSchedule({
+      ruleVersions: [createRule({ frequency: 'weekdays' })],
+    });
+    expectInvalidSchedule(
+      schedule,
+      'Weekday rules must have at least one weekday',
+    );
+  });
+
+  test.each([null, undefined, 'monday', 3])(
+    'rejects weekdays that are not an array: %j',
+    (weekdays) => {
+      const schedule = createSchedule({
+        ruleVersions: [
+          createRule({
+            frequency: 'weekdays',
+            weekdays: weekdays as unknown as IsoWeekday[],
+          }),
+        ],
+      });
+      expectInvalidSchedule(
+        schedule,
+        'Weekday rules must have a weekdays array',
+      );
+    },
+  );
+
+  test.each([[[0]], [[8]], [[1.5]], [['2']], [[1, NaN]]])(
+    'rejects the weekdays %j',
+    (weekdays) => {
+      const schedule = createSchedule({
+        ruleVersions: [
+          createRule({
+            frequency: 'weekdays',
+            weekdays: weekdays as unknown as IsoWeekday[],
+          }),
+        ],
+      });
+      expectInvalidSchedule(
+        schedule,
+        'Weekdays must be integers from 1 (Monday) to 7 (Sunday)',
+      );
+    },
+  );
+
+  test('rejects versions that share the same validFrom, in any order', () => {
+    const daily = createRule();
+    const weekly = createRule({ frequency: 'weekdays', weekdays: [1] });
+    const later = createRule({ validFrom: '2026-01-05' });
+    const laterWeekly = createRule({
+      validFrom: '2026-01-05',
+      frequency: 'weekdays',
+      weekdays: [2],
+    });
+    const orders = [
+      [daily, weekly],
+      [weekly, daily],
+      [daily, later, laterWeekly],
+      [laterWeekly, later, daily],
     ];
-    for (const schedule of schedules) {
-      expect(() =>
-        getOccurrencesInRange(schedule, '2026-01-01', '2026-01-10'),
-      ).toThrow(Error);
+    for (const ruleVersions of orders) {
+      expectInvalidSchedule(
+        createSchedule({ ruleVersions }),
+        'Rule versions must have distinct validFrom dates',
+      );
     }
   });
+
+  test.each(['2026-01-05', '2025-12-31'])(
+    'rejects a first version starting on %s instead of the start date',
+    (validFrom) => {
+      const schedule = createSchedule({
+        ruleVersions: [createRule({ validFrom })],
+      });
+      expectInvalidSchedule(
+        schedule,
+        'The first rule version must start on the habit start date',
+      );
+    },
+  );
 
   test.each<[TimeSlot, string]>([
     ['morning', '09:00'],

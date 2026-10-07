@@ -178,11 +178,47 @@ describe('Habits', () => {
 });
 
 describe('Habit rules', () => {
-  function insertRule(rule: Record<string, unknown>) {
+  // Cada versión de un hábito necesita su propio valid_from, así que cada
+  // prueba usa un hábito nuevo para no chocar con las anteriores.
+  async function insertRule(rule: Record<string, unknown>) {
+    const ruleHabitId = await insertId(user.client, 'habits', {
+      name: 'Rule habit',
+      start_date: '2026-10-01',
+    });
+    return insertRuleFor(ruleHabitId, '2026-10-01', rule);
+  }
+
+  function insertRuleFor(
+    ruleHabitId: string,
+    validFrom: string,
+    rule: Record<string, unknown>,
+  ) {
     return user.client
       .from('habit_rules')
-      .insert({ habit_id: habitId, valid_from: '2026-10-01', ...rule });
+      .insert({ habit_id: ruleHabitId, valid_from: validFrom, ...rule });
   }
+
+  it('rejects two versions of a habit with the same valid_from', async () => {
+    const ruleHabitId = await insertId(user.client, 'habits', {
+      name: 'Duplicated version',
+      start_date: '2026-10-01',
+    });
+    const first = await insertRuleFor(ruleHabitId, '2026-10-01', {
+      frequency: 'daily',
+    });
+    const second = await insertRuleFor(ruleHabitId, '2026-10-01', {
+      frequency: 'weekdays',
+      weekdays: [1],
+    });
+    const laterVersion = await insertRuleFor(ruleHabitId, '2026-10-08', {
+      frequency: 'weekdays',
+      weekdays: [1],
+    });
+
+    expect(first.error).toBeNull();
+    expect(second.error?.code).toBe(UNIQUE_VIOLATION);
+    expect(laterVersion.error).toBeNull();
+  });
 
   it('accepts ISO weekdays from 1 (Monday) to 7 (Sunday)', async () => {
     const response = await insertRule({

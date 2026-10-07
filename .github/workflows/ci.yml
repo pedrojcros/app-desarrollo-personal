@@ -12,6 +12,7 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     env:
       EXPO_NO_TELEMETRY: '1'
       SUPABASE_TELEMETRY_DISABLED: '1'
@@ -30,6 +31,8 @@ jobs:
         run: ./docker/app/run npm run typecheck
       - name: Tests de componentes
         run: ./docker/app/run npm run test
+      - name: Tests del dominio en varias zonas horarias
+        run: ./docker/app/run npm run test:zones
       - name: Arrancar Supabase local
         run: ./docker/app/run npx supabase start > /tmp/supabase-start.log 2>&1
       - name: Integración con Supabase real

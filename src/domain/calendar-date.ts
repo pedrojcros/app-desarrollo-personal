@@ -1,9 +1,16 @@
 import type { CalendarDate, IsoWeekday } from './types';
 
 const MILLISECONDS_PER_DAY = 86_400_000;
+const CALENDAR_DATE_LENGTH = 10;
 
+// La 'Z' fija UTC: sin ella el resultado dependería de la zona del proceso.
 function toUtcDate(date: CalendarDate): Date {
   return new Date(`${date}T00:00:00.000Z`);
+}
+
+function formatCalendarDate(instant: Date): CalendarDate {
+  const isoText = instant.toISOString();
+  return isoText.slice(0, CALENDAR_DATE_LENGTH);
 }
 
 export function parseCalendarDate(value: string): CalendarDate {
@@ -15,7 +22,9 @@ export function parseCalendarDate(value: string): CalendarDate {
   if (!Number.isFinite(timestamp)) {
     throw new Error('Invalid calendar date: date does not exist');
   }
-  const normalized = instant.toISOString().slice(0, 10);
+  // Date desborda en vez de fallar (2026-02-30 pasa a 2026-03-02), así que
+  // se compara con lo que se escribió para detectar las fechas que no existen.
+  const normalized = formatCalendarDate(instant);
   if (normalized !== value) {
     throw new Error('Invalid calendar date: date does not exist');
   }
@@ -36,7 +45,7 @@ export function addDays(date: CalendarDate, amount: number): CalendarDate {
   const instant = toUtcDate(date);
   const day = instant.getUTCDate();
   instant.setUTCDate(day + amount);
-  const result = instant.toISOString().slice(0, 10);
+  const result = formatCalendarDate(instant);
   return parseCalendarDate(result);
 }
 
@@ -54,6 +63,11 @@ export function getIsoWeekday(date: CalendarDate): IsoWeekday {
   return weekday as IsoWeekday;
 }
 
+/** Número del día del mes, entre 1 y 31. */
+export function getDayOfMonth(date: CalendarDate): number {
+  return toUtcDate(date).getUTCDate();
+}
+
 /** Número del último día del mes, entre 28 y 31. */
 export function getLastDayOfMonth(date: CalendarDate): number {
   const instant = toUtcDate(date);
@@ -62,19 +76,45 @@ export function getLastDayOfMonth(date: CalendarDate): number {
   return instant.getUTCDate();
 }
 
-export function getCalendarDateInTimeZone(
-  instant: Date,
-  timeZone: string,
-): CalendarDate {
+// Crear un Intl.DateTimeFormat es caro: se guarda uno por zona horaria.
+const formatterByTimeZone = new Map<string, Intl.DateTimeFormat>();
+
+function getFormatter(timeZone: string): Intl.DateTimeFormat {
+  const cachedFormatter = formatterByTimeZone.get(timeZone);
+  if (cachedFormatter !== undefined) {
+    return cachedFormatter;
+  }
   const formatter = new Intl.DateTimeFormat('en-US', {
     timeZone,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
   });
+  formatterByTimeZone.set(timeZone, formatter);
+  return formatter;
+}
+
+function getDatePart(
+  parts: Intl.DateTimeFormatPart[],
+  type: 'year' | 'month' | 'day',
+): string {
+  const part = parts.find((candidate) => candidate.type === type);
+  if (part === undefined) {
+    throw new Error(`Could not read the ${type} from the formatted date`);
+  }
+  return part.value;
+}
+
+export function getCalendarDateInTimeZone(
+  instant: Date,
+  timeZone: string,
+): CalendarDate {
+  const formatter = getFormatter(timeZone);
   const parts = formatter.formatToParts(instant);
-  const year = parts.find((part) => part.type === 'year')!.value;
-  const month = parts.find((part) => part.type === 'month')!.value;
-  const day = parts.find((part) => part.type === 'day')!.value;
-  return parseCalendarDate(`${year.padStart(4, '0')}-${month}-${day}`);
+  const year = getDatePart(parts, 'year');
+  const month = getDatePart(parts, 'month');
+  const day = getDatePart(parts, 'day');
+  // Intl escribe los años menores de 1000 sin ceros a la izquierda.
+  const paddedYear = year.padStart(4, '0');
+  return parseCalendarDate(`${paddedYear}-${month}-${day}`);
 }
