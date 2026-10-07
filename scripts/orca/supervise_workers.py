@@ -21,10 +21,13 @@ import json
 import re
 import subprocess
 import time
+from dataclasses import dataclass
+from enum import Enum
 
 CHECK_INTERVAL_SECONDS = 20
 MAXIMUM_ENTER_ATTEMPTS = 3
 CAPACITY_RETRY_LIMIT = 3
+RECENT_LINE_COUNT = 15
 CAPACITY_RETRY_INTERVAL = datetime.timedelta(minutes=5)
 QUOTA_RESUME_DELAY = datetime.timedelta(minutes=1)
 MODEL_CAPACITY_MESSAGE = 'Selected model is at capacity'
@@ -37,6 +40,19 @@ CLAUDE_PERMISSION_MARKERS = (
     'Do you want to make this edit',
     'Do you want to create',
 )
+
+
+class CodexStatus(Enum):
+    NOTHING = 'nothing'
+    WAITING = 'waiting'
+    ACTED = 'acted'
+    ALERT = 'alert'
+
+
+@dataclass
+class CodexOutcome:
+    status: CodexStatus
+    alert: str = ''
 
 
 def parse_arguments():
@@ -140,54 +156,88 @@ def continue_worker(worker, action_description):
     handle = worker['agentTerminalHandle']
     send_to_terminal(handle, '--text', 'continúa')
     send_to_terminal(handle, '--enter')
+    print_action(worker, action_description)
+
+
+def recent_lines(text):
+    non_empty_lines = [line for line in text.splitlines() if line.strip()]
+    return '\n'.join(non_empty_lines[-RECENT_LINE_COUNT:])
+
+
+def update_screen_stillness(worker_state, text):
+    fingerprint = hashlib.sha256(text.encode('utf-8')).hexdigest()
+    previous_fingerprint = worker_state.get('screen_fingerprint')
+    worker_state['screen_fingerprint'] = fingerprint
+    return fingerprint == previous_fingerprint
+
+
+def print_action(worker, action_description):
     print(time.strftime('%H:%M:%S'), worker_description(worker), action_description, flush=True)
 
 
-def handle_codex_wait(worker, text, worker_states, current_time):
-    dispatch = worker['dispatchId']
-    worker_state = worker_states.setdefault(dispatch, {})
+def handle_quota_wait(worker, worker_state, current_time):
     quota_retry_time = worker_state.get('quota_retry_time')
-    if quota_retry_time is not None:
-        if worker_state.get('quota_resumed'):
-            if USAGE_LIMIT_MESSAGE in text:
-                return 'handled'
-            worker_state.pop('quota_retry_time')
-            worker_state.pop('quota_resumed')
-        elif is_worker_waiting_for_quota(current_time, quota_retry_time):
-            return 'waiting'
-        else:
-            continue_worker(worker, f'cuota recuperada; continúa ({quota_retry_time:%H:%M})')
-            worker_state['quota_resumed'] = True
-            return 'waiting'
+    if quota_retry_time is None:
+        return None
+    if is_worker_waiting_for_quota(current_time, quota_retry_time):
+        return CodexOutcome(CodexStatus.WAITING)
+    continue_worker(worker, f'cuota recuperada; continúa ({quota_retry_time:%H:%M})')
+    # Se olvida todo lo anterior: si vuelve a pararse, se juzga como una situación nueva.
+    worker_state.clear()
+    return CodexOutcome(CodexStatus.ACTED)
 
-    if detect_usage_limit(text):
-        retry_time = parse_retry_time(text, current_time)
-        if retry_time is None:
-            return f'{worker_description(worker)} muestra el límite de cuota sin una hora legible'
-        worker_state['quota_retry_time'] = retry_time
-        send_to_terminal(worker['agentTerminalHandle'], '--text', '2')
-        send_to_terminal(worker['agentTerminalHandle'], '--enter')
-        print(time.strftime('%H:%M:%S'), worker_description(worker), f'mantiene el modelo y espera hasta {retry_time:%H:%M}', flush=True)
-        return 'waiting'
-    if USAGE_LIMIT_MESSAGE in text:
-        return f'{worker_description(worker)} muestra el límite de cuota sin una hora o menú reconocible'
 
-    if detect_model_capacity(text):
-        retry_count = worker_state.get('capacity_retry_count', 0)
-        last_retry_time = worker_state.get('capacity_last_retry_time')
-        if not should_retry_capacity(current_time, last_retry_time, retry_count):
-            if retry_count < CAPACITY_RETRY_LIMIT:
-                return 'handled'
-            if current_time - last_retry_time < CAPACITY_RETRY_INTERVAL:
-                return 'handled'
-            return f'{worker_description(worker)} agotó {CAPACITY_RETRY_LIMIT} reintentos por saturación del modelo'
+def start_quota_wait(worker, worker_state, recent_text, current_time):
+    retry_time = parse_retry_time(recent_text, current_time)
+    if retry_time is None:
+        alert = f'{worker_description(worker)} muestra el límite de cuota sin una hora legible'
+        return CodexOutcome(CodexStatus.ALERT, alert)
+    worker_state['quota_retry_time'] = retry_time
+    handle = worker['agentTerminalHandle']
+    send_to_terminal(handle, '--text', '2')
+    send_to_terminal(handle, '--enter')
+    print_action(worker, f'mantiene el modelo y espera hasta {retry_time:%H:%M}')
+    return CodexOutcome(CodexStatus.ACTED)
+
+
+def retry_model_capacity(worker, worker_state, current_time):
+    retry_count = worker_state.get('capacity_retry_count', 0)
+    last_retry_time = worker_state.get('capacity_last_retry_time')
+    if should_retry_capacity(current_time, last_retry_time, retry_count):
         worker_state['capacity_retry_count'] = retry_count + 1
         worker_state['capacity_last_retry_time'] = current_time
         continue_worker(worker, f'modelo saturado; continúa (intento {retry_count + 1}/{CAPACITY_RETRY_LIMIT})')
-        return 'handled'
-    worker_state['capacity_retry_count'] = 0
-    worker_state['capacity_last_retry_time'] = None
-    return None
+        return CodexOutcome(CodexStatus.ACTED)
+    is_cooling_down = retry_count < CAPACITY_RETRY_LIMIT or current_time - last_retry_time < CAPACITY_RETRY_INTERVAL
+    if is_cooling_down:
+        return CodexOutcome(CodexStatus.WAITING)
+    alert = f'{worker_description(worker)} agotó {CAPACITY_RETRY_LIMIT} reintentos por saturación del modelo'
+    return CodexOutcome(CodexStatus.ALERT, alert)
+
+
+def handle_codex_wait(worker, text, worker_states, current_time):
+    worker_state = worker_states.setdefault(worker['dispatchId'], {})
+    screen_is_still = update_screen_stillness(worker_state, text)
+    quota_outcome = handle_quota_wait(worker, worker_state, current_time)
+    if quota_outcome is not None:
+        return quota_outcome
+
+    # Solo cuenta lo que está al final de la pantalla: más arriba es historial.
+    recent_text = recent_lines(text)
+    if not detect_model_capacity(recent_text):
+        worker_state['capacity_retry_count'] = 0
+        worker_state['capacity_last_retry_time'] = None
+    if not screen_is_still:
+        return CodexOutcome(CodexStatus.NOTHING)
+
+    if detect_usage_limit(recent_text):
+        return start_quota_wait(worker, worker_state, recent_text, current_time)
+    if USAGE_LIMIT_MESSAGE in recent_text:
+        alert = f'{worker_description(worker)} muestra el límite de cuota sin una hora o menú reconocible'
+        return CodexOutcome(CodexStatus.ALERT, alert)
+    if detect_model_capacity(recent_text):
+        return retry_model_capacity(worker, worker_state, current_time)
+    return CodexOutcome(CodexStatus.NOTHING)
 
 
 def send_to_terminal(handle, *arguments):
@@ -278,12 +328,12 @@ def supervise_worker(worker, repository_root, screen_history, enter_attempts, id
     if draft_problem or has_unsent_assignment(terminal):
         return draft_problem
     text = screen_text(terminal)
-    codex_wait = handle_codex_wait(worker, text, worker_states, datetime.datetime.now())
-    if codex_wait == 'waiting' or codex_wait == 'handled':
+    codex_outcome = handle_codex_wait(worker, text, worker_states, datetime.datetime.now())
+    if codex_outcome.status == CodexStatus.ALERT:
+        return codex_outcome.alert
+    if codex_outcome.status != CodexStatus.NOTHING:
         screen_history.pop(worker['dispatchId'], None)
         return None
-    if codex_wait:
-        return codex_wait
     allowed_roots = (repository_root, worktree_path(worker))
     permission_problem = answer_copilot_permission(worker, text, allowed_roots)
     if permission_problem:
