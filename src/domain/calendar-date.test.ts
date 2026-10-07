@@ -5,6 +5,7 @@ import {
   compareCalendarDates,
   daysBetween,
   getCalendarDateInTimeZone,
+  getDayOfMonth,
   getIsoWeekday,
   getLastDayOfMonth,
   parseCalendarDate,
@@ -29,7 +30,27 @@ describe('calendar dates', () => {
     '2026-01-01T00:00:00Z',
     'invalid',
   ])('rejects invalid date %s', (date) => {
-    expect(() => parseCalendarDate(date)).toThrow(Error);
+    expect(() => parseCalendarDate(date)).toThrow(
+      /^Invalid calendar date: (expected YYYY-MM-DD|date does not exist)$/,
+    );
+  });
+
+  test('explains whether the format or the date itself is wrong', () => {
+    expect(() => parseCalendarDate('invalid')).toThrow(
+      new Error('Invalid calendar date: expected YYYY-MM-DD'),
+    );
+    expect(() => parseCalendarDate('2026-02-30')).toThrow(
+      new Error('Invalid calendar date: date does not exist'),
+    );
+  });
+
+  test.each([
+    ['2026-01-01', 1],
+    ['2026-02-28', 28],
+    ['2024-02-29', 29],
+    ['2026-12-31', 31],
+  ])('finds the day of the month of %s', (date, expected) => {
+    expect(getDayOfMonth(date)).toBe(expected);
   });
 
   test('compares dates chronologically', () => {
@@ -90,9 +111,34 @@ describe('calendar dates', () => {
     ['2026-01-01T00:30:00Z', 'America/Los_Angeles', '2025-12-31'],
     ['2026-12-31T12:30:00Z', 'Pacific/Auckland', '2027-01-01'],
     ['2026-01-01T00:30:00Z', 'UTC', '2026-01-01'],
+    ['2026-01-15T22:59:59Z', 'Europe/Madrid', '2026-01-15'],
+    ['2026-01-15T23:00:00Z', 'Europe/Madrid', '2026-01-16'],
+    ['2026-03-29T21:59:59Z', 'Europe/Madrid', '2026-03-29'],
+    ['2026-03-29T22:00:00Z', 'Europe/Madrid', '2026-03-30'],
+    ['2026-07-15T21:59:59Z', 'Europe/Madrid', '2026-07-15'],
+    ['2026-07-15T22:00:00Z', 'Europe/Madrid', '2026-07-16'],
+    ['2026-10-25T22:59:59Z', 'Europe/Madrid', '2026-10-25'],
+    ['2026-10-25T23:00:00Z', 'Europe/Madrid', '2026-10-26'],
+    ['0099-06-15T12:00:00Z', 'UTC', '0099-06-15'],
   ])('converts %s in %s', (instant, timeZone, expected) => {
     expect(getCalendarDateInTimeZone(new Date(instant), timeZone)).toBe(
       expected,
+    );
+  });
+
+  test('reuses the formatter and still converts correctly afterwards', () => {
+    const instant = new Date('2026-01-15T23:00:00Z');
+    expect(getCalendarDateInTimeZone(instant, 'Europe/Madrid')).toBe(
+      '2026-01-16',
+    );
+    expect(getCalendarDateInTimeZone(instant, 'Europe/Madrid')).toBe(
+      '2026-01-16',
+    );
+  });
+
+  test('rejects an unknown time zone with a clear error', () => {
+    expect(() => getCalendarDateInTimeZone(new Date(), 'Not/AZone')).toThrow(
+      RangeError,
     );
   });
 });

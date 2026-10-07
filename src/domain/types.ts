@@ -15,6 +15,11 @@ export interface HabitRuleVersion {
   intervalDays: number | null; // Solo con 'every_n_days'; entero >= 1.
 }
 
+/**
+ * Un hábito empieza el día startDate y su primera versión de regla empieza ese
+ * mismo día: el validFrom más antiguo es igual a startDate. Las versiones
+ * tienen validFrom distintos entre sí.
+ */
 export interface HabitSchedule {
   habitId: string;
   startDate: CalendarDate;
