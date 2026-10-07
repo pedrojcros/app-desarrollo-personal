@@ -4,6 +4,7 @@ import { PortalHost } from '@rn-primitives/portal';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 
+import { UndoToastProvider } from '@/components/undo-toast';
 import { useSession } from '@/data/auth';
 import { ThemeProvider } from '@/theme/provider';
 
@@ -41,7 +42,9 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <ProtectedStack />
+        <UndoToastProvider>
+          <ProtectedStack />
+        </UndoToastProvider>
         <PortalHost />
       </QueryClientProvider>
     </ThemeProvider>

@@ -8,7 +8,8 @@ import { usePressed } from './use-pressed';
 type UndoNoticeProps = {
   message: string;
   actionLabel?: string;
-  onAction: () => void;
+  // Sin acción no se pinta el botón (avisos de error).
+  onAction?: () => void;
   // Fuerza el estado pulsado del botón (catálogo y tests).
   pressed?: boolean;
 };
@@ -46,17 +47,19 @@ export function UndoNotice({
       >
         {message}
       </Text>
-      <Pressable
-        role="button"
-        className={actionClassName}
-        onPress={onAction}
-        onPressIn={press.handlePressIn}
-        onPressOut={press.handlePressOut}
-      >
-        <Text variant="callout" weight="bold" className="text-inverse-accent">
-          {actionLabel}
-        </Text>
-      </Pressable>
+      {onAction !== undefined && (
+        <Pressable
+          role="button"
+          className={actionClassName}
+          onPress={onAction}
+          onPressIn={press.handlePressIn}
+          onPressOut={press.handlePressOut}
+        >
+          <Text variant="callout" weight="bold" className="text-inverse-accent">
+            {actionLabel}
+          </Text>
+        </Pressable>
+      )}
     </View>
   );
 }
