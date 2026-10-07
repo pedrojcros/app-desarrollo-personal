@@ -20,11 +20,11 @@ const colorNames = [
   'inverse-accent',
   'badge',
   'badge-foreground',
-  'category-shopping',
-  'category-university',
-  'category-health',
-  'category-personal',
-  'category-home',
+  'category-teal',
+  'category-blue',
+  'category-green',
+  'category-amber',
+  'category-garnet',
 ];
 
 const colors = Object.fromEntries(

@@ -15,9 +15,9 @@ Tres temas con la misma estructura. **Por defecto, el tema sigue el modo del mó
 | Superficie 2 | `#EAE2D4` | `#1C2C23` | `#F4EFDF` |
 | Borde | `#D9CDB9` | `#27392F` | `#111111` |
 | Texto | `#1F1B16` | `#E9F1EB` | `#111111` |
-| Texto suave | `#75695A` | `#93A89A` | `#4A4A4A` |
-| Acento | `#C2410C` | `#E8C468` | `#FFE14D` |
-| No hecho | `#9C8F7E` | `#D9776A` | `#111111` |
+| Texto suave | `#6F6355` (DEC-37) | `#93A89A` | `#4A4A4A` |
+| Acento | `#B43C0B` (DEC-37) | `#E8C468` | `#FFE14D` |
+| No hecho | `#8C8071` (DEC-37) | `#D9776A` | `#111111` |
 | Lista de la compra | `#1F7A80` | `#5CCFC4` | `#62D9CB` |
 | Universidad | `#3B5B7A` | `#8DB8F2` | `#8AB4FF` |
 | Salud | `#4F7A45` | `#7AD39A` | `#6EE7A8` |
@@ -56,11 +56,11 @@ Los tokens viven en `src/theme/tokens.ts` y los tres temas se aplican con `Theme
 | Botón principal y su texto | `bg-accent`, `text-accent-foreground` |
 | Pastilla de la pestaña activa | `bg-accent-soft` |
 | Hecho, no hecho | `bg-done`, `text-not-done` |
-| Categorías | `bg-category-shopping`, `-university`, `-health`, `-personal`, `-home` (con `text-on-category` encima) |
+| Categorías | `bg-category-teal`, `-blue`, `-green`, `-amber`, `-garnet` (con `text-on-category` encima) |
 | Aviso inferior | `bg-inverse`, `text-inverse-foreground`, `text-inverse-accent` |
 | Contador de pestaña | `bg-badge`, `text-badge-foreground` |
 
-Se pueden usar con transparencia (`bg-accent/20`). Un color de categoría nuevo es una clase escrita entera en `src/components/ui/category-classes.ts` (Tailwind no ve las clases construidas con plantillas de texto). Los tokens que la tabla no nombra (`accent-foreground`, `accent-soft`, `accent-text`, `done`, `on-category`, `inverse*`, `badge*`) salen de los prototipos de la ronda 4.
+Se pueden usar con transparencia (`bg-accent/20`). La paleta de categorías se llama por el nombre del color (`CATEGORY_COLORS`, `getCategoryColorLabel` y `useCategoryColorValue` en `src/theme/category-colors.ts`): la base de datos guarda el nombre (`'teal'`), nunca el valor, y cada tema lo pinta con su tono. Un color de categoría nuevo es una clase escrita entera en `src/components/ui/category-classes.ts` (Tailwind no ve las clases construidas con plantillas de texto). Los tokens que la tabla no nombra (`accent-foreground`, `accent-soft`, `accent-text`, `done`, `on-category`, `inverse*`, `badge*`) salen de los prototipos de la ronda 4.
 
 **Tipografía:** `Text` (`src/components/ui/text.tsx`) con `variant` (`title`, `heading`, `headline`, `body`, `callout`, `eyebrow`, `caption`, `label`) y `weight` (`regular`, `medium`, `semibold`, `bold`). Elige solo la letra del tema (Fraunces e Inter, DM Sans o Archivo) y los tamaños de `fontSize` en `tailwind.config.js`. **Espaciado:** el de Tailwind, múltiplos de 4 (`p-4`, `gap-3`). Las zonas de toque miden al menos `min-h-11`/`h-11` (44 pt).
 

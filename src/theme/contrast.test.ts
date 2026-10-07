@@ -32,11 +32,11 @@ type ContrastPair = {
 };
 
 const categoryTokens: ColorToken[] = [
-  'category-shopping',
-  'category-university',
-  'category-health',
-  'category-personal',
-  'category-home',
+  'category-teal',
+  'category-blue',
+  'category-green',
+  'category-amber',
+  'category-garnet',
 ];
 
 const textOnBackgrounds: ColorToken[] = ['background', 'surface', 'raised'];
@@ -175,25 +175,16 @@ function findFailures(): string[] {
   return failures;
 }
 
-// Incumplimientos que vienen de los colores de docs/diseno.md. No se cambian
-// aquí: los decide el humano. Si uno se arregla, hay que quitarlo de la lista.
-const knownFailuresPendingDecision: string[] = [
-  'Blanco: muted-foreground sobre raised (texto suave) = 4.16:1, mínimo 4.5:1',
-  'Blanco: accent-text sobre background (texto de acento sobre el fondo) = 4.40:1, mínimo 4.5:1',
-  'Blanco: not-done sobre background (la ✗ de no hecho sobre el fondo) = 2.69:1, mínimo 3:1',
-  'Blanco: not-done sobre surface (la ✗ de no hecho sobre la superficie) = 2.93:1, mínimo 3:1',
-];
-
 describe('contrast of the theme tokens (RNF-03, WCAG AA)', () => {
   it('measures a known contrast', () => {
     expect(contrastRatio('#000000', '#FFFFFF')).toBeCloseTo(21, 5);
     expect(contrastRatio('#FFFFFF', '#FFFFFF')).toBeCloseTo(1, 5);
   });
 
-  it('meets AA in every theme, except the failures pending a decision', () => {
+  it('meets AA in every theme without exceptions', () => {
     const failures = findFailures();
 
-    expect(failures).toEqual(knownFailuresPendingDecision);
+    expect(failures).toEqual([]);
   });
 });
 

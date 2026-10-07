@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { useTheme } from '@/theme/theme-context';
-import type { CategoryColor } from '@/theme/tokens';
+import type { CategoryColor } from '@/theme/category-colors';
 
 import { categoryBackgroundClasses } from './category-classes';
 import { Icon } from './icon';

@@ -35,7 +35,7 @@ describe('ListRow', () => {
       <ListRow
         title="Leer 20 minutos"
         meta="Personal · Hábito"
-        category="personal"
+        category="amber"
         onMarkDone={handleDone}
         onMarkNotDone={handleNotDone}
       />,
@@ -56,7 +56,7 @@ describe('ListRow', () => {
       <ListRow
         title="Leer 20 minutos"
         meta="Personal · Hábito"
-        category="personal"
+        category="amber"
         disabled
         onMarkDone={handleDone}
         onMarkNotDone={jest.fn()}

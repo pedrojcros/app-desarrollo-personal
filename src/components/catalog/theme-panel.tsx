@@ -127,35 +127,35 @@ function ListRowStates() {
       <ListRow
         title="Comprar proteína"
         meta="Personal · Tarea"
-        category="personal"
+        category="amber"
         onMarkDone={doNothing}
         onMarkNotDone={doNothing}
       />
       <ListRow
         title="Entregar práctica de Redes"
         meta="23:59 · Universidad · Tarea"
-        category="university"
+        category="blue"
         onMarkDone={doNothing}
         onMarkNotDone={doNothing}
       />
       <ListRow
         title="Beber 2 L de agua"
         meta="Salud · Hábito"
-        category="health"
+        category="green"
         onMarkDone={doNothing}
         onMarkNotDone={doNothing}
       />
       <ListRow
         title="Comprar leche"
         meta="Lista de la compra · Tarea"
-        category="shopping"
+        category="teal"
         onMarkDone={doNothing}
         onMarkNotDone={doNothing}
       />
       <ListRow
         title="Limpiar la cocina"
         meta="Casa · Hábito"
-        category="home"
+        category="garnet"
         onMarkDone={doNothing}
         onMarkNotDone={doNothing}
       />
@@ -165,7 +165,7 @@ function ListRowStates() {
       <ListRow
         title="Llamar al dentista"
         meta="10:00 · Personal · Tarea"
-        category="personal"
+        category="amber"
         donePressed
         notDonePressed
         onMarkDone={doNothing}
@@ -177,7 +177,7 @@ function ListRowStates() {
       <ListRow
         title="Ir al gimnasio"
         meta="18:30 · Salud · Hábito"
-        category="health"
+        category="green"
         disabled
         onMarkDone={doNothing}
         onMarkNotDone={doNothing}

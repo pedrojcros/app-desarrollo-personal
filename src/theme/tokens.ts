@@ -34,11 +34,11 @@ export type ColorToken =
   | 'inverse-accent'
   | 'badge'
   | 'badge-foreground'
-  | 'category-shopping'
-  | 'category-university'
-  | 'category-health'
-  | 'category-personal'
-  | 'category-home';
+  | 'category-teal'
+  | 'category-blue'
+  | 'category-green'
+  | 'category-amber'
+  | 'category-garnet';
 
 export type ThemeColors = Record<ColorToken, string>;
 
@@ -61,22 +61,11 @@ export const colorTokens: ColorToken[] = [
   'inverse-accent',
   'badge',
   'badge-foreground',
-  'category-shopping',
-  'category-university',
-  'category-health',
-  'category-personal',
-  'category-home',
-];
-
-export type CategoryColor =
-  'shopping' | 'university' | 'health' | 'personal' | 'home';
-
-export const categoryColors: CategoryColor[] = [
-  'shopping',
-  'university',
-  'health',
-  'personal',
-  'home',
+  'category-teal',
+  'category-blue',
+  'category-green',
+  'category-amber',
+  'category-garnet',
 ];
 
 // Los valores de la tabla de docs/diseno.md van tal cual. Los tokens que la
@@ -89,24 +78,24 @@ export const themeColors: Record<ThemeName, ThemeColors> = {
     raised: '#EAE2D4',
     border: '#D9CDB9',
     foreground: '#1F1B16',
-    'muted-foreground': '#75695A',
-    accent: '#C2410C',
+    'muted-foreground': '#6F6355',
+    accent: '#B43C0B',
     'accent-foreground': '#FFFFFF',
     'accent-soft': '#F4DDCF',
-    'accent-text': '#C2410C',
+    'accent-text': '#B43C0B',
     done: '#1F1B16',
-    'not-done': '#9C8F7E',
+    'not-done': '#8C8071',
     'on-category': '#FAF6EF',
     inverse: '#1F1B16',
     'inverse-foreground': '#FAF6EF',
     'inverse-accent': '#FFFFFF',
     badge: '#1F1B16',
     'badge-foreground': '#FAF6EF',
-    'category-shopping': '#1F7A80',
-    'category-university': '#3B5B7A',
-    'category-health': '#4F7A45',
-    'category-personal': '#B7791F',
-    'category-home': '#9B3A4C',
+    'category-teal': '#1F7A80',
+    'category-blue': '#3B5B7A',
+    'category-green': '#4F7A45',
+    'category-amber': '#B7791F',
+    'category-garnet': '#9B3A4C',
   },
   black: {
     background: '#0E1813',
@@ -127,11 +116,11 @@ export const themeColors: Record<ThemeName, ThemeColors> = {
     'inverse-accent': '#E8C468',
     badge: '#E8C468',
     'badge-foreground': '#0E1813',
-    'category-shopping': '#5CCFC4',
-    'category-university': '#8DB8F2',
-    'category-health': '#7AD39A',
-    'category-personal': '#EFA66A',
-    'category-home': '#F2A7A0',
+    'category-teal': '#5CCFC4',
+    'category-blue': '#8DB8F2',
+    'category-green': '#7AD39A',
+    'category-amber': '#EFA66A',
+    'category-garnet': '#F2A7A0',
   },
   bold: {
     background: '#FFFBEF',
@@ -152,11 +141,11 @@ export const themeColors: Record<ThemeName, ThemeColors> = {
     'inverse-accent': '#FFE14D',
     badge: '#FFB86B',
     'badge-foreground': '#111111',
-    'category-shopping': '#62D9CB',
-    'category-university': '#8AB4FF',
-    'category-health': '#6EE7A8',
-    'category-personal': '#FFB86B',
-    'category-home': '#FF8FB1',
+    'category-teal': '#62D9CB',
+    'category-blue': '#8AB4FF',
+    'category-green': '#6EE7A8',
+    'category-amber': '#FFB86B',
+    'category-garnet': '#FF8FB1',
   },
 };
 
