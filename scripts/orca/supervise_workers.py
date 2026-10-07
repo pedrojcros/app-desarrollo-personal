@@ -32,6 +32,40 @@ CAPACITY_RETRY_INTERVAL = datetime.timedelta(minutes=5)
 QUOTA_RESUME_DELAY = datetime.timedelta(minutes=1)
 MODEL_CAPACITY_MESSAGE = 'Selected model is at capacity'
 USAGE_LIMIT_MESSAGE = "You've hit your usage limit"
+ENGLISH_MONTH_NUMBERS = {
+    'jan': 1,
+    'january': 1,
+    'feb': 2,
+    'february': 2,
+    'mar': 3,
+    'march': 3,
+    'apr': 4,
+    'april': 4,
+    'may': 5,
+    'jun': 6,
+    'june': 6,
+    'jul': 7,
+    'july': 7,
+    'aug': 8,
+    'august': 8,
+    'sep': 9,
+    'sept': 9,
+    'september': 9,
+    'oct': 10,
+    'october': 10,
+    'nov': 11,
+    'november': 11,
+    'dec': 12,
+    'december': 12,
+}
+RETRY_TIME_PATTERN = re.compile(
+    r'try again at\s+'
+    r'(?:(January|Jan|February|Feb|March|Mar|April|Apr|May|June|Jun|'
+    r'July|Jul|August|Aug|September|Sept|Sep|October|Oct|November|Nov|'
+    r'December|Dec)\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})\s+)?'
+    r'(\d{1,2}:\d{2}(?:\s*[AP]M)?)',
+    re.IGNORECASE,
+)
 COPILOT_PERMISSION_QUESTION = 'Do you want to allow this?'
 COPILOT_PARKED_PASTE = '[Paste #'
 CLAUDE_PERMISSION_MARKERS = (
@@ -119,23 +153,30 @@ def detect_model_capacity(text):
 
 def detect_usage_limit(text):
     has_usage_limit = USAGE_LIMIT_MESSAGE in text
-    has_retry_time = re.search(r'try again at\s+\d{1,2}:\d{2}(?:\s*[AP]M)?', text, re.IGNORECASE)
-    has_keep_model_option = re.search(r'^\s*2[.)]\s+.*model', text, re.IGNORECASE | re.MULTILINE)
-    return has_usage_limit and has_retry_time is not None and has_keep_model_option is not None
+    has_retry_time = RETRY_TIME_PATTERN.search(text)
+    return has_usage_limit and has_retry_time is not None
 
 
 def parse_retry_time(text, current_time):
-    time_match = re.search(r'try again at\s+(\d{1,2}:\d{2}(?:\s*[AP]M)?)', text, re.IGNORECASE)
+    time_match = RETRY_TIME_PATTERN.search(text)
     if time_match is None:
         return None
-    time_text = time_match.group(1).upper().replace(' ', '')
+    month_name, day_text, year_text, clock_text = time_match.groups()
+    time_text = clock_text.upper().replace(' ', '')
     time_format = '%I:%M%p' if 'AM' in time_text or 'PM' in time_text else '%H:%M'
     try:
         retry_clock = datetime.datetime.strptime(time_text, time_format).time()
     except ValueError:
         return None
-    retry_time = datetime.datetime.combine(current_time.date(), retry_clock)
-    if retry_time <= current_time:
+    retry_date = current_time.date()
+    if month_name is not None:
+        month_number = ENGLISH_MONTH_NUMBERS[month_name.lower()]
+        try:
+            retry_date = datetime.date(int(year_text), month_number, int(day_text))
+        except ValueError:
+            return None
+    retry_time = datetime.datetime.combine(retry_date, retry_clock)
+    if month_name is None and retry_time <= current_time:
         retry_time += datetime.timedelta(days=1)
     return retry_time
 
@@ -193,10 +234,19 @@ def start_quota_wait(worker, worker_state, recent_text, current_time):
         alert = f'{worker_description(worker)} muestra el límite de cuota sin una hora legible'
         return CodexOutcome(CodexStatus.ALERT, alert)
     worker_state['quota_retry_time'] = retry_time
-    handle = worker['agentTerminalHandle']
-    send_to_terminal(handle, '--text', '2')
-    send_to_terminal(handle, '--enter')
-    print_action(worker, f'mantiene el modelo y espera hasta {retry_time:%H:%M}')
+    has_keep_model_option = re.search(
+        r'^\s*2[.)]\s+.*model',
+        recent_text,
+        re.IGNORECASE | re.MULTILINE,
+    )
+    if has_keep_model_option is not None:
+        handle = worker['agentTerminalHandle']
+        send_to_terminal(handle, '--text', '2')
+        send_to_terminal(handle, '--enter')
+        action_description = f'mantiene el modelo y espera hasta {retry_time:%H:%M}'
+    else:
+        action_description = f'espera hasta {retry_time:%H:%M}'
+    print_action(worker, action_description)
     return CodexOutcome(CodexStatus.ACTED)
 
 
