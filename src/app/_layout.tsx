@@ -6,6 +6,7 @@ import { Stack } from 'expo-router';
 
 import { QuickAddProvider } from '@/components/quick-add';
 import { UndoToastProvider } from '@/components/undo-toast';
+import { PageMetadata } from '@/components/ui/page-metadata';
 import { useSession } from '@/data/auth';
 import { ThemeProvider } from '@/theme/provider';
 
@@ -42,6 +43,7 @@ function ProtectedStack() {
 export default function RootLayout() {
   return (
     <ThemeProvider>
+      <PageMetadata />
       <QueryClientProvider client={queryClient}>
         <UndoToastProvider>
           <QuickAddProvider>

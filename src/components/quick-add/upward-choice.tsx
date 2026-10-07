@@ -39,6 +39,8 @@ export function UpwardChoice<Value extends string>({
       </Button>
       {isOpen ? (
         <View
+          role="radiogroup"
+          accessibilityLabel={label}
           className="absolute bottom-full mb-2 w-full bg-surface"
           style={{
             borderColor: colors.border,
