@@ -15,9 +15,9 @@ Tres temas con la misma estructura. **Por defecto, el tema sigue el modo del mó
 | Superficie 2 | `#EAE2D4` | `#1C2C23` | `#F4EFDF` |
 | Borde | `#D9CDB9` | `#27392F` | `#111111` |
 | Texto | `#1F1B16` | `#E9F1EB` | `#111111` |
-| Texto suave | `#75695A` | `#93A89A` | `#4A4A4A` |
-| Acento | `#C2410C` | `#E8C468` | `#FFE14D` |
-| No hecho | `#9C8F7E` | `#D9776A` | `#111111` |
+| Texto suave | `#6F6355` (DEC-37) | `#93A89A` | `#4A4A4A` |
+| Acento | `#B43C0B` (DEC-37) | `#E8C468` | `#FFE14D` |
+| No hecho | `#8C8071` (DEC-37) | `#D9776A` | `#111111` |
 | Lista de la compra | `#1F7A80` | `#5CCFC4` | `#62D9CB` |
 | Universidad | `#3B5B7A` | `#8DB8F2` | `#8AB4FF` |
 | Salud | `#4F7A45` | `#7AD39A` | `#6EE7A8` |
@@ -41,6 +41,47 @@ Los colores de categoría son los de las categorías de ejemplo; al crear una ca
 - **Categorías** (DEC-31): con icono y color; en su lista se despliegan y se recogen, con sus secciones dentro. Al abrir una categoría, sus tareas van agrupadas por sección, y al final las que no tienen sección.
 - **Historial:** una cuadrícula con una fila por hábito o tarea y una columna por día, con ✓, ✗ y «sin marcar»; la celda vacía es un día que no tocaba; debajo, el porcentaje de cada día.
 - **Accesibilidad:** contraste AA y zonas de toque de 44 px (RNF-03).
+
+## Cómo usar los tokens
+
+Los tokens viven en `src/theme/tokens.ts` y los tres temas se aplican con `ThemeScope` (`src/theme/theme-scope.tsx`); `ThemeProvider` lo usa una vez en la raíz de la app. Las pantallas y los componentes **nunca llevan un color, un tamaño o una letra sueltos**.
+
+**Colores: clases de NativeWind por función.** Cada token de la tabla de arriba es una variable CSS que cambia con el tema, y `tailwind.config.js` las expone como colores:
+
+| Para | Clases |
+|---|---|
+| Fondo de pantalla, superficie, superficie 2 | `bg-background`, `bg-surface`, `bg-raised` |
+| Líneas | `border-border` |
+| Texto, texto suave, acento | `text-foreground`, `text-muted-foreground`, `text-accent-text` |
+| Botón principal y su texto | `bg-accent`, `text-accent-foreground` |
+| Pastilla de la pestaña activa | `bg-accent-soft` |
+| Hecho, no hecho | `bg-done`, `text-not-done` |
+| Categorías | `bg-category-teal`, `-blue`, `-green`, `-amber`, `-garnet` (con `text-on-category` encima) |
+| Aviso inferior | `bg-inverse`, `text-inverse-foreground`, `text-inverse-accent` |
+| Contador de pestaña | `bg-badge`, `text-badge-foreground` |
+
+Se pueden usar con transparencia (`bg-accent/20`). La paleta de categorías se llama por el nombre del color (`CATEGORY_COLORS`, `getCategoryColorLabel` y `useCategoryColorValue` en `src/theme/category-colors.ts`): la base de datos guarda el nombre (`'teal'`), nunca el valor, y cada tema lo pinta con su tono. Un color de categoría nuevo es una clase escrita entera en `src/components/ui/category-classes.ts` (Tailwind no ve las clases construidas con plantillas de texto). Los tokens que la tabla no nombra (`accent-foreground`, `accent-soft`, `accent-text`, `done`, `on-category`, `inverse*`, `badge*`) salen de los prototipos de la ronda 4.
+
+**Tipografía:** `Text` (`src/components/ui/text.tsx`) con `variant` (`title`, `heading`, `headline`, `body`, `callout`, `eyebrow`, `caption`, `label`) y `weight` (`regular`, `medium`, `semibold`, `bold`). Elige solo la letra del tema (Fraunces e Inter, DM Sans o Archivo) y los tamaños de `fontSize` en `tailwind.config.js`. **Espaciado:** el de Tailwind, múltiplos de 4 (`p-4`, `gap-3`). Las zonas de toque miden al menos `min-h-11`/`h-11` (44 pt).
+
+**Forma y letra, por código:** lo que no se puede escribir con variables CSS (grosor de borde, radios, sombras, tamaño de las marcas y el nombre de cada fuente) está en `themeShapes` y `themeFonts`, y se lee con el hook:
+
+```tsx
+const { themeName, preference, setPreference, colors, fonts, shape } = useTheme();
+```
+
+`colors` da el valor real para lo que no acepta clases (iconos, `placeholderTextColor`, cabeceras de navegación); en los iconos, usa `Icon` de `src/components/ui/icon.tsx`.
+
+**Cambiar de tema:** `setPreference('automatic' | 'white' | 'black' | 'bold')`. «Automático» sigue al modo del móvil; la elección se guarda en el dispositivo (`src/theme/preference-storage.ts`; en la web, `localStorage`). Ajustes ya lo ofrece con `ThemeSelector`.
+
+**Añadir un componente:**
+
+1. Créalo en `src/components/ui/` con clases de los tokens y, para forma y sombras, `useTheme().shape`.
+2. Si tiene estados (pulsado, deshabilitado, error), usa `usePressed` y acepta una prop que los fuerce, para poder enseñarlos.
+3. Añádelo con sus estados a `src/components/catalog/theme-panel.tsx` y míralo en los tres temas en `/catalog` (solo en desarrollo; también desde Ajustes).
+4. Si añade un color, ponlo en los tres temas de `tokens.ts` y en la lista de `tailwind.config.js` (un test comprueba que coinciden) y en los pares de `src/theme/contrast.test.ts`: el test falla si algún texto baja de 4,5:1 (3:1 para iconos y formas).
+
+**Fuentes:** ficheros locales en `assets/fonts/` (licencia OFL, ver su README), cargados con `expo-font` en `ThemeProvider`, que mantiene la pantalla de arranque hasta tenerlas.
 
 ## Pendiente de pulir con el uso
 

@@ -1,14 +1,10 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react-native';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
 import { signInWithPassword } from '@/data/auth';
 
 import LoginScreen from '../app/login';
+import { renderWithTheme } from './render-with-theme';
 
 jest.mock('@/data/auth', () => ({ signInWithPassword: jest.fn() }));
 
@@ -30,7 +26,7 @@ describe('LoginScreen', () => {
 
   it('signs in with the typed email and password', async () => {
     signInWithPasswordMock.mockResolvedValue({ ok: true, value: null });
-    render(<LoginScreen />);
+    renderWithTheme(<LoginScreen />);
 
     fillAndSubmit('owner@example.com', fakePassword);
 
@@ -48,7 +44,7 @@ describe('LoginScreen', () => {
       ok: false,
       error: { code: 'invalid_credentials', message: 'Technical detail' },
     });
-    render(<LoginScreen />);
+    renderWithTheme(<LoginScreen />);
 
     fillAndSubmit('owner@example.com', wrongFakePassword);
 
@@ -63,7 +59,7 @@ describe('LoginScreen', () => {
       ok: false,
       error: { code: 'network_error', message: 'Technical detail' },
     });
-    render(<LoginScreen />);
+    renderWithTheme(<LoginScreen />);
 
     fillAndSubmit('owner@example.com', fakePassword);
 

@@ -27,6 +27,8 @@ function ProtectedStack() {
       <Stack.Protected guard={hasSession}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="ajustes" />
+        <Stack.Screen name="(dev)/catalog" />
       </Stack.Protected>
       <Stack.Protected guard={!hasSession}>
         <Stack.Screen name="login" options={{ headerShown: false }} />
