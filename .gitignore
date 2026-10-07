@@ -29,3 +29,7 @@ android/
 ios/
 .vercel/
 .backup/
+
+# Ficheros generados por Python
+__pycache__/
+*.pyc
