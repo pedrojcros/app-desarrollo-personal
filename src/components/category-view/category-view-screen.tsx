@@ -54,6 +54,7 @@ function CategoryContents({
   }
   return (
     <CategoryViewList
+      categoryId={categoryId}
       items={view.data.items}
       sections={category?.sections ?? []}
       color={category?.color}

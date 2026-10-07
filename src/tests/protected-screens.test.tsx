@@ -8,6 +8,9 @@ import { useSession } from '@/data/auth';
 
 import RootLayout from '../app/_layout';
 
+jest.mock('@/components/quick-add', () => ({
+  QuickAddProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 jest.mock('@/theme/global.css', () => ({}));
 jest.mock('@/data/auth', () => ({ useSession: jest.fn() }));
 jest.mock('expo-font', () => ({ useFonts: () => [true, null] }));
