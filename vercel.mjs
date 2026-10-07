@@ -27,7 +27,9 @@ function getScriptHashes(files) {
       if (/\bsrc\s*=/i.test(match[1]) || !match[2]) {
         continue;
       }
-      const digest = createHash('sha256').update(match[2]).digest('base64');
+      const hash = createHash('sha256');
+      hash.update(match[2]);
+      const digest = hash.digest('base64');
       hashes.add(`'sha256-${digest}'`);
     }
   }

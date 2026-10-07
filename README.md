@@ -247,7 +247,7 @@ La validación de un PR que modifica los scripts o flujos de copia copia solo
 **pruebas** y conserva ese artefacto **un día**.
 
 El archivo incluye esquema de la aplicación, esquema gestionado de Auth y
-Storage, datos (también usuarios y sesiones de Auth) e historial de migraciones.
+Storage, datos (también usuarios y sesiones de Auth) e historial de migraciones. Antes de la primera migración, la ausencia de historial se comprueba mediante una consulta de solo lectura y sus dos ficheros quedan vacíos de SQL.
 El script elimina el SQL temporal al terminar. No incluye archivos binarios de
 Storage ni configuración de los servicios; la aplicación no utiliza Storage.
 Conservar `BACKUP_PASSPHRASE` en `~/.config/app-desarrollo-personal/secretos.env`

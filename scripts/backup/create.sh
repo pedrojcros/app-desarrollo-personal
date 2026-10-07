@@ -24,8 +24,19 @@ npx --no-install supabase db dump --linked --file "$temporary_directory/schema.s
 # probar la recuperación aunque el Auth remoto y el local tengan versiones distintas.
 npx --no-install supabase db dump --linked --schema auth,storage --file "$temporary_directory/managed-schema.sql"
 npx --no-install supabase db dump --linked --data-only --use-copy --file "$temporary_directory/data.sql"
-npx --no-install supabase db dump --linked --schema supabase_migrations --file "$temporary_directory/history-schema.sql"
-npx --no-install supabase db dump --linked --schema supabase_migrations --data-only --use-copy --file "$temporary_directory/history-data.sql"
+script_directory=$(dirname -- "$0")
+migration_history=$(node "$script_directory/has-migration-history.mjs")
+if [ "$migration_history" = 'present' ]; then
+  npx --no-install supabase db dump --linked --schema supabase_migrations --file "$temporary_directory/history-schema.sql"
+  npx --no-install supabase db dump --linked --schema supabase_migrations --data-only --use-copy --file "$temporary_directory/history-data.sql"
+elif [ "$migration_history" = 'absent' ]; then
+  # Una producción aún sin migraciones también necesita una copia válida.
+  printf '%s\n' '-- No migration history exists yet.' > "$temporary_directory/history-schema.sql"
+  printf '%s\n' '-- No migration history exists yet.' > "$temporary_directory/history-data.sql"
+else
+  printf '%s\n' 'Invalid migration history inspection result' >&2
+  exit 1
+fi
 
 tar -czf "$temporary_directory/backup.tar.gz" -C "$temporary_directory" schema.sql managed-schema.sql data.sql history-schema.sql history-data.sql
 # La clave entra por stdin: no aparece en argumentos ni en el registro de Actions.
