@@ -55,10 +55,10 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 Para retomar en otra sesión (`/ejecutar-plan`, Opus 5.5 al máximo), en este orden:
 
-1. Atender a los tres trabajadores (`orca orchestration check --run run_fe8fef684013`), revisar sus PR ejecutando las comprobaciones y fusionar en `develop` lo que esté bien (DEC-36). El Supabase local está arrancado y es **compartido** (ver Trampas).
-2. Lanzar T08 (encargo 014) con Codex en cuanto haya hueco.
-3. **Ola 3**, cuando estén fusionadas T04, T07 y T08: T05, hábitos (encargo 016, ya escrito, Codex); T06, tareas (encargo por escribir, Codex); T09, Hoy (encargo por escribir). Las reglas de T05 están en su encargo. T09 enlaza cada fila con `/habitos/[id]` y `/tareas/[id]` y se fusiona después de T05 y T06.
-4. **Ola 4**: T10, T11 y T16; **ola 5**: T13 (ver [plan](05-plan.md)). Cada carpeta de pantallas nueva lleva su propio `_layout.tsx` con guardián de sesión (no se toca el layout raíz). Las pestañas se quedan como ficheros sueltos (`(tabs)/hoy.tsx`…).
+1. Atender a los trabajadores (`orca orchestration check --run run_fe8fef684013`), con el supervisor en marcha; revisar sus PR ejecutando las comprobaciones y fusionar en `develop` lo que esté bien (DEC-36). El Supabase local está arrancado y es **compartido** (ver Trampas).
+2. Fusionar el PR #21 (migraciones con `--include-all`) y comprobar que el despliegue a pruebas desde `develop` sale bien.
+3. Lanzar T10 y T11 (encargos 019 y 020) en cuanto haya hueco (tope de 3 en código), y T05 y T06 (016 y 017) cuando T08 esté en `develop`. T09 se fusiona después de T05 y T06, porque enlaza con sus fichas.
+4. Escribir y lanzar T16 (añadir rápido, cuando estén T05 y T06) y después T13 (caminos críticos). Cada carpeta de pantallas nueva lleva su propio `_layout.tsx` con guardián de sesión; las pestañas siguen como ficheros sueltos.
 5. Al cerrar la versión 1: proponer al humano publicar `develop` en `main` con la comprobación del orquestador (el humano crea su usuario de producción, DEC-37).
 
 
