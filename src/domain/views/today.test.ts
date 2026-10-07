@@ -104,6 +104,12 @@ describe('getTodayItems', () => {
     expect(getItems({ habits: [archivedBefore, archivedToday] })).toEqual([]);
   });
 
+  it('skips archived habits even when their archive date is after today', () => {
+    const archived = makeHabit({ archivedOn: '2026-10-08' });
+
+    expect(getItems({ habits: [archived] })).toEqual([]);
+  });
+
   it('skips habits that start tomorrow', () => {
     const habit = makeHabit({
       startDate: '2026-10-08',

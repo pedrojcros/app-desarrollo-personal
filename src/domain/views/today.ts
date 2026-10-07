@@ -45,6 +45,9 @@ export function getTodayItems(input: {
   const items: ViewItem[] = [];
 
   for (const habit of input.habits) {
+    if (habit.archivedOn !== null) {
+      continue;
+    }
     const occurrences = getHabitOccurrences(habit, input.today, input.today);
     for (const occurrence of occurrences) {
       items.push(occurrenceToViewItem(habit, occurrence, markIndex));
