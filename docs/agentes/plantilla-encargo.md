@@ -19,6 +19,12 @@
 
 Lee `AGENTS.md` entero. Es obligatorio aunque tu herramienta lo cargue sola.
 
+## Cómo trabajar (DEC-39)
+
+- **Commits pequeños a menudo**, uno por paso terminado, con un mensaje que diga qué queda hecho: si tu sesión se corta, quien te sustituya sigue desde `git log` sin repetir nada.
+- **En local, solo los tests de tu parte** (y lint y tipos); la batería completa la ejecuta la CI. El navegador, solo si este encargo lo pide. Al terminar, cierra los contenedores y servidores que hayas arrancado.
+- Lee de la documentación solo las secciones que este encargo te señala.
+
 ## Objetivo
 
 Una o dos frases: qué tiene que existir al terminar que ahora no existe.
