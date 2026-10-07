@@ -42,28 +42,33 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-07 (madrugada, al terminar la ejecución nocturna).*
+*Actualizado: 2026-10-07, media mañana.*
 
-- **Fase: ejecución, ola 1 casi cerrada.** Plan `APROBADO`; Jira al día (T01 = ADP-2 … T13 = ADP-17).
-- **Fusionadas en `develop`:** T01 (PR #7, con permiso expreso del humano para fusionarla de noche), T03 (PR #9) y T15 (PR #12). Las tres, revisadas por el orquestador ejecutando él las comprobaciones.
-- **Esperando al humano (puertas `requiere-revisión`):** T02 (PR #10, con las correcciones de la revisión independiente ya hechas) y T14 (PR #11). Los dos se fusionan limpios sobre `develop`; chocan entre sí solo en `jest.config.js`.
-- **Bloqueo que solo el humano puede quitar:** el inicio de sesión con email no funciona en el Supabase local porque `[auth.email] enable_signup = false` lo desactiva. La propuesta (una línea, confirmada con fuentes oficiales) está en el [buzón](buzon.md) y en el PR #10.
-- **PR #8** (documentación del orquestador: DEC-35, encargos, buzón, este contexto) sin fusionar: lo bloqueó el permiso automático. Lo fusiona el humano.
-- **Reparto de agentes (DEC-35):** Claude y Codex por igual; Copilot, fuera.
-- La ola 2 (T04, T07, T08) **no puede empezar** hasta que T02 y T14 estén fusionadas.
+- **Fase: ejecución de la ola 2.** En `develop`: T01, T02, T03 (con su corrección tras la revisión de Opus), T14, T15 y la base común de vistas (encargo 010). Jira al día.
+- **Trabajadores en marcha** (Run de Orca `run_fe8fef684013`; supervisor `scripts/orca/supervise_workers.py` siempre en marcha):
+  - T12, despliegue (Codex, `ctx_71b6b0739d09`, encargo 011): proyectos de Supabase `pruebas` y `produccion`, Vercel (alias `app-desarrollo-personal-three.vercel.app`), EAS, copias cifradas.
+  - T04, categorías (Claude, `ctx_485c4c6607ac`, encargo 012): casi terminada; tenía que traer `develop` y aplicar su migración con `migration up --include-all`.
+  - T07, marcar y «Deshacer» (Codex, `ctx_8896f164f46e`, encargo 013): sigue lo que empezó un trabajador de Claude.
+- **En cola:** T08, historial (Codex, encargo 014, ya escrito), en cuanto haya un hueco (tope de 3 en código).
+- **Reparto (DEC-38):** tres de Codex por cada uno de Claude. La cuota de 5 horas de Claude estaba al 79 %.
+- Decisiones del humano para las olas 2 a 5: DEC-37. Lo que decidió el orquestador y conviene revisar: en el [buzón](buzon.md).
 
 
 ## Lo siguiente
 
-1. El humano revisa y decide: **T02** (PR #10; primero la decisión de `config.toml`), **T14** (PR #11, comparando con su prototipo y decidiendo sobre 4 pares de colores sin contraste AA) y el **PR #8**. Detalle en el [buzón](buzon.md).
-2. Tras fusionar T02 y T14 (y activar los 4 tests omitidos de T02), `/ejecutar-plan` en una sesión nueva lanza la ola 2 (T04, T07, T08), y después las olas 3 a 5 según el [plan](05-plan.md).
-3. H02 (cuentas y tokens) ya está hecha según DEC-34: T12 se puede lanzar cuando T02 esté fusionada.
+Para retomar en otra sesión (`/ejecutar-plan`, Opus 5.5 al máximo), en este orden:
+
+1. Atender a los tres trabajadores (`orca orchestration check --run run_fe8fef684013`), revisar sus PR ejecutando las comprobaciones y fusionar en `develop` lo que esté bien (DEC-36). El Supabase local está arrancado y es **compartido** (ver Trampas).
+2. Lanzar T08 (encargo 014) con Codex en cuanto haya hueco.
+3. **Ola 3**, cuando estén fusionadas T04, T07 y T08: T05, hábitos (encargo 016, ya escrito, Codex); T06, tareas (encargo por escribir, Codex); T09, Hoy (encargo por escribir). Las reglas de T05 están en su encargo. T09 enlaza cada fila con `/habitos/[id]` y `/tareas/[id]` y se fusiona después de T05 y T06.
+4. **Ola 4**: T10, T11 y T16; **ola 5**: T13 (ver [plan](05-plan.md)). Cada carpeta de pantallas nueva lleva su propio `_layout.tsx` con guardián de sesión (no se toca el layout raíz). Las pestañas se quedan como ficheros sueltos (`(tabs)/hoy.tsx`…).
+5. Al cerrar la versión 1: proponer al humano publicar `develop` en `main` con la comprobación del orquestador (el humano crea su usuario de producción, DEC-37).
 
 
 ## Pendiente del humano
 
-- **Decidir lo de `config.toml` (T02)**, revisar y fusionar **PR #10 (T02)** y **PR #11 (T14)**, y fusionar el **PR #8**.
-- Revisar T01 ya fusionada: abrir la app con Expo Go (H05) y mirar los paquetes auxiliares que se autorizaron (en el buzón) y los avisos de `npm audit` (72, sin críticos; revisar antes de publicar y el 2026-10-14).
+- Revisar el [buzón](buzon.md): lo que decidió el orquestador por su cuenta.
+- Revisar T01 en el móvil con Expo Go (H05) y los avisos de `npm audit` (antes de publicar y el 2026-10-14).
 - Cuando T15 esté en uso, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
 - El ticket `ADP-1` es de prueba y se puede borrar a mano.
 
@@ -72,7 +77,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-38**.
+  chat. Siguiente número libre: **DEC-39**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -80,7 +85,11 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 *(Cosas que costaron tiempo y no deben costarlo dos veces.)*
 
-- **Dos worktrees no pueden tener Supabase local a la vez**: `project_id` de `supabase/config.toml` es el mismo (`ADP-2-esqueleto-expo`) y los contenedores y puertos (54321, 54322) chocan. Un trabajador que lo necesite debe parar el anterior o avisar; los revisores no deben pararlo.
+- **El Supabase local es compartido entre worktrees** (mismo `project_id`): se arranca una vez y lo usan todos. Una migración de una rama aún sin fusionar se aplica con `supabase migration up --include-all` y queda aplicada para todos, así que un test de otra rama puede fallar en local aunque pase en la CI (base limpia). Nadie hace `db reset`, `stop` ni `start` sin el orquestador.
+- **Un trabajador de Claude con Haiku pide permiso para cada orden** (no tiene el modo automático): no usar Haiku para trabajadores.
+- **Un trabajador puede commitear después de mandar `worker_done`**: antes de liberar su terminal, mirar `git status` en su worktree. Liberar un trabajador puede borrar su worktree.
+- **`pgrep -f`/`pkill -f` con el nombre del supervisor coinciden con la propia orden y la matan** (salida 144): buscar el proceso con `ps -eo pid,args` y `awk`.
+- **En zsh, `status` es una variable de solo lectura**; para esperar a la CI, `gh pr checks N --watch`.
 - **Un servidor de Expo por trabajador necesita su puerto**: con la red del anfitrión, el 8081 solo puede usarlo uno. Los demás, otro (por ejemplo 8090).
 - **Un trabajador de Claude puede quedarse con el encargo sin enviar** (`turn_start_unobserved`): hay que mirar su pantalla y darle un Enter (el supervisor también lo hace).
 - **`worker-release` puede dejar `release_unknown`** ("no se pudo confirmar que el proceso se detuvo") aunque el trabajador haya terminado bien: no hay nada pendiente, el terminal está cerrado.
@@ -109,6 +118,10 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-07 — Mañana: T02, T14, T03 corregida y base común en `develop`; DEC-38
+
+Con DEC-36 y DEC-37, el orquestador cerró y fusionó T02 (inicio de sesión real, cambio de `config.toml` aprobado por el humano) y T14 (colores AA, paleta por nombre, «Cerrar sesión»), encargó una revisión de T03 a Opus (el plan pedía `+revisión`: algoritmo correcto, tres hallazgos importantes, corregidos y fusionados) y repartió la ola 2 tras una base común de vistas y marcas, para que T07 a T11 compartan tipos y caché. T12 creó los proyectos de Supabase y Vercel. A media mañana el humano avisó de que la cuota de Claude iba al 79 % y de que se estaban lanzando más Claude que Codex: DEC-38 (tres de Codex por cada uno de Claude) y T07 pasó a Codex.
 
 ### 2026-10-07 — Tanda de decisiones para trabajar solo (DEC-37)
 

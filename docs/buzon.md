@@ -26,6 +26,8 @@ Para pedir control sobre una idea, añade al final:
 - 2026-10-07 — **Orden de fusión de #10 y #11:** chocan solo en `jest.config.js` (los dos añaden `moduleNameMapper`). Fusiona primero uno y, al fusionar el otro, une las dos listas del mapa. Si prefieres, dime y lo resuelvo yo.
 - 2026-10-07 — **Trampa encontrada:** `project_id` en `supabase/config.toml` es el mismo en todos los worktrees (`ADP-2-esqueleto-expo`), así que dos worktrees no pueden tener Supabase local a la vez (mismos nombres de contenedor y puertos). Propongo ponerlo por entorno o parar el anterior antes de arrancar; no lo he tocado (es de T01/T02).
 
+- 2026-10-07 — **Decidido por el orquestador (revísalo cuando quieras):** (1) T03: la primera versión de la regla de un hábito empieza siempre en su fecha de inicio y no puede haber dos versiones con la misma fecha (lo pedía la revisión de Opus). (2) T05: cambiar la frecuencia vale desde hoy (o desde el inicio si aún no empezó); dos cambios el mismo día no crean dos versiones; la fecha de inicio solo se cambia si el hábito no ha empezado (RN-19). (3) La web no permite `eval` (CSP): Zod va sin JIT en vez de abrir `unsafe-eval`. (4) Vercel publicó su primer despliegue como producción (cosa del servicio la primera vez): apunta a la base de pruebas y la de producción sigue vacía hasta que publiques. (5) Las capturas del catálogo de T14 tienen aún los colores antiguos.
+
 ## Procesadas
 
 | Fecha | Idea | Qué se hizo |
