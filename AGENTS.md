@@ -37,7 +37,7 @@ Valen por defecto, y el arquitecto las ajusta en la planificación:
 6. **Nada que cueste dinero** (servicios, planes o APIs de pago) sin aprobación: el proyecto es de coste cero.
 7. **La base de datos de producción, con cuidado** (DEC-33): los agentes pueden tocarla, pero siempre con una copia de seguridad recién hecha antes de cualquier migración o cambio de datos, y sin borrar datos del dueño sin preguntarle. El desarrollo y los tests van contra el Supabase local.
 8. **No cambiar cómo se guardan las fechas ni el motor de ocurrencias** ([ADR-0003](docs/adr/0003-ocurrencias-calculadas.md)) sin aprobación.
-9. **No guardar datos de otras personas** ni enviar los del dueño a servicios distintos de los de la [ADR-0005](docs/adr/0005-stack-expo.md).
+9. **No guardar datos de otras personas** ni enviar los del dueño a servicios distintos de los de la [ADR-0005](docs/adr/0005-stack-expo.md) (única excepción: la copia semanal cifrada en GitHub de DEC-37).
 10. **No enviar nada del proyecto a terceros** fuera de los servicios del stack: ni comentarios a los autores de una skill (`submit-expo-feedback` y similares), ni telemetría, ni código o datos pegados en servicios externos.
 
 ## Legibilidad: regla obligatoria

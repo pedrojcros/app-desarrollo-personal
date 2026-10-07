@@ -72,7 +72,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-37**.
+  chat. Siguiente número libre: **DEC-38**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -109,6 +109,10 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 ## Bitácora
 
 Lo más reciente, arriba.
+
+### 2026-10-07 — Tanda de decisiones para trabajar solo (DEC-37)
+
+Con el orquestador ya en Opus 5.5 y esfuerzo máximo, el humano contestó de una vez lo que quedaba suyo para las olas 2 a 5: oscurecer un poco tres colores del tema Blanco para cumplir AA, dejar «Marcadas hoy» para después, añadir «Cerrar sesión» en Ajustes, crear él su usuario de producción, aviso de «Deshacer» de 4 segundos, porcentaje del historial sobre todo lo que tocaba, copia semanal cifrada en GitHub y los 5 colores de categoría del diseño. Además aprobó el cambio de `config.toml` de T02 y se fusionó el PR #8.
 
 ### 2026-10-07 — Control total del orquestador sobre `develop` (DEC-36)
 
