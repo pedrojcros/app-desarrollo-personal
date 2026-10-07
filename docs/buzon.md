@@ -30,6 +30,8 @@ Para pedir control sobre una idea, añade al final:
 
 - 2026-10-07 — **Más decisiones del orquestador (revísalas cuando quieras):** (1) En la vista de una categoría, de cada hábito sale la ocurrencia de hoy si toca y está pendiente (las tareas, todas las pendientes, con y sin fecha). (2) En «Pendientes» no salen los hábitos archivados. (3) Las migraciones se aplican con `--include-all` porque dos ramas en paralelo las fusionaron en otro orden que sus fechas (eso rompió el primer despliegue a pruebas; ya está encargado el arreglo).
 
+- 2026-10-07 (noche) — **Decidido por el orquestador (revísalo cuando quieras):** (1) **Añadir rápido (T16):** tras enviar, la barra se vacía y sigue abierta para añadir otra; «Lunes» es el próximo lunes; «Más» lleva al formulario completo con lo escrito (también el nombre); desde la vista de una categoría, cada sección tiene su «+» pequeño para crear directamente en ella. (2) **Hábitos:** cambiar la frecuencia nunca toca el pasado ni crea una versión si la regla no cambia, y cambiar y deshacer el mismo día deja todo como estaba (lo pidió la revisión de Opus; se corrige en el encargo 024). (3) **T06:** «Añadir hora» propone las 09:00. (4) **T13** se parte en dos encargos para no esperar a T16.
+
 ## Procesadas
 
 | Fecha | Idea | Qué se hizo |

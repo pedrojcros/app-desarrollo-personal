@@ -4,6 +4,10 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-07 — Noche: T05, T06, T09 y T11 fusionadas; supervisor autónomo
+
+Con la cuota de Codex de vuelta, el humano pidió dos Codex y un Claude. T05 y T09 se retomaron con una orden corta en sus carpetas (DEC-39, punto 8) y T06 y T11 las hizo Claude Sonnet; las cuatro se fusionaron tras pasar el orquestador sus tests. T05 pasó además una revisión de Opus (sin críticos, cuatro importantes en el cambio de regla de un hábito), que se corrige aparte (encargo 024) para no bloquear T16. El supervisor ya reanuda solo a Codex cuando el modelo se satura o se acaba la cuota (encargos 023 y 025; la primera versión se rechazó porque leía avisos viejos del historial de la pantalla). Con tres trabajadores compilando a la vez el portátil llegó a carga 67, así que lo pesado va ahora con un candado compartido (`flock /tmp/adp-pesado.lock`). T13 se parte en dos: datos sintéticos y RNF-01 ya (026), Maestro y el resto tras T16.
+
 ### 2026-10-07 — Jira en tiempo real (DEC-40) y más cierres inesperados
 
 El humano pidió ver en el tablero qué hace cada agente sin esfuerzo extra. Creó un token de Atlassian con permisos limitados, Copilot escribió `scripts/jira/jira.py` y el flujo `jira.yml` (PR #26), y desde ahora las tarjetas se mueven solas al abrir y fusionar PR, con una etiqueta por agente. Fusionadas T10 y DEC-39. La sesión del orquestador se cerró sola varias veces por falta de CPU y memoria, y cada cierre se llevó a los trabajadores, que al relanzarse releían todo: eso agotó la cuota de Codex. Se añadió a DEC-39 el relanzamiento con orden corta y se pausaron T05 y T09 hasta que vuelva la cuota.
