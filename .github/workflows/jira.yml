@@ -1,0 +1,66 @@
+name: Jira
+
+on:
+  push:
+    branches:
+      - '**ADP-**'
+  pull_request:
+    branches: [develop]
+    types: [opened, reopened, ready_for_review, closed]
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: Buscar clave Jira
+        id: issue
+        env:
+          ISSUE_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
+          ISSUE_TITLE: ${{ github.event.pull_request.title || '' }}
+        run: |
+          issue_key="$(python3 scripts/jira/jira.py extract "$ISSUE_BRANCH" "$ISSUE_TITLE")"
+          printf 'key=%s\n' "$issue_key" >> "$GITHUB_OUTPUT"
+      - name: Mover a En curso si está Por hacer
+        if: github.event_name == 'push' && steps.issue.outputs.key != ''
+        env:
+          ISSUE_KEY: ${{ steps.issue.outputs.key }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_CLOUD_ID: ${{ vars.JIRA_CLOUD_ID }}
+        run: |
+          issue_status="$(python3 scripts/jira/jira.py status "$ISSUE_KEY")"
+          case "$issue_status" in
+            *" → Por hacer")
+              python3 scripts/jira/jira.py move "$ISSUE_KEY" en-curso
+              ;;
+            *)
+              printf '%s\n' "$issue_status"
+              ;;
+          esac
+      - name: Marcar En revisión y comentar el PR
+        if: github.event_name == 'pull_request' && github.event.action != 'closed' && steps.issue.outputs.key != ''
+        env:
+          ISSUE_KEY: ${{ steps.issue.outputs.key }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_CLOUD_ID: ${{ vars.JIRA_CLOUD_ID }}
+        run: |
+          python3 scripts/jira/jira.py move "$ISSUE_KEY" en-revision
+          python3 scripts/jira/jira.py comment "$ISSUE_KEY" "PR #${PR_NUMBER} abierto: ${PR_URL}"
+      - name: Marcar Listo y comentar la fusión
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && steps.issue.outputs.key != ''
+        env:
+          ISSUE_KEY: ${{ steps.issue.outputs.key }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_CLOUD_ID: ${{ vars.JIRA_CLOUD_ID }}
+        run: |
+          python3 scripts/jira/jira.py move "$ISSUE_KEY" listo
+          python3 scripts/jira/jira.py comment "$ISSUE_KEY" "PR #${PR_NUMBER} fusionado en develop"
