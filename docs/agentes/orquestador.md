@@ -198,6 +198,14 @@ Cuando se cierra una ola del plan o un hito, propón al humano publicar. No lo h
 
 Los detalles exactos de los comandos están en [orca](orca.md) y, sobre todo, en `orca skills get orchestration`, que es lo que manda.
 
+### Si un trabajador se cae (DEC-39, punto 8)
+
+Un cierre inesperado (Orca o la sesión del orquestador que se reinician, el modelo saturado, la cuota agotada) no puede convertirse en gasto. Al relanzar:
+
+- **Orden corta**, no el encargo entero: «Continúa el encargo `docs/agentes/encargos/NNN-…md` en este worktree. Lee solo ese encargo, `git log` y tu diff; no vuelvas a leer la documentación ni las skills salvo que te falte algo. Commits pequeños; tienes permiso para push y PR». Si el encargo aún no está en `develop`, pega solo sus apartados «Qué hacer» y «Criterio de hecho».
+- **Como mucho un relanzamiento automático por tarea en cada ventana de cuota.** Si vuelve a caerse, no se relanza: se espera y se avisa al humano.
+- Si a la cuota del agente le queda menos del 10 %, no se relanza: se espera a que se reinicie.
+
 ### Tus propios cambios en el repositorio
 
 Los encargos nuevos y las actualizaciones de documentación que haces tú no pueden ir directos a `develop`. Agrúpalos en **una rama tuya** (`docs/orquestador-<tema>`) y preséntalos como cualquier otro PR cuando cierres una tarea, no uno por encargo.
