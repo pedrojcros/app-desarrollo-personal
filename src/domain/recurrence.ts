@@ -173,7 +173,7 @@ function matchesRule(date: CalendarDate, rule: HabitRuleVersion): boolean {
 }
 
 // Las reglas llegan ordenadas por validFrom; vale la última que ya empezó.
-function findRuleInForce(
+export function findRuleInForce(
   sortedRules: HabitRuleVersion[],
   date: CalendarDate,
 ): HabitRuleVersion {

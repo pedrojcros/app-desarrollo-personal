@@ -81,6 +81,17 @@ export default function EditHabitScreen() {
       </View>
     );
   }
+  const initialValue = habitToFormValue(habit, today);
+  if (!initialValue) {
+    return (
+      <View className="flex-1 gap-4 bg-background p-4">
+        <Text role="alert">No se pudo cargar la frecuencia del hábito.</Text>
+        <Button onPress={() => habitQuery.refetch()}>
+          <Text>Reintentar</Text>
+        </Button>
+      </View>
+    );
+  }
   const pending = update.isPending || archive.isPending;
   return (
     <View className="flex-1 bg-background">
@@ -97,7 +108,7 @@ export default function EditHabitScreen() {
           ) : null}
           <HabitForm
             mode="edit"
-            initialValue={habitToFormValue(habit)}
+            initialValue={initialValue}
             onSubmit={save}
             isPending={pending}
           />

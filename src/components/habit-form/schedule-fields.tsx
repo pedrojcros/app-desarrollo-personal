@@ -37,6 +37,7 @@ const moments: { value: Moment; label: string }[] = [
 interface ScheduleFieldsProps {
   value: HabitInput;
   intervalText: string;
+  startsChangeToday: boolean;
   errors: { weekdays?: string; intervalDays?: string; timeOfDay?: string };
   disabled: boolean;
   onChange: (changes: Partial<HabitInput>) => void;
@@ -53,6 +54,7 @@ function getMoment(value: HabitInput): Moment {
 export function ScheduleFields({
   value,
   intervalText,
+  startsChangeToday,
   errors,
   disabled,
   onChange,
@@ -66,7 +68,7 @@ export function ScheduleFields({
     } else {
       selectedDays = [...value.weekdays, weekday];
     }
-    selectedDays.sort();
+    selectedDays.sort((first, second) => first - second);
     onChange({ weekdays: selectedDays });
   }
   function chooseMoment(selected: Moment): void {
@@ -109,10 +111,16 @@ export function ScheduleFields({
           error={errors.intervalDays}
         />
       ) : null}
+      {value.frequency === 'every_n_days' && startsChangeToday ? (
+        <Text variant="callout" className="text-muted-foreground">
+          Cuenta desde hoy.
+        </Text>
+      ) : null}
       {value.frequency === 'monthly' ? (
         <Text variant="callout" className="text-muted-foreground">
-          Se repite el día del mes de la fecha de inicio; si no existe, el
-          último día del mes.
+          {startsChangeToday
+            ? 'Se repite el día del mes de hoy, que es cuando empieza el cambio; si no existe, el último día del mes.'
+            : 'Se repite el día del mes de la fecha de inicio; si no existe, el último día del mes.'}
         </Text>
       ) : null}
       <ChoiceGroup

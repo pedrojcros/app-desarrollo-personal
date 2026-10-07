@@ -169,3 +169,37 @@ it('locks an already started date and explains why', () => {
     screen.getByText('Ya ha empezado: cambiarla reescribiría el pasado'),
   ).toBeTruthy();
 });
+
+it('rejects a past start date when creating without submitting', async () => {
+  const onSubmit = renderForm();
+  fireEvent.changeText(screen.getByLabelText('Nombre'), 'Leer');
+  fireEvent.changeText(screen.getByLabelText('Fecha de inicio'), '2026-10-06');
+  fireEvent.press(screen.getByRole('button', { name: 'Crear hábito' }));
+  expect(
+    await screen.findByText('Elige una fecha de hoy en adelante.'),
+  ).toBeTruthy();
+  expect(onSubmit).not.toHaveBeenCalled();
+});
+
+it.each([
+  {
+    frequency: 'monthly' as const,
+    explanation:
+      'Se repite el día del mes de hoy, que es cuando empieza el cambio',
+  },
+  { frequency: 'every_n_days' as const, explanation: 'Cuenta desde hoy' },
+])(
+  'explains the new anchor for $frequency when editing a started habit',
+  ({ frequency, explanation }) => {
+    render(
+      <ThemeScope themeName="white">
+        <HabitForm
+          mode="edit"
+          initialValue={{ startDate: '2026-10-01', frequency, intervalDays: 3 }}
+          onSubmit={jest.fn<() => Promise<void>>()}
+        />
+      </ThemeScope>,
+    );
+    expect(screen.getByText(new RegExp(explanation))).toBeTruthy();
+  },
+);
