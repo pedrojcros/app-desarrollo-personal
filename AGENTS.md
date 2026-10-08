@@ -65,6 +65,7 @@ Decidido en [ADR-0005](docs/adr/0005-stack-expo.md) (sustituye a la ADR-0001). S
 | Node.js | 24 (LTS), fijada en `.nvmrc` |
 | Expo SDK (con React Native y React que trae) | 56 |
 | Expo Router | La que trae el SDK |
+| `expo-notifications` | 56.0.26 |
 | TypeScript (modo `strict`) | 6.0.3 |
 | NativeWind y Tailwind CSS (la versión que pida NativeWind) | NativeWind 4.2.7; Tailwind CSS 3.4.19 |
 | React Native Reusables (componentes copiados en `src/components/ui`, sus `@rn-primitives/*` y `lucide-react-native`) | Button y Text mínimos del registro NativeWind (385834c); portal 1.5.3, slot 1.5.2; lucide-react-native 1.52.0 |
@@ -92,6 +93,7 @@ docs/          toda la documentación; índice en docs/README.md
 src/domain/    lógica pura: fechas, ocurrencias y reglas de cada vista; sin React ni Supabase
 src/data/      la única capa que habla con Supabase: lecturas, escrituras y hooks de TanStack Query
 src/app/       rutas y pantallas (Expo Router)
+src/platform/  adaptadores de APIs nativas y alternativas web
 src/components/ componentes compartidos (los de React Native Reusables, en src/components/ui)
 src/theme/     tokens del sistema visual
 supabase/      configuración local y migraciones
