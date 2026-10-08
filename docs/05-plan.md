@@ -62,7 +62,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 **Hitos de versión:**
 
 - **Versión 1 (`v1.0.0`)**: olas 0 a 5 fusionadas en `develop` y la comprobación de «Preparar una versión para `main`» del [orquestador](agentes/orquestador.md#preparar-una-versión-para-main) superada. El humano pasa `develop` a `main` y se instala el APK (H04).
-- **Versión 1.1**: recordatorios locales en el móvil (DEC-24).
+- **Versión 1.1**: recordatorios locales en el móvil (DEC-24; aprobados con sus valores por defecto en DEC-43). Encargos R1 a R5 de la [propuesta](propuestas/recordatorios.md#5-encargos-para-la-ejecución) (en `docs/agentes/encargos/`, del 036 en adelante); R6 es la comprobación del humano en el móvil al publicar.
 - **Versiones 1.x siguientes**: cada funcionalidad deseable, o un grupo pequeño, cuando el humano quiera (ver «Después de la versión 1»).
 
 ## Tareas
