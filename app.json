@@ -10,8 +10,12 @@
       "expo-status-bar",
       "expo-splash-screen",
       "@react-native-community/datetimepicker",
-      "expo-font"
+      "expo-font",
+      "expo-notifications"
     ],
+    "android": {
+      "permissions": ["android.permission.USE_EXACT_ALARM"]
+    },
     "web": {
       "bundler": "metro",
       "output": "static"
