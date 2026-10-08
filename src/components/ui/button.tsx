@@ -54,9 +54,13 @@ export function Button({
   const buttonClassName = mergeClasses(
     buttonVariants({ variant, size }),
     disabled && 'opacity-50',
-    press.isPressed && 'opacity-80 scale-[0.97]',
     className,
   );
+  // Las clases scale añaden variables CSS al pulsar y NativeWind remonta el
+  // botón; su aviso de diagnóstico recorre React y falla con la navegación.
+  const pressedStyle = press.isPressed
+    ? { opacity: 0.8, transform: [{ scale: 0.97 }] }
+    : undefined;
   const shapeStyle = {
     borderRadius: shape.controlRadius,
     borderWidth: hasOutline ? shape.outlineWidth : 0,
@@ -81,7 +85,7 @@ export function Button({
       <Pressable
         role="button"
         className={buttonClassName}
-        style={[shapeStyle, style]}
+        style={[shapeStyle, pressedStyle, style]}
         disabled={disabled}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
