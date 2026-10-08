@@ -250,6 +250,8 @@ Hoy el humano no ha pedido programar nada él mismo. Si lo pide, se apunta aquí
 
 ## Al terminar la sesión
 
+- Quita el modo cafeína (DEC-42): para la tarea en segundo plano de `systemd-inhibit`, salvo que el humano pida apagar el ordenador.
+
 - Todos los trabajadores están liberados o retenidos a propósito (`worker-list --terminal-state reclaimable` no devuelve nada).
 - La [bitácora](../bitacora.md) tiene la entrada de la sesión y [contexto](../contexto.md), los apartados *Ahora mismo* y *Lo siguiente* al día.
 - **Al cerrar una ola, propón al humano abrir una sesión nueva de orquestador** (DEC-39): una conversación larga hace que cada paso cueste más.

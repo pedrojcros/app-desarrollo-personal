@@ -75,7 +75,7 @@ Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto):
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-42**.
+  chat. Siguiente número libre: **DEC-43**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
@@ -106,7 +106,7 @@ Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto):
 - **Orca borra el worktree de un trabajador al liquidarlo o fusionar su PR** (pasó con T05 y T09): no cuentes con reutilizar su carpeta ni su terminal para una corrección; lánzala en un worktree nuevo desde `develop`.
 - **Una pregunta de un trabajador (`ask`) solo llega si el orquestador está esperando con `check --wait`**: si se queda revisando un rato largo, el trabajador espera parado (T16 esperó 30 minutos). Entre revisión y revisión, vuelve a `check`.
 - **`worker-start --base-branch develop` usa el `develop` local**, que no avanza al fusionar en GitHub: el trabajador arranca sin lo último (pasó con 028 y 029). Antes de lanzar, `git fetch origin && git branch -f develop origin/develop` (o `--base-branch origin/develop`).
-- **El portátil se suspende si nadie lo toca**, y con él los trabajadores y el supervisor (pasó la noche del 7 al 8). Si el orquestador se queda solo: `systemd-inhibit --what=sleep:idle:handle-lid-switch --who=orquestador --why="trabajo" sleep infinity` en segundo plano.
+- **El portátil se suspende si nadie lo toca**, y con él los trabajadores y el supervisor (pasó la noche del 7 al 8). Con `/ejecutar-plan` se activa siempre al empezar (DEC-42): `systemd-inhibit --what=sleep:idle:handle-lid-switch --who=orquestador --why="trabajo" sleep infinity` en segundo plano.
 - **Codex escribe la hora de la cuota con fecha** («try again at Oct 8th, 2026 2:09 AM») **y con apóstrofo tipográfico** («You’ve»): el supervisor ya lo entiende (PR #39 y #41).
 - **`docker run` con una imagen propia que no existe la busca en Docker Hub**, donde podría haber otra con el mismo nombre: siempre `--pull never`.
 
