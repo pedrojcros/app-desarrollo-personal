@@ -10,7 +10,9 @@ export function QuickAddButton({ defaults }: { defaults: QuickAddDefaults }) {
   const { open } = useQuickAdd();
   const { shape, colors } = useTheme();
   const press = usePressed(undefined);
-  const pressedClassName = press.isPressed ? 'scale-95 opacity-90' : '';
+  const pressedStyle = press.isPressed
+    ? { opacity: 0.9, transform: [{ scale: 0.95 }] }
+    : undefined;
   return (
     <Pressable
       role="button"
@@ -18,12 +20,15 @@ export function QuickAddButton({ defaults }: { defaults: QuickAddDefaults }) {
       onPress={() => open(defaults)}
       onPressIn={press.handlePressIn}
       onPressOut={press.handlePressOut}
-      className={`h-14 w-14 items-center justify-center rounded-full bg-accent ${pressedClassName}`}
-      style={{
-        borderWidth: shape.outlineWidth,
-        borderColor: colors.border,
-        boxShadow: shape.floatingShadow,
-      }}
+      className="h-14 w-14 items-center justify-center rounded-full bg-accent"
+      style={[
+        {
+          borderWidth: shape.outlineWidth,
+          borderColor: colors.border,
+          boxShadow: shape.floatingShadow,
+        },
+        pressedStyle,
+      ]}
     >
       <Icon icon={Plus} color="accent-foreground" size={26} />
     </Pressable>

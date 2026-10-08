@@ -54,7 +54,9 @@ function MarkButton({
   children,
 }: MarkProps) {
   const press = usePressed(pressed);
-  const pressedClassName = press.isPressed ? 'scale-90' : '';
+  const pressedStyle = press.isPressed
+    ? { transform: [{ scale: 0.9 }] }
+    : undefined;
   const disabledClassName = disabled ? 'opacity-50' : '';
 
   return (
@@ -65,7 +67,8 @@ function MarkButton({
       onPress={onPress}
       onPressIn={press.handlePressIn}
       onPressOut={press.handlePressOut}
-      className={`h-11 w-11 items-center justify-center ${pressedClassName} ${disabledClassName}`}
+      className={`h-11 w-11 items-center justify-center ${disabledClassName}`}
+      style={pressedStyle}
     >
       {children}
     </Pressable>
