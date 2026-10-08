@@ -1,8 +1,106 @@
 #!/bin/sh
 set -eu
 
-# Se ejecuta desde app: su cliente Docker controla el contenedor hermano sin instalar Maestro en Node.
-exec docker compose exec -T android-emulator \
-  maestro --device emulator-5554 test \
-  -e EXPO_PORT="${EXPO_PORT:-8081}" \
-  --test-output-dir /tmp/maestro-results /workspace/e2e/smoke.yaml
+emulator_service=android-emulator
+device_serial=emulator-5554
+email=e2e@app-desarrollo-personal.local
+expo_port=${EXPO_PORT:-8081}
+
+run_adb() {
+  docker compose exec -T "$emulator_service" adb -s "$device_serial" "$@"
+}
+
+read_display_setting() {
+  setting_name=$1
+  setting_output=$2
+  printf '%s\n' "$setting_output" | sed -n "s/^${setting_name}: //p" | tail -n 1
+}
+
+read_pixel_size() {
+  size_output=$1
+  override_size=$(read_display_setting 'Override size' "$size_output")
+  if [ -n "$override_size" ]; then
+    printf '%s' "$override_size"
+    return
+  fi
+  read_display_setting 'Physical size' "$size_output"
+}
+
+read_density() {
+  density_output=$1
+  override_density=$(read_display_setting 'Override density' "$density_output")
+  if [ -n "$override_density" ]; then
+    printf '%s' "$override_density"
+    return
+  fi
+  read_display_setting 'Physical density' "$density_output"
+}
+
+run_flow() {
+  flow_name=$1
+  printf '\n== Maestro: %s ==\n' "$flow_name"
+  maestro_status=0
+  docker compose exec -T "$emulator_service" maestro --device "$device_serial" test \
+    -e "EXPO_PORT=$expo_port" \
+    -e "EMAIL=$email" \
+    -e "PASSWORD=$e2e_password" \
+    --test-output-dir "/tmp/maestro-results/$suite_name/$flow_name" \
+    "/workspace/e2e/$flow_name.yaml" || maestro_status=$?
+  # Maestro guarda todas las variables -e en commands.json, incluida la clave.
+  docker compose exec -T "$emulator_service" sh -c \
+    "find '/tmp/maestro-results/$suite_name/$flow_name' -name commands.json -delete"
+  return "$maestro_status"
+}
+
+run_suite() {
+  suite_name=$1
+  e2e_password=$(node scripts/e2e/prepare-user.mjs)
+  export e2e_password
+  printf '\n== Ejecutando caminos críticos (%s) ==\n' "$suite_name"
+  run_flow login
+  run_flow smoke
+  run_flow quick-task
+  run_flow mark-today
+  run_flow create-habit
+  run_flow category-section-task
+  run_flow mark-pending
+  run_flow history
+  unset e2e_password
+}
+
+original_size=$(run_adb shell wm size | tr -d '\r')
+original_density=$(run_adb shell wm density | tr -d '\r')
+original_size_override=$(read_display_setting 'Override size' "$original_size")
+original_density_override=$(read_display_setting 'Override density' "$original_density")
+current_size=$(read_pixel_size "$original_size")
+current_density=$(read_density "$original_density")
+
+restore_display() {
+  if [ -n "$original_size_override" ]; then
+    run_adb shell wm size "$original_size_override" >/dev/null
+  else
+    run_adb shell wm size reset >/dev/null
+  fi
+  if [ -n "$original_density_override" ]; then
+    run_adb shell wm density "$original_density_override" >/dev/null
+  else
+    run_adb shell wm density reset >/dev/null
+  fi
+}
+trap restore_display EXIT HUP INT TERM
+
+suite_name=normal
+run_suite "$suite_name"
+
+width_pixels=$((360 * current_density / 160))
+old_width=${current_size%x*}
+old_height=${current_size#*x}
+height_pixels=$((old_height * width_pixels / old_width))
+run_adb shell wm size "${width_pixels}x${height_pixels}"
+suite_name=360dp
+printf '\n== Resolución de prueba: 360 dp, %sx%s px a %s dpi ==\n' \
+  "$width_pixels" "$height_pixels" "$current_density"
+run_suite "$suite_name"
+
+restore_display
+trap - EXIT HUP INT TERM

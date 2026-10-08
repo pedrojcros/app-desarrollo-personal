@@ -1,0 +1,17 @@
+appId: host.exp.exponent
+---
+- tapOn: Añadir tarea o hábito
+- tapOn: Hábito
+- tapOn: Nombre
+- inputText: E2E hábito semanal
+- tapOn: Frecuencia
+- tapOn: Días de la semana
+- tapOn: Lunes
+- tapOn: Martes
+- tapOn: Miércoles
+- tapOn: Jueves
+- tapOn: Viernes
+- tapOn: Sábado
+- tapOn: Domingo
+- tapOn: Enviar
+- assertVisible: E2E hábito semanal

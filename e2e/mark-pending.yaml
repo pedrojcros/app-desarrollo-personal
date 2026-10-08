@@ -1,0 +1,6 @@
+appId: host.exp.exponent
+---
+- tapOn: Pendientes
+- assertVisible: E2E pendiente
+- tapOn: Marcar E2E pendiente como hecho
+- assertVisible: Marcada como hecha

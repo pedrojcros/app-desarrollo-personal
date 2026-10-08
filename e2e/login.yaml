@@ -1,0 +1,14 @@
+appId: host.exp.exponent
+---
+- openLink: exp://10.0.2.2:${EXPO_PORT}
+- extendedWaitUntil:
+    visible: Entrar
+    timeout: 120000
+- tapOn: Email
+- inputText: ${EMAIL}
+- tapOn: Contraseña
+- inputText: ${PASSWORD}
+- tapOn: Entrar
+- extendedWaitUntil:
+    visible: Hoy
+    timeout: 30000
