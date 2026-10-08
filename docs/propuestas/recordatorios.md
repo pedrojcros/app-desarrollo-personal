@@ -1,5 +1,7 @@
 # Propuesta: versión 1.1, recordatorios en el móvil
 
+> **Aprobada el 2026-10-08 con los valores por defecto (DEC-43).** Lo funcional ya está en `02-funcionalidades.md` y `03-casos-de-uso.md`; allí sus reglas **RN-33 a RN-39 son RN-34 a RN-40** (RN-33 ya existía). Este documento se conserva por el diseño técnico (apartado 3) y el reparto (apartado 5).
+
 *Arquitecto automático, 2026-10-07 por la noche. Es una **propuesta**: nada de
 esto está aprobado ni aplicado a `docs/`. El humano decide el qué (apartado 4);
 lo demás es la recomendación de cómo hacerlo.*

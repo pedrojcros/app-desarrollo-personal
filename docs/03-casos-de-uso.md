@@ -393,3 +393,72 @@ Se definen aquí una sola vez y los casos las enlazan.
 - **Escenario 5: la Bandeja de entrada no se elimina (E4).** Cuando el usuario intenta eliminar la Bandeja de entrada, entonces no se permite y no cambia nada.
 - **Escenario 6: secciones (DEC-31).** Dada la categoría «Lista de la compra», cuando el usuario crea en ella las secciones «Mercadona» y «Lidl» y pone «Leche» en «Mercadona», entonces al abrir «Lista de la compra» ve «Leche» bajo «Mercadona», y lo que no tiene sección, aparte.
 - **Escenario 7: eliminar una sección (DEC-31).** Dada la sección «Mercadona», con dos tareas, dentro de «Lista de la compra», cuando el usuario la elimina y confirma, entonces las dos tareas siguen en «Lista de la compra», sin sección.
+
+---
+
+## CU-08 — Recibir recordatorios en el móvil
+
+- **Actor principal:** el usuario
+- **Actores secundarios:** el sistema operativo del móvil (programa y enseña los avisos)
+- **Funcionalidades:** RF-24 a RF-30
+- **Precondiciones:** la app del móvil tiene sesión iniciada y se ha abierto al menos una vez desde la última actualización
+- **Postcondiciones:** el móvil tiene programados los avisos de lo pendiente de los próximos 7 días, y ninguno de lo resuelto
+- **Disparador:** el usuario crea una tarea con fecha o un hábito con hora, o se abre la app
+
+### Flujo normal
+
+1. El usuario abre la app en el móvil por primera vez con la versión 1.1.
+2. El sistema explica en una frase para qué son los recordatorios y pide el permiso del móvil.
+3. El usuario lo acepta.
+4. El usuario crea «Entregar práctica» con fecha el viernes 20, en Universidad.
+5. El sistema programa los avisos de esa tarea que caen en los próximos 7 días.
+6. El martes 17 a las 09:00, el móvil enseña «Entregar práctica — Universidad · En 3 días, el viernes 20».
+7. El usuario toca el aviso y la app se abre en la ficha de la tarea.
+
+### Flujos alternativos
+
+- **A1.** En el paso 3, si el usuario **rechaza el permiso**: el sistema no programa nada y Ajustes indica «Los avisos están bloqueados en el móvil» con un botón que abre los ajustes del móvil. Termina el caso.
+- **A2.** En el paso 4, si la tarea tiene **hora** (23:59): el aviso del mismo día llega a las 22:59 en vez de a las 09:00 (RN-36).
+- **A3.** En el paso 4, si el usuario crea un **hábito con hora exacta** («Nadar», los miércoles a las 17:00): cada miércoles a las 17:00 el móvil enseña «Nadar — Ahora, a las 17:00» (RN-37).
+- **A4.** Antes del paso 6, si el usuario **marca la tarea** hecha o no hecha, la **archiva** o le **quita la fecha**: el sistema cancela sus avisos y en el paso 6 no llega nada (RN-34).
+- **A5.** Antes del paso 6, si el usuario **cambia la fecha** al lunes 23: el sistema cancela los avisos del viernes 20 y programa los del 23.
+- **A6.** En A4, si el usuario pulsa **Deshacer**: los avisos que aún estén en el futuro vuelven.
+- **A7.** Antes del paso 6, si el usuario marca la tarea **desde el ordenador** y no abre la app del móvil: el aviso llega igualmente; al abrir la app en el móvil se cancelan los que queden (RN-40).
+- **A8.** Entre los pasos 5 y 6, si el **móvil se reinicia**: los avisos siguen programados.
+- **A9.** En el paso 7, si el aviso es de un **hábito**: la app se abre en Hoy.
+- **A10.** En cualquier momento, si el usuario **apaga los recordatorios** en Ajustes: el sistema cancela todos; al encenderlos, los vuelve a programar.
+
+### Excepciones
+
+- **E1.** En el paso 5, si el sistema **no puede leer los datos** (sin conexión): mantiene los avisos que ya había y lo reintenta al volver a la app. No enseña ningún error.
+- **E2.** En el paso 5, si el móvil **no deja programar** (permiso retirado desde los ajustes del móvil): no se programa nada y Ajustes indica que los avisos están bloqueados.
+- **E3.** En el paso 6, si el móvil está en **ahorro de batería extremo**: el aviso puede llegar tarde. El sistema no lo puede evitar (RNF-09).
+
+### Reglas de negocio
+
+- **RN-34.** Solo avisa lo **pendiente**: nada hecho, no hecho, archivado ni sin fecha (o, en hábitos, sin momento del día).
+- **RN-35.** Los avisos **no se guardan**: se calculan a partir de las tareas, los hábitos y sus marcas cada vez que el móvil se pone al día (como las ocurrencias, ADR-0003).
+- **RN-36.** Una tarea avisa a las **09:00** de cada día de antelación elegido (por defecto, 3 días antes, el día anterior y el mismo día). Si tiene hora, el aviso del mismo día llega **una hora antes** de ella.
+- **RN-37.** Un hábito con hora exacta avisa **a esa hora** cada día que toca; uno con franja, si se activa, a la hora de la franja (RN-20).
+- **RN-38.** **Nunca** se avisa de un momento pasado; las tareas vencidas no avisan (viven en Pendientes, DEC-17).
+- **RN-39.** Se programan como mucho los **64 avisos más próximos** de los **próximos 7 días**.
+- **RN-40.** Lo cambiado en otro dispositivo se refleja en los avisos **al abrir la app en el móvil**.
+- Aplican también RN-06 y RN-22.
+
+### Cómo se comprueba
+
+- **Escenario 1: tres días antes.** Dado que hoy es lunes 16 y existe «Entregar práctica» para el viernes 20, cuando el móvil se pone al día, entonces hay avisos programados el martes 17, el jueves 19 y el viernes 20, todos a las 09:00.
+- **Escenario 2: con hora (A2).** Dada una tarea para hoy a las 23:59 creada a las 12:00, entonces hay un aviso a las 22:59 de hoy y ninguno a las 09:00.
+- **Escenario 3: nada en el pasado (RN-38).** Dada una tarea para hoy creada a las 10:00 sin hora, entonces no se programa el aviso de las 09:00 de hoy; y una tarea vencida no tiene ningún aviso.
+- **Escenario 4: hábito con hora (A3).** Dado «Nadar» los miércoles a las 17:00 y hoy lunes, entonces hay un aviso el miércoles a las 17:00 con el texto «Ahora, a las 17:00» y ninguno el resto de días.
+- **Escenario 5: franja (RF-26).** Dado «Lavarme los dientes» con franja noche, cuando los avisos de franja están apagados no hay ningún aviso; al encenderlos, hay uno cada día a las 21:00.
+- **Escenario 6: marcar (A4).** Dada una tarea con tres avisos programados, cuando el usuario la marca hecha, entonces no queda ninguno; cuando pulsa Deshacer, vuelven los que están en el futuro (A6).
+- **Escenario 7: una ocurrencia (RN-32).** Dado un hábito diario a las 08:00, cuando el usuario marca hoy como hecho a las 07:30, entonces no avisa hoy y sí mañana.
+- **Escenario 8: cambiar la fecha (A5).** Cuando el usuario mueve una tarea del 20 al 23, entonces los avisos son los del 23 y ninguno del 20.
+- **Escenario 9: archivar (A4).** Cuando el usuario archiva un hábito con hora, entonces no queda ningún aviso suyo.
+- **Escenario 10: permiso aceptado.** Dado el primer arranque con la 1.1, cuando el usuario acepta el permiso, entonces Ajustes enseña los recordatorios encendidos.
+- **Escenario 11: permiso rechazado (A1).** Cuando el usuario lo rechaza, entonces no se programa nada y Ajustes ofrece abrir los ajustes del móvil.
+- **Escenario 12: apagar (A10).** Cuando el usuario apaga los recordatorios en Ajustes, entonces no queda ningún aviso programado.
+- **Escenario 13: tocar el aviso (A9, RF-29).** Cuando el usuario toca el aviso de una tarea, la app se abre en su ficha; si es de un hábito, en Hoy.
+- **Escenario 14: cambio de hora (RNF-07).** Dado un hábito diario a las 09:00, el día del cambio de hora de marzo y el de octubre tiene exactamente un aviso, a las 09:00 de la hora local.
+- **Escenario 15: límite (RN-39).** Dados 100 avisos posibles en los próximos 7 días, entonces se programan los 64 más próximos.

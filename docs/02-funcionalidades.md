@@ -40,6 +40,13 @@ Registro de funcionalidades (`RF`) y requisitos no funcionales (`RNF`). Es el co
 | RF-21 | Eliminar una categoría | IMPRESCINDIBLE | CU-07 | | |
 | RF-22 | Renombrar una categoría | DESEABLE · **HECHO** | CU-07 | | |
 | RF-23 | Elegir el tema | IMPRESCINDIBLE | — | | |
+| RF-24 | Aviso con antelación de una tarea con fecha | IMPRESCINDIBLE | CU-08 | | |
+| RF-25 | Aviso a la hora de un hábito con hora exacta | IMPRESCINDIBLE | CU-08 | | |
+| RF-26 | Aviso de los hábitos con franja | DESEABLE | CU-08 | | |
+| RF-27 | Los avisos siguen al estado de cada elemento | IMPRESCINDIBLE | CU-08 | | |
+| RF-28 | Activar y ajustar los recordatorios | IMPRESCINDIBLE | CU-08 | | |
+| RF-29 | Abrir el elemento desde el aviso | DESEABLE | CU-08 | | |
+| RF-30 | Avisar en la web de que no hay recordatorios | DESEABLE | — | | |
 
 El estado de construcción **no** se apunta aquí, salvo que un encargo pida expresamente marcar una funcionalidad como hecha.
 
@@ -206,6 +213,55 @@ El estado de construcción **no** se apunta aquí, salvo que un encargo pida exp
 - **Criterio de aceptación:** con el móvil en modo oscuro y sin elegir nada, la app sale en negro; al fijar el tercer estilo en Ajustes, sale en ese estilo aunque el móvil cambie de modo, también al cerrar y abrir la app.
 - **Notas:** DEC-32; el aspecto de cada tema está en `docs/diseno.md`.
 
+*Versión 1.1, recordatorios (DEC-43; propuesta en [propuestas/recordatorios](propuestas/recordatorios.md)):*
+
+### RF-24 — Aviso con antelación de una tarea con fecha
+
+- **Descripción:** el sistema debe avisar en el móvil de cada tarea pendiente con fecha, a las 09:00 de los días de antelación elegidos (por defecto, 3 días antes, el día anterior y el mismo día); si la tarea tiene hora, el aviso del mismo día llega una hora antes de ella.
+- **Prioridad:** IMPRESCINDIBLE (versión 1.1)
+- **Criterio de aceptación:** CU-08, escenarios 1, 2 y 3.
+- **Notas:** RN-34, RN-35, RN-36, RN-38.
+
+### RF-25 — Aviso a la hora de un hábito con hora exacta
+
+- **Descripción:** el sistema debe avisar en el móvil, a la hora exacta del hábito, de cada ocurrencia pendiente.
+- **Prioridad:** IMPRESCINDIBLE (versión 1.1)
+- **Criterio de aceptación:** CU-08, escenario 4. Además: dado un hábito «cada 3 días» a las 08:00 que empezó el día 1, entre los días 1 y 7 avisa los días 1, 4 y 7, y nunca un día que no toca (RN-22).
+- **Notas:** RN-34, RN-37; usa el motor de ocurrencias sin cambiarlo (ADR-0003).
+
+### RF-26 — Aviso de los hábitos con franja
+
+- **Descripción:** el sistema debe permitir activar avisos para los hábitos con franja, a la hora de su franja (RN-20). Desactivado por defecto.
+- **Prioridad:** DESEABLE. *Sin él, basta con poner hora exacta al hábito que se quiera recordar.*
+- **Criterio de aceptación:** CU-08, escenario 5.
+- **Notas:** RN-37.
+
+### RF-27 — Los avisos siguen al estado de cada elemento
+
+- **Descripción:** el sistema no debe avisar de nada hecho, no hecho, archivado, sin fecha o cuya fecha u hora haya cambiado; al volver algo a pendiente, sus avisos futuros vuelven.
+- **Prioridad:** IMPRESCINDIBLE (versión 1.1). *Sin esto, los avisos serían ruido y el humano los apagaría.*
+- **Criterio de aceptación:** CU-08, escenarios 6, 7, 8 y 9.
+- **Notas:** RN-34, RN-39, RN-40.
+
+### RF-28 — Activar y ajustar los recordatorios
+
+- **Descripción:** el sistema debe permitir, desde Ajustes, encender y apagar los recordatorios, elegir la antelación de las tareas y activar los de hábitos con franja; debe pedir el permiso del móvil y, si está denegado, decirlo y ofrecer abrir los ajustes del móvil.
+- **Prioridad:** IMPRESCINDIBLE (versión 1.1)
+- **Criterio de aceptación:** CU-08, escenarios 10, 11 y 12.
+- **Notas:** los ajustes se guardan en el dispositivo, como el tema (RF-23).
+
+### RF-29 — Abrir el elemento desde el aviso
+
+- **Descripción:** al tocar un aviso, la app se abre en la ficha de la tarea o, si es un hábito, en Hoy.
+- **Prioridad:** DESEABLE. *Sin él, el aviso abre la app donde estuviera.*
+- **Criterio de aceptación:** CU-08, escenario 13.
+
+### RF-30 — Avisar en la web de que no hay recordatorios
+
+- **Descripción:** en el navegador, la sección de recordatorios de Ajustes indica que solo funcionan en la app del móvil.
+- **Prioridad:** DESEABLE
+- **Criterio de aceptación:** dado que el usuario abre Ajustes en el navegador, entonces ve «Los recordatorios solo funcionan en la app del móvil» y ningún interruptor.
+
 ## Requisitos no funcionales
 
 Cómo de bien tiene que hacerlo. Cada uno con **un número**, no con adjetivos.
@@ -220,5 +276,6 @@ Cómo de bien tiene que hacerlo. Cada uno con **un número**, no con adjetivos.
 | RNF-06 | Rapidez de uso | Desde Hoy, marcar algo cuesta **una** acción; crear una tarea con solo el nombre, escribirlo y confirmar | Prueba de extremo a extremo que cuenta las acciones |
 | RNF-07 | Fechas | Zona horaria del dispositivo (para el dueño, Europe/Madrid); los cambios de hora no duplican ni pierden ocurrencias, ni mueven sus horas | Tests en los días de cambio de hora |
 | RNF-08 | Móvil | Funciona instalada en las versiones de Android que soporta el SDK de Expo fijado, en pantallas desde 360 dp de ancho; la misma app se usa en el navegador del ordenador sin romperse *(versión 1, DEC-24)* | Flujos de Maestro en el emulador; prueba de la web con el MCP de Chrome |
+| RNF-09 | Recordatorios | En la app instalada, con el permiso concedido y sin ahorro de batería extremo, un aviso llega **como mucho 2 minutos** después de su hora; los avisos siguen programados **después de reiniciar el móvil** | Comprobación manual del humano con el APK (lista del encargo R6) |
 
 Si un requisito no funcional no tiene número, todavía es una intención.

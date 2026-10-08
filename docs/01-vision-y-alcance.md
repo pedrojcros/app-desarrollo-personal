@@ -60,7 +60,6 @@ Las 15 funcionalidades imprescindibles están en [02-funcionalidades](02-funcion
 |---|---|---|
 | Otros usuarios, cuentas, compartir | Es una herramienta personal; evita autenticación y privacidad ajena | Cuando el autor quiera compartirla |
 | Estadísticas e interfaces interactivas del progreso | Valiosas, pero el historial tiene que existir antes | Primera versión posterior a la 1 |
-| Recordatorios y avisos («en 4 días entregas X») | Con la app nativa son locales y baratos, pero se dejan fuera para no inflar la versión 1 | **Versión 1.1**, lo primero después de la 1 |
 | Integración con Todoist | Dependencia de un tercero que se quiere abandonar | Solo si hace falta migrar datos |
 | Conexión con Google Calendar | Exige cuenta de Google y permisos de su API | Versión 2 |
 | Uso sin conexión (marcar sin cobertura) | La versión 1 necesita internet: sin conexión se ve lo ya cargado, pero no se puede marcar (DEC-25) | Si el uso diario lo pide (D-01 en [06-riesgos](06-riesgos.md)) |
