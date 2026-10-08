@@ -97,21 +97,49 @@ export async function cancelAllReminders(): Promise<void> {
 export function addReminderTapListener(
   onTap: (target: PlannedReminder['target']) => void,
 ): () => void {
-  const subscription = Notifications.addNotificationResponseReceivedListener(
-    (response) => {
-      const notificationData = response.notification.request.content.data;
-      if (notificationData === undefined) {
-        return;
-      }
-      const target = notificationData.target;
-      if (!isReminderTarget(target)) {
-        return;
-      }
-      onTap(target);
-    },
-  );
+  let active = true;
+  const handledResponses = new Set<string>();
 
-  return () => subscription.remove();
+  function handleResponse(response: Notifications.NotificationResponse): void {
+    if (!active) {
+      return;
+    }
+    const request = response.notification.request;
+    const responseId = JSON.stringify([
+      request.identifier,
+      response.notification.date,
+      response.actionIdentifier,
+    ]);
+    if (handledResponses.has(responseId)) {
+      return;
+    }
+    const target = request.content.data?.target;
+    if (!isReminderTarget(target)) {
+      return;
+    }
+    handledResponses.add(responseId);
+    // Al consumir el toque se evita abrirlo otra vez al montar una sesión nueva.
+    void Notifications.clearLastNotificationResponseAsync().catch(
+      () => undefined,
+    );
+    onTap(target);
+  }
+
+  const subscription =
+    Notifications.addNotificationResponseReceivedListener(handleResponse);
+  // El listener por sí solo pierde el toque que arrancó la aplicación cerrada.
+  void Notifications.getLastNotificationResponseAsync()
+    .then((response) => {
+      if (response !== null) {
+        handleResponse(response);
+      }
+    })
+    .catch(() => undefined);
+
+  return () => {
+    active = false;
+    subscription.remove();
+  };
 }
 
 function getReminderPermissionFromStatus(

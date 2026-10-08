@@ -43,9 +43,9 @@ Registro de funcionalidades (`RF`) y requisitos no funcionales (`RNF`). Es el co
 | RF-24 | Aviso con antelación de una tarea con fecha | IMPRESCINDIBLE | CU-08 | | |
 | RF-25 | Aviso a la hora de un hábito con hora exacta | IMPRESCINDIBLE | CU-08 | | |
 | RF-26 | Aviso de los hábitos con franja | DESEABLE | CU-08 | | |
-| RF-27 | Los avisos siguen al estado de cada elemento | IMPRESCINDIBLE | CU-08 | | |
+| RF-27 | Los avisos siguen al estado de cada elemento | IMPRESCINDIBLE | CU-08 | Hecho en ADP-25 (encargo 041) | |
 | RF-28 | Activar y ajustar los recordatorios | IMPRESCINDIBLE · **HECHO** | CU-08 | | |
-| RF-29 | Abrir el elemento desde el aviso | DESEABLE | CU-08 | | |
+| RF-29 | Abrir el elemento desde el aviso | DESEABLE | CU-08 | Hecho en ADP-25 (encargo 041) | |
 | RF-30 | Avisar en la web de que no hay recordatorios | DESEABLE · **HECHO** | — | | |
 
 El estado de construcción **no** se apunta aquí, salvo que un encargo pida expresamente marcar una funcionalidad como hecha.

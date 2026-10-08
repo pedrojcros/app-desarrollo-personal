@@ -20,7 +20,9 @@ export function FloatingButton({
 }: FloatingButtonProps) {
   const { shape, colors } = useTheme();
   const press = usePressed(pressed);
-  const pressedClassName = press.isPressed ? 'scale-95 opacity-90' : '';
+  const pressedStyle = press.isPressed
+    ? { opacity: 0.9, transform: [{ scale: 0.95 }] }
+    : undefined;
   const buttonStyle = {
     borderRadius: shape.floatingRadius,
     borderWidth: shape.outlineWidth,
@@ -35,8 +37,8 @@ export function FloatingButton({
       onPress={onPress}
       onPressIn={press.handlePressIn}
       onPressOut={press.handlePressOut}
-      className={`h-14 w-14 items-center justify-center bg-accent ${pressedClassName}`}
-      style={buttonStyle}
+      className="h-14 w-14 items-center justify-center bg-accent"
+      style={[buttonStyle, pressedStyle]}
     >
       <Icon icon={Plus} color="accent-foreground" size={26} />
     </Pressable>

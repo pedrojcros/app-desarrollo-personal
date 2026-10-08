@@ -8,6 +8,8 @@ import { QuickAddProvider } from '@/components/quick-add';
 import { UndoToastProvider } from '@/components/undo-toast';
 import { PageMetadata } from '@/components/ui/page-metadata';
 import { useSession } from '@/data/auth';
+import { useReminderSync } from '@/data/reminders';
+import { useReminderNavigation } from '@/data/reminders-navigation';
 import { ThemeProvider } from '@/theme/provider';
 
 const queryClient = new QueryClient();
@@ -16,14 +18,15 @@ const queryClient = new QueryClient();
 // redirige solo cuando la sesión aparece o desaparece.
 function ProtectedStack() {
   const { session, isLoading } = useSession();
+  const hasSession = !isLoading && session !== null;
+  useReminderSync(hasSession);
+  useReminderNavigation(hasSession);
 
   // Hasta saber si hay sesión guardada no se enseña nada: evita el parpadeo
   // de contenido protegido.
   if (isLoading) {
     return null;
   }
-
-  const hasSession = session !== null;
 
   return (
     <Stack>

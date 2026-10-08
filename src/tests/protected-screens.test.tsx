@@ -13,6 +13,10 @@ jest.mock('@/components/quick-add', () => ({
 }));
 jest.mock('@/theme/global.css', () => ({}));
 jest.mock('@/data/auth', () => ({ useSession: jest.fn() }));
+jest.mock('@/data/reminders', () => ({ useReminderSync: jest.fn() }));
+jest.mock('@/data/reminders-navigation', () => ({
+  useReminderNavigation: jest.fn(),
+}));
 jest.mock('expo-font', () => ({ useFonts: () => [true, null] }));
 jest.mock('expo-status-bar', () => ({ StatusBar: () => null }));
 jest.mock('expo-splash-screen', () => ({
