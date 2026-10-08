@@ -1,7 +1,6 @@
 appId: host.exp.exponent
 ---
 - tapOn: Añadir tarea o hábito
-- tapOn: Nombre
 - inputText: E2E tarea rápida
 - pressKey: ENTER
 - pressKey: BACK

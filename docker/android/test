@@ -56,6 +56,8 @@ run_suite() {
   suite_name=$1
   e2e_password=$(node scripts/e2e/prepare-user.mjs)
   export e2e_password
+  # Cada tamaño crea un usuario nuevo; se borra la sesión anterior de Expo Go.
+  run_adb shell pm clear host.exp.exponent >/dev/null
   printf '\n== Ejecutando caminos críticos (%s) ==\n' "$suite_name"
   run_flow login
   run_flow smoke

@@ -2,10 +2,20 @@ appId: host.exp.exponent
 ---
 - tapOn: Añadir tarea o hábito
 - tapOn: Hábito
-- tapOn: Nombre
 - inputText: E2E hábito semanal
 - tapOn: Frecuencia
-- tapOn: Días de la semana
+- tapOn:
+    text: Días de la semana
+    optional: true
+- runFlow:
+    when:
+      visible: Todos los días
+    commands:
+      # Maestro recibe límites invertidos en esta opción del selector emergente.
+      - tapOn:
+          point: "26%,64%"
+- hideKeyboard
+- assertVisible: Días de la semana
 - tapOn: Lunes
 - tapOn: Martes
 - tapOn: Miércoles
@@ -14,4 +24,6 @@ appId: host.exp.exponent
 - tapOn: Sábado
 - tapOn: Domingo
 - tapOn: Enviar
+- hideKeyboard
+- pressKey: BACK
 - assertVisible: E2E hábito semanal
