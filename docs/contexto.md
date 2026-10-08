@@ -65,7 +65,6 @@ Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto):
 
 - **Publicar la versión 1:** cuando T13b esté fusionada, pasar `develop` a `main`; o, si no quieres esperar, el commit `6e9182c` (las funcionalidades de la 1.x fusionadas después no tienen por qué ir). Antes: crear tu usuario de producción (DEC-37). La comprobación, en el [buzón](buzon.md).
 - **Recordatorios (1.1):** contestar las 8 decisiones de la [propuesta](propuestas/recordatorios.md); «ok» acepta todas.
-- **Confirmar DEC-41:** el criterio de reparto Luna/Sol (lo mecánico y grande con Luna; lo denso, SQL, seguridad y correcciones con Sol; no partir lo pequeño).
 - Revisar el [buzón](buzon.md): lo que decidió el orquestador por su cuenta.
 - Revisar T01 en el móvil con Expo Go (H05) y los avisos de `npm audit` (antes de publicar y el 2026-10-14).
 - Cuando T15 esté en uso, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
@@ -76,7 +75,7 @@ Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto):
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-41**.
+  chat. Siguiente número libre: **DEC-42**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 

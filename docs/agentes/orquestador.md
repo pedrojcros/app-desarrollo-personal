@@ -143,6 +143,8 @@ Sé honesto con el ahorro: un trabajador de Claude arranca en frío y relee la d
 
 Los identificadores de modelo de Codex compruébalos en su ayuda o su configuración antes de usarlos; no los adivines. Vistos el 2026-10-07: `gpt-6.1-sol` (el que usa por defecto) y `gpt-6-luna` (el barato, que ofrece Codex al acercarse al límite). Si un encargo con `gpt-6-luna` sale mal, se repite con `gpt-6.1-sol` y se anota.
 
+**Luna o Sol (DEC-41).** Lo mecánico y grande, con pasos fijados, va a Luna; lo denso (lógica central, SQL, seguridad, correcciones) a Sol; lo pequeño no se parte; lo diminuto, a Copilot.
+
 **Encargos cortos (DEC-39).** Cada trabajador arranca leyendo todo lo que le pides: pide **2 o 3 skills**, las que de verdad necesita, y **secciones concretas** de los documentos en vez de documentos enteros. Cada relanzamiento vuelve a pagar esa lectura: evita los fallos que obligan a relanzar.
 
 ### 6. Tope de paralelismo
