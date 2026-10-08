@@ -35,7 +35,7 @@ Cada ticket lleva en la descripción el identificador del plan (`RF-03`, `T07`) 
 | Momento | Estado en Jira |
 |---|---|
 | Tarea creada desde el plan | Por hacer (la crea el orquestador) |
-| Se lanza el trabajador | En curso **y etiqueta del agente** (`codex`, `claude` o `copilot`): el orquestador, con el script |
+| Se lanza el trabajador | En curso, **etiqueta del agente** (`codex`, `claude` o `copilot`) y **comentario con modelo y esfuerzo**: el orquestador, con el script |
 | El trabajador sube su rama | En curso, si seguía en «Por hacer»: **automático** (flujo `jira.yml`) |
 | Se abre el PR | En revisión, con comentario y enlace: **automático** |
 | Se fusiona el PR | Listo, con comentario: **automático** |
