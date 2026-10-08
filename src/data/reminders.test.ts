@@ -15,7 +15,6 @@ import { cancelReminderSync, syncReminders } from './reminders';
 import { fail, succeed } from './result';
 
 jest.mock('../platform/notifications');
-jest.mock('expo-notifications', () => ({ setNotificationHandler: jest.fn() }));
 jest.mock('./reminders-read', () => ({ fetchReminderData: jest.fn() }));
 jest.mock('./reminder-settings');
 
@@ -185,10 +184,10 @@ describe('Reminder synchronization', () => {
   it('reports scheduling failures for the next lifecycle retry', async () => {
     jest
       .mocked(platform.scheduleReminder)
-      .mockResolvedValue(fail('SCHEDULE_FAILED', 'Unavailable'));
+      .mockResolvedValue(fail('schedule_failed', 'Unavailable'));
     expect(await syncReminders()).toMatchObject({
       ok: false,
-      error: { code: 'SCHEDULE_FAILED' },
+      error: { code: 'schedule_failed' },
     });
   });
 });

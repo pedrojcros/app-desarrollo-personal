@@ -25,7 +25,6 @@ import type { PropsWithChildren } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { UndoToastProvider } from '@/components/undo-toast';
-import { NOTICE_DURATION_MILLISECONDS } from '@/components/undo-toast/undo-toast-provider';
 import { useRescheduleTask } from '@/data/tasks';
 import { usePastPending, usePastPendingCount } from '@/data/past-pending';
 import { queryKeys } from '@/data/query-keys';
@@ -58,6 +57,7 @@ jest.mock('@react-native-community/datetimepicker', () => ({
 }));
 
 const today = '2026-10-07';
+const longNoticeDurationMilliseconds = 60000;
 const flossThreeDaysAgo: ViewItem = {
   target: { kind: 'occurrence', habitId: 'floss', date: '2026-10-04' },
   name: 'Hilo dental',
@@ -131,28 +131,11 @@ beforeAll(async () => {
 
 beforeEach(() => {
   prepareMocks();
-  keepNoticeVisible();
 });
 afterEach(() => {
   queryClient.clear();
   jest.restoreAllMocks();
 });
-
-// El aviso con «Deshacer» se oculta solo a los 4 s (eso ya lo prueba el test del
-// aviso). Con el reloj real, una máquina lenta lo veía desaparecer antes de que
-// estos tests lo buscaran, así que aquí se anula solo ese temporizador.
-function keepNoticeVisible() {
-  const realSetTimeout = global.setTimeout;
-  jest.spyOn(global, 'setTimeout').mockImplementation(((
-    callback: () => void,
-    delay?: number,
-  ) => {
-    if (delay === NOTICE_DURATION_MILLISECONDS) {
-      return 0;
-    }
-    return realSetTimeout(callback, delay);
-  }) as never);
-}
 
 function renderScreen(items: ViewItem[]) {
   queryClient.setQueryData(queryKeys.pastPending(today), { items });
@@ -165,7 +148,9 @@ function renderScreen(items: ViewItem[]) {
     >
       <ThemeScope themeName="white">
         <QueryClientProvider client={queryClient}>
-          <UndoToastProvider>
+          <UndoToastProvider
+            noticeDurationMilliseconds={longNoticeDurationMilliseconds}
+          >
             <PastPendingScreen />
           </UndoToastProvider>
         </QueryClientProvider>
