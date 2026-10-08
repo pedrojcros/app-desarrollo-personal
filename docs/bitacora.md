@@ -4,6 +4,10 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-08 — Mañana: 1.x casi entera, recordatorios R1 a R4 y un fallo de Android
+
+Tras reiniciar el portátil, el humano aprobó con «ok» los recordatorios (DEC-43), el reparto entre Luna y Sol (DEC-41) y la cafeína automática con `/ejecutar-plan` (DEC-42), y pidió ver en Jira el modelo y el esfuerzo de cada trabajador. Se fusionaron RF-09, RF-10, RF-16 y RF-17, los recordatorios R1 a R4 y una limpieza de deuda. Las pruebas de Maestro encontraron que la app fallaba en Android al iniciar sesión: Codex Sol con esfuerzo alto demostró la causa (clases `scale` de NativeWind al pulsar) y la arregló (PR #53). Un test que dependía del tiempo real fallaba en la CI lenta y se arregló (PR #51). Cuellos de botella: el candado de lo pesado y un `jest` que no terminaba. Al apagar el portátil a las 14:55 quedan a medias T13b y R5.
+
 ### 2026-10-08 — Madrugada: T13a y T13c, primeras funcionalidades 1.x y una noche perdida
 
 Se fusionaron la accesibilidad y la web de T13 (Lighthouse 100 en todas las pantallas auditadas), RF-13 y RF-14 (reprogramar y día entero como no hecho) y RF-22 (renombrar categoría), además de dos arreglos del supervisor para entender cómo escribe Codex la hora de la cuota. El humano pidió seguir solo de noche aprovechando las cuotas, con las tareas partidas entre Luna y Sol. Opus escribió la [propuesta de recordatorios](propuestas/recordatorios.md), con 8 decisiones para el humano. A las 0:30 el portátil se suspendió y no se avanzó hasta las 8:00; el humano pidió activar el modo cafeína cada vez que el orquestador se quede solo. El candidato de la versión 1 es `6e9182c`; T13b (Maestro) y RF-09 y RF-10 quedan a medias en sus ramas.
