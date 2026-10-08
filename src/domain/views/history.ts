@@ -31,6 +31,12 @@ export interface HistoryGrid {
   days: CalendarDate[];
   rows: HistoryRow[];
   dayPercentages: (number | null)[];
+  dimmedCells: boolean[][];
+}
+export interface HistoryFilters {
+  status: 'all' | 'done' | 'not_done' | 'unmarked';
+  categoryId: 'all' | string | null;
+  itemKey: string | null;
 }
 export type HistoryRangeError =
   'end_before_start' | 'end_after_today' | 'too_long';
@@ -243,5 +249,42 @@ export function buildHistoryGrid(
   const dayPercentages = days.map((date, index) =>
     getDayPercentage(rows, index),
   );
-  return { days, rows, dayPercentages };
+  const dimmedCells = rows.map((row) => row.cells.map(() => false));
+  return { days, rows, dayPercentages, dimmedCells };
+}
+
+function rowMatchesStatus(row: HistoryRow, status: HistoryFilters['status']) {
+  if (status === 'all') {
+    return true;
+  }
+  return row.cells.some((cell) => cell === status);
+}
+
+export function filterHistoryGrid(
+  grid: HistoryGrid,
+  filters: HistoryFilters,
+): HistoryGrid {
+  const matchingRows = grid.rows.filter((row) => {
+    if (filters.categoryId !== 'all' && row.categoryId !== filters.categoryId) {
+      return false;
+    }
+    if (filters.itemKey !== null && row.key !== filters.itemKey) {
+      return false;
+    }
+    return rowMatchesStatus(row, filters.status);
+  });
+  const dimmedCells = matchingRows.map((row) =>
+    row.cells.map(
+      (cell) => filters.status !== 'all' && cell !== filters.status,
+    ),
+  );
+  const dayPercentages = grid.days.map((day, index) =>
+    getDayPercentage(matchingRows, index),
+  );
+  return {
+    days: grid.days,
+    rows: matchingRows,
+    dayPercentages,
+    dimmedCells,
+  };
 }

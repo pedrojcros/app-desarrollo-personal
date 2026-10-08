@@ -1,6 +1,7 @@
 import { memo, useCallback, useMemo } from 'react';
 import {
   FlatList,
+  Pressable,
   ScrollView,
   View,
   type ListRenderItemInfo,
@@ -26,6 +27,8 @@ export interface HistoryCategory {
 interface HistoryGridProps {
   grid: HistoryGridData;
   categories?: HistoryCategory[];
+  today: string;
+  onCellPress: (row: HistoryRow, day: string) => void;
 }
 const cellLabels: Record<HistoryCell, string> = {
   done: 'hecha',
@@ -57,11 +60,15 @@ const HistoryColumn = memo(function HistoryColumn({
   index,
   grid,
   categoryColors,
+  today,
+  onCellPress,
 }: {
   day: string;
   index: number;
   grid: HistoryGridData;
   categoryColors: ReadonlyMap<string, CategoryColor>;
+  today: string;
+  onCellPress: (row: HistoryRow, day: string) => void;
 }) {
   const { colors } = useTheme();
   const dateLabel = formatAccessibleDate(day);
@@ -90,22 +97,50 @@ const HistoryColumn = memo(function HistoryColumn({
           {formatShortDate(day)}
         </Text>
       </View>
-      {grid.rows.map((row) => {
+      {grid.rows.map((row, rowIndex) => {
         const cell = row.cells[index];
         const label = `${row.name}, ${dateLabel}: ${cellLabels[cell]}`;
         const color = getCellColor(row, cell);
+        const isDimmed = grid.dimmedCells[rowIndex][index];
+        let cellClassName =
+          'h-12 items-center justify-center border-b border-border';
+        if (isDimmed) {
+          cellClassName = `${cellClassName} opacity-40`;
+        }
+        if (cell === 'empty') {
+          return (
+            <View key={row.key} className={cellClassName} accessible={false} />
+          );
+        }
+        const canCorrect = day <= today;
+        if (!canCorrect) {
+          return (
+            <View
+              key={row.key}
+              accessible
+              accessibilityRole="image"
+              accessibilityLabel={label}
+              className={cellClassName}
+            >
+              <Text variant="headline" style={{ color }}>
+                {cellSymbols[cell]}
+              </Text>
+            </View>
+          );
+        }
         return (
-          <View
+          <Pressable
             key={row.key}
-            accessible
-            accessibilityRole="image"
+            role="button"
             accessibilityLabel={label}
-            className="h-12 items-center justify-center border-b border-border"
+            accessibilityHint="Cambiar el estado de esta actividad"
+            onPress={() => onCellPress(row, day)}
+            className={cellClassName}
           >
             <Text variant="headline" style={{ color }}>
               {cellSymbols[cell]}
             </Text>
-          </View>
+          </Pressable>
         );
       })}
       <View
@@ -123,7 +158,12 @@ const HistoryColumn = memo(function HistoryColumn({
 });
 
 /** Se virtualizan días enteros: 366 × 50 no monta todas las celdas a la vez. */
-export function HistoryGrid({ grid, categories = [] }: HistoryGridProps) {
+export function HistoryGrid({
+  grid,
+  categories = [],
+  today,
+  onCellPress,
+}: HistoryGridProps) {
   const categoryColors = useMemo(() => {
     const entries = categories.map(
       (category) => [category.id, category.color] as const,
@@ -137,9 +177,11 @@ export function HistoryGrid({ grid, categories = [] }: HistoryGridProps) {
         index={index}
         grid={grid}
         categoryColors={categoryColors}
+        today={today}
+        onCellPress={onCellPress}
       />
     ),
-    [grid, categoryColors],
+    [grid, categoryColors, today, onCellPress],
   );
   return (
     <View className="flex-1 gap-3">

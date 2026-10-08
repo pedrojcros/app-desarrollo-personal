@@ -1,5 +1,6 @@
 import {
   afterEach,
+  beforeAll,
   beforeEach,
   describe,
   expect,
@@ -12,6 +13,7 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 import {
+  cleanup,
   fireEvent,
   render,
   renderHook,
@@ -23,6 +25,7 @@ import type { PropsWithChildren } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { UndoToastProvider } from '@/components/undo-toast';
+import { NOTICE_DURATION_MILLISECONDS } from '@/components/undo-toast/undo-toast-provider';
 import { useRescheduleTask } from '@/data/tasks';
 import { usePastPending, usePastPendingCount } from '@/data/past-pending';
 import { queryKeys } from '@/data/query-keys';
@@ -85,7 +88,7 @@ const retry = jest.fn();
 const rescheduleMutate = jest.fn();
 let queryClient: QueryClient;
 
-beforeEach(() => {
+function prepareMocks() {
   jest.clearAllMocks();
   queryClient = new QueryClient({
     defaultOptions: {
@@ -109,8 +112,47 @@ beforeEach(() => {
     mutate: rescheduleMutate,
     isPending: false,
   } as never);
+}
+
+// Los módulos de la pantalla, del diálogo y del aviso cargan al primer uso y,
+// con la CI cargada, ese arranque en frío tardaba más que el propio test.
+// Se hace una vez, fuera de los casos medidos.
+beforeAll(async () => {
+  prepareMocks();
+  renderScreen([invoiceYesterday, flossThreeDaysAgo]);
+  fireEvent.press(screen.getByRole('button', { name: 'Todo no hecho: Ayer' }));
+  fireEvent.press(screen.getByRole('button', { name: 'Marcar como no hecho' }));
+  await waitFor(() => expect(screen.queryByText('Factura')).toBeNull(), {
+    timeout: 30000,
+  });
+  cleanup();
+  queryClient.clear();
+}, 60000);
+
+beforeEach(() => {
+  prepareMocks();
+  keepNoticeVisible();
 });
-afterEach(() => queryClient.clear());
+afterEach(() => {
+  queryClient.clear();
+  jest.restoreAllMocks();
+});
+
+// El aviso con «Deshacer» se oculta solo a los 4 s (eso ya lo prueba el test del
+// aviso). Con el reloj real, una máquina lenta lo veía desaparecer antes de que
+// estos tests lo buscaran, así que aquí se anula solo ese temporizador.
+function keepNoticeVisible() {
+  const realSetTimeout = global.setTimeout;
+  jest.spyOn(global, 'setTimeout').mockImplementation(((
+    callback: () => void,
+    delay?: number,
+  ) => {
+    if (delay === NOTICE_DURATION_MILLISECONDS) {
+      return 0;
+    }
+    return realSetTimeout(callback, delay);
+  }) as never);
+}
 
 function renderScreen(items: ViewItem[]) {
   queryClient.setQueryData(queryKeys.pastPending(today), { items });
@@ -294,6 +336,8 @@ describe('Reschedule an overdue task (RF-13)', () => {
 describe('Mark a whole day as not done (RF-14)', () => {
   // Dos guardados y un diálogo por medio: en la CI, más de 1 s (el valor por defecto).
   const SLOW_RENDER_TIMEOUT = 5000;
+  // Tope del test entero (no una espera): ha de ser mayor que la espera de arriba.
+  const SLOW_TEST_TIMEOUT = 15000;
   const markDayButton = 'Todo no hecho: Ayer';
 
   it('has one action per day header', () => {
@@ -321,36 +365,44 @@ describe('Mark a whole day as not done (RF-14)', () => {
     expect(screen.getByText('Factura')).toBeTruthy();
   });
 
-  it('marks everything pending that day with a single notice', async () => {
-    renderScreen([invoiceYesterday, mealPrepYesterday, flossThreeDaysAgo]);
-    fireEvent.press(screen.getByRole('button', { name: markDayButton }));
-    fireEvent.press(
-      screen.getByRole('button', { name: 'Marcar como no hecho' }),
-    );
-    await waitFor(() => expect(screen.queryByText('Factura')).toBeNull(), {
-      timeout: SLOW_RENDER_TIMEOUT,
-    });
-    expect(screen.queryByText('Preparar comida')).toBeNull();
-    expect(screen.getByText('Hilo dental')).toBeTruthy();
-    expect(setMarkStatus).toHaveBeenCalledTimes(2);
-    expect(screen.getAllByText('2 marcadas como no hechas')).toHaveLength(1);
-  });
+  it(
+    'marks everything pending that day with a single notice',
+    async () => {
+      renderScreen([invoiceYesterday, mealPrepYesterday, flossThreeDaysAgo]);
+      fireEvent.press(screen.getByRole('button', { name: markDayButton }));
+      fireEvent.press(
+        screen.getByRole('button', { name: 'Marcar como no hecho' }),
+      );
+      await waitFor(() => expect(screen.queryByText('Factura')).toBeNull(), {
+        timeout: SLOW_RENDER_TIMEOUT,
+      });
+      expect(screen.queryByText('Preparar comida')).toBeNull();
+      expect(screen.getByText('Hilo dental')).toBeTruthy();
+      expect(setMarkStatus).toHaveBeenCalledTimes(2);
+      expect(screen.getAllByText('2 marcadas como no hechas')).toHaveLength(1);
+    },
+    SLOW_TEST_TIMEOUT,
+  );
 
-  it('brings the whole day back with Undo', async () => {
-    renderScreen([invoiceYesterday, mealPrepYesterday]);
-    fireEvent.press(screen.getByRole('button', { name: markDayButton }));
-    fireEvent.press(
-      screen.getByRole('button', { name: 'Marcar como no hecho' }),
-    );
-    await waitFor(() => expect(screen.queryByText('Factura')).toBeNull(), {
-      timeout: SLOW_RENDER_TIMEOUT,
-    });
-    fireEvent.press(screen.getByRole('button', { name: 'Deshacer' }));
-    await waitFor(() => expect(screen.getByText('Factura')).toBeTruthy(), {
-      timeout: SLOW_RENDER_TIMEOUT,
-    });
-    expect(screen.getByText('Preparar comida')).toBeTruthy();
-  });
+  it(
+    'brings the whole day back with Undo',
+    async () => {
+      renderScreen([invoiceYesterday, mealPrepYesterday]);
+      fireEvent.press(screen.getByRole('button', { name: markDayButton }));
+      fireEvent.press(
+        screen.getByRole('button', { name: 'Marcar como no hecho' }),
+      );
+      await waitFor(() => expect(screen.queryByText('Factura')).toBeNull(), {
+        timeout: SLOW_RENDER_TIMEOUT,
+      });
+      fireEvent.press(screen.getByRole('button', { name: 'Deshacer' }));
+      await waitFor(() => expect(screen.getByText('Factura')).toBeTruthy(), {
+        timeout: SLOW_RENDER_TIMEOUT,
+      });
+      expect(screen.getByText('Preparar comida')).toBeTruthy();
+    },
+    SLOW_TEST_TIMEOUT,
+  );
 });
 
 describe('Pending tab counter', () => {
