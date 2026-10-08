@@ -11,6 +11,7 @@ import {
   useCategories,
   useCreateCategory,
   useDeleteCategory,
+  useRenameCategory,
   type Category,
 } from '@/data/categories';
 import { useCreateSection, useDeleteSection } from '@/data/sections';
@@ -23,6 +24,7 @@ jest.mock('@/data/categories', () => ({
   useCategories: jest.fn(),
   useCreateCategory: jest.fn(),
   useDeleteCategory: jest.fn(),
+  useRenameCategory: jest.fn(),
 }));
 jest.mock('@/data/sections', () => ({
   useCreateSection: jest.fn(),
@@ -42,6 +44,7 @@ const shoppingList: Category = {
 
 const createCategoryMutate = jest.fn();
 const deleteCategoryMutate = jest.fn();
+const renameCategoryMutate = jest.fn();
 const createSectionMutate = jest.fn();
 const deleteSectionMutate = jest.fn();
 
@@ -81,6 +84,7 @@ describe('Categories screen', () => {
     jest.resetAllMocks();
     mockMutation(useCreateCategory, createCategoryMutate);
     mockMutation(useDeleteCategory, deleteCategoryMutate);
+    mockMutation(useRenameCategory, renameCategoryMutate);
     mockMutation(useCreateSection, createSectionMutate);
     mockMutation(useDeleteSection, deleteSectionMutate);
   });

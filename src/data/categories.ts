@@ -25,6 +25,7 @@ import {
 } from './category-shared';
 import { queryKeys } from './query-keys';
 import {
+  fail,
   succeed,
   unwrapResult,
   type DataResult,
@@ -47,12 +48,18 @@ export type CreateCategoryInput = {
   color: CategoryColor;
 };
 
+export type RenameCategoryInput = { categoryId: string; name: string };
+
 const DEFAULT_CATEGORY_COLOR: CategoryColor = 'teal';
 
 const createCategorySchema = z.object({
   name: nameSchema,
   icon: z.enum(CATEGORY_ICON_NAMES),
   color: z.enum(CATEGORY_COLORS),
+});
+const renameCategorySchema = z.object({
+  categoryId: z.uuid(),
+  name: nameSchema,
 });
 
 type SectionRow = { id: string; category_id: string; name: string };
@@ -142,6 +149,32 @@ export async function createCategory(
   }
 }
 
+export async function renameCategory(
+  categoryId: string,
+  name: string,
+): Promise<DataResult<null>> {
+  const parsedInput = renameCategorySchema.safeParse({ categoryId, name });
+  if (!parsedInput.success) {
+    return describeInvalidInput(parsedInput.error);
+  }
+  try {
+    const response = await supabase
+      .from('categories')
+      .update({ name: parsedInput.data.name })
+      .eq('id', parsedInput.data.categoryId)
+      .select('id');
+    if (response.error) {
+      return describePostgrestFailure(response.error, response.status);
+    }
+    if (response.data.length === 0) {
+      return fail('not_found', 'The category does not exist');
+    }
+    return succeed(null);
+  } catch (error) {
+    return describeThrownFailure(error);
+  }
+}
+
 export function countCategoryContents(
   categoryId: string,
 ): Promise<DataResult<ContentCounts>> {
@@ -199,6 +232,23 @@ export function useDeleteCategory(): UseMutationResult<
   return useMutation({
     mutationFn: async (categoryId: string) =>
       unwrapResult(await deleteCategory(categoryId)),
+    onSuccess: () =>
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.categories() }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.views() }),
+      ]),
+  });
+}
+
+export function useRenameCategory(): UseMutationResult<
+  null,
+  DataResultError,
+  RenameCategoryInput
+> {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ categoryId, name }: RenameCategoryInput) =>
+      unwrapResult(await renameCategory(categoryId, name)),
     onSuccess: () =>
       Promise.all([
         queryClient.invalidateQueries({ queryKey: queryKeys.categories() }),
