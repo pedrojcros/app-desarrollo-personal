@@ -24,6 +24,7 @@ import TodayScreen from '@/app/(tabs)/hoy';
 import type { ItemStatus, MarkTarget } from '@/domain/items';
 
 type TableRows = Record<string, unknown[]>;
+type Row = Record<string, string>;
 
 const mockRouterPush = jest.fn();
 let mockTableRows: TableRows = {};
@@ -96,22 +97,27 @@ jest.mock('@/data/supabase/client', () => ({
   supabase: {
     from: (table: string) => {
       const builder: Record<string, unknown> = {};
-      const chainMethods = [
-        'select',
-        'is',
-        'eq',
-        'gte',
-        'lte',
-        'order',
-        'range',
-      ];
-      for (const method of chainMethods) {
-        builder[method] = () => builder;
-      }
+      let rows = mockTableRows[table] ?? [];
+      builder.select = () => builder;
+      builder.is = () => builder;
+      builder.order = () => builder;
+      builder.range = () => builder;
+      builder.eq = (column: string, value: unknown) => {
+        rows = rows.filter((row) => (row as Row)[column] === value);
+        return builder;
+      };
+      builder.gte = (column: string, value: string) => {
+        rows = rows.filter((row) => (row as Row)[column] >= value);
+        return builder;
+      };
+      builder.lte = (column: string, value: string) => {
+        rows = rows.filter((row) => (row as Row)[column] <= value);
+        return builder;
+      };
       builder.then = (onFulfilled: never, onRejected: never) => {
         const response = mockFailReads
           ? { data: null, error: { message: 'boom' }, status: 500 }
-          : { data: mockTableRows[table] ?? [], error: null, status: 200 };
+          : { data: rows, error: null, status: 200 };
         return Promise.resolve(response).then(onFulfilled, onRejected);
       };
       return builder;
@@ -256,7 +262,7 @@ describe('Today screen', () => {
     expect(screen.getByLabelText('1 de 1 marcadas')).toBeTruthy();
     expect(screen.getByText('Marcada como hecha')).toBeTruthy();
     expect(screen.getByText('Deshacer')).toBeTruthy();
-    expect(screen.queryByText('Marcadas hoy')).toBeNull();
+    expect(screen.getByText('Marcadas hoy (1)')).toBeTruthy();
   });
 
   it('marks a habit as not done with one press', async () => {
@@ -322,12 +328,165 @@ describe('Today screen', () => {
   it('shows an error with a retry button that loads again', async () => {
     mockFailReads = true;
     renderScreen();
-    expect(await screen.findByText('No se pudo cargar Hoy.')).toBeTruthy();
+    expect(await screen.findByText('No se pudo cargar el día.')).toBeTruthy();
 
     mockFailReads = false;
     mockTableRows = { tasks: [makeTaskRow({})] };
     fireEvent.press(screen.getByText('Reintentar'));
 
     expect(await screen.findByText('Leche')).toBeTruthy();
+  });
+});
+
+const swimHabitRow = {
+  ...brushHabitRow,
+  id: '33333333-3333-4333-8333-333333333333',
+  name: 'Nadar',
+  time_of_day: '17:00:00',
+  habit_rules: [
+    {
+      valid_from: '2026-09-01',
+      frequency: 'weekdays',
+      weekdays: [3],
+      interval_days: null,
+    },
+  ],
+};
+
+function makeMarkedTask(status: string) {
+  return makeTaskRow({ status, marked_at: '2026-10-07T08:00:00.000Z' });
+}
+
+describe('Marked section (RF-09)', () => {
+  it('is hidden when nothing is marked', async () => {
+    mockTableRows = { tasks: [makeTaskRow({})] };
+    renderScreen();
+    await screen.findByText('Leche');
+
+    expect(screen.queryByText(/^Marcadas hoy/)).toBeNull();
+  });
+
+  it('is folded by default and shows the count', async () => {
+    mockTableRows = { tasks: [makeMarkedTask('done')] };
+    renderScreen();
+
+    const toggle = await screen.findByLabelText('Marcadas hoy (1)');
+
+    expect(toggle.props.accessibilityState.expanded).toBe(false);
+    expect(screen.queryByText('Hecho · Tarea')).toBeNull();
+  });
+
+  it('unfolds and folds again', async () => {
+    mockTableRows = { tasks: [makeMarkedTask('done')] };
+    renderScreen();
+    fireEvent.press(await screen.findByLabelText('Marcadas hoy (1)'));
+
+    expect(screen.getByText('Hecho · Tarea')).toBeTruthy();
+
+    fireEvent.press(screen.getByLabelText('Marcadas hoy (1)'));
+
+    expect(screen.queryByText('Hecho · Tarea')).toBeNull();
+  });
+
+  it('changes a not-done item to done (CU-03, scenario 7)', async () => {
+    mockTableRows = { tasks: [makeMarkedTask('not_done')] };
+    renderScreen();
+    fireEvent.press(await screen.findByLabelText('Marcadas hoy (1)'));
+    expect(screen.getByText('No hecho · Tarea')).toBeTruthy();
+
+    fireEvent.press(screen.getByLabelText('Marcar Leche como hecho'));
+
+    expect(await screen.findByText('Hecho · Tarea')).toBeTruthy();
+  });
+
+  it('returns an item to the pending list', async () => {
+    mockTableRows = { tasks: [makeMarkedTask('done')] };
+    renderScreen();
+    fireEvent.press(await screen.findByLabelText('Marcadas hoy (1)'));
+
+    fireEvent.press(screen.getByLabelText('Devolver Leche a pendiente'));
+
+    expect(await screen.findByText('Devuelta a pendiente')).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.queryByText(/^Marcadas hoy/)).toBeNull();
+    });
+    expect(screen.getByLabelText('Marcar Leche como hecho')).toBeTruthy();
+    expect(screen.getByLabelText('0 de 1 marcadas')).toBeTruthy();
+  });
+});
+
+describe('Other days (RF-10)', () => {
+  it('goes to tomorrow, shows its items and cannot mark them (scenario 8)', async () => {
+    mockTableRows = {
+      tasks: [makeTaskRow({ due_date: '2026-10-08' })],
+    };
+    renderScreen();
+    await screen.findByText('Hoy no tienes nada. Día libre.');
+
+    fireEvent.press(screen.getByLabelText('Día siguiente'));
+
+    expect(await screen.findByText('Leche')).toBeTruthy();
+    expect(screen.getByText('Mañana')).toBeTruthy();
+    expect(screen.getByText('Jueves, 8 de octubre de 2026')).toBeTruthy();
+    const blockedMarks = screen.getAllByLabelText('Todavía no se puede marcar');
+    expect(blockedMarks).toHaveLength(2);
+    fireEvent.press(blockedMarks[0]);
+    expect(screen.queryByText('Marcada como hecha')).toBeNull();
+    expect(screen.getByLabelText('0 de 1 marcadas')).toBeTruthy();
+  });
+
+  it('goes to yesterday and lets the user mark', async () => {
+    mockTableRows = {
+      tasks: [makeTaskRow({ due_date: '2026-10-06' })],
+    };
+    renderScreen();
+    await screen.findByText('Hoy no tienes nada. Día libre.');
+
+    fireEvent.press(screen.getByLabelText('Día anterior'));
+    await screen.findByText('Leche');
+    fireEvent.press(screen.getByLabelText('Marcar Leche como hecho'));
+
+    expect(await screen.findByText('Marcadas ese día (1)')).toBeTruthy();
+    expect(screen.getByText('Ayer')).toBeTruthy();
+  });
+
+  it('says it is a free day on any day', async () => {
+    renderScreen();
+    await screen.findByText('Hoy no tienes nada. Día libre.');
+
+    fireEvent.press(screen.getByLabelText('Día siguiente'));
+
+    expect(
+      await screen.findByText('Ese día no tienes nada. Día libre.'),
+    ).toBeTruthy();
+  });
+
+  it('comes back to today with the button', async () => {
+    renderScreen();
+    await screen.findByText('Hoy no tienes nada. Día libre.');
+    expect(screen.queryByText('Volver a hoy')).toBeNull();
+
+    fireEvent.press(screen.getByLabelText('Día anterior'));
+    await screen.findByText('Ayer');
+    fireEvent.press(screen.getByText('Volver a hoy'));
+
+    expect(await screen.findByText('Hoy')).toBeTruthy();
+    expect(screen.queryByText('Volver a hoy')).toBeNull();
+  });
+
+  it('shows swimming at 17:00 next Wednesday', async () => {
+    mockTableRows = { habits: [swimHabitRow] };
+    renderScreen();
+    await screen.findByText('Nadar');
+
+    for (let step = 0; step < 7; step += 1) {
+      fireEvent.press(screen.getByLabelText('Día siguiente'));
+    }
+
+    expect(
+      await screen.findByText('Miércoles, 14 de octubre de 2026'),
+    ).toBeTruthy();
+    expect(await screen.findByText('Nadar')).toBeTruthy();
+    expect(screen.getByText('17:00 · Personal · Hábito')).toBeTruthy();
   });
 });

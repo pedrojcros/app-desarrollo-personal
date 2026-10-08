@@ -17,6 +17,8 @@ export type ListRowSecondaryAction = {
   onPress: () => void;
 };
 
+const NOT_YET_MARKABLE_LABEL = 'Todavía no se puede marcar';
+
 type ListRowProps = {
   title: string;
   // Texto de debajo del título: «10:00 · Personal · Tarea».
@@ -28,6 +30,8 @@ type ListRowProps = {
   onMarkNotDone: () => void;
   secondaryAction?: ListRowSecondaryAction;
   disabled?: boolean;
+  // Desactiva solo ✓ y ✗ (un día que aún no ha llegado) y lo explica a los lectores de pantalla.
+  markDisabled?: boolean;
   // Fuerza el estado pulsado de las marcas (catálogo y tests).
   donePressed?: boolean;
   notDonePressed?: boolean;
@@ -51,6 +55,7 @@ function MarkButton({
 }: MarkProps) {
   const press = usePressed(pressed);
   const pressedClassName = press.isPressed ? 'scale-90' : '';
+  const disabledClassName = disabled ? 'opacity-50' : '';
 
   return (
     <Pressable
@@ -60,7 +65,7 @@ function MarkButton({
       onPress={onPress}
       onPressIn={press.handlePressIn}
       onPressOut={press.handlePressOut}
-      className={`h-11 w-11 items-center justify-center ${pressedClassName}`}
+      className={`h-11 w-11 items-center justify-center ${pressedClassName} ${disabledClassName}`}
     >
       {children}
     </Pressable>
@@ -136,6 +141,7 @@ export function ListRow({
   onMarkNotDone,
   secondaryAction,
   disabled,
+  markDisabled,
   donePressed,
   notDonePressed,
 }: ListRowProps) {
@@ -143,6 +149,13 @@ export function ListRow({
   const TitleContainer = onPress === undefined ? View : Pressable;
   const titleRole = onPress === undefined ? undefined : 'button';
   const titleLabel = onPress === undefined ? undefined : `Abrir ${title}`;
+  const areMarksDisabled = disabled || markDisabled;
+  const doneLabel = markDisabled
+    ? NOT_YET_MARKABLE_LABEL
+    : `Marcar ${title} como hecho`;
+  const notDoneLabel = markDisabled
+    ? NOT_YET_MARKABLE_LABEL
+    : `Marcar ${title} como no hecho`;
 
   return (
     <View
@@ -174,17 +187,17 @@ export function ListRow({
         </MarkButton>
       ) : null}
       <MarkButton
-        label={`Marcar ${title} como hecho`}
+        label={doneLabel}
         onPress={onMarkDone}
-        disabled={disabled}
+        disabled={areMarksDisabled}
         pressed={donePressed}
       >
         <DoneDisc category={category} />
       </MarkButton>
       <MarkButton
-        label={`Marcar ${title} como no hecho`}
+        label={notDoneLabel}
         onPress={onMarkNotDone}
-        disabled={disabled}
+        disabled={areMarksDisabled}
         pressed={notDonePressed}
       >
         <NotDoneDisc />

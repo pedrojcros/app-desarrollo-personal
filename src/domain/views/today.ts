@@ -1,4 +1,4 @@
-import { getIsoWeekday, parseCalendarDate } from '../calendar-date';
+import { addDays, getIsoWeekday, parseCalendarDate } from '../calendar-date';
 import type { Habit, HabitMark, Task } from '../entities';
 import { compareViewItemsForDay, type ViewItem } from '../items';
 import {
@@ -91,4 +91,31 @@ export function formatLongDate(date: CalendarDate): string {
   const weekdayName = WEEKDAY_NAMES[getIsoWeekday(validDate)];
   const monthName = MONTH_NAMES[month - 1];
   return `${weekdayName}, ${day} de ${monthName} de ${year}`;
+}
+
+/** «Hoy», «Ayer», «Mañana» o el día de la semana. */
+export function getDayTitle(date: CalendarDate, today: CalendarDate): string {
+  if (date === today) {
+    return 'Hoy';
+  }
+  if (date === addDays(today, -1)) {
+    return 'Ayer';
+  }
+  if (date === addDays(today, 1)) {
+    return 'Mañana';
+  }
+  return WEEKDAY_NAMES[getIsoWeekday(date)];
+}
+
+/** RN-05: lo que todavía no ha llegado solo se consulta. */
+export function canMarkDay(date: CalendarDate, today: CalendarDate): boolean {
+  // Las fechas YYYY-MM-DD se ordenan igual como texto que como calendario.
+  return date <= today;
+}
+
+export function getMarkedSectionTitle(
+  date: CalendarDate,
+  today: CalendarDate,
+): string {
+  return date === today ? 'Marcadas hoy' : 'Marcadas ese día';
 }
