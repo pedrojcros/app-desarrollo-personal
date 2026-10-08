@@ -42,28 +42,28 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-08, 08:15.*
+*Actualizado: 2026-10-08, 14:45.*
 
-- **La versión 1 está hecha salvo los flujos de Maestro (T13b).** Candidato: el commit **`6e9182c`** de `develop` (todas las funcionalidades imprescindibles, accesibilidad y rendimiento medidos). T13b solo añade pruebas (`e2e/`, `scripts/e2e/`), no código de la app.
-- **Versión 1.x empezada** (deseables del plan): en `develop` ya están RF-13 y RF-14 (reprogramar y día entero como no hecho, ADP-18) y RF-22 (renombrar categoría, ADP-21).
-- **A medias, con su trabajo subido en su rama (WIP):** T13b, flujos de Maestro (encargo 028, Codex Luna, rama `pedrojcros/ADP-17-caminos-criticos`), y RF-09 y RF-10, «Marcadas hoy» y otros días (033, Claude Sonnet, rama `pedrojcros/ADP-19-marcadas-hoy-y-otros-dias`).
-- **Sin empezar:** RF-16 y RF-17, historial (034, ADP-20, Codex Luna). Los **recordatorios (1.1)** esperan las 8 decisiones del humano ([propuesta](propuestas/recordatorios.md)).
-- **La noche se perdió de 0:30 a 8:00:** el portátil se suspendió. A partir de ahora, modo cafeína cuando el orquestador se quede solo.
+- **Versión 1:** todo en `develop` salvo los flujos de Maestro (T13b, PR #50, a medias). Las pruebas de Maestro encontraron un **fallo real en Android al iniciar sesión** (el efecto de pulsar los botones con clases `scale` de NativeWind), ya arreglado (PR #53).
+- **Versión 1.x en `develop`:** RF-09 y RF-10 («Marcadas hoy» y otros días), RF-13 y RF-14 (reprogramar y día entero como no hecho), RF-16 y RF-17 (filtrar y corregir el historial) y RF-22 (renombrar categoría).
+- **Versión 1.1, recordatorios (DEC-43):** R1 a R4 en `develop` (avisos locales de tareas y hábitos, sección en Ajustes, puesta al día en el móvil, abrir desde el aviso). Falta R5 (pantalla de prueba y flujo de Maestro, PR o rama `pedrojcros/ADP-26-recordatorios-prueba`) y R6, la comprobación del humano en el móvil con el APK.
+- **Reparto (DEC-41) y cafeína con `/ejecutar-plan` (DEC-42)** en vigor.
 
 
 ## Lo siguiente
 
-Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto):
+Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto; activa la cafeína al empezar):
 
-1. Retomar 028 y 033 con una **orden corta** en sus ramas (DEC-39, punto 8): leer su último commit «WIP:», que dice lo que falta. Revisar y fusionar.
-2. Lanzar 034 (historial) con Codex Luna.
-3. Con la respuesta del humano a los recordatorios, lanzar sus encargos (apartado 5 de la propuesta).
-4. Deuda menor: estilo de los ficheros de `src/components/quick-add/` (sin separación entre bloques; `useQuickAddDraft` devuelve 20 valores) y el test intermitente `src/components/category-view/category-view-screen.test.tsx`, que falla a veces con la batería completa bajo carga.
+1. Arrancar el Supabase local si hace falta y aplicar migraciones (`supabase migration up --include-all`).
+2. Retomar con **orden corta** T13b (PR #50, rama `pedrojcros/ADP-17-caminos-criticos`) y R5 (rama `pedrojcros/ADP-26-recordatorios-prueba`): su último commit «WIP:» dice lo que falta. Los dos necesitan el emulador: **de uno en uno** (primero T13b).
+3. Con T13b fusionada, proponer al humano publicar la versión 1 (y, si quiere, la 1.1 entera, con R6 hecho en su móvil).
+4. Deuda menor: el estilo de `src/components/quick-add/` (sin separación entre bloques; `useQuickAddDraft` devuelve 20 valores) y `reminderSettingsQueryKey` duplicada en `src/data/reminders.ts` (importarla de `reminder-settings.ts`).
 
 
 ## Pendiente del humano
 
-- **Publicar la versión 1:** cuando T13b esté fusionada, pasar `develop` a `main`; o, si no quieres esperar, el commit `6e9182c` (las funcionalidades de la 1.x fusionadas después no tienen por qué ir). Antes: crear tu usuario de producción (DEC-37). La comprobación, en el [buzón](buzon.md).
+- **Publicar la versión 1:** cuando T13b esté fusionada, pasar `develop` a `main` (lleva ya la 1.x y los recordatorios R1 a R4), o el commit `6e9182c` si solo quieres la versión 1. Antes: crear tu usuario de producción (DEC-37). La comprobación, en el [buzón](buzon.md).
+- **Recordatorios (R6):** al instalar el APK de la 1.1, la lista de comprobación del informe de R5 (permiso, aviso en punto, tras reiniciar, ahorro de batería, tocar el aviso).
 - Revisar el [buzón](buzon.md): lo que decidió el orquestador por su cuenta.
 - Revisar T01 en el móvil con Expo Go (H05) y los avisos de `npm audit` (antes de publicar y el 2026-10-14).
 - Cuando T15 esté en uso, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
@@ -107,6 +107,8 @@ Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto):
 - **`worker-start --base-branch develop` usa el `develop` local**, que no avanza al fusionar en GitHub: el trabajador arranca sin lo último (pasó con 028 y 029). Antes de lanzar, `git fetch origin && git branch -f develop origin/develop` (o `--base-branch origin/develop`).
 - **El portátil se suspende si nadie lo toca**, y con él los trabajadores y el supervisor (pasó la noche del 7 al 8). Con `/ejecutar-plan` se activa siempre al empezar (DEC-42): `systemd-inhibit --what=sleep:idle:handle-lid-switch --who=orquestador --why="trabajo" sleep infinity` en segundo plano.
 - **Codex escribe la hora de la cuota con fecha** («try again at Oct 8th, 2026 2:09 AM») **y con apóstrofo tipográfico** («You’ve»): el supervisor ya lo entiende (PR #39 y #41).
+- **Un `jest` que no termina** (operaciones asíncronas abiertas) **retiene el candado `adp-pesado.lock`** y para a todos: los tests unitarios enfocados van sin candado, y si alguien lo retiene mucho, mirar con `ps` y parar su contenedor.
+- **La app del emulador apunta a `127.0.0.1`**, que dentro de Android no es el ordenador: para Maestro, Expo con `EXPO_PUBLIC_SUPABASE_URL=http://10.0.2.2:54321`.
 - **`docker run` con una imagen propia que no existe la busca en Docker Hub**, donde podría haber otra con el mismo nombre: siempre `--pull never`.
 
 ## Lo que no viaja con el repositorio
