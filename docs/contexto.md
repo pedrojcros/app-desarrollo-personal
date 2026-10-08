@@ -42,25 +42,30 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-07, 23:40.*
+*Actualizado: 2026-10-08, 08:15.*
 
-- **Fase: ejecución, ola 5 (T13), la última de la versión 1.** En `develop` están todas las tareas de producto: T01 a T12, T14, T15 y T16 (añadir rápido), la corrección de las reglas de hábito (024), la primera parte de T13 (datos sintéticos de un año; RNF-01 medido: Hoy 5 ms, Pendientes 130 ms) y el supervisor autónomo. `develop` pasa entera: 483 tests unitarios y 202 de integración.
-- **En marcha:** T13b, flujos de Maestro de los caminos críticos con RNF-06 y RNF-08 (encargo 028, Codex Luna), y T13c, accesibilidad y web con RNF-03 (029, Codex Sol), en paralelo y sin ficheros en común.
-- **Reparto (pendiente de confirmar como DEC-41):** el humano pide partir más las tareas, con lo mecánico para Luna y lo denso para Sol; propuesta en la conversación del 2026-10-07 por la noche.
-- **Lo pesado, de uno en uno:** `flock /tmp/adp-pesado.lock` para integración, zonas, exportación, Expo, el emulador y el navegador.
+- **La versión 1 está hecha salvo los flujos de Maestro (T13b).** Candidato: el commit **`6e9182c`** de `develop` (todas las funcionalidades imprescindibles, accesibilidad y rendimiento medidos). T13b solo añade pruebas (`e2e/`, `scripts/e2e/`), no código de la app.
+- **Versión 1.x empezada** (deseables del plan): en `develop` ya están RF-13 y RF-14 (reprogramar y día entero como no hecho, ADP-18) y RF-22 (renombrar categoría, ADP-21).
+- **A medias, con su trabajo subido en su rama (WIP):** T13b, flujos de Maestro (encargo 028, Codex Luna, rama `pedrojcros/ADP-17-caminos-criticos`), y RF-09 y RF-10, «Marcadas hoy» y otros días (033, Claude Sonnet, rama `pedrojcros/ADP-19-marcadas-hoy-y-otros-dias`).
+- **Sin empezar:** RF-16 y RF-17, historial (034, ADP-20, Codex Luna). Los **recordatorios (1.1)** esperan las 8 decisiones del humano ([propuesta](propuestas/recordatorios.md)).
+- **La noche se perdió de 0:30 a 8:00:** el portátil se suspendió. A partir de ahora, modo cafeína cuando el orquestador se quede solo.
 
 
 ## Lo siguiente
 
-Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto), en este orden:
+Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto):
 
-1. Con el supervisor en marcha, atender a los trabajadores de 028 y 029 (`orca orchestration check --run run_fe8fef684013`), revisar sus PR y fusionarlos (DEC-36). Lo grande que 029 deje como propuesta se convierte en encargos nuevos.
-2. Con T13 fusionada, la versión 1 está completa: proponer al humano publicar `develop` en `main` con la comprobación del orquestador (el humano crea su usuario de producción, DEC-37).
-3. Deuda anotada: en T16, ficheros sin separación entre bloques y un hook (`useQuickAddDraft`) que devuelve 20 valores; el error de guardar un hábito desde el añadir rápido no distingue el código.
+1. Retomar 028 y 033 con una **orden corta** en sus ramas (DEC-39, punto 8): leer su último commit «WIP:», que dice lo que falta. Revisar y fusionar.
+2. Lanzar 034 (historial) con Codex Luna.
+3. Con la respuesta del humano a los recordatorios, lanzar sus encargos (apartado 5 de la propuesta).
+4. Deuda menor: estilo de los ficheros de `src/components/quick-add/` (sin separación entre bloques; `useQuickAddDraft` devuelve 20 valores) y el test intermitente `src/components/category-view/category-view-screen.test.tsx`, que falla a veces con la batería completa bajo carga.
 
 
 ## Pendiente del humano
 
+- **Publicar la versión 1:** cuando T13b esté fusionada, pasar `develop` a `main`; o, si no quieres esperar, el commit `6e9182c` (las funcionalidades de la 1.x fusionadas después no tienen por qué ir). Antes: crear tu usuario de producción (DEC-37). La comprobación, en el [buzón](buzon.md).
+- **Recordatorios (1.1):** contestar las 8 decisiones de la [propuesta](propuestas/recordatorios.md); «ok» acepta todas.
+- **Confirmar DEC-41:** el criterio de reparto Luna/Sol (lo mecánico y grande con Luna; lo denso, SQL, seguridad y correcciones con Sol; no partir lo pequeño).
 - Revisar el [buzón](buzon.md): lo que decidió el orquestador por su cuenta.
 - Revisar T01 en el móvil con Expo Go (H05) y los avisos de `npm audit` (antes de publicar y el 2026-10-14).
 - Cuando T15 esté en uso, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
@@ -102,6 +107,8 @@ Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto), 
 - **Orca borra el worktree de un trabajador al liquidarlo o fusionar su PR** (pasó con T05 y T09): no cuentes con reutilizar su carpeta ni su terminal para una corrección; lánzala en un worktree nuevo desde `develop`.
 - **Una pregunta de un trabajador (`ask`) solo llega si el orquestador está esperando con `check --wait`**: si se queda revisando un rato largo, el trabajador espera parado (T16 esperó 30 minutos). Entre revisión y revisión, vuelve a `check`.
 - **`worker-start --base-branch develop` usa el `develop` local**, que no avanza al fusionar en GitHub: el trabajador arranca sin lo último (pasó con 028 y 029). Antes de lanzar, `git fetch origin && git branch -f develop origin/develop` (o `--base-branch origin/develop`).
+- **El portátil se suspende si nadie lo toca**, y con él los trabajadores y el supervisor (pasó la noche del 7 al 8). Si el orquestador se queda solo: `systemd-inhibit --what=sleep:idle:handle-lid-switch --who=orquestador --why="trabajo" sleep infinity` en segundo plano.
+- **Codex escribe la hora de la cuota con fecha** («try again at Oct 8th, 2026 2:09 AM») **y con apóstrofo tipográfico** («You’ve»): el supervisor ya lo entiende (PR #39 y #41).
 - **`docker run` con una imagen propia que no existe la busca en Docker Hub**, donde podría haber otra con el mismo nombre: siempre `--pull never`.
 
 ## Lo que no viaja con el repositorio

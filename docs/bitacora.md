@@ -4,6 +4,10 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-08 — Madrugada: T13a y T13c, primeras funcionalidades 1.x y una noche perdida
+
+Se fusionaron la accesibilidad y la web de T13 (Lighthouse 100 en todas las pantallas auditadas), RF-13 y RF-14 (reprogramar y día entero como no hecho) y RF-22 (renombrar categoría), además de dos arreglos del supervisor para entender cómo escribe Codex la hora de la cuota. El humano pidió seguir solo de noche aprovechando las cuotas, con las tareas partidas entre Luna y Sol. Opus escribió la [propuesta de recordatorios](propuestas/recordatorios.md), con 8 decisiones para el humano. A las 0:30 el portátil se suspendió y no se avanzó hasta las 8:00; el humano pidió activar el modo cafeína cada vez que el orquestador se quede solo. El candidato de la versión 1 es `6e9182c`; T13b (Maestro) y RF-09 y RF-10 quedan a medias en sus ramas.
+
 ### 2026-10-07 — Noche (2): T16 y la corrección de T05 en `develop`; empieza T13
 
 Se fusionaron la corrección de las reglas de hábito (una sola función SQL que no reescribe el pasado ni crea versiones repetidas), los datos sintéticos de un año con la medida de RNF-01 (muy por debajo de los límites), un arreglo de `.pyc` subidos por error (Copilot) y T16, el añadir rápido. El humano avisó de que se gastaba demasiado `gpt-6.1-sol` y, después, de que pasar todo a Luna tampoco era la idea: pidió partir más las tareas, con lo mecánico para Luna y lo denso para Sol. T13b y T13c ya salen así.
