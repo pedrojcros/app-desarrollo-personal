@@ -7,6 +7,10 @@ import type { ViewItem } from '@/domain/items';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
 jest.mock('@/data/history', () => ({ useHistory: jest.fn() }));
+const mockMarkItem = jest.fn();
+jest.mock('@/data/marks', () => ({
+  useMarkItem: () => ({ markItem: mockMarkItem, isMarking: false }),
+}));
 jest.mock('@/data/categories', () => ({
   useCategories: jest.fn(() => ({ data: [], error: null, refetch: jest.fn() })),
 }));
@@ -22,6 +26,16 @@ const item: ViewItem = {
   target: { kind: 'task', taskId: 'milk' },
   name: 'Leche',
   status: 'done',
+  date: null,
+  sortTime: null,
+  categoryId: null,
+  sectionId: null,
+  markedAt: '2026-10-05T22:00:00Z',
+};
+const notDoneItem: ViewItem = {
+  target: { kind: 'task', taskId: 'water' },
+  name: 'Agua',
+  status: 'not_done',
   date: null,
   sortTime: null,
   categoryId: null,
@@ -53,7 +67,7 @@ it('shows the default seven days and a mark on the Madrid day', () => {
   showScreen();
   expect(useHistory).toHaveBeenCalledWith('2026-10-01', '2026-10-07');
   expect(
-    screen.getByRole('image', { name: 'Leche, martes 6 de octubre: hecha' }),
+    screen.getByRole('button', { name: 'Leche, martes 6 de octubre: hecha' }),
   ).toBeTruthy();
   expect(
     screen.getByLabelText('martes 6 de octubre: 100% hechas'),
@@ -159,7 +173,53 @@ it('keeps complete cached history visible alongside a refresh failure', () => {
   setQuery({ items: [item] }, new Error('Refresh failure'));
   showScreen();
   expect(
-    screen.getByRole('image', { name: 'Leche, martes 6 de octubre: hecha' }),
+    screen.getByRole('button', { name: 'Leche, martes 6 de octubre: hecha' }),
   ).toBeTruthy();
   expect(screen.getByRole('button', { name: 'Reintentar' })).toBeTruthy();
+});
+
+it('opens the status menu for a past cell and saves the selected correction', () => {
+  setQuery({ items: [item] });
+  showScreen();
+
+  fireEvent.press(
+    screen.getByRole('button', {
+      name: 'Leche, martes 6 de octubre: hecha',
+    }),
+  );
+  const doneOption = screen.getByRole('radio', { name: 'Hecha' });
+  expect(doneOption.props.accessibilityState.checked).toBe(true);
+
+  fireEvent.press(screen.getByRole('radio', { name: 'No hecha' }));
+
+  expect(mockMarkItem).toHaveBeenCalledWith(item, 'not_done');
+  expect(screen.queryByText('Cambiar estado')).toBeNull();
+});
+
+it('does not make a cell clickable when the element did not occur that day', () => {
+  setQuery({ items: [item] });
+  showScreen();
+
+  expect(
+    screen.queryByRole('button', {
+      name: 'Leche, miércoles 7 de octubre: no tocaba',
+    }),
+  ).toBeNull();
+});
+
+it('filters the history to not-done items and recalculates the visible percentage', () => {
+  setQuery({ items: [item, notDoneItem] });
+  showScreen();
+
+  fireEvent.press(screen.getByRole('radio', { name: 'No hechas' }));
+
+  expect(
+    screen.getByRole('button', {
+      name: 'Agua, martes 6 de octubre: no hecha',
+    }),
+  ).toBeTruthy();
+  expect(
+    screen.queryByRole('button', { name: 'Leche, martes 6 de octubre: hecha' }),
+  ).toBeNull();
+  expect(screen.getByLabelText('martes 6 de octubre: 0% hechas')).toBeTruthy();
 });

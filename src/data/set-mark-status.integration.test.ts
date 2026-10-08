@@ -115,6 +115,25 @@ afterAll(async () => {
 });
 
 describe('setMarkStatus with occurrences', () => {
+  it('corrects a two-week-old not-done occurrence and saves the correction instant', async () => {
+    const date = '2026-09-23';
+    const target = { kind: 'occurrence', habitId, date } as const;
+    await setMarkStatus(target, 'not_done', today);
+    const previousMark = await readMark(date);
+    const beforeCorrection = Date.now();
+
+    const result = await setMarkStatus(target, 'done', today);
+
+    expect(result.ok).toBe(true);
+    const correctedMark = await readMark(date);
+    expect(correctedMark).toHaveLength(1);
+    expect(correctedMark[0].status).toBe('done');
+    expect(correctedMark[0].marked_at).not.toBe(previousMark[0].marked_at);
+    const correctedInstant = new Date(correctedMark[0].marked_at).getTime();
+    expect(correctedInstant).toBeGreaterThanOrEqual(beforeCorrection - 1000);
+    expect(correctedInstant).toBeLessThanOrEqual(Date.now() + 1000);
+  });
+
   it('creates a mark with the current UTC instant', async () => {
     const before = Date.now();
     const target = { kind: 'occurrence', habitId, date: today } as const;

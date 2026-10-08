@@ -1,6 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
 import {
   buildHistoryGrid,
+  filterHistoryGrid,
   getHistoryItems,
   validateHistoryRange,
 } from './history';
@@ -70,6 +71,60 @@ describe('history range', () => {
   });
 });
 describe('history grid', () => {
+  it('filters rows by state while dimming other cells and recalculating percentages', () => {
+    const source = grid(
+      [habit],
+      [{ ...task, id: 'water', name: 'Agua', dueDate: '2026-10-05' }],
+      [
+        {
+          habitId: 'swim',
+          date: '2026-10-05',
+          status: 'done',
+          markedAt: '2026-10-05T09:00:00Z',
+        },
+        {
+          habitId: 'swim',
+          date: '2026-10-04',
+          status: 'not_done',
+          markedAt: '2026-10-04T09:00:00Z',
+        },
+      ],
+    );
+
+    const filtered = filterHistoryGrid(source, {
+      status: 'not_done',
+      categoryId: 'all',
+      itemKey: null,
+    });
+
+    expect(filtered.days).toEqual(source.days);
+    expect(filtered.rows.map((row) => row.name)).toEqual(['Nadar']);
+    expect(filtered.rows[0].cells).toEqual([
+      'pending',
+      'unmarked',
+      'done',
+      'not_done',
+    ]);
+    expect(filtered.dimmedCells[0]).toEqual([true, true, true, false]);
+    expect(filtered.dayPercentages).toEqual([0, 0, 100, 0]);
+  });
+
+  it('combines category and item filters and returns an empty grid when none match', () => {
+    const source = grid([
+      { ...habit, categoryId: 'health' },
+      { ...habit, id: 'read', name: 'Leer', categoryId: 'home' },
+    ]);
+
+    const filtered = filterHistoryGrid(source, {
+      status: 'all',
+      categoryId: 'health',
+      itemKey: 'habit:read',
+    });
+
+    expect(filtered.rows).toEqual([]);
+    expect(filtered.dayPercentages).toEqual([null, null, null, null]);
+  });
+
   it('distinguishes today pending, past unmarked, done and not done', () => {
     const marks: HabitMark[] = [
       {
@@ -87,6 +142,7 @@ describe('history grid', () => {
     ];
     expect(grid([habit], [], marks)).toEqual({
       days: ['2026-10-07', '2026-10-06', '2026-10-05', '2026-10-04'],
+      dimmedCells: [[false, false, false, false]],
       rows: [
         {
           key: 'habit:swim',
