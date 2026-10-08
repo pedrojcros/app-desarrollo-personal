@@ -4,4 +4,5 @@ appId: host.exp.exponent
 - tapOn: Nombre
 - inputText: E2E tarea rápida
 - pressKey: ENTER
+- pressKey: BACK
 - assertVisible: E2E tarea rápida
