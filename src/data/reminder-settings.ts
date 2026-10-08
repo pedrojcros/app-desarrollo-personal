@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 
 import {
@@ -52,4 +53,31 @@ export async function saveReminderSettings(
   }
 
   return succeed(undefined);
+}
+
+export const reminderSettingsQueryKey = ['reminder-settings'] as const;
+
+export function useReminderSettings(): {
+  settings: ReminderSettings;
+  saveSettings: (next: ReminderSettings) => Promise<void>;
+} {
+  const queryClient = useQueryClient();
+  const settingsQuery = useQuery({
+    queryKey: reminderSettingsQueryKey,
+    queryFn: loadReminderSettings,
+    staleTime: Infinity,
+  });
+  const settings = settingsQuery.data ?? DEFAULT_REMINDER_SETTINGS;
+
+  async function saveSettings(next: ReminderSettings): Promise<void> {
+    // Se actualiza la caché antes de escribir para que dos toques seguidos
+    // partan de lo último; si no se guarda, se vuelve a lo anterior.
+    queryClient.setQueryData(reminderSettingsQueryKey, next);
+    const saveResult = await saveReminderSettings(next);
+    if (!saveResult.ok) {
+      queryClient.setQueryData(reminderSettingsQueryKey, settings);
+    }
+  }
+
+  return { settings, saveSettings };
 }
