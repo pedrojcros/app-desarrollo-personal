@@ -2,6 +2,7 @@ import { AuthRetryableFetchError, isAuthError } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 import { fail, succeed, type DataResult } from '../result';
+import { cancelReminderSync } from '../reminders';
 import { supabase } from '../supabase/client';
 
 const credentialsSchema = z.object({
@@ -55,6 +56,7 @@ export async function signOut(): Promise<DataResult<null>> {
     if (response.error) {
       return describeFailure(response.error);
     }
+    await cancelReminderSync();
     return succeed(null);
   } catch (error) {
     return describeFailure(error);
