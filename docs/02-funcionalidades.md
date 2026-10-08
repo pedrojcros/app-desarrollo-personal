@@ -32,8 +32,8 @@ Registro de funcionalidades (`RF`) y requisitos no funcionales (`RNF`). Es el co
 | RF-13 | Reprogramar una tarea vencida | DESEABLE | CU-04 | | |
 | RF-14 | Marcar un día entero como no hecho | DESEABLE | CU-04 | | |
 | RF-15 | Consultar el historial | IMPRESCINDIBLE | CU-05 | | |
-| RF-16 | Filtrar el historial | DESEABLE | CU-05 | | |
-| RF-17 | Corregir desde el historial | DESEABLE | CU-05 | | |
+| RF-16 | Filtrar el historial | DESEABLE | CU-05 | Hecho en ADP-20 (encargo 034) | |
+| RF-17 | Corregir desde el historial | DESEABLE | CU-05 | Hecho en ADP-20 (encargo 034) | |
 | RF-18 | Modificar un hábito o una tarea | IMPRESCINDIBLE | CU-06 | | |
 | RF-19 | Archivar (eliminar) un hábito o una tarea | IMPRESCINDIBLE | CU-06 | | |
 | RF-20 | Crear categorías con secciones y asignarlas | IMPRESCINDIBLE | CU-07, CU-01, CU-02 | | |
