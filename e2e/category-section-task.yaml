@@ -12,7 +12,7 @@ appId: host.exp.exponent
 - tapOn: Crear sección
 - tapOn: Abrir E2E categoría
 - tapOn: Añadir tarea o hábito
-- tapOn: Categoría: E2E categoría
+- tapOn: 'Categoría: E2E categoría'
 - tapOn: E2E categoría › E2E sección
 - tapOn: Nombre
 - inputText: E2E tarea de sección

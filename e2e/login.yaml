@@ -8,7 +8,9 @@ appId: host.exp.exponent
 - inputText: ${EMAIL}
 - tapOn: Contraseña
 - inputText: ${PASSWORD}
-- tapOn: Entrar
+- tapOn:
+    text: Entrar
+    index: 1
 - extendedWaitUntil:
     visible: Hoy
     timeout: 30000
