@@ -14,6 +14,14 @@ Si no lo está, **no ejecutes nada**: enseña qué falta, recomienda volver a `/
 
 ## 2. Prepárate
 
+**Lo primero, sin preguntar: activa el modo cafeína** (DEC-42), para que el portátil no se suspenda mientras trabajas. En segundo plano (Bash con `run_in_background`):
+
+```sh
+systemd-inhibit --what=sleep:idle:handle-lid-switch --who=orquestador --why="ejecutar-plan" sleep infinity
+```
+
+Compruébalo con `systemd-inhibit --list` y dile al humano que está puesto. Se quita al terminar (parando esa tarea en segundo plano) o al apagar.
+
 Lee, por este orden:
 
 1. `docs/agentes/orquestador.md`
