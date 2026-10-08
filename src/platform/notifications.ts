@@ -11,6 +11,17 @@ export function isReminderPlatformSupported(): boolean {
   return Platform.OS !== 'web';
 }
 
+export function configureReminderPresentation(): void {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
+}
+
 export async function prepareReminderChannels(): Promise<void> {
   if (Platform.OS !== 'android') {
     return;
@@ -78,7 +89,7 @@ export async function scheduleReminder(
     if (error instanceof Error) {
       message = error.message;
     }
-    return fail('SCHEDULE_FAILED', message);
+    return fail('schedule_failed', message);
   }
 
   return succeed(undefined);

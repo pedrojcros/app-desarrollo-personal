@@ -8,6 +8,10 @@ export function isReminderPlatformSupported(): boolean {
   return false;
 }
 
+export function configureReminderPresentation(): void {
+  return;
+}
+
 export async function prepareReminderChannels(): Promise<void> {
   return;
 }

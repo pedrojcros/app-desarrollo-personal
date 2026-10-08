@@ -49,7 +49,15 @@ type VisibleNotice = NoticeOptions & {
   id: number;
 };
 
-export function UndoToastProvider({ children }: { children: ReactNode }) {
+interface UndoToastProviderProps {
+  children: ReactNode;
+  noticeDurationMilliseconds?: number;
+}
+
+export function UndoToastProvider({
+  children,
+  noticeDurationMilliseconds = NOTICE_DURATION_MILLISECONDS,
+}: UndoToastProviderProps) {
   const [notice, setNotice] = useState<VisibleNotice | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const nextIdRef = useRef(0);
@@ -73,13 +81,13 @@ export function UndoToastProvider({ children }: { children: ReactNode }) {
       clearTimer();
       nextIdRef.current += 1;
       setNotice({ ...options, id: nextIdRef.current });
-      timerRef.current = setTimeout(hideNotice, NOTICE_DURATION_MILLISECONDS);
+      timerRef.current = setTimeout(hideNotice, noticeDurationMilliseconds);
       // iOS no lee las regiones en vivo: se anuncia el texto sin mover el foco.
       if (Platform.OS === 'ios') {
         AccessibilityInfo.announceForAccessibility(options.message);
       }
     },
-    [clearTimer, hideNotice],
+    [clearTimer, hideNotice, noticeDurationMilliseconds],
   );
 
   useEffect(() => clearTimer, [clearTimer]);

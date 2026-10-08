@@ -1,5 +1,4 @@
 import { useQueryClient, type QueryClient } from '@tanstack/react-query';
-import * as Notifications from 'expo-notifications';
 import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 import { getCalendarDateInTimeZone } from '../domain/calendar-date';
@@ -12,6 +11,7 @@ import {
 import {
   cancelAllReminders,
   cancelReminders,
+  configureReminderPresentation,
   getReminderPermission,
   getScheduledReminderKeys,
   isReminderPlatformSupported,
@@ -88,7 +88,7 @@ async function readReminderPlan(
   const date = getCalendarDateInTimeZone(instant, timeZone);
   if (date !== readingDate) {
     return fail(
-      'DAY_CHANGED',
+      'day_changed',
       'The local day changed while reading reminders.',
     );
   }
@@ -151,7 +151,7 @@ async function performSync(
     return succeed(undefined);
   } catch {
     return fail(
-      'REMINDER_SYNC_FAILED',
+      'reminder_sync_failed',
       'Could not synchronize device reminders.',
     );
   }
@@ -174,17 +174,6 @@ function isSuccessfulMutation(data: unknown): boolean {
     return data.ok === true;
   }
   return true;
-}
-
-function configureReminderPresentation(): void {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
-  });
 }
 
 function subscribeToReminderChanges(
