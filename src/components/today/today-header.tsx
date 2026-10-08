@@ -2,29 +2,43 @@ import { View } from 'react-native';
 
 import { DayProgress, type DayOutcome } from '@/components/ui/day-progress';
 import { Text } from '@/components/ui/text';
-import { formatLongDate } from '@/domain/views/today';
 import type { ViewItem } from '@/domain/items';
+import type { CalendarDate } from '@/domain/types';
+import { formatLongDate, getDayTitle } from '@/domain/views/today';
+
+import { DayNavigator } from './day-navigator';
 
 type TodayHeaderProps = {
-  today: string;
+  date: CalendarDate;
+  today: CalendarDate;
   total: number;
   marked: ViewItem[];
+  onSelectDate: (date: CalendarDate) => void;
 };
 
 function toOutcome(item: ViewItem): DayOutcome {
   return item.status === 'done' ? 'done' : 'not-done';
 }
 
-export function TodayHeader({ today, total, marked }: TodayHeaderProps) {
+export function TodayHeader({
+  date,
+  today,
+  total,
+  marked,
+  onSelectDate,
+}: TodayHeaderProps) {
   const outcomes = marked.map(toOutcome);
 
   return (
-    <View className="flex-row flex-wrap items-end justify-between gap-3 pb-3 pt-2">
-      <View>
-        <Text variant="caption">{formatLongDate(today)}</Text>
-        <Text variant="title">Hoy</Text>
+    <View>
+      <DayNavigator date={date} today={today} onSelectDate={onSelectDate} />
+      <View className="flex-row flex-wrap items-end justify-between gap-3 pb-3 pt-3">
+        <View>
+          <Text variant="caption">{formatLongDate(date)}</Text>
+          <Text variant="title">{getDayTitle(date, today)}</Text>
+        </View>
+        <DayProgress outcomes={outcomes} total={total} />
       </View>
-      <DayProgress outcomes={outcomes} total={total} />
     </View>
   );
 }

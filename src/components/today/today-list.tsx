@@ -14,6 +14,8 @@ type TodayListProps = {
   categories: Category[];
   emptyMessage: string;
   header: ReactElement;
+  footer?: ReactElement;
+  canMark: boolean;
   onMark: (item: ViewItem, status: ItemStatus) => void;
   onOpen: (path: string) => void;
 };
@@ -23,6 +25,8 @@ export function TodayList({
   categories,
   emptyMessage,
   header,
+  footer,
+  canMark,
   onMark,
   onOpen,
 }: TodayListProps) {
@@ -35,6 +39,7 @@ export function TodayList({
         title={item.name}
         meta={describeItemMeta(item, category?.name)}
         category={category?.color}
+        markDisabled={!canMark}
         onMarkDone={() => onMark(item, 'done')}
         onMarkNotDone={() => onMark(item, 'not_done')}
         onPress={() => onOpen(getItemDetailPath(item))}
@@ -49,6 +54,7 @@ export function TodayList({
       renderItem={renderItem}
       contentInsetAdjustmentBehavior="automatic"
       ListHeaderComponent={header}
+      ListFooterComponent={footer}
       ListEmptyComponent={
         <View className="py-6">
           <Text className="text-center">{emptyMessage}</Text>

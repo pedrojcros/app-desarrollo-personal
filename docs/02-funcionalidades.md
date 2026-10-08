@@ -114,6 +114,7 @@ El estado de construcción **no** se apunta aquí, salvo que un encargo pida exp
 - **Prioridad:** DESEABLE. *El aviso con «Deshacer» y el historial ya permiten corregir.*
 - **Criterio de aceptación:** CU-03, escenario 7.
 - **Notas:** RN-29.
+- **Estado:** hecho en ADP-19 (encargo 033). Hoy muestra el apartado «Marcadas hoy», plegado por defecto, con las filas editables.
 
 ### RF-10 — Ver otros días
 
@@ -121,6 +122,7 @@ El estado de construcción **no** se apunta aquí, salvo que un encargo pida exp
 - **Prioridad:** DESEABLE
 - **Criterio de aceptación:** CU-03, escenario 8. Además: cuando el usuario abre el próximo miércoles, ve la ocurrencia de «Nadar» a las 17:00.
 - **Notas:** RN-05.
+- **Estado:** hecho en ADP-19 (encargo 033). Hoy tiene navegación entre días; las fechas futuras solo se consultan.
 
 ### RF-11 — Vista de categoría y Bandeja de entrada
 
