@@ -2,6 +2,12 @@ import { beforeEach, expect, it, jest } from '@jest/globals';
 import * as Notifications from 'expo-notifications';
 import { addReminderTapListener } from './notifications';
 
+jest.mock('expo-constants', () => ({
+  __esModule: true,
+  default: { executionEnvironment: 'standalone' },
+  ExecutionEnvironment: { StoreClient: 'storeClient' },
+}));
+
 jest.mock('expo-notifications', () => ({
   addNotificationResponseReceivedListener: jest.fn(),
   getLastNotificationResponseAsync: jest.fn(),

@@ -31,7 +31,7 @@ export function RemindersSection() {
       <View>
         <SectionTitle title="Recordatorios" />
         <Text variant="eyebrow" className="mt-2">
-          Los recordatorios solo funcionan en la app del móvil
+          Los recordatorios solo funcionan en la app instalada
         </Text>
       </View>
     );
