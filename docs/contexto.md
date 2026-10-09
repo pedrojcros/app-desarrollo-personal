@@ -42,23 +42,20 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-09, 16:00.*
+*Actualizado: 2026-10-09, 17:20.*
 
-- **La versión 1 está completa en `develop`** (commit `92411a4`, CI en verde): las funcionalidades imprescindibles, la accesibilidad y el rendimiento medidos y los **8 caminos críticos de Maestro** pasando a tamaño normal y a 360 dp (PR #50). Falta solo que el humano la publique en `main`.
-- **`develop` lleva además** la 1.x (RF-09, RF-10, RF-13, RF-14, RF-16, RF-17 y RF-22) y los recordatorios R1 a R4 (1.1). Los recordatorios **no funcionan en Expo Go** (desde el SDK 53 rompía la carga de la app; PR #59 los desactiva allí): solo en la app instalada.
-- **Pendiente de la 1.1:** R5 (PR #57, pantalla de prueba de avisos) necesita ajustarse a lo anterior, y R6 es la comprobación del humano con el APK.
-- **Accesibilidad pendiente** (lo encontró Maestro): las opciones del selector de frecuencia del añadir rápido no tienen etiqueta accesible; el flujo `create-habit` las toca por coordenadas.
-- **CI:** el encargo 048 (DEC-44) prepara una rama para reducir minutos; espera que se abra su PR y pase Actions antes de cambiar el flujo de `develop`.
+- **La versión 1 está completa en `develop`** y lista para que el humano la publique (comprobación en el [buzón](buzon.md)). Los 8 caminos críticos de Maestro pasan a tamaño normal y a 360 dp.
+- **`develop` lleva además** la 1.x (RF-09, RF-10, RF-13, RF-14, RF-16, RF-17, RF-22) y **los recordatorios completos (1.1, R1 a R5)**, que solo funcionan en la app instalada (en Expo Go se desactivan). Queda R6: la comprobación del humano en su móvil con el APK (lista en el buzón).
+- **El repositorio es público** desde el 2026-10-09 (DEC-44) y la CI gasta unos 17 minutos menos por PR: se podrá volver a privado cuando el ritmo de cambios baje.
+- **En marcha o recién terminado:** el arreglo del teclado que tapa el añadir rápido en Android (encargo 046).
 
 
 ## Lo siguiente
 
 Para retomar en una sesión nueva (`/ejecutar-plan`; activa la cafeína al empezar):
 
-1. Etiquetas accesibles en las opciones de `src/components/quick-add/upward-choice.tsx` (y su flujo de Maestro, por texto en vez de coordenadas).
-2. R5 (PR #57): que la pantalla de desarrollo use el adaptador de `src/platform/notifications.ts` (sin importar `expo-notifications` directamente) y que el flujo de Maestro se quite o se marque como solo para una compilación de desarrollo, porque en Expo Go no hay recordatorios.
-3. Deuda menor: el estilo de `src/components/quick-add/` y `reminderSettingsQueryKey` duplicada en `src/data/reminders.ts`.
-4. Lo que queda del plan después de la 1.1 (RF-04 y la versión 2) es decisión del humano.
+1. Si el encargo 046 (teclado en Android) no está fusionado, revisar su PR y fusionarlo.
+2. Lo que queda del plan tras la 1.1 (RF-04 y la versión 2) es decisión del humano: preguntarle.
 
 
 ## Pendiente del humano
@@ -75,7 +72,7 @@ Para retomar en una sesión nueva (`/ejecutar-plan`; activa la cafeína al empez
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-44**.
+  chat. Siguiente número libre: **DEC-45**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 

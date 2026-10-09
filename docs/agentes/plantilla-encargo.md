@@ -45,6 +45,8 @@ Solo si hay API, esquema de datos o firma compartida con otro encargo. Para cada
 
 ## Fuera de alcance
 
+- `docs/contexto.md`, la bitácora y `docs/decisiones.md` los actualiza el orquestador al cerrar: no los toques ni lo preguntes.
+
 Lo que **no** debes tocar aunque parezca relacionado:
 
 -
