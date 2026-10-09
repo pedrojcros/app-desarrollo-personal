@@ -14,7 +14,8 @@ function parseApiUrl(apiUrl) {
 }
 
 function assertNotProduction(url) {
-  if (url.hostname === PRODUCTION_HOSTNAME) {
+  const hostname = url.hostname.replace(/\.$/, '');
+  if (hostname === PRODUCTION_HOSTNAME) {
     throw new Error(
       'Refusing to seed production: production is always forbidden',
     );
