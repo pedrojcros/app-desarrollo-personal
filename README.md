@@ -176,6 +176,16 @@ de errores; no se usa Maestro Cloud. El
 Las imágenes propias tienen `pull_policy: never`: si faltan, constrúyelas.
 El emulador requiere KVM y se comprueba localmente, sin añadirlo a la CI.
 
+## Datos sintéticos
+
+Con Supabase local arrancado, `./scripts/seed/seed-synthetic-year.sh` conserva
+el perfil `year` de rendimiento. `SEED_PROFILE=realistic ./scripts/seed/seed-synthetic-year.sh` genera 4 categorías, 10 hábitos,
+30 tareas y 90 días de historial de un estudiante. Solo reemplaza los datos del
+usuario de siembra. Para entrar en local, proporciona `SEED_USER_PASSWORD`
+mediante el entorno; una contraseña local generada no se imprime.
+Los perfiles, las variables y la protección del destino se detallan en
+[scripts/seed/README.md](scripts/seed/README.md).
+
 ## Comprobaciones
 
 ```sh
@@ -241,11 +251,29 @@ El proyecto Vercel es `app-desarrollo-personal`, en el equipo
 despliegue de preparación automáticamente; apunta a **pruebas** y está protegido.
 El primer push humano a `main` lo sustituirá por la web de producción.
 
+### Usuario de demostración en pruebas
+
+Abre [la web de pruebas](https://app-desarrollo-personal-pruebas.vercel.app).
+Vercel puede pedir primero su sesión, porque esta web está protegida. Después,
+entra en la app con `demo@example.com`; su contraseña está en
+`~/.config/app-desarrollo-personal/secretos.env` como `PRUEBAS_DEMO_PASSWORD`.
+
+Para volver a sembrar, cuando `seed-pruebas.yml` esté en la rama por defecto
+`main`, abre Actions → **Sembrar demostración en pruebas** → **Run workflow**.
+Es un flujo únicamente manual, del entorno `pruebas`, que usa el perfil
+`realistic` y comparte el candado del despliegue y las copias de pruebas.
+Mientras no esté en `main`, el orquestador puede usar el envoltorio local con
+las variables exportadas desde `secretos.env`, siguiendo
+[estas instrucciones](scripts/seed/README.md#pruebas-remotas).
+**Solo se borran los datos de `demo@example.com`** para reemplazarlos;
+los demás usuarios se conservan y producción siempre se rechaza.
+
 ### Configuración por entorno
 
 Los entornos de GitHub `pruebas` y `produccion` contienen los secretos
 `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `VERCEL_TOKEN`, `EXPO_TOKEN` y
-`BACKUP_PASSPHRASE`. `produccion` solo permite la rama `main`.
+`BACKUP_PASSPHRASE`. Además, `pruebas` tiene `PRUEBAS_DEMO_PASSWORD` para la
+siembra manual. `produccion` solo permite la rama `main`.
 Sus variables públicas son `SUPABASE_PROJECT_REF`, `EXPO_PUBLIC_SUPABASE_URL`,
 `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`.
 No se guardan sus valores en git. EAS tiene las dos variables `EXPO_PUBLIC_*`
