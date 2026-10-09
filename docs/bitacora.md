@@ -4,6 +4,26 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-09 — Noche: DEC-45 aplicada y `ADP-27` cerrado
+
+Primera sesión de orquestador con el flujo nuevo, en unas tres horas y media. Se fusionaron:
+
+- el registro de incidencias (PR #70, Codex Luna);
+- el reinicio del emulador y el candado con tiempo máximo (PR #71, Codex Sol);
+- la medida por encargo (PR #72, Codex Luna con una corrección de Codex Sol);
+- los detalles visuales (PR #73, Claude Sonnet, y PR #74, Codex Luna).
+
+Cada PR lo revisó un **revisor aparte** (un subagente de Sonnet) y el orquestador solo leyó el veredicto.
+
+Las revisiones encontraron cuatro cosas que importan:
+
+- la medida contaba dos veces los pasos de Claude;
+- los tests del supervisor escribían datos falsos en el registro real (se vació);
+- el emulador quedaba en un proyecto de Compose distinto según la carpeta (ahora el nombre es fijo);
+- quitar el título repetido dejaba Hoy sin encabezado accesible.
+
+Copilot rechazó dos veces el encargo al arrancar («Managed account policy is still loading») y se pasó a Codex ([trampas](agentes/trampas.md)). La medida da el primer dato del flujo nuevo: esta sesión relee unos 170.000 tokens por paso, frente a los 500.000 de la anterior. Los encargos son del 049 al 054.
+
 ### 2026-10-09 — Noche: mejora del flujo de trabajo (DEC-45)
 
 Antes de planificar la siguiente versión, el humano pidió a Claude, sin papel de orquestador, revisar el flujo con los problemas vividos y un bucle de retroalimentación, y valorar si dividir tareas compensa. Sumando los tokens que Codex y Claude guardan en el equipo salió lo que no se veía: **el orquestador gastó más que todos los trabajadores de Claude juntos** (cada paso relee 400.000 a 550.000 tokens porque sus sesiones duran días, y la sesión nueva por ola de DEC-39 no se cumplió), Maestro se llevó una cuarta parte de Codex y dos tareas se relanzaron cinco veces. El humano aprobó las 8 decisiones de la [propuesta](propuestas/mejora-del-flujo.md) (DEC-45). Los detalles visuales del buzón tienen ya tarjeta, `ADP-27`.

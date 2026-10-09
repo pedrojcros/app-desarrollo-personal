@@ -1,6 +1,6 @@
 # Propuesta: mejorar el flujo de trabajo antes de la siguiente versión
 
-> **Aprobada el 2026-10-09 con los valores por defecto (DEC-45).** Falta aplicarla: encargos A a D del apartado 4.
+> **Aprobada el 2026-10-09 con los valores por defecto (DEC-45) y aplicada el mismo día** (encargos A a D: PR #70, #71, #72 y la documentación de la sesión). Queda el E, el diseño del orquestador por eventos, con el arquitecto.
 
 *Claude (Opus 5.5), sin papel de orquestador, 2026-10-09 por la tarde, a
 petición del humano. Es una **propuesta**: nada de esto está aprobado ni
