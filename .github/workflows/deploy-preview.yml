@@ -3,7 +3,12 @@ name: Vista previa del PR
 on:
   pull_request:
     branches: [develop]
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -36,13 +41,17 @@ jobs:
       environment: pruebas
       retention_days: 1
   deploy:
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: >-
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+      contains(github.event.pull_request.labels.*.name, 'preview'))
     uses: ./.github/workflows/deploy-web.yml
     secrets: inherit
     with:
       environment: pruebas
   comment:
     needs: deploy
+    if: always() && github.event_name == 'pull_request' && needs.deploy.result == 'success'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/github-script@v7.0.1

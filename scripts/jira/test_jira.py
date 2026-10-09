@@ -102,6 +102,15 @@ class JiraScriptTests(unittest.TestCase):
         self.assertNotIn(api_token, output.getvalue())
         self.assertNotIn(api_token, errors.getvalue())
 
+    def test_missing_email_reports_configuration_error(self):
+        with mock.patch.dict(os.environ, {"JIRA_API_TOKEN": "sensitive-token"}, clear=True):
+            with mock.patch.object(jira, "read_secret_file", return_value={}):
+                with contextlib.redirect_stderr(io.StringIO()) as errors:
+                    result = jira.main(["status", "ADP-12"])
+
+        self.assertNotEqual(result, 0)
+        self.assertIn("JIRA_EMAIL is required", errors.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()

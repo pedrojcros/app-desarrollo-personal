@@ -48,6 +48,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 - **`develop` lleva además** la 1.x (RF-09, RF-10, RF-13, RF-14, RF-16, RF-17 y RF-22) y los recordatorios R1 a R4 (1.1). Los recordatorios **no funcionan en Expo Go** (desde el SDK 53 rompía la carga de la app; PR #59 los desactiva allí): solo en la app instalada.
 - **Pendiente de la 1.1:** R5 (PR #57, pantalla de prueba de avisos) necesita ajustarse a lo anterior, y R6 es la comprobación del humano con el APK.
 - **Accesibilidad pendiente** (lo encontró Maestro): las opciones del selector de frecuencia del añadir rápido no tienen etiqueta accesible; el flujo `create-habit` las toca por coordenadas.
+- **CI:** el encargo 048 (DEC-44) prepara una rama para reducir minutos; espera que se abra su PR y pase Actions antes de cambiar el flujo de `develop`.
 
 
 ## Lo siguiente

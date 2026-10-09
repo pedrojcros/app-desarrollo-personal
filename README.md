@@ -182,12 +182,18 @@ integración usa Node y el cliente real de Supabase. La exportación queda en `d
 `./docker/app/run npm run test:e2e` comprueba el arranque en Expo Go; necesita
 el emulador preparado y Expo servido, como se explica arriba.
 
-La CI repite lint, formato, tipos, tests, integración y exportación dentro de
-Docker. Gitleaks escanea el historial con su imagen fijada, sin licencia de pago
-ni dependencias npm. `.gitleaks.toml` permite únicamente la clave anon pública
-conocida en `.env.example`; cualquier otro JWT se sigue comprobando.
-Expo y Supabase CLI llevan la telemetría desactivada; el
-contenedor no abre aplicaciones gráficas del anfitrión.
+En cada PR a `develop`, la CI ejecuta lint, formato, tipos, tests, integración
+y exportación dentro de Docker, y Gitleaks escanea el historial. Los cambios
+solo de documentación omiten la batería cara; si el PR también cambia código,
+se ejecuta completa. En `push` a `main` se repite la CI completa. En `develop`,
+la fusión solo despliega a pruebas y aplica sus migraciones. Gitleaks usa su
+imagen fijada, sin licencia de pago ni dependencias npm. `.gitleaks.toml` permite
+únicamente la clave anon pública de `.env.example`; cualquier otro JWT se comprueba.
+
+La vista previa de Vercel no se publica automáticamente: añade la etiqueta
+`preview` al PR para solicitarla. También se puede iniciar manualmente desde
+Actions. La CI reutiliza la caché de npm; Expo y Supabase CLI mantienen la
+telemetría desactivada y el contenedor no abre aplicaciones gráficas del anfitrión.
 
 ## Despliegue
 
