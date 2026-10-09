@@ -5,7 +5,7 @@
 | Campo | Valor |
 |---|---|
 | Ticket | `ADP-27` (solo informativo: no lo toques) |
-| Agente | copilot (diminuto y mecánico; DEC-39) |
+| Agente | codex, `--model gpt-6-luna` (diminuto; iba a Copilot, pero Copilot rechazó dos veces el encargo al arrancar: «Managed account policy is still loading») |
 | Skills | `codigo-legible` (en `.agents/skills/`) |
 | Rama | `ADP-27-encabezado-hoy`, desde `origin/develop` |
 | Reservado | `src/components/today/today-header.tsx` y su test (o `src/tests/tabs-layout.test.tsx` si el test va mejor ahí) |
