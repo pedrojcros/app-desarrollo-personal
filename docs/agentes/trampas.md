@@ -33,11 +33,14 @@ Cosas que costaron tiempo y no deben costarlo dos veces. Salieron de [contexto](
 
 - **El Supabase local es compartido entre worktrees** (mismo `project_id`): se arranca una vez y lo usan todos. Una migración de una rama aún sin fusionar se aplica con `supabase migration up --include-all` y queda aplicada para todos, así que un test de otra rama puede fallar en local aunque pase en la CI (base limpia). Nadie hace `db reset`, `stop` ni `start` sin el orquestador.
 - **Un servidor de Expo por trabajador necesita su puerto**: con la red del anfitrión, el 8081 solo puede usarlo uno. Los demás, otro (por ejemplo 8090).
-- **Lo pesado va con el candado `/tmp/adp-pesado.lock`**, y un `jest` que no termina (operaciones asíncronas abiertas) lo retiene y para a todos. Los tests unitarios enfocados van sin candado; lo pesado, con el envoltorio con tiempo máximo del encargo 050 (`scripts/with-heavy-lock`).
-- **El emulador se prepara con una orden** (`docker/android/reset`, encargo 050), que resuelve estas tres:
+- **Lo pesado va con el candado `/tmp/adp-pesado.lock`**, y un `jest` que no termina (operaciones asíncronas abiertas) lo retiene y para a todos. Los tests unitarios enfocados van sin candado; lo pesado, con `scripts/with-heavy-lock <orden>`, que espera el candado como mucho 30 minutos, corta la orden a los 45 y anota la incidencia si vence (ver el README).
+- **El emulador se prepara con una orden**, `./docker/android/reset` (PR #71), que resuelve estas tres:
   - **Tras un apagado brusco, el emulador no arranca** («Running multiple emulators with the same AVD»): el AVD vive dentro del contenedor y conserva sus `.lock`.
   - **ADB pierde el emulador** a mitad de Maestro, sobre todo en la pasada a 360 dp.
   - Para que Maestro no pierda el dispositivo, todos los flujos van en una sola ejecución (`e2e/critical-paths.yaml`).
+- **El emulador es uno solo para todos los worktrees** desde el PR #71: `compose.yaml` fija `name: app-desarrollo-personal`. Un worktree creado antes de ese cambio no tiene el nombre fijado y tiene que usar `docker compose -p app-desarrollo-personal ...`.
+- **El emulador monta la carpeta `e2e/` del worktree que ejecutó `docker/android/reset`**: para probar los flujos de otro worktree, ejecuta `reset` desde ese worktree.
+- **`.gitignore` ignora cualquier carpeta `android/`**, también `docker/android/`: un fichero nuevo ahí se añade con `git add -f` (los que ya están se siguen sin problema).
 - **El servidor `adb` del puerto 5037 es el del contenedor del emulador** (usa la red del anfitrión), no de Orca: no pararlo.
 - **La app del emulador apunta a `127.0.0.1`**, que dentro de Android no es el ordenador: para Maestro, Expo con `EXPO_PUBLIC_SUPABASE_URL=http://10.0.2.2:54321`.
 - **`expo-notifications` rompe la app en Expo Go** (SDK 53 o posterior): no se importa fuera de `src/platform/notifications.ts`, que lo carga solo en la app instalada (PR #59).
