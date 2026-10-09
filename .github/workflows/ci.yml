@@ -63,8 +63,14 @@ jobs:
       - uses: actions/checkout@v4.2.2
       - name: Construir entorno Docker
         run: ./docker/app/run build
+      - name: Restaurar caché de npm
+        uses: actions/cache@v4.2.3
+        with:
+          path: .npm
+          key: linux-npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: linux-npm-
       - name: Instalar dependencias fijadas
-        run: ./docker/app/run npm ci
+        run: ./docker/app/run sh -c 'npm_config_cache="$PWD/.npm" npm ci --prefer-offline'
       - name: Preparar variables locales
         run: cp .env.example .env
       - name: Lint y formato
