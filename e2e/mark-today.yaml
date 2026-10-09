@@ -1,0 +1,6 @@
+appId: host.exp.exponent
+---
+- tapOn: Marcar E2E tarea rápida como hecho
+- assertVisible: Marcada como hecha
+- tapOn: Deshacer
+- assertVisible: E2E tarea rápida

@@ -1,0 +1,25 @@
+appId: host.exp.exponent
+---
+- openLink: exp://10.0.2.2:${EXPO_PORT}
+- extendedWaitUntil:
+    visible: Continue|Entrar
+    timeout: 120000
+- runFlow:
+    when:
+      visible: Continue
+    commands:
+      - tapOn: Continue
+      - pressKey: BACK
+- extendedWaitUntil:
+    visible: Entrar
+    timeout: 120000
+- tapOn: Email
+- inputText: ${EMAIL}
+- tapOn: Contraseña
+- inputText: ${PASSWORD}
+- tapOn:
+    text: Entrar
+    index: 1
+- extendedWaitUntil:
+    visible: Hoy
+    timeout: 120000

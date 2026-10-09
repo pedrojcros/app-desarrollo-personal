@@ -116,19 +116,24 @@ docker compose exec -T android-emulator adb -s emulator-5554 shell getprop sys.b
 ```
 
 Los dos primeros deben listar `emulator-5554`; el último debe responder `1`.
-Selecciona ese dispositivo en el panel de emulador de Orca. Sirve la app en un
-terminal y, desde otro, lanza el flujo que abre Expo Go y comprueba «Hoy»:
+Selecciona ese dispositivo en el panel de emulador de Orca. Sirve la app en el
+puerto 8090 y, desde otro terminal, ejecuta todos los flujos de Maestro. El
+lanzador renueva el usuario local de pruebas para cada tamaño, ejecuta primero
+con el tamaño normal del emulador y después a 360 dp, y restaura el tamaño y la
+densidad originales:
 
 ```sh
-./docker/app/run npm run start
-./docker/app/run npm run test:e2e
+./docker/app/run npm run start -- --port 8090
+flock /tmp/adp-pesado.lock ./docker/app/run env EXPO_PORT=8090 npm run test:e2e
 ```
 
-Si 8081 está ocupado, usa `./docker/app/run npm run start -- --port 8090` y
-`./docker/app/run env EXPO_PORT=8090 npm run test:e2e`. El valor por defecto es
-8081; el flujo llega al anfitrión mediante `10.0.2.2`. Los resultados de
-Maestro quedan en `/tmp/maestro-results` dentro del contenedor. Para detener
-el emulador: `docker compose stop android-emulator`.
+Los flujos cubren iniciar sesión, crear una tarea rápida desde Hoy, marcarla y
+deshacer, crear un hábito semanal, crear una categoría con sección y tarea,
+marcar una tarea vencida desde Pendientes y consultar el Historial. También se
+conserva `e2e/smoke.yaml`. Los flujos llegan al anfitrión mediante `10.0.2.2`.
+Maestro guarda los resultados en `/tmp/maestro-results` dentro del contenedor
+del emulador, separados por tamaño y flujo. Para detener Expo, interrumpe su
+terminal; para detener el emulador: `docker compose stop android-emulator`.
 
 La entrada `chrome-devtools` de `.mcp.json` arranca su contenedor por stdio
 con `docker compose run --rm --pull never -T -i chrome-mcp`. El MCP lanza
