@@ -60,8 +60,9 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 Para retomar en una sesión nueva:
 
-1. **Ejecutar la 1.2 con `/ejecutar-plan`** cuando el humano lo diga. Lo primero, la épica y todas sus tarjetas en «Por hacer» (DEC-47). Olas 055 a 057, 058 y 059 ([propuesta](propuestas/progreso.md#3-encargos-para-la-ejecución)). Al cerrar, Maestro una sola vez y la primera retrospectiva (DEC-45).
-2. **Después de esa retrospectiva, con el arquitecto:** el diseño del orquestador por eventos (DEC-45, encargo E) y la versión 2 (Google Calendar).
+1. **Pulido visual (1.1.1) antes de la 1.2** (DEC-48): el encargo **060** (datos de demostración en la web de pruebas, DEC-49) puede ir ya; el humano revisa allí la app y cuenta lo que no le gusta; el arquitecto lo apunta y clasifica en [propuestas/pulido-visual](propuestas/pulido-visual.md) y escribe los encargos.
+2. **Después, ejecutar la 1.2 con `/ejecutar-plan`** cuando el humano lo diga. Lo primero, la épica y todas sus tarjetas en «Por hacer» (DEC-47). Olas 055 a 057, 058 y 059 ([propuesta](propuestas/progreso.md#3-encargos-para-la-ejecución)). Al cerrar, Maestro una sola vez y la primera retrospectiva (DEC-45).
+3. **Después de esa retrospectiva, con el arquitecto:** el diseño del orquestador por eventos (DEC-45, encargo E) y la versión 2 (Google Calendar).
 
 
 ## Pendiente del humano
@@ -78,7 +79,7 @@ Para retomar en una sesión nueva:
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-48**.
+  chat. Siguiente número libre: **DEC-50**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
