@@ -48,6 +48,8 @@ Para pedir control sobre una idea, añade al final:
   **Pasos:** (a) crea tu usuario de producción en Supabase (README, «Crear el usuario real de producción»); (b) pasa `develop` a `main` con un PR de `develop` contra `main` y fusiónalo tú; (c) crea la etiqueta `v1.0.0` sobre ese commit de `main`; (d) para el APK, `eas build --profile preview` cuando quieras instalarla (H04).
 - 2026-10-09 — **Lista R6 corregida** (recordatorios en el APK). La pantalla «Recordatorios (prueba)» solo existe en desarrollo, así que en el APK: el paso 2 («Probar en 10 segundos») se cambia por **una tarea de hoy con hora dentro de 62 minutos** (el aviso de «una hora antes» llega en 2 minutos), y el paso 7 («Poner al día») por **marcar la tarea como hecha antes de su aviso y comprobar que no llega**. El resto de la lista del PR #57 vale tal cual.
 
+- 2026-10-09 — **Detalles visuales vistos en el emulador (decide tú si se arreglan):** (1) en Hoy, el título «Hoy» sale dos veces (en la cabecera de la pestaña y en grande debajo); (2) el botón de Ajustes de la cabecera se ve con dos engranajes superpuestos; (3) bajo los atajos de fecha del añadir rápido aparece la fecha en bruto («2026-10-09») en vez de con formato. Captura: `docs/diseno/capturas/anadir-rapido/teclado-android-arreglado.png`.
+
 ## Procesadas
 
 | Fecha | Idea | Qué se hizo |
