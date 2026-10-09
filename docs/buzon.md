@@ -37,6 +37,17 @@ Para pedir control sobre una idea, añade al final:
 
 - 2026-10-08 — **Para publicar la versión 1 (tú):** comprobación del orquestador. (1) Funcionalidades imprescindibles fusionadas y con sus criterios: sí, todas (T01 a T16). (2) Tests y CI de `develop` en verde: sí (483 unitarios y 202 de integración al cerrar T16; CI verde en cada fusión). (3) Tareas a medias que dependan de la versión: solo T13b, que añade los flujos de Maestro y no cambia la app. (4) Documentación y contexto al día: sí. (5) Qué cambia respecto a `main`: es la primera versión (inicio de sesión, hábitos con sus cuatro frecuencias, tareas, categorías con secciones, Hoy, Pendientes, Historial, marcar con Deshacer, añadir rápido y tres temas). (6) Migraciones: las de `supabase/migrations/` hasta `20261007200000_habit_rule_guard.sql`; la integración continua las aplica a producción desde `main`. Etiqueta propuesta: `v1.0.0`. Candidato: `6e9182c` (o `develop` tras fusionar T13b). Antes, crea tu usuario de producción (DEC-37).
 
+- 2026-10-09 — **VERSIÓN 1 LISTA PARA PUBLICAR (tú).** Comprobación del orquestador:
+  1. Funcionalidades imprescindibles fusionadas con sus criterios: **sí** (T01 a T16).
+  2. Tests y CI de `develop` en verde: **sí** (commit `92411a4`: CI y despliegue a pruebas correctos; 627 tests unitarios e integración).
+  3. Caminos críticos en el emulador: **sí**, los 8 flujos de Maestro a tamaño normal y a 360 dp (PR #50).
+  4. Tareas a medias que dependan de la versión: **ninguna**.
+  5. Qué cambia respecto a `main`: es la primera versión (inicio de sesión, hábitos con cuatro frecuencias, tareas, categorías con secciones, Hoy, Pendientes, Historial, marcar con Deshacer, añadir rápido, tres temas), **más** la 1.x (otros días, «Marcadas hoy», reprogramar, día entero como no hecho, filtrar y corregir el historial, renombrar categoría) y los recordatorios R1 a R4 (solo en la app instalada).
+  6. Migraciones: las de `supabase/migrations/`; la integración continua hace la copia y las aplica a producción al hacer push a `main`. Etiqueta propuesta: `v1.0.0`.
+  
+  **Pasos:** (a) crea tu usuario de producción en Supabase (README, «Crear el usuario real de producción»); (b) pasa `develop` a `main` con un PR de `develop` contra `main` y fusiónalo tú; (c) crea la etiqueta `v1.0.0` sobre ese commit de `main`; (d) para el APK, `eas build --profile preview` cuando quieras instalarla (H04).
+- 2026-10-09 — **Lista R6 corregida** (recordatorios en el APK). La pantalla «Recordatorios (prueba)» solo existe en desarrollo, así que en el APK: el paso 2 («Probar en 10 segundos») se cambia por **una tarea de hoy con hora dentro de 62 minutos** (el aviso de «una hora antes» llega en 2 minutos), y el paso 7 («Poner al día») por **marcar la tarea como hecha antes de su aviso y comprobar que no llega**. El resto de la lista del PR #57 vale tal cual.
+
 ## Procesadas
 
 | Fecha | Idea | Qué se hizo |

@@ -42,27 +42,27 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-08, 14:45.*
+*Actualizado: 2026-10-09, 16:00.*
 
-- **Versión 1:** todo en `develop` salvo los flujos de Maestro (T13b, PR #50, a medias). Las pruebas de Maestro encontraron un **fallo real en Android al iniciar sesión** (el efecto de pulsar los botones con clases `scale` de NativeWind), ya arreglado (PR #53).
-- **Versión 1.x en `develop`:** RF-09 y RF-10 («Marcadas hoy» y otros días), RF-13 y RF-14 (reprogramar y día entero como no hecho), RF-16 y RF-17 (filtrar y corregir el historial) y RF-22 (renombrar categoría).
-- **Versión 1.1, recordatorios (DEC-43):** R1 a R4 en `develop` (avisos locales de tareas y hábitos, sección en Ajustes, puesta al día en el móvil, abrir desde el aviso). Falta R5 (pantalla de prueba y flujo de Maestro, PR o rama `pedrojcros/ADP-26-recordatorios-prueba`) y R6, la comprobación del humano en el móvil con el APK.
-- **Reparto (DEC-41) y cafeína con `/ejecutar-plan` (DEC-42)** en vigor.
+- **La versión 1 está completa en `develop`** (commit `92411a4`, CI en verde): las funcionalidades imprescindibles, la accesibilidad y el rendimiento medidos y los **8 caminos críticos de Maestro** pasando a tamaño normal y a 360 dp (PR #50). Falta solo que el humano la publique en `main`.
+- **`develop` lleva además** la 1.x (RF-09, RF-10, RF-13, RF-14, RF-16, RF-17 y RF-22) y los recordatorios R1 a R4 (1.1). Los recordatorios **no funcionan en Expo Go** (desde el SDK 53 rompía la carga de la app; PR #59 los desactiva allí): solo en la app instalada.
+- **Pendiente de la 1.1:** R5 (PR #57, pantalla de prueba de avisos) necesita ajustarse a lo anterior, y R6 es la comprobación del humano con el APK.
+- **Accesibilidad pendiente** (lo encontró Maestro): las opciones del selector de frecuencia del añadir rápido no tienen etiqueta accesible; el flujo `create-habit` las toca por coordenadas.
 
 
 ## Lo siguiente
 
-Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto; activa la cafeína al empezar):
+Para retomar en una sesión nueva (`/ejecutar-plan`; activa la cafeína al empezar):
 
-1. Arrancar el Supabase local si hace falta y aplicar migraciones (`supabase migration up --include-all`).
-2. Retomar con **orden corta** T13b (PR #50, rama `pedrojcros/ADP-17-caminos-criticos`) y R5 (rama `pedrojcros/ADP-26-recordatorios-prueba`): su último commit «WIP:» dice lo que falta. Los dos necesitan el emulador: **de uno en uno** (primero T13b).
-3. Con T13b fusionada, proponer al humano publicar la versión 1 (y, si quiere, la 1.1 entera, con R6 hecho en su móvil).
-4. Deuda menor: el estilo de `src/components/quick-add/` (sin separación entre bloques; `useQuickAddDraft` devuelve 20 valores) y `reminderSettingsQueryKey` duplicada en `src/data/reminders.ts` (importarla de `reminder-settings.ts`).
+1. Etiquetas accesibles en las opciones de `src/components/quick-add/upward-choice.tsx` (y su flujo de Maestro, por texto en vez de coordenadas).
+2. R5 (PR #57): que la pantalla de desarrollo use el adaptador de `src/platform/notifications.ts` (sin importar `expo-notifications` directamente) y que el flujo de Maestro se quite o se marque como solo para una compilación de desarrollo, porque en Expo Go no hay recordatorios.
+3. Deuda menor: el estilo de `src/components/quick-add/` y `reminderSettingsQueryKey` duplicada en `src/data/reminders.ts`.
+4. Lo que queda del plan después de la 1.1 (RF-04 y la versión 2) es decisión del humano.
 
 
 ## Pendiente del humano
 
-- **Publicar la versión 1:** cuando T13b esté fusionada, pasar `develop` a `main` (lleva ya la 1.x y los recordatorios R1 a R4), o el commit `6e9182c` si solo quieres la versión 1. Antes: crear tu usuario de producción (DEC-37). La comprobación, en el [buzón](buzon.md).
+- **Publicar la versión 1:** ya se puede. Comprobación y pasos en el [buzón](buzon.md). Antes: crear tu usuario de producción (DEC-37, README «Crear el usuario real de producción»).
 - **Recordatorios (R6):** al instalar el APK de la 1.1, la lista de comprobación del informe de R5 (permiso, aviso en punto, tras reiniciar, ahorro de batería, tocar el aviso).
 - Revisar el [buzón](buzon.md): lo que decidió el orquestador por su cuenta.
 - Revisar T01 en el móvil con Expo Go (H05) y los avisos de `npm audit` (antes de publicar y el 2026-10-14).
@@ -109,6 +109,9 @@ Para retomar en una sesión nueva (`/ejecutar-plan`, Opus 5.5 a esfuerzo alto; a
 - **Codex escribe la hora de la cuota con fecha** («try again at Oct 8th, 2026 2:09 AM») **y con apóstrofo tipográfico** («You’ve»): el supervisor ya lo entiende (PR #39 y #41).
 - **Un `jest` que no termina** (operaciones asíncronas abiertas) **retiene el candado `adp-pesado.lock`** y para a todos: los tests unitarios enfocados van sin candado, y si alguien lo retiene mucho, mirar con `ps` y parar su contenedor.
 - **La app del emulador apunta a `127.0.0.1`**, que dentro de Android no es el ordenador: para Maestro, Expo con `EXPO_PUBLIC_SUPABASE_URL=http://10.0.2.2:54321`.
+- **Tras un apagado brusco, el emulador no arranca** («Running multiple emulators with the same AVD»): el AVD vive dentro del contenedor y conserva sus `.lock`. Arreglo: `docker compose rm -sf android-emulator` y volver a levantarlo.
+- **`expo-notifications` rompe la app en Expo Go** (SDK 53 o posterior): no se importa fuera de `src/platform/notifications.ts`, que lo carga solo en la app instalada (PR #59).
+- **El servidor `adb` del puerto 5037 es el del contenedor del emulador** (usa la red del anfitrión), no de Orca: no pararlo. Para que Maestro no pierda el dispositivo, todos los flujos en una sola ejecución (`e2e/critical-paths.yaml`).
 - **`docker run` con una imagen propia que no existe la busca en Docker Hub**, donde podría haber otra con el mismo nombre: siempre `--pull never`.
 
 ## Lo que no viaja con el repositorio
