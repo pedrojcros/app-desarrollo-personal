@@ -35,6 +35,7 @@ function ProtectedStack() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="ajustes" />
         <Stack.Screen name="(dev)/catalog" />
+        <Stack.Screen name="(dev)/recordatorios" />
       </Stack.Protected>
       <Stack.Protected guard={!hasSession}>
         <Stack.Screen name="login" options={{ headerShown: false }} />
