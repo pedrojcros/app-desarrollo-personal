@@ -17,3 +17,5 @@ appId: host.exp.exponent
     file: mark-pending.yaml
 - runFlow:
     file: history.yaml
+- runFlow:
+    file: quick-add-keyboard.yaml
