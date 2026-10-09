@@ -80,7 +80,12 @@ export default function TabsLayout() {
       >
         <Tabs.Screen
           name="hoy"
-          options={{ title: 'Hoy', tabBarIcon: tabIcon(Sun) }}
+          options={{
+            title: 'Hoy',
+            // La pantalla ya trae su propio «Hoy» en grande.
+            headerTitle: '',
+            tabBarIcon: tabIcon(Sun),
+          }}
         />
         <Tabs.Screen
           name="bandeja"

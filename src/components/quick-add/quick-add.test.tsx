@@ -6,6 +6,7 @@ import {
   waitFor,
 } from '@testing-library/react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { formatFullDate } from '@/components/date-field/format';
 import { ThemeContext } from '@/theme/theme-context';
 import { themeColors, themeFonts, themeShapes } from '@/theme/tokens';
 import { QuickAddButton, QuickAddProvider } from './index';
@@ -225,4 +226,11 @@ it('paints the empty name field with the muted colour and the typed one with the
   });
   fireEvent.changeText(nameField, 'Leer');
   expect(nameField).toHaveStyle({ color: themeColors.white.foreground });
+});
+
+it('shows the chosen date formatted instead of as YYYY-MM-DD', () => {
+  openBar();
+  fireEvent.press(screen.getByLabelText('Fecha: Mañana'));
+  expect(screen.getByText(formatFullDate('2026-10-08'))).toBeVisible();
+  expect(screen.queryByText('2026-10-08')).toBeNull();
 });

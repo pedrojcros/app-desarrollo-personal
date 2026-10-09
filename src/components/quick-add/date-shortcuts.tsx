@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import { DateField } from '@/components/date-field';
+import { formatFullDate } from '@/components/date-field/format';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import {
@@ -16,6 +17,13 @@ const shortcuts: { value: QuickAddDateShortcut; label: string }[] = [
   { value: 'tomorrow', label: 'Mañana' },
   { value: 'monday', label: 'Lunes' },
 ];
+function describeDate(date: CalendarDate | null): string {
+  if (date === null) {
+    return 'Sin fecha';
+  }
+  return formatFullDate(date);
+}
+
 export function DateShortcuts({
   value,
   today,
@@ -65,7 +73,7 @@ export function DateShortcuts({
         </Button>
       </View>
       <Text variant="caption" className="text-muted-foreground">
-        {value ?? 'Sin fecha'}
+        {describeDate(value)}
       </Text>
       {calendarOpen ? (
         <View
