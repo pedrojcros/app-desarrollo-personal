@@ -8,7 +8,7 @@ Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesió
 
 Sesión de arquitecto para decidir qué viene tras la 1.1. Lo que quedaba del plan era RF-04 y Google Calendar, pero las estadísticas, uno de los tres problemas de la visión, no tenían plan. El arquitecto recomendó hacerlas antes que Google Calendar: no necesitan servidor, ni permisos de Google, ni migraciones, ni dependencias. El humano aceptó con «ok» los siete valores por defecto (DEC-46).
 
-El diseño reutiliza la rejilla del historial, que ya resuelve las ocurrencias, las marcas fuera de regla y los archivados: Progreso solo cuenta casillas, así que cuadra siempre con Registro y se actualiza solo al marcar. Funcionalidades RF-31 a RF-40, RNF-10 y CU-09; diseño y encargos 055 a 059 en la [propuesta](propuestas/progreso.md). El mapa del hábito es de 6 semanas en columnas de lunes a domingo, porque las casillas de 44 puntos no caben de otra forma en 360 dp. El humano preguntó cómo organizar Jira: queda abierta DEC-47.
+El diseño reutiliza la rejilla del historial, que ya resuelve las ocurrencias, las marcas fuera de regla y los archivados: Progreso solo cuenta casillas, así que cuadra siempre con Registro y se actualiza solo al marcar. Funcionalidades RF-31 a RF-40, RNF-10 y CU-09; diseño y encargos 055 a 059 en la [propuesta](propuestas/progreso.md). El mapa del hábito es de 6 semanas en columnas de lunes a domingo, porque las casillas de 44 puntos no caben de otra forma en 360 dp. El humano preguntó cómo organizar Jira y aceptó la recomendación: toda la versión en «Por hacer» desde el principio, con una épica por versión y una tarjeta por encargo (DEC-47).
 
 ### 2026-10-09 — Noche: DEC-45 aplicada y `ADP-27` cerrado
 

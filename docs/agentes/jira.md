@@ -22,11 +22,13 @@ Jira sirve para ver el avance de un vistazo y para que el humano mueva prioridad
 
 | En el plan | En Jira |
 |---|---|
-| Funcionalidad (`RF-nn`) | Epic (`Epic`) |
-| Tarea (`Tnn`) | `Historia` (algo que ve el usuario) o `Tarea` (trabajo técnico) |
-| Encargo | `Subtask` |
+| Versión (1.2, 2…) | Epic (`Epic`): «Versión 1.2 — Progreso» *(desde DEC-47; antes, una épica por funcionalidad)* |
+| Encargo (o tarea del plan) | `Historia` (algo que ve el usuario) o `Tarea` (trabajo técnico), hija de la épica de su versión. Lleva en la descripción sus `RF-nn` y el enlace a la propuesta |
+| Dependencia entre encargos | Enlace «bloquea» (*blocks*) |
 | Decisión abierta que bloquea | `Tarea` con etiqueta `decision` |
 | Bug encontrado | `Error` |
+
+**Al empezar una versión (DEC-47):** el orquestador crea de golpe la épica y **todas** las tarjetas de sus encargos en «Por hacer», con sus enlaces «bloquea», para que el humano vea la versión entera desde el principio. En «Por hacer» solo entra lo aprobado: lo que no está planificado sigue en la lista de espera de [01-vision-y-alcance](../01-vision-y-alcance.md#lista-de-espera) y en el [buzón](../buzon.md). Sin subtareas: la tarjeta del encargo es la que lleva la rama y el PR.
 
 Cada ticket lleva en la descripción el identificador del plan (`RF-03`, `T07`) y un enlace al documento. **Los tipos de incidencia y flujos varían** entre proyectos *company-managed* y *team-managed*: la primera vez, el orquestador lee los tipos y transiciones reales del proyecto y los anota abajo.
 
