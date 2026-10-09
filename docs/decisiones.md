@@ -20,7 +20,21 @@ Cuando una decisión se cierra:
 
 ## Abiertas
 
-*(Ninguna.)*
+### DEC-48 — Cuándo se arreglan los cambios visuales que no gustan (abierta el 2026-10-09, sesión de arquitecto)
+
+El humano ve en la versión actual muchos cambios, sobre todo visuales, que no le gustan, y propone guardarlos todos para más adelante, junto con lo que vea en el APK y en futuras versiones.
+
+**Recomendación del arquitecto:** **no acumularlos**. Se hace una ronda corta de **pulido visual (1.1.1) antes de la 1.2**:
+
+1. El humano los cuenta ahora (o los deja en el [buzón](buzon.md), uno por línea y con captura si puede), y añade lo que vea en el APK en sus primeros días.
+2. El arquitecto los clasifica en tres grupos: (a) **del sistema visual** (colores, letra, espaciado, componentes comunes), que van **antes** de la 1.2 porque Progreso se construye encima; (b) **de una pantalla** que la 1.2 no toca, que pueden ir a la vez que la primera ola de la 1.2; (c) **rediseños grandes**, que se planifican como una propuesta aparte.
+3. Desde entonces, el buzón queda abierto siempre para esto y se revisa al empezar cada versión.
+
+**Por qué:** si el fallo está en el sistema visual y se arregla después, se rehace también lo que construya la 1.2; y un detalle anotado semanas después se recuerda peor. La retrospectiva de DEC-45, al cerrar la 1.2, trata del **proceso** (tiempos, tokens, incidencias), no del aspecto de la app.
+
+**Alternativa seria:** seguir con la 1.2 y juntar todo para después. Es más rápido hoy, pero se paga en trabajo repetido si los cambios son del sistema visual.
+
+**Respuesta:**
 
 ---
 
