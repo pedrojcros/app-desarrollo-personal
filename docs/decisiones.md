@@ -20,21 +20,7 @@ Cuando una decisión se cierra:
 
 ## Abiertas
 
-### DEC-48 — Cuándo se arreglan los cambios visuales que no gustan (abierta el 2026-10-09, sesión de arquitecto)
-
-El humano ve en la versión actual muchos cambios, sobre todo visuales, que no le gustan, y propone guardarlos todos para más adelante, junto con lo que vea en el APK y en futuras versiones.
-
-**Recomendación del arquitecto:** **no acumularlos**. Se hace una ronda corta de **pulido visual (1.1.1) antes de la 1.2**:
-
-1. El humano los cuenta ahora (o los deja en el [buzón](buzon.md), uno por línea y con captura si puede), y añade lo que vea en el APK en sus primeros días.
-2. El arquitecto los clasifica en tres grupos: (a) **del sistema visual** (colores, letra, espaciado, componentes comunes), que van **antes** de la 1.2 porque Progreso se construye encima; (b) **de una pantalla** que la 1.2 no toca, que pueden ir a la vez que la primera ola de la 1.2; (c) **rediseños grandes**, que se planifican como una propuesta aparte.
-3. Desde entonces, el buzón queda abierto siempre para esto y se revisa al empezar cada versión.
-
-**Por qué:** si el fallo está en el sistema visual y se arregla después, se rehace también lo que construya la 1.2; y un detalle anotado semanas después se recuerda peor. La retrospectiva de DEC-45, al cerrar la 1.2, trata del **proceso** (tiempos, tokens, incidencias), no del aspecto de la app.
-
-**Alternativa seria:** seguir con la 1.2 y juntar todo para después. Es más rápido hoy, pero se paga en trabajo repetido si los cambios son del sistema visual.
-
-**Respuesta:**
+*(Ninguna.)*
 
 ---
 
@@ -87,5 +73,6 @@ El humano ve en la versión actual muchos cambios, sobre todo visuales, que no l
 | DEC-45 | Mejora del flujo de trabajo tras la versión 1 | El humano (2026-10-09), antes de planificar la siguiente versión, pidió revisar el flujo «para tener un bucle de retroalimentación» y «optimizar el tiempo», valorando si dividir tareas es rentable. Aprobó con «ok, apruebo todas» las 8 decisiones de la [propuesta](propuestas/mejora-del-flujo.md#5-decisiones-para-el-humano), basada en los tokens y tiempos reales de la versión 1 (el orquestador gastó más que todos los trabajadores de Claude juntos; Maestro, una cuarta parte de Codex): (1) **registro de incidencias** que rellenan el supervisor y el orquestador, y **retrospectiva** corta al cerrar cada versión; (2) **medida automática** de tokens, tiempo y relanzamientos por encargo y por sesión, con datos locales; (3) **orquestador ligero**: sesiones cortas (ninguna ola nueva pasadas unas 6 h en la misma sesión) y revisiones de PR por un revisor aparte; (4) diseñar más adelante, con el arquitecto, un **orquestador por eventos** para probarlo en una ola; (5) **regla para dividir**: ficheros distintos, a la vez y más de una hora cada parte, revisada con datos; (6) **Maestro solo al cerrar una versión u ola**, con un script que deja limpio el emulador; (7) **decisiones de bajo riesgo con plazo de 8 h**, nunca en seguridad, producción, dinero, alcance, ADR ni datos; (8) **un solo PR de documentación por sesión** del orquestador. Se aplica con los encargos A a D de la propuesta. | `propuestas/mejora-del-flujo.md`; al aplicarse, `agentes/orquestador.md`, `contexto.md`, `scripts/` |
 | DEC-46 | Qué viene después de la 1.1 | El humano (2026-10-09) aceptó con «ok» los valores por defecto: la siguiente es la **versión 1.2, «Progreso»** (estadísticas); Google Calendar y RF-04, en la versión 2. Progreso en la pantalla de cada hábito y como resumen en Historial («Registro / Progreso»), sin pestaña nueva; el porcentaje cuenta las hechas entre todas las ocurrencias pasadas, también las sin marcar; la racha la rompen un «no hecho» o un «sin marcar», y no lo de hoy pendiente; las tareas entran en el resumen por semana; tocar un día del mapa de un hábito abre la corrección; se planifica ahora y se ejecuta cuando el humano diga. Del arquitecto: periodos de 7, 30 y 90 días y un año (30 por defecto), sin librería de gráficos, cálculo en `src/domain` sobre la rejilla del historial, y el orquestador por eventos (encargo E de DEC-45) tras la retrospectiva de la 1.2. | `01-vision-y-alcance.md`, `02-funcionalidades.md` (RF-31 a RF-40, RNF-10), `03-casos-de-uso.md` (CU-09), `05-plan.md`, `propuestas/progreso.md` |
 | DEC-47 | Jira para cada versión | El humano (2026-10-09) aceptó con «ok» la recomendación del arquitecto: al empezar `/ejecutar-plan`, el orquestador crea **toda la versión en «Por hacer»**; **una épica por versión** («Versión 1.2 — Progreso»), no por funcionalidad; **una tarjeta por encargo** (`Historia` o `Tarea`), sin subtareas, con sus `RF-nn` en la descripción; las dependencias con el enlace **«bloquea»**; y en «Por hacer» **solo lo aprobado** (lo demás, en la lista de espera y el buzón). | `agentes/jira.md` (Mapeo) |
+| DEC-48 | Cuándo se arreglan los cambios visuales que no gustan | El humano (2026-10-09) aceptó con «ok» la recomendación del arquitecto: **no acumularlos**, sino hacer una ronda corta de **pulido visual (1.1.1) antes de la 1.2**. El humano cuenta lo que ve mal y el arquitecto lo clasifica en sistema visual (antes de la 1.2), pantalla que la 1.2 no toca (a la vez que su primera ola) o rediseño grande (propuesta aparte). Después, el buzón queda abierto para esto y se revisa al empezar cada versión. Objetivo del humano: «que la pantalla de Hoy sea la más cómoda de todas». Se revisa con la versión de `develop` y los datos sintéticos locales; las capturas, fuera del repositorio (es público). | `propuestas/pulido-visual.md` |
 | DEC-05 | Regla de legibilidad | Se mantiene. Los agentes escriben los nombres del código **siempre en inglés** y legible para humanos. | `AGENTS.md` (Legibilidad) |
 | DEC-06 | Idioma | **Nombres de código y mensajes de error en inglés. Comentarios, commits y documentación en español.** | `AGENTS.md` (Convenciones de código) |
