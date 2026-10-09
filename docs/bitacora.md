@@ -4,6 +4,10 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-09 — La versión 1, completa
+
+El humano pidió cerrar la versión 1 en tres horas como mucho; se cerró en una hora y media. Retomado T13b, Maestro encontró otro fallo real: desde los recordatorios, la app no cargaba en Expo Go porque `expo-notifications` lanza un error al importarse allí. Codex Sol lo aisló en la plataforma (PR #59) y los 8 caminos críticos pasaron a tamaño normal y a 360 dp (PR #50, Codex Luna). Por el camino: el emulador no arrancaba por los `.lock` del apagado anterior, y ADB perdía el dispositivo entre flujos (se resolvió con una sola ejecución de Maestro). La revisión de R5 mostró que su lista para el móvil usaba una pantalla que no existe en el APK; se corrigió en el buzón.
+
 ### 2026-10-08 — Mañana: 1.x casi entera, recordatorios R1 a R4 y un fallo de Android
 
 Tras reiniciar el portátil, el humano aprobó con «ok» los recordatorios (DEC-43), el reparto entre Luna y Sol (DEC-41) y la cafeína automática con `/ejecutar-plan` (DEC-42), y pidió ver en Jira el modelo y el esfuerzo de cada trabajador. Se fusionaron RF-09, RF-10, RF-16 y RF-17, los recordatorios R1 a R4 y una limpieza de deuda. Las pruebas de Maestro encontraron que la app fallaba en Android al iniciar sesión: Codex Sol con esfuerzo alto demostró la causa (clases `scale` de NativeWind al pulsar) y la arregló (PR #53). Un test que dependía del tiempo real fallaba en la CI lenta y se arregló (PR #51). Cuellos de botella: el candado de lo pesado y un `jest` que no terminaba. Al apagar el portátil a las 14:55 quedan a medias T13b y R5.
