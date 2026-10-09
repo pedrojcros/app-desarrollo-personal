@@ -26,22 +26,13 @@ export function UpwardChoice<Value extends string>({
   const { colors, shape } = useTheme();
   const selectedChoice = choices.find((choice) => choice.value === value);
   return (
-    <View className="relative z-20 flex-1">
-      <Button
-        variant="secondary"
-        size="small"
-        accessibilityLabel={label}
-        aria-expanded={isOpen}
-        disabled={disabled}
-        onPress={() => setIsOpen(!isOpen)}
-      >
-        <Text>{selectedChoice?.label}</Text>
-      </Button>
+    <View className="z-20 flex-1 justify-end">
+      {/* Android recorta los límites accesibles si el menú sale de su padre. */}
       {isOpen ? (
         <View
           role="radiogroup"
           accessibilityLabel={label}
-          className="absolute bottom-full mb-2 w-full bg-surface"
+          className="mb-2 w-full bg-surface"
           style={{
             borderColor: colors.border,
             borderWidth: Math.max(shape.outlineWidth, 1),
@@ -54,6 +45,7 @@ export function UpwardChoice<Value extends string>({
                 key={choice.value}
                 variant="ghost"
                 size="small"
+                accessibilityLabel={choice.label}
                 role="radio"
                 aria-checked={choice.value === value}
                 onPress={() => {
@@ -67,6 +59,16 @@ export function UpwardChoice<Value extends string>({
           </ScrollView>
         </View>
       ) : null}
+      <Button
+        variant="secondary"
+        size="small"
+        accessibilityLabel={label}
+        aria-expanded={isOpen}
+        disabled={disabled}
+        onPress={() => setIsOpen(!isOpen)}
+      >
+        <Text>{selectedChoice?.label}</Text>
+      </Button>
     </View>
   );
 }

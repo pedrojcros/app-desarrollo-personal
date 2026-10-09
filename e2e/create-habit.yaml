@@ -3,18 +3,9 @@ appId: host.exp.exponent
 - tapOn: Añadir tarea o hábito
 - tapOn: Hábito
 - inputText: E2E hábito semanal
+# La entrada Unicode de Maestro ya ha ocultado el teclado; Back cerraría la barra.
 - tapOn: Frecuencia
-- tapOn:
-    text: Días de la semana
-    optional: true
-- runFlow:
-    when:
-      visible: Todos los días
-    commands:
-      # El selector no expone la opción con etiqueta y cambia de posición según el ancho.
-      - tapOn:
-          point: '26%,${FREQUENCY_OPTION_Y}'
-- hideKeyboard
+- tapOn: Días de la semana
 - assertVisible: Días de la semana
 - tapOn: Lunes
 - tapOn: Martes
