@@ -42,7 +42,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-09, sesión de arquitecto (noche).*
+*Actualizado: 2026-10-10, sesión de orquestador (madrugada).*
 
 - **La versión 1 está publicada** (2026-10-09, PR #67, etiqueta [`v1.0.0`](https://github.com/pedrojcros/app-desarrollo-personal/releases/tag/v1.0.0)), con la 1.x y los recordatorios (1.1, R1 a R5), que solo funcionan en la app instalada. Falta el APK y, con él, R6: la comprobación del humano en su móvil (lista en el buzón).
 - **DEC-45 aplicada** (encargos A a D; el E, el orquestador por eventos, queda para diseñarlo con el arquitecto):
@@ -53,6 +53,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
   - las trampas, en [agentes/trampas](agentes/trampas.md).
 - **`ADP-27` hecho** (PR #73 y #74): el título «Hoy» ya no sale dos veces y sigue siendo un encabezado accesible; la fecha del añadir rápido sale con formato. El «doble engranaje» no era de la app: es la burbuja «Tools» de Expo Go, que solo existe en desarrollo.
 - **El repositorio es público** desde el 2026-10-09 (DEC-44): se podrá volver a privado cuando el ritmo de cambios baje.
+- **La web de pruebas tiene datos de demostración** (060 y 061, PR #77 y #78, DEC-49): usuario `demo@example.com` (contraseña en `secretos.env`) con 10 hábitos, 30 tareas y 90 días de historial. Para volver a sembrar, el botón de Actions `seed-pruebas.yml` cuando llegue a `main`; mientras, el envoltorio local de `scripts/seed/README.md`.
 - **La versión 1.2, «Progreso», está planificada** (DEC-46): porcentaje, rachas y mapa de cada hábito, y un resumen por periodo en Historial, sin migraciones ni dependencias. Diseño y encargos 055 a 059 en [propuestas/progreso](propuestas/progreso.md). Google Calendar, con RF-04, pasa a la versión 2.
 
 
@@ -60,7 +61,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 Para retomar en una sesión nueva:
 
-1. **Pulido visual (1.1.1) antes de la 1.2** (DEC-48): el encargo **060** (datos de demostración en la web de pruebas, DEC-49) puede ir ya; el humano revisa allí la app y cuenta lo que no le gusta; el arquitecto lo apunta y clasifica en [propuestas/pulido-visual](propuestas/pulido-visual.md) y escribe los encargos.
+1. **Pulido visual (1.1.1) antes de la 1.2** (DEC-48, épica `ADP-32`): los datos de demostración ya están en la web de pruebas (060 y 061 hechos); el humano revisa allí la app y cuenta lo que no le gusta en una sesión de `/arquitecto`, que lo apunta y clasifica en [propuestas/pulido-visual](propuestas/pulido-visual.md) y escribe los encargos.
 2. **Después, ejecutar la 1.2 con `/ejecutar-plan`** cuando el humano lo diga. Lo primero, la épica y todas sus tarjetas en «Por hacer» (DEC-47). Olas 055 a 057, 058 y 059 ([propuesta](propuestas/progreso.md#3-encargos-para-la-ejecución)). Al cerrar, Maestro una sola vez y la primera retrospectiva (DEC-45).
 3. **Después de esa retrospectiva, con el arquitecto:** el diseño del orquestador por eventos (DEC-45, encargo E) y la versión 2 (Google Calendar).
 
@@ -69,6 +70,8 @@ Para retomar en una sesión nueva:
 
 - **APK de la versión 1:** `eas build --profile preview` cuando quieras instalarla en el móvil (gasta una de las 15 compilaciones gratis del mes). Conviene antes de ejecutar la 1.2: Progreso tiene sentido con unos días de uso real.
 - **Recordatorios (R6):** al instalar el APK de la 1.1, la lista de comprobación del informe de R5 (permiso, aviso en punto, tras reiniciar, ahorro de batería, tocar el aviso).
+- **Revisar la app en la web de pruebas** (`https://app-desarrollo-personal-pruebas.vercel.app`, primero la sesión de Vercel; después `demo@example.com`) y contar lo que no guste al arquitecto.
+- **Secreto `PRUEBAS_DEMO_PASSWORD` de GitHub:** puede haberse guardado vacío (se puso con `!`, sin teclado). Volver a ponerlo desde `secretos.env` antes de usar el botón de `seed-pruebas.yml`.
 - Revisar el [buzón](buzon.md): lo que decidió el orquestador por su cuenta.
 - Revisar T01 en el móvil con Expo Go (H05) y los avisos de `npm audit` (antes de publicar y el 2026-10-14).
 - Cuando T15 esté en uso, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).

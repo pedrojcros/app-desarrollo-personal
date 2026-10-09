@@ -57,6 +57,12 @@ Para pedir control sobre una idea, añade al final:
   4. El «doble engranaje» no se arregla: es la burbuja «Tools» de Expo Go, que solo sale en desarrollo y se puede arrastrar. En el APK no aparece.
   5. Los PR pequeños los revisa un subagente de Sonnet, y el diminuto (#74) lo revisé yo directamente.
 
+- 2026-10-10 (madrugada) — **Decidido por el orquestador (revísalo cuando quieras), encargos 060 y 061:**
+  1. Al 060 le añadí condiciones que la propuesta no fijaba: en pruebas solo vale `demo@example.com`, la contraseña nunca se genera ni se muestra, la clave de servicio se oculta en el registro de Actions y un envoltorio local permite sembrar pruebas mientras el flujo no está en `main`.
+  2. El 060 lo revisó un subagente de Opus (toca la protección de producción) y el 061, uno de Sonnet.
+  3. La primera siembra en pruebas (y la de después del 061) la hice yo desde el portátil, con tu «ok».
+  4. El 061 reparte las tareas por categoría a juicio del trabajador; «Renovar el abono de transporte» y «Devolver el préstamo» quedaron en Casa.
+
 ## Procesadas
 
 | Fecha | Idea | Qué se hizo |

@@ -4,6 +4,17 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-10 — Madrugada: datos de demostración en la web de pruebas
+
+Sesión corta de orquestador (unas dos horas) para el encargo 060 del pulido visual (DEC-49). Se creó la épica `ADP-32` («Versión 1.1.1 — Pulido visual») y se fusionaron:
+
+- el **060** (`ADP-33`, PR #77, Codex Sol): perfil `realistic`, protección que solo amplía el permiso al Supabase de pruebas y sigue rechazando producción, usuario `demo@example.com` y flujo manual `seed-pruebas.yml`;
+- el **061** (`ADP-34`, PR #78, Codex Sol): corrige cuatro hallazgos menores de la revisión del 060.
+
+El 060 lo revisó un subagente de **Opus** por tocar una protección de seguridad y la CI: no encontró forma de llegar a producción, pero sí que todas las tareas caían en Universidad y que «hoy» salía en UTC (de madrugada, las tareas de hoy se veían vencidas). El 061 lo revisó Sonnet.
+
+**Trampa nueva:** GitHub solo ofrece «Run workflow» para los flujos que están en la rama por defecto, y aquí es `main`. Por eso la primera siembra la hizo el orquestador desde su ordenador con el envoltorio local, y se repitió tras el 061 sin fijar la fecha para comprobar el arreglo en real (en UTC aún era el día 9 y sembró el 10). El inicio de sesión de demo se comprobó contra pruebas. El humano también aprobó fusionar el PR #76 (planificación de la 1.2).
+
 ### 2026-10-09 — Noche: planificada la versión 1.2, «Progreso»
 
 Sesión de arquitecto para decidir qué viene tras la 1.1. Lo que quedaba del plan era RF-04 y Google Calendar, pero las estadísticas, uno de los tres problemas de la visión, no tenían plan. El arquitecto recomendó hacerlas antes que Google Calendar: no necesitan servidor, ni permisos de Google, ni migraciones, ni dependencias. El humano aceptó con «ok» los siete valores por defecto (DEC-46).

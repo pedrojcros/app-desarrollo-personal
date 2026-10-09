@@ -55,3 +55,6 @@ Cosas que costaron tiempo y no deben costarlo dos veces. Salieron de [contexto](
 - **`sudo` no funciona con `!` en Claude Code**: no hay terminal para pedir la contraseña. Los comandos con `sudo`, en una terminal normal de Orca.
 - **`pgrep -f`/`pkill -f` con el nombre del supervisor coinciden con la propia orden y la matan** (salida 144): buscar el proceso con `ps -eo pid,args` y `awk`.
 - **En zsh, `status` es una variable de solo lectura**; para esperar a la CI, `gh pr checks N --watch`.
+- **`gh secret set` con `!` en Claude Code no pide el valor**: sin terminal lee la entrada, que llega vacía, y puede guardar el secreto vacío sin avisar (2026-10-10). Pasar el valor por tubería desde `secretos.env` (`grep ... | cut -d= -f2- | tr -d '\n' | gh secret set NOMBRE --env ...`) o hacerlo en una terminal normal.
+- **«Run workflow» solo aparece para los flujos que están en la rama por defecto** (`main`): un flujo `workflow_dispatch` nuevo fusionado en `develop` no se puede lanzar hasta que el humano pasa `develop` a `main` (pasó con `seed-pruebas.yml`). Mientras, lo que haga se ejecuta con su envoltorio local.
+- **El contenedor `app` está en UTC**: lo que calcule «hoy» dentro de Docker, de 00:00 a 02:00 de Madrid, da ayer. Los scripts reciben la fecha desde el anfitrión (como `SEED_TODAY` en la siembra).
