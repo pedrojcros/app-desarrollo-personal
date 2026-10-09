@@ -1,4 +1,5 @@
-import * as Notifications from 'expo-notifications';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
+import type * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
 import { fail, succeed, type DataResult } from '../data/result';
@@ -8,10 +9,18 @@ export type ReminderPermission =
   'granted' | 'denied' | 'undetermined' | 'unsupported';
 
 export function isReminderPlatformSupported(): boolean {
-  return Platform.OS !== 'web';
+  return (
+    Platform.OS !== 'web' &&
+    Constants.executionEnvironment !== ExecutionEnvironment.StoreClient
+  );
 }
 
 export function configureReminderPresentation(): void {
+  if (!isReminderPlatformSupported()) {
+    return;
+  }
+
+  const Notifications = loadNotifications();
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowBanner: true,
@@ -23,6 +32,11 @@ export function configureReminderPresentation(): void {
 }
 
 export async function prepareReminderChannels(): Promise<void> {
+  if (!isReminderPlatformSupported()) {
+    return;
+  }
+
+  const Notifications = loadNotifications();
   if (Platform.OS !== 'android') {
     return;
   }
@@ -42,6 +56,8 @@ export async function getReminderPermission(): Promise<ReminderPermission> {
     return 'unsupported';
   }
 
+  const Notifications = loadNotifications();
+
   const permissionStatus = await Notifications.getPermissionsAsync();
   return getReminderPermissionFromStatus(permissionStatus);
 }
@@ -51,12 +67,19 @@ export async function requestReminderPermission(): Promise<ReminderPermission> {
     return 'unsupported';
   }
 
+  const Notifications = loadNotifications();
+
   await prepareReminderChannels();
   const permissionStatus = await Notifications.requestPermissionsAsync();
   return getReminderPermissionFromStatus(permissionStatus);
 }
 
 export async function getScheduledReminderKeys(): Promise<string[]> {
+  if (!isReminderPlatformSupported()) {
+    return [];
+  }
+
+  const Notifications = loadNotifications();
   const scheduledNotifications =
     await Notifications.getAllScheduledNotificationsAsync();
   const scheduledKeys = scheduledNotifications.map(
@@ -68,6 +91,11 @@ export async function getScheduledReminderKeys(): Promise<string[]> {
 export async function scheduleReminder(
   reminder: PlannedReminder,
 ): Promise<DataResult<void>> {
+  if (!isReminderPlatformSupported()) {
+    return succeed(undefined);
+  }
+
+  const Notifications = loadNotifications();
   const triggerDate = getReminderDate(reminder);
 
   try {
@@ -96,18 +124,33 @@ export async function scheduleReminder(
 }
 
 export async function cancelReminders(keys: string[]): Promise<void> {
+  if (!isReminderPlatformSupported()) {
+    return;
+  }
+
+  const Notifications = loadNotifications();
   for (const key of keys) {
     await Notifications.cancelScheduledNotificationAsync(key);
   }
 }
 
 export async function cancelAllReminders(): Promise<void> {
+  if (!isReminderPlatformSupported()) {
+    return;
+  }
+
+  const Notifications = loadNotifications();
   await Notifications.cancelAllScheduledNotificationsAsync();
 }
 
 export function addReminderTapListener(
   onTap: (target: PlannedReminder['target']) => void,
 ): () => void {
+  if (!isReminderPlatformSupported()) {
+    return () => undefined;
+  }
+
+  const Notifications = loadNotifications();
   let active = true;
   const handledResponses = new Set<string>();
 
@@ -200,4 +243,11 @@ function isReminderTarget(value: unknown): value is PlannedReminder['target'] {
   }
 
   return false;
+}
+
+function loadNotifications(): typeof Notifications {
+  // La importación activa listeners de push que fallan en Expo Go Android.
+  // https://docs.expo.dev/versions/v56.0.0/sdk/notifications/
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return require('expo-notifications');
 }

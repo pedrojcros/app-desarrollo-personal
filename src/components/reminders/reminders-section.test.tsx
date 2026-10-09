@@ -152,7 +152,7 @@ describe('RemindersSection', () => {
     renderSection();
 
     expect(
-      screen.getByText('Los recordatorios solo funcionan en la app del móvil'),
+      screen.getByText('Los recordatorios solo funcionan en la app instalada'),
     ).toBeTruthy();
     expect(screen.queryByRole('switch')).toBeNull();
   });

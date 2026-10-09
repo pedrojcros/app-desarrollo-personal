@@ -9,6 +9,12 @@ import {
   scheduleReminder,
 } from './notifications';
 
+jest.mock('expo-constants', () => ({
+  __esModule: true,
+  default: { executionEnvironment: 'standalone' },
+  ExecutionEnvironment: { StoreClient: 'storeClient' },
+}));
+
 jest.mock('expo-notifications', () => ({
   AndroidImportance: {
     DEFAULT: 3,
