@@ -42,22 +42,26 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-09, 20:30.*
+*Actualizado: 2026-10-09, 22:45.*
 
-- **La versión 1 está publicada** (2026-10-09): el humano pasó `develop` a `main` (PR #67), la CI hizo la copia cifrada, aplicó las migraciones y publicó la web de producción, y la etiqueta es [`v1.0.0`](https://github.com/pedrojcros/app-desarrollo-personal/releases/tag/v1.0.0). El humano ya entra con su usuario de producción. Falta el APK (`eas build --profile preview`), cuando quiera instalarla en el móvil.
-- **Esa publicación incluye** la 1.x (RF-09, RF-10, RF-13, RF-14, RF-16, RF-17, RF-22) y **los recordatorios completos (1.1, R1 a R5)**, que solo funcionan en la app instalada (en Expo Go se desactivan). Queda R6: la comprobación del humano en su móvil con el APK (lista en el buzón).
-- **Aprobada la mejora del flujo de trabajo** (DEC-45, [propuesta](propuestas/mejora-del-flujo.md)): registro de incidencias, medida de tokens por encargo, orquestador con sesiones cortas, regla para dividir y Maestro solo al cerrar. Falta aplicarla.
-- **El repositorio es público** desde el 2026-10-09 (DEC-44) y la CI gasta unos 17 minutos menos por PR: se podrá volver a privado cuando el ritmo de cambios baje.
-- **Arreglado (encargo 046, PR #65):** en Android el teclado ya no tapa la barra del añadir rápido; tiene su flujo de Maestro. La pasada completa de Maestro a 360 dp a veces se corta porque ADB pierde el emulador (problema del entorno de pruebas, no de la app).
+- **La versión 1 está publicada** (2026-10-09, PR #67, etiqueta [`v1.0.0`](https://github.com/pedrojcros/app-desarrollo-personal/releases/tag/v1.0.0)), con la 1.x y los recordatorios (1.1, R1 a R5), que solo funcionan en la app instalada. Falta el APK y, con él, R6: la comprobación del humano en su móvil (lista en el buzón).
+- **DEC-45 aplicada** (encargos A a D; el E, el orquestador por eventos, queda para diseñarlo con el arquitecto):
+  - **registro de incidencias** que rellenan solos el supervisor y el candado (PR #70);
+  - **medida** de tokens y tiempos por encargo y por sesión (PR #72);
+  - **`docker/android/reset`** y el candado con tiempo máximo **`scripts/with-heavy-lock`** (PR #71); desde ese PR el emulador es uno solo para todos los worktrees;
+  - [`orquestador.md`](agentes/orquestador.md) con sesiones cortas, revisor aparte, regla para dividir, Maestro solo al cerrar y un PR de documentación por sesión;
+  - las trampas, en [agentes/trampas](agentes/trampas.md).
+- **`ADP-27` hecho** (PR #73 y #74): el título «Hoy» ya no sale dos veces y sigue siendo un encabezado accesible; la fecha del añadir rápido sale con formato. El «doble engranaje» no era de la app: es la burbuja «Tools» de Expo Go, que solo existe en desarrollo.
+- **El repositorio es público** desde el 2026-10-09 (DEC-44): se podrá volver a privado cuando el ritmo de cambios baje.
 
 
 ## Lo siguiente
 
-Para retomar en una sesión nueva (`/ejecutar-plan`; activa la cafeína al empezar):
+Para retomar en una sesión nueva:
 
-1. **Aplicar DEC-45 antes que nada**: encargos A (registro de incidencias), B (medida por encargo) y C (reinicio del emulador y tiempo máximo en el candado) a la vez, y después D (documentación del orquestador, `trampas.md` y este fichero más corto). Detalle en el apartado 4 de la [propuesta](propuestas/mejora-del-flujo.md#4-cómo-se-aplicaría-si-se-aprueba). En una sesión nueva: es la propia DEC-45.
-2. Los detalles visuales del buzón ya tienen tarjeta (`ADP-27`): encargarlos cuando el humano lo diga.
-3. Lo que queda del plan tras la 1.1 (RF-04 y la versión 2) es decisión del humano: preguntarle.
+1. **Decidir qué viene** (decisión del humano): lo que queda del plan tras la 1.1 es RF-04 y la versión 2. Con `/arquitecto` si hay que planificar; con `/ejecutar-plan` si ya está planificado.
+2. **Al cerrar la siguiente versión:** Maestro una sola vez (con `docker/android/reset`) y la primera retrospectiva con `scripts/incidents/report.py` y `measure.py` (DEC-45).
+3. **Más adelante, con el arquitecto:** el diseño del orquestador por eventos (DEC-45, encargo E).
 
 
 ## Pendiente del humano
