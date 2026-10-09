@@ -207,5 +207,61 @@ class SupervisorCurrentSituationTests(unittest.TestCase):
         self.assertIn('minutos con la pantalla quieta', problems[2])
 
 
+class SupervisorIncidentLoggingTests(unittest.TestCase):
+    def setUp(self):
+        self.incidents = mock.patch.object(supervise_workers, 'append_incident')
+        self.append_incident = self.incidents.start()
+        self.addCleanup(self.incidents.stop)
+
+    def test_logs_unsent_assignment_as_environment_incident(self):
+        worker = {
+            'dispatchId': 'dispatch-1',
+            'agentTerminalHandle': 'terminal-1',
+            'resource': {'worktreeId': '/work/ADP-27'},
+        }
+        terminal = {'draft': 'encargo'}
+        with mock.patch.object(supervise_workers, 'read_terminal', return_value=terminal), \
+                mock.patch.object(supervise_workers, 'send_to_terminal'):
+            supervise_workers.supervise_worker(worker, '/repository', {}, {}, 8, {})
+        self.append_incident.assert_called_once()
+        self.assertEqual(self.append_incident.call_args.kwargs['type'], 'environment')
+        self.assertEqual(self.append_incident.call_args.kwargs['task'], 'ADP-27')
+
+    def test_logs_idle_worker_with_elapsed_minutes(self):
+        worker = {'dispatchId': 'dispatch-1', 'agentTerminalHandle': 'terminal-1'}
+        terminal = {'tail': 'quiet terminal'}
+        fingerprint = supervise_workers.hashlib.sha256(b'quiet terminal').hexdigest()
+        screen_history = {'dispatch-1': (fingerprint, 1000.0)}
+        with mock.patch.object(supervise_workers, 'read_terminal', return_value=terminal), \
+                mock.patch.object(supervise_workers, 'time') as mocked_time:
+            mocked_time.time.return_value = 1540.0
+            supervise_workers.supervise_worker(worker, '/repository', screen_history, {}, 8, {})
+        self.append_incident.assert_called_once()
+        self.assertEqual(self.append_incident.call_args.kwargs['type'], 'stuck-agent')
+        self.assertEqual(self.append_incident.call_args.kwargs['minutes'], 9)
+
+    def test_incident_write_failure_does_not_interrupt_supervision(self):
+        with mock.patch.object(supervise_workers, 'append_incident', side_effect=OSError('disk full')), \
+                mock.patch('builtins.print') as mocked_print:
+            supervise_workers.append_supervisor_incident(
+                'tool', 1, 'test', '', {'dispatchId': 'dispatch-1'}
+            )
+        self.assertTrue(mocked_print.called)
+
+    def test_logs_quota_wait_with_elapsed_minutes_after_resume(self):
+        worker = {'dispatchId': 'dispatch-1', 'agentTerminalHandle': 'terminal-1'}
+        worker_state = {
+            'quota_retry_time': datetime.datetime(2026, 10, 7, 18, 55),
+            'quota_started_at': datetime.datetime(2026, 10, 7, 16, 0),
+        }
+        current_time = datetime.datetime(2026, 10, 7, 18, 56)
+        with mock.patch.object(supervise_workers, 'send_to_terminal'):
+            outcome = supervise_workers.handle_quota_wait(worker, worker_state, current_time)
+        self.assertEqual(outcome.status, supervise_workers.CodexStatus.ACTED)
+        self.append_incident.assert_called_once()
+        self.assertEqual(self.append_incident.call_args.kwargs['type'], 'quota')
+        self.assertEqual(self.append_incident.call_args.kwargs['minutes'], 176)
+
+
 if __name__ == '__main__':
     unittest.main()
