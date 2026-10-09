@@ -1,6 +1,8 @@
 import { describe, expect, it, jest } from '@jest/globals';
+import { within } from '@testing-library/react-native';
 import { renderRouter, screen } from 'expo-router/testing-library';
 import { Text } from 'react-native';
+import Svg from 'react-native-svg';
 
 import { ThemeContext } from '@/theme/theme-context';
 import { themeColors, themeFonts, themeShapes } from '@/theme/tokens';
@@ -51,5 +53,15 @@ describe('Tabs layout', () => {
     await screen.findByText('Inbox screen');
 
     expect(screen.getAllByRole('heading', { name: 'Bandeja' })).toHaveLength(1);
+  });
+
+  // Guarda, no regresión: el segundo engranaje que se ve en Expo Go es la
+  // burbuja «Tools» de Expo Go, no un icono de la app.
+  it('draws a single settings icon in the header button', async () => {
+    renderRouter(routes, { initialUrl: '/hoy' });
+    await screen.findByText('Today screen');
+
+    const button = screen.getByRole('link', { name: 'Ajustes' });
+    expect(within(button).UNSAFE_getAllByType(Svg)).toHaveLength(1);
   });
 });
