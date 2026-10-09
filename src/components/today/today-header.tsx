@@ -35,7 +35,9 @@ export function TodayHeader({
       <View className="flex-row flex-wrap items-end justify-between gap-3 pb-3 pt-3">
         <View>
           <Text variant="caption">{formatLongDate(date)}</Text>
-          <Text variant="title">{getDayTitle(date, today)}</Text>
+          <Text variant="title" accessibilityRole="header">
+            {getDayTitle(date, today)}
+          </Text>
         </View>
         <DayProgress outcomes={outcomes} total={total} />
       </View>
