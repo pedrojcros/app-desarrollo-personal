@@ -52,11 +52,13 @@ describe('RemindersDebugScreen', () => {
     syncRemindersMock.mockResolvedValue(succeed(undefined));
   });
 
-  it('says there are no reminders on the web', () => {
+  it('says reminders only work in the installed app', () => {
     isSupportedMock.mockReturnValue(false);
     renderScreen();
 
-    expect(screen.getByText('No hay recordatorios en la web.')).toBeTruthy();
+    expect(
+      screen.getByText('Los recordatorios solo funcionan en la app instalada.'),
+    ).toBeTruthy();
     expect(listRemindersMock).not.toHaveBeenCalled();
   });
 

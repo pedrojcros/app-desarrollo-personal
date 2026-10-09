@@ -23,7 +23,7 @@ export default function RemindersDebugScreen() {
   if (!isSupported) {
     return (
       <View className="flex-1 bg-background px-5 pt-4">
-        <Text>No hay recordatorios en la web.</Text>
+        <Text>Los recordatorios solo funcionan en la app instalada.</Text>
       </View>
     );
   }

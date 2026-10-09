@@ -1,8 +1,11 @@
-import * as Notifications from 'expo-notifications';
+import type * as Notifications from 'expo-notifications';
 
 import { fail, succeed, type DataResult } from '../data/result';
 
-import { prepareReminderChannels } from './notifications';
+import {
+  isReminderPlatformSupported,
+  prepareReminderChannels,
+} from './notifications';
 
 export interface ScheduledReminderSummary {
   key: string;
@@ -56,6 +59,11 @@ function summarizeScheduledNotification(
 export async function listScheduledReminders(): Promise<
   ScheduledReminderSummary[]
 > {
+  if (!isReminderPlatformSupported()) {
+    return [];
+  }
+
+  const Notifications = loadNotifications();
   const notifications = await Notifications.getAllScheduledNotificationsAsync();
   const summaries = notifications.map(summarizeScheduledNotification);
   return summaries.sort((first, second) => first.key.localeCompare(second.key));
@@ -63,6 +71,11 @@ export async function listScheduledReminders(): Promise<
 
 /** Programa un aviso suelto con la clave `test:<instante>`, 10 segundos adelante. */
 export async function scheduleTestReminder(): Promise<DataResult<string>> {
+  if (!isReminderPlatformSupported()) {
+    return fail('test_reminder_failed', 'Reminders are not supported here.');
+  }
+
+  const Notifications = loadNotifications();
   const now = Date.now();
   const key = `test:${now}`;
   const triggerDate = new Date(now + TEST_REMINDER_DELAY_SECONDS * 1000);
@@ -83,8 +96,14 @@ export async function scheduleTestReminder(): Promise<DataResult<string>> {
     if (error instanceof Error) {
       message = error.message;
     }
-    return fail('TEST_REMINDER_FAILED', message);
+    return fail('test_reminder_failed', message);
   }
 
   return succeed(key);
+}
+
+function loadNotifications(): typeof Notifications {
+  // Igual que en notifications.ts: importarlo arriba rompe Expo Go.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  return require('expo-notifications');
 }
