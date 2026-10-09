@@ -4,6 +4,10 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-09 — Menos minutos de CI (DEC-44)
+
+Se preparó el encargo 048 para reducir el gasto de Actions tras agotarse los minutos gratuitos del repositorio privado. La CI de PR omite su trabajo costoso si solo cambia documentación, el push a `develop` queda para el despliegue de pruebas, npm reutiliza su caché y la vista previa requiere `preview` o despacho manual. La rama y el PR siguen pendientes de CI; los tiempos previos medidos están en la descripción del PR.
+
 ### 2026-10-09 — La versión 1, completa
 
 El humano pidió cerrar la versión 1 en tres horas como mucho; se cerró en una hora y media. Retomado T13b, Maestro encontró otro fallo real: desde los recordatorios, la app no cargaba en Expo Go porque `expo-notifications` lanza un error al importarse allí. Codex Sol lo aisló en la plataforma (PR #59) y los 8 caminos críticos pasaron a tamaño normal y a 360 dp (PR #50, Codex Luna). Por el camino: el emulador no arrancaba por los `.lock` del apagado anterior, y ADB perdía el dispositivo entre flujos (se resolvió con una sola ejecución de Maestro). La revisión de R5 mostró que su lista para el móvil usaba una pantalla que no existe en el APK; se corrigió en el buzón.
