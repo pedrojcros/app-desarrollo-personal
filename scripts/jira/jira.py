@@ -9,7 +9,6 @@ import urllib.request
 from pathlib import Path
 
 
-DEFAULT_EMAIL = "pedrojcros@gmail.com"
 DEFAULT_CLOUD_ID = "490863fe-a6c1-4134-913e-c2470cb7c508"
 SECRETS_PATH = Path.home() / ".config/app-desarrollo-personal/secretos.env"
 ISSUE_KEY_PATTERN = re.compile(r"(?<![A-Za-z0-9])ADP-\d+(?![A-Za-z0-9])")
@@ -62,7 +61,7 @@ def load_configuration():
     if not email:
         email = file_secrets.get("JIRA_EMAIL")
     if not email:
-        email = DEFAULT_EMAIL
+        raise JiraError("JIRA_EMAIL is required in the environment or secrets file.")
 
     api_token = os.environ.get("JIRA_API_TOKEN") or file_secrets.get("JIRA_API_TOKEN")
     cloud_id = os.environ.get("JIRA_CLOUD_ID") or file_secrets.get("JIRA_CLOUD_ID")
