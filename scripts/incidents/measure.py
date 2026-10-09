@@ -359,26 +359,60 @@ def format_timestamp(value):
     return value.astimezone().strftime('%Y-%m-%d %H:%M %Z')
 
 
+def first_session_activity(summaries):
+    activity_times = [
+        summary['first_activity']
+        for summary in summaries.values()
+        if summary['first_activity'] is not None
+    ]
+    return min(activity_times, default=None)
+
+
+def pull_request_times(pull_requests, field):
+    activity_times = []
+    for pull_request in pull_requests:
+        timestamp = parse_datetime(pull_request.get(field))
+        if timestamp is not None:
+            activity_times.append(timestamp)
+    return activity_times
+
+
+def format_jira_pull_requests(pull_requests, first_activity):
+    ordered_requests = sorted(pull_requests, key=lambda item: item['number'])
+    numbers = ', '.join(f"#{item['number']}" for item in ordered_requests)
+    opening_times = pull_request_times(ordered_requests, 'createdAt')
+    merging_times = pull_request_times(ordered_requests, 'mergedAt')
+    first_opening = min(opening_times, default=None)
+    last_merge = max(merging_times, default=None)
+    opening_duration = format_elapsed(first_activity, first_opening)
+    merge_duration = format_elapsed(first_activity, last_merge)
+    if len(ordered_requests) == 1:
+        text = f'PR {numbers}, abierto en {opening_duration}'
+        if last_merge is not None:
+            text += f', fusionado en {merge_duration}'
+        return text
+    text = f'PR {numbers} (el primero abierto en {opening_duration}'
+    if last_merge is not None:
+        text += f', el último fusionado en {merge_duration}'
+    return text + ')'
+
+
 def format_jira_line(summaries, pull_requests, incident_minutes):
     if not summaries:
         return f'Medida: sin sesiones registradas · {incident_minutes} min perdidos'
-    agent, model = sorted(summaries)[0]
-    summary = summaries[(agent, model)]
-    sessions_text = 'sesión' if summary['sessions'] == 1 else 'sesiones'
-    line = (f"Medida: {agent} {model} · {summary['sessions']} {sessions_text} · "
-            f"{format_number(summary['new_tokens'])} nuevos / "
-            f"{format_number(summary['read_tokens'])} releídos")
+    agents = ', '.join(f'{agent} {model}' for agent, model in sorted(summaries))
+    session_count = sum(summary['sessions'] for summary in summaries.values())
+    sessions_text = 'sesión' if session_count == 1 else 'sesiones'
+    new_tokens = sum(summary['new_tokens'] for summary in summaries.values())
+    read_tokens = sum(summary['read_tokens'] for summary in summaries.values())
+    new_tokens_text = format_number(new_tokens)
+    read_tokens_text = format_number(read_tokens)
+    line = (f'Medida: {agents} · {session_count} {sessions_text} · '
+            f'{new_tokens_text} nuevos / {read_tokens_text} releídos')
     if pull_requests:
-        pull_request = pull_requests[0]
-        first_activity = summary['first_activity']
-        created_at = parse_datetime(pull_request.get('createdAt'))
-        merged_at = parse_datetime(pull_request.get('mergedAt'))
-        pull_request_numbers = ', '.join(
-            f"#{pull_request['number']}" for pull_request in pull_requests
-        )
-        line += f" · PR {pull_request_numbers}, abierto en {format_elapsed(first_activity, created_at)}"
-        if merged_at:
-            line += f", fusionado en {format_elapsed(first_activity, merged_at)}"
+        first_activity = first_session_activity(summaries)
+        requests_text = format_jira_pull_requests(pull_requests, first_activity)
+        line += f' · {requests_text}'
     return f'{line} · {incident_minutes} min perdidos'
 
 

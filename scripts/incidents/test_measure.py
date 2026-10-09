@@ -155,6 +155,43 @@ class MeasureCommandTests(unittest.TestCase):
         self.assertIn('2 pasos', result.stdout)
         self.assertIn('500 nuevos', result.stdout)
 
+    def test_jira_summarizes_all_agents_and_sorted_pull_requests(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            source_path = Path(temporary_directory)
+            pull_requests_path = source_path / 'pull_requests.json'
+            pull_requests = [
+                {'number': 65, 'title': 'ADP-16', 'createdAt': '2026-10-01T12:00:00Z',
+                 'mergedAt': '2026-10-01T14:00:00Z'},
+                {'number': 37, 'title': 'ADP-16', 'createdAt': '2026-10-01T10:00:00Z',
+                 'mergedAt': '2026-10-01T11:00:00Z'},
+                {'number': 61, 'title': 'ADP-16', 'createdAt': '2026-10-01T11:00:00Z',
+                 'mergedAt': None},
+            ]
+            pull_requests_path.write_text(json.dumps(pull_requests), encoding='utf-8')
+            incident_path = source_path / 'incidents.jsonl'
+            incident_path.write_text(json.dumps({
+                'date': '2026-10-01T09:00:00+00:00', 'type': 'tool', 'task': 'ADP-16',
+                'minutes': 12, 'cause': 'ejemplo', 'fix': 'ejemplo', 'source': 'orchestrator',
+            }) + '\n', encoding='utf-8')
+            result = self.run_measure(
+                'task', 'ADP-16', '--jira',
+                environment={
+                    'ADP_CODEX_SESSIONS': str(TEST_DATA_PATH / 'codex_session.jsonl'),
+                    'ADP_CLAUDE_SESSIONS': str(TEST_DATA_PATH / 'claude_session.jsonl'),
+                    'ADP_PULL_REQUESTS_FILE': str(pull_requests_path),
+                    'ADP_INCIDENTS_FILE': str(incident_path),
+                },
+            )
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(len(result.stdout.strip().splitlines()), 1)
+        self.assertIn('Claude claude-sonnet-4-5', result.stdout)
+        self.assertIn('Codex gpt-6-luna', result.stdout)
+        self.assertIn('2 sesiones', result.stdout)
+        self.assertIn('1.200 nuevos / 2.600 releídos', result.stdout)
+        self.assertIn('PR #37, #61, #65', result.stdout)
+        self.assertIn('(el primero abierto en 1 h, el último fusionado en 5 h)', result.stdout)
+        self.assertIn('12 min perdidos', result.stdout)
+
     def test_missing_source_is_reported_without_failing_other_sources(self):
         result = self.run_measure(
             'task',
