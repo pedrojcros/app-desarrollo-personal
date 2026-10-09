@@ -63,6 +63,7 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 
 - **Versión 1 (`v1.0.0`)**: olas 0 a 5 fusionadas en `develop` y la comprobación de «Preparar una versión para `main`» del [orquestador](agentes/orquestador.md#preparar-una-versión-para-main) superada. El humano pasa `develop` a `main` y se instala el APK (H04).
 - **Versión 1.1**: recordatorios locales en el móvil (DEC-24; aprobados con sus valores por defecto en DEC-43). Encargos R1 a R5 de la [propuesta](propuestas/recordatorios.md#5-encargos-para-la-ejecución) (en `docs/agentes/encargos/`, del 036 en adelante); R6 es la comprobación del humano en el móvil al publicar.
+- **Versión 1.2 — Progreso** (DEC-46, 2026-10-09): RF-31 a RF-40 y RNF-10. Encargos **055 a 059** de la [propuesta](propuestas/progreso.md#3-encargos-para-la-ejecución), en tres olas: 055, 056 y 057 a la vez; después 058; al final 059 (Maestro una sola vez y la retrospectiva de DEC-45). Sin migraciones ni dependencias nuevas. Se ejecuta cuando el humano lo diga.
 - **Versiones 1.x siguientes**: cada funcionalidad deseable, o un grupo pequeño, cuando el humano quiera (ver «Después de la versión 1»).
 
 ## Tareas
@@ -278,6 +279,8 @@ Agrupación orientativa de qué puede ir en paralelo. El orquestador la recalcul
 | RNF-05 | ADR-0005 |
 | RNF-07 | T03 |
 | RNF-08 | T01, T15, T13 |
+| RF-31 a RF-34, RF-35 a RF-40 *(1.2)* | Encargos 055 y 056 (dominio), 057 (interfaz), 058 (conexión) |
+| RNF-10 *(1.2)* | Encargo 058 |
 
 ## Tareas que no se delegan
 
@@ -303,5 +306,5 @@ Primero la versión 1.1 y después las deseables, en este orden sugerido (cada u
 | 4 | RF-10 Ver otros días | Ver lo que viene |
 | 5 | RF-14 Marcar un día entero como no hecho | Atajo |
 | 6 | RF-16 Filtrar el historial y RF-22 Renombrar categoría | Comodidad |
-| 7 | RF-04 Duración | Solo sirve con Google Calendar |
-| Versión 2 | Conexión con Google Calendar; Google Play cuando el humano decida | DEC-18, DEC-24 |
+| 7 | **Versión 1.2: Progreso** (DEC-46) | Uno de los tres problemas de la visión, con los datos que ya hay |
+| Versión 2 | Conexión con Google Calendar, con RF-04 Duración (solo sirve con ella); Google Play cuando el humano decida | DEC-18, DEC-24, DEC-46 |

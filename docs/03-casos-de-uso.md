@@ -26,6 +26,9 @@ No hace falta un caso de uso para cada funcionalidad: solo para las que tienen i
 | **Sin marcar** | Una ocurrencia de un hábito, de un día ya pasado, que sigue pendiente. No es un estado nuevo: es «pendiente» de una fecha pasada |
 | **Vencida** | Una tarea con fecha anterior a hoy que sigue pendiente |
 | **Historial** | El registro de todo lo que se hizo, no se hizo o quedó sin marcar |
+| **Progreso** | Lo que se ha cumplido en un periodo, calculado a partir del historial: porcentaje, rachas y recuentos (versión 1.2) |
+| **Porcentaje de cumplimiento** | Hechas entre hechas, no hechas y sin marcar (RN-41) |
+| **Racha** | Ocurrencias seguidas de un hábito hechas, sin un «no hecho» ni un «sin marcar» entre medias (RN-42) |
 
 ## Índice
 
@@ -38,6 +41,8 @@ No hace falta un caso de uso para cada funcionalidad: solo para las que tienen i
 | CU-05 | Consultar el historial | *(sesión 3)* |
 | CU-06 | Modificar o eliminar un hábito o una tarea | *(sesión 3)* |
 | CU-07 | Gestionar categorías | *(sesión 3)* |
+| CU-08 | Recibir recordatorios en el móvil | RF-24 a RF-30 |
+| CU-09 | Ver el progreso | RF-31 a RF-40 |
 
 ## Reglas de negocio compartidas
 
@@ -462,3 +467,59 @@ Se definen aquí una sola vez y los casos las enlazan.
 - **Escenario 13: tocar el aviso (A9, RF-29).** Cuando el usuario toca el aviso de una tarea, la app se abre en su ficha; si es de un hábito, en Hoy.
 - **Escenario 14: cambio de hora (RNF-07).** Dado un hábito diario a las 09:00, el día del cambio de hora de marzo y el de octubre tiene exactamente un aviso, a las 09:00 de la hora local.
 - **Escenario 15: límite (RN-39).** Dados 100 avisos posibles en los próximos 7 días, entonces se programan los 64 más próximos.
+
+---
+
+## CU-09 — Ver el progreso
+
+- **Actor principal:** el usuario
+- **Actores secundarios:** ninguno
+- **Funcionalidades:** RF-31 a RF-40 (versión 1.2, DEC-46)
+- **Precondiciones:** ninguna (sin datos, ver A3)
+- **Postcondiciones:** ninguna, salvo que el usuario corrija algo (A2)
+- **Disparador:** el usuario quiere saber cómo va con sus hábitos y sus tareas
+
+### Flujo normal
+
+1. El usuario abre Historial y elige **Progreso**.
+2. El sistema muestra los **últimos 30 días**: el porcentaje de cumplimiento de los hábitos con sus recuentos y la diferencia con los 30 días anteriores, el porcentaje por categoría, los hábitos de peor a mejor y las tareas por semana.
+3. El usuario elige otro **periodo** (7 días, 90 días o un año).
+4. El sistema muestra lo mismo para ese periodo.
+5. El usuario toca un hábito de la lista.
+6. El sistema abre la pantalla del hábito, con su porcentaje de los últimos 30 días, su racha actual, su mejor racha y el mapa de las últimas 6 semanas.
+
+### Flujos alternativos
+
+- **A1.** En el paso 3, si el usuario elige **un año**: el sistema no muestra la comparación con el periodo anterior (RN-43). Continúa en el paso 4.
+- **A2.** En el paso 6, si el usuario **toca un día del mapa** con ocurrencia (pasado u hoy): el sistema le permite marcarlo o corregirlo como en el historial (RF-17), y el porcentaje, las rachas y el mapa se actualizan al momento. Los días que no tocaban y los futuros no se pueden tocar.
+- **A3.** En el paso 2 o 4, si **no hay ocurrencias que cuenten** en el periodo: el sistema muestra «Sin datos» en lugar de un porcentaje, nunca 0 %. Termina el caso.
+- **A4.** En el paso 6, si el hábito **no tiene todavía ninguna ocurrencia** (recién creado o con fecha de inicio futura): el bloque dice «Aún no hay datos».
+- **A5.** En el paso 1, el usuario también puede llegar al paso 6 abriendo un hábito desde cualquier otra vista.
+
+### Excepciones
+
+- **E1.** En el paso 2, 4 o 6, si **no se pueden leer los datos**: el sistema avisa del error con «Reintentar» y no muestra porcentajes parciales como si fueran completos. Queda: sin cambios.
+
+### Reglas de negocio
+
+- **RN-41.** El **porcentaje de cumplimiento** es hechas / (hechas + no hechas + sin marcar), sobre las ocurrencias de hábitos del periodo, redondeado al entero. Lo de hoy que sigue pendiente no cuenta; lo de hoy ya marcado, sí. Si no cuenta ninguna, es «sin datos».
+- **RN-42.** La **racha** se cuenta en ocurrencias, no en días. La rompen un «no hecho» o un «sin marcar»; la ocurrencia de hoy pendiente ni la rompe ni la suma. La **mejor racha** es la más larga del último año.
+- **RN-43.** Los periodos terminan hoy. El **periodo anterior** es el de la misma longitud justo antes; el año no tiene comparación.
+- **RN-44.** Una tarea cuenta en la semana (de lunes a domingo) de su fecha; sin fecha, en la del día en que se marcó (RN-33). Es **hecha tarde** si se marcó hecha un día posterior a su fecha. Las vencidas que siguen pendientes se cuentan como pendientes, nunca como no hechas (DEC-17).
+- **RN-45.** Progreso cuenta lo mismo que el historial: también lo de hábitos y tareas archivados y las marcas de días que la regla ya no incluye (RN-16).
+- Aplican también RN-06 y RN-17.
+
+### Cómo se comprueba
+
+- **Escenario 1: porcentaje con sin marcar (RN-41).** Dado un hábito diario que en los últimos 30 días tiene 20 hechas, 5 no hechas y 5 sin marcar, cuando el usuario abre su pantalla, entonces ve 67 % con «20 hechas, 5 no hechas, 5 sin marcar».
+- **Escenario 2: hoy.** Dado ese hábito con hoy pendiente, el porcentaje no cambia; cuando el usuario marca hoy como hecho, pasa a contar y el porcentaje sube al momento.
+- **Escenario 3: racha en ocurrencias (RN-42).** Dado «Nadar» los miércoles, con los cuatro últimos miércoles hechos y el anterior no hecho, entonces la racha actual es 4.
+- **Escenario 4: lo que rompe una racha.** Dado un hábito diario hecho los últimos 5 días, sin marcar el día anterior a esos 5 y hoy pendiente, entonces la racha actual es 5; si hoy se marca no hecho, pasa a 0.
+- **Escenario 5: mapa.** Dado «Nadar» los miércoles, el mapa muestra 6 semanas de lunes a domingo, con los miércoles en su estado, el resto de días como «no tocaba» y los días después de hoy como futuros; cada día tiene su etiqueta accesible.
+- **Escenario 6: corregir desde el mapa (A2).** Cuando el usuario toca un miércoles sin marcar y elige «Hecha», entonces el día pasa a hecho y el porcentaje y la racha se recalculan.
+- **Escenario 7: cambiar de periodo.** Cuando el usuario elige 7 días, entonces los porcentajes, los recuentos y las semanas de tareas son los de los últimos 7 días.
+- **Escenario 8: sin datos (A3).** Dado un usuario sin hábitos, cuando abre Progreso, entonces ve «Sin datos» y no 0 %.
+- **Escenario 9: comparación (RN-43).** Dado 60 % en los últimos 30 días y 55 % en los 30 anteriores, entonces ve «5 puntos más que los 30 días anteriores»; con «Un año» no hay comparación.
+- **Escenario 10: de peor a mejor.** Dados «Leer» al 30 %, «Nadar» al 80 % y «Meditar» sin datos, entonces la lista es Leer, Nadar, Meditar; al tocar Leer se abre su pantalla.
+- **Escenario 11: tareas por semana (RN-44).** Dada una semana con una tarea hecha a tiempo, una hecha al día siguiente de su fecha, una no hecha, una vencida pendiente y una sin fecha marcada hecha el jueves, entonces esa semana muestra 3 hechas (una de ellas tarde), 1 no hecha y 1 pendiente.
+- **Escenario 12: cambio de hora (RNF-07).** Dado un hábito diario hecho todos los días de la semana del 19 al 25 de octubre de 2026, entonces esa semana cuenta 7 ocurrencias y la racha no se corta el domingo 25.

@@ -42,7 +42,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-09, 22:45.*
+*Actualizado: 2026-10-09, sesión de arquitecto (noche).*
 
 - **La versión 1 está publicada** (2026-10-09, PR #67, etiqueta [`v1.0.0`](https://github.com/pedrojcros/app-desarrollo-personal/releases/tag/v1.0.0)), con la 1.x y los recordatorios (1.1, R1 a R5), que solo funcionan en la app instalada. Falta el APK y, con él, R6: la comprobación del humano en su móvil (lista en el buzón).
 - **DEC-45 aplicada** (encargos A a D; el E, el orquestador por eventos, queda para diseñarlo con el arquitecto):
@@ -53,20 +53,21 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
   - las trampas, en [agentes/trampas](agentes/trampas.md).
 - **`ADP-27` hecho** (PR #73 y #74): el título «Hoy» ya no sale dos veces y sigue siendo un encabezado accesible; la fecha del añadir rápido sale con formato. El «doble engranaje» no era de la app: es la burbuja «Tools» de Expo Go, que solo existe en desarrollo.
 - **El repositorio es público** desde el 2026-10-09 (DEC-44): se podrá volver a privado cuando el ritmo de cambios baje.
+- **La versión 1.2, «Progreso», está planificada** (DEC-46): porcentaje, rachas y mapa de cada hábito, y un resumen por periodo en Historial, sin migraciones ni dependencias. Diseño y encargos 055 a 059 en [propuestas/progreso](propuestas/progreso.md). Google Calendar, con RF-04, pasa a la versión 2.
 
 
 ## Lo siguiente
 
 Para retomar en una sesión nueva:
 
-1. **Decidir qué viene** (decisión del humano): lo que queda del plan tras la 1.1 es RF-04 y la versión 2. Con `/arquitecto` si hay que planificar; con `/ejecutar-plan` si ya está planificado.
-2. **Al cerrar la siguiente versión:** Maestro una sola vez (con `docker/android/reset`) y la primera retrospectiva con `scripts/incidents/report.py` y `measure.py` (DEC-45).
-3. **Más adelante, con el arquitecto:** el diseño del orquestador por eventos (DEC-45, encargo E).
+1. **Contestar DEC-47** (cómo se organiza Jira para la 1.2), en [decisiones](decisiones.md#abiertas).
+2. **Ejecutar la 1.2 con `/ejecutar-plan`** cuando el humano lo diga: olas 055 a 057, 058 y 059 ([propuesta](propuestas/progreso.md#3-encargos-para-la-ejecución)). Al cerrar, Maestro una sola vez y la primera retrospectiva (DEC-45).
+3. **Después de esa retrospectiva, con el arquitecto:** el diseño del orquestador por eventos (DEC-45, encargo E) y la versión 2 (Google Calendar).
 
 
 ## Pendiente del humano
 
-- **APK de la versión 1:** `eas build --profile preview` cuando quieras instalarla en el móvil (gasta una de las 15 compilaciones gratis del mes).
+- **APK de la versión 1:** `eas build --profile preview` cuando quieras instalarla en el móvil (gasta una de las 15 compilaciones gratis del mes). Conviene antes de ejecutar la 1.2: Progreso tiene sentido con unos días de uso real.
 - **Recordatorios (R6):** al instalar el APK de la 1.1, la lista de comprobación del informe de R5 (permiso, aviso en punto, tras reiniciar, ahorro de batería, tocar el aviso).
 - Revisar el [buzón](buzon.md): lo que decidió el orquestador por su cuenta.
 - Revisar T01 en el móvil con Expo Go (H05) y los avisos de `npm audit` (antes de publicar y el 2026-10-14).
@@ -78,7 +79,7 @@ Para retomar en una sesión nueva:
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-46**.
+  chat. Siguiente número libre: **DEC-48**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 

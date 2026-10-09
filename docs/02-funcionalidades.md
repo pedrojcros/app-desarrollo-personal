@@ -2,7 +2,7 @@
 
 Registro de funcionalidades (`RF`) y requisitos no funcionales (`RNF`). Es el contrato de **qué hace** el sistema; el plan en [05-plan](05-plan.md) dice cómo y cuándo se construye.
 
-*Estado: **confirmado** por el humano el 2026-10-06: la versión 1 son las imprescindibles (15 desde que DEC-32 añadió RF-23, el tema); las deseables van justo después (DEC-19).*
+*Estado: **confirmado** por el humano el 2026-10-06: la versión 1 son las imprescindibles (15 desde que DEC-32 añadió RF-23, el tema); las deseables van justo después (DEC-19).* *RF-31 a RF-40 y RNF-10 son la **versión 1.2, «Progreso»** (DEC-46, 2026-10-09).*
 
 ## Cómo se escribe una funcionalidad
 
@@ -47,6 +47,16 @@ Registro de funcionalidades (`RF`) y requisitos no funcionales (`RNF`). Es el co
 | RF-28 | Activar y ajustar los recordatorios | IMPRESCINDIBLE · **HECHO** | CU-08 | | |
 | RF-29 | Abrir el elemento desde el aviso | DESEABLE | CU-08 | Hecho en ADP-25 (encargo 041) | |
 | RF-30 | Avisar en la web de que no hay recordatorios | DESEABLE · **HECHO** | — | | |
+| RF-31 | Porcentaje de cumplimiento de un hábito | IMPRESCINDIBLE (1.2) | CU-09 | | |
+| RF-32 | Rachas de un hábito | IMPRESCINDIBLE (1.2) | CU-09 | | |
+| RF-33 | Mapa de las últimas semanas de un hábito | IMPRESCINDIBLE (1.2) | CU-09 | | |
+| RF-34 | Corregir desde el mapa de un hábito | IMPRESCINDIBLE (1.2) | CU-09 | | |
+| RF-35 | Cumplimiento de un periodo | IMPRESCINDIBLE (1.2) | CU-09 | | |
+| RF-36 | Comparar con el periodo anterior | DESEABLE (1.2) | CU-09 | | |
+| RF-37 | Cumplimiento por categoría | DESEABLE (1.2) | CU-09 | | |
+| RF-38 | Hábitos de peor a mejor | IMPRESCINDIBLE (1.2) | CU-09 | | |
+| RF-39 | Tareas por semana | IMPRESCINDIBLE (1.2) | CU-09 | | |
+| RF-40 | Elegir el periodo | IMPRESCINDIBLE (1.2) | CU-09 | | |
 
 El estado de construcción **no** se apunta aquí, salvo que un encargo pida expresamente marcar una funcionalidad como hecha.
 
@@ -264,6 +274,74 @@ El estado de construcción **no** se apunta aquí, salvo que un encargo pida exp
 - **Prioridad:** DESEABLE
 - **Criterio de aceptación:** dado que el usuario abre Ajustes en el navegador, entonces ve «Los recordatorios solo funcionan en la app del móvil» y ningún interruptor.
 
+### RF-31 — Porcentaje de cumplimiento de un hábito
+
+- **Descripción:** el sistema debe mostrar, en la pantalla de un hábito, el porcentaje de sus ocurrencias de los últimos 30 días que se hicieron, contando también las que quedaron sin marcar.
+- **Prioridad:** IMPRESCINDIBLE (versión 1.2, DEC-46)
+- **Criterio de aceptación:** CU-09, escenarios 1 y 2.
+- **Notas:** RN-41, RN-45.
+
+### RF-32 — Rachas de un hábito
+
+- **Descripción:** el sistema debe mostrar, en la pantalla de un hábito, su racha actual y su mejor racha del último año, contadas en ocurrencias.
+- **Prioridad:** IMPRESCINDIBLE (versión 1.2)
+- **Criterio de aceptación:** CU-09, escenarios 3 y 4.
+- **Notas:** RN-42.
+
+### RF-33 — Mapa de las últimas semanas de un hábito
+
+- **Descripción:** el sistema debe mostrar, en la pantalla de un hábito, un calendario de las últimas 6 semanas con el estado de cada día.
+- **Prioridad:** IMPRESCINDIBLE (versión 1.2)
+- **Criterio de aceptación:** CU-09, escenario 5.
+- **Notas:** cada día, de al menos 44 puntos (RNF-03); diseño en [propuestas/progreso](propuestas/progreso.md#12-en-la-pantalla-de-cada-hábito).
+
+### RF-34 — Corregir desde el mapa de un hábito
+
+- **Descripción:** el sistema debe permitir cambiar el estado de una ocurrencia pasada o de hoy tocándola en el mapa del hábito.
+- **Prioridad:** IMPRESCINDIBLE (versión 1.2)
+- **Criterio de aceptación:** CU-09, escenario 6.
+- **Notas:** RN-03, RN-05; el mismo menú que RF-17.
+
+### RF-35 — Cumplimiento de un periodo
+
+- **Descripción:** el sistema debe mostrar, en Historial › Progreso, el porcentaje de cumplimiento de todos los hábitos en el periodo elegido y cuántas ocurrencias hay hechas, no hechas y sin marcar.
+- **Prioridad:** IMPRESCINDIBLE (versión 1.2)
+- **Criterio de aceptación:** CU-09, escenarios 1, 7 y 8.
+- **Notas:** RN-41, RN-43.
+
+### RF-36 — Comparar con el periodo anterior
+
+- **Descripción:** el sistema debe mostrar la diferencia, en puntos, entre el cumplimiento del periodo elegido y el del periodo anterior de la misma longitud.
+- **Prioridad:** DESEABLE (versión 1.2)
+- **Criterio de aceptación:** CU-09, escenario 9.
+- **Notas:** RN-43: el año no tiene comparación.
+
+### RF-37 — Cumplimiento por categoría
+
+- **Descripción:** el sistema debe mostrar el porcentaje de cumplimiento de los hábitos de cada categoría y de la Bandeja en el periodo elegido.
+- **Prioridad:** DESEABLE (versión 1.2)
+- **Criterio de aceptación:** dado que en los últimos 30 días los hábitos de Salud se cumplieron al 90 % y los de Universidad al 40 %, cuando el usuario abre Progreso, entonces ve Universidad antes que Salud, con sus porcentajes.
+
+### RF-38 — Hábitos de peor a mejor
+
+- **Descripción:** el sistema debe mostrar la lista de hábitos con su porcentaje en el periodo, del peor al mejor, y abrir la pantalla del hábito al tocar uno.
+- **Prioridad:** IMPRESCINDIBLE (versión 1.2)
+- **Criterio de aceptación:** CU-09, escenario 10.
+
+### RF-39 — Tareas por semana
+
+- **Descripción:** el sistema debe mostrar, por cada semana del periodo, cuántas tareas se hicieron, cuántas se hicieron tarde, cuántas no se hicieron y cuántas siguen pendientes tras su fecha.
+- **Prioridad:** IMPRESCINDIBLE (versión 1.2)
+- **Criterio de aceptación:** CU-09, escenario 11.
+- **Notas:** RN-44.
+
+### RF-40 — Elegir el periodo
+
+- **Descripción:** el sistema debe permitir elegir el periodo de Progreso entre 7 días, 30 días, 90 días y un año, con 30 días por defecto.
+- **Prioridad:** IMPRESCINDIBLE (versión 1.2)
+- **Criterio de aceptación:** CU-09, escenario 7.
+- **Notas:** RN-43.
+
 ## Requisitos no funcionales
 
 Cómo de bien tiene que hacerlo. Cada uno con **un número**, no con adjetivos.
@@ -279,5 +357,6 @@ Cómo de bien tiene que hacerlo. Cada uno con **un número**, no con adjetivos.
 | RNF-07 | Fechas | Zona horaria del dispositivo (para el dueño, Europe/Madrid); los cambios de hora no duplican ni pierden ocurrencias, ni mueven sus horas | Tests en los días de cambio de hora |
 | RNF-08 | Móvil | Funciona instalada en las versiones de Android que soporta el SDK de Expo fijado, en pantallas desde 360 dp de ancho; la misma app se usa en el navegador del ordenador sin romperse *(versión 1, DEC-24)* | Flujos de Maestro en el emulador; prueba de la web con el MCP de Chrome |
 | RNF-09 | Recordatorios | En la app instalada, con el permiso concedido y sin ahorro de batería extremo, un aviso llega **como mucho 2 minutos** después de su hora; los avisos siguen programados **después de reiniciar el móvil** | Comprobación manual del humano con el APK (lista del encargo R6) |
+| RNF-10 | Rendimiento de Progreso | Con los datos sintéticos de un año (los de RNF-01), Progreso con el periodo «Un año» se calcula y se muestra en menos de 1 segundo, y el bloque de un hábito también | El test de rendimiento de RNF-01, ampliado (encargo 058) |
 
 Si un requisito no funcional no tiene número, todavía es una intención.
