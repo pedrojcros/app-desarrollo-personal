@@ -1,0 +1,36 @@
+appId: host.exp.exponent
+---
+- tapOn: Hoy
+- tapOn: Añadir tarea o hábito
+- inputText: E2E barra sobre teclado
+- assertVisible:
+    id: com.google.android.inputmethod.latin:id/key_pos_space
+- assertVisible: Enviar
+- assertVisible: 'Fecha: Sin fecha'
+- assertVisible: 'Fecha: Hoy'
+- assertVisible: 'Fecha: Mañana'
+- assertVisible: 'Fecha: Lunes'
+- takeScreenshot: quick-add-keyboard-open
+- tapOn: 'Fecha: Mañana'
+- tapOn: 'Fecha: Lunes'
+- tapOn: 'Fecha: Sin fecha'
+- tapOn: 'Fecha: Hoy'
+- assertVisible:
+    id: com.google.android.inputmethod.latin:id/key_pos_space
+- tapOn: 'Categoría: Bandeja de entrada'
+- assertVisible:
+    text: Bandeja de entrada
+    above: 'Categoría: Bandeja de entrada'
+- takeScreenshot: quick-add-keyboard-category
+- tapOn:
+    text: Bandeja de entrada
+    above: 'Categoría: Bandeja de entrada'
+- tapOn: Enviar
+- assertVisible:
+    text: '¿Qué quieres añadir?'
+- assertVisible:
+    id: com.google.android.inputmethod.latin:id/key_pos_space
+- takeScreenshot: quick-add-keyboard-after-send
+- pressKey: BACK
+- tapOn: Cerrar añadir rápido
+- assertVisible: E2E barra sobre teclado
