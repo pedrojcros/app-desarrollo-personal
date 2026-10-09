@@ -66,11 +66,13 @@ Comprobable, no subjetivo:
 
 ## Cómo informar al terminar
 
-Responde con estos seis puntos:
+En la descripción del PR, con estos seis puntos y **en formato corto** (DEC-45: el orquestador lo lee entero, y cada línea le cuesta). Sin repetir el encargo ni pegar salidas largas:
 
-1. Qué has hecho, en tres líneas.
-2. Ficheros tocados.
-3. Decisiones que has tomado tú y por qué.
-4. Dudas o cosas que no estaban especificadas.
-5. Resultado de los tests (comando y salida resumida).
-6. Enlace al PR.
+1. **Hecho:** qué has hecho, en tres líneas como mucho.
+2. **Ficheros:** la lista, sin explicar cada uno.
+3. **Decisiones:** las que has tomado tú, una línea cada una con su porqué. «Ninguna» si no hay.
+4. **Dudas:** lo que no estaba especificado, una línea cada una. «Ninguna» si no hay.
+5. **Tests:** el comando y el resultado en una línea (`npm run test: 640 pasan`). Si algo falla, el nombre del test y el error, nada más.
+6. **PR:** el enlace.
+
+Y al final, `worker_done` con un resumen de tres frases.
