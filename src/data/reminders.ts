@@ -18,19 +18,20 @@ import {
   prepareReminderChannels,
   scheduleReminder,
 } from '../platform/notifications';
-import { loadReminderSettings } from './reminder-settings';
+import {
+  loadReminderSettings,
+  reminderSettingsQueryKey,
+} from './reminder-settings';
 import { fetchReminderData } from './reminders-read';
 import { fail, succeed, type DataResult } from './result';
 import { getDeviceTimeZone } from './time-zone';
 import { useToday } from './use-today';
 
-// R3 publicará esta misma clave; mientras no esté en develop se comparte el valor.
-const reminderSettingsQueryKey = ['reminder-settings'] as const;
-
 interface SyncOptions {
   settings?: ReminderSettings;
   signal?: AbortSignal;
 }
+
 let syncQueue: Promise<void> = Promise.resolve();
 let cancellationVersion = 0;
 

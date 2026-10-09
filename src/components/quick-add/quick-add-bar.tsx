@@ -19,25 +19,20 @@ export function QuickAddBar({
 }) {
   const { colors, fonts } = useTheme();
   const {
-    today,
-    name,
-    setName,
-    kind,
-    setKind,
-    place,
-    setPlace,
-    dueDate,
-    setDueDate,
-    startDate,
-    setStartDate,
-    options,
-    setOptions,
-    error,
-    setError,
-    disabled,
-    nameInput,
-    submit,
-    openMore,
+    draft: { today, name, kind, place, dueDate, startDate, options },
+    actions: {
+      setName,
+      setKind,
+      setPlace,
+      setDueDate,
+      setStartDate,
+      setOptions,
+      setError,
+      setNameInputRef,
+      submit,
+      openMore,
+    },
+    status: { error, disabled },
   } = useQuickAddDraft(defaults, close);
   // El preflight de Tailwind pinta de gris el campo vacío en la web y no llega
   // al contraste mínimo; el color en línea lo corrige.
@@ -47,7 +42,7 @@ export function QuickAddBar({
     <View className="gap-3 bg-surface p-4">
       <View className="flex-row items-center gap-3">
         <TextInput
-          ref={nameInput}
+          ref={setNameInputRef}
           autoFocus
           accessibilityLabel="Nombre"
           placeholder="¿Qué quieres añadir?"

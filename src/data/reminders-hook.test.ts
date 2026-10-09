@@ -6,14 +6,22 @@ import { AppState, type AppStateStatus } from 'react-native';
 import { useReminderSync } from './reminders';
 import { fetchReminderData } from './reminders-read';
 import * as platform from '../platform/notifications';
-import { loadReminderSettings } from './reminder-settings';
+import {
+  loadReminderSettings,
+  reminderSettingsQueryKey,
+} from './reminder-settings';
 import { DEFAULT_REMINDER_SETTINGS } from '../domain/reminder-types';
 import { succeed } from './result';
 
 jest.mock('../platform/notifications');
 jest.mock('expo-notifications', () => ({ setNotificationHandler: jest.fn() }));
 jest.mock('./reminders-read', () => ({ fetchReminderData: jest.fn() }));
-jest.mock('./reminder-settings');
+jest.mock('./reminder-settings', () => ({
+  ...jest.requireActual<typeof import('./reminder-settings')>(
+    './reminder-settings',
+  ),
+  loadReminderSettings: jest.fn(),
+}));
 let queryClient: QueryClient;
 let onForeground: (state: AppStateStatus) => void;
 let readCount: number;
@@ -121,7 +129,7 @@ it('refreshes when settings change and when the local day changes', async () => 
   const { unmount } = renderHook(() => useReminderSync(true), { wrapper });
   await flush();
   act(() => {
-    queryClient.setQueryData(['reminder-settings'], {
+    queryClient.setQueryData(reminderSettingsQueryKey, {
       ...DEFAULT_REMINDER_SETTINGS,
       enabled: false,
     });
@@ -129,7 +137,10 @@ it('refreshes when settings change and when the local day changes', async () => 
   await flush();
   expect(platform.cancelAllReminders).toHaveBeenCalled();
   act(() => {
-    queryClient.setQueryData(['reminder-settings'], DEFAULT_REMINDER_SETTINGS);
+    queryClient.setQueryData(
+      reminderSettingsQueryKey,
+      DEFAULT_REMINDER_SETTINGS,
+    );
   });
   await flush();
   expect(readCount).toBe(2);

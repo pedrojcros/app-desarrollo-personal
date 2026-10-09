@@ -1,15 +1,19 @@
 import { addDays, getIsoWeekday } from './calendar-date';
 import type { CalendarDate } from './types';
+
 export interface QuickAddDefaults {
   dueDate: CalendarDate | null;
   categoryId: string | null;
   sectionId: string | null;
 }
+
 export type QuickAddOrigin =
   | { kind: 'today' | 'other' }
   | { kind: 'category'; categoryId: string }
   | { kind: 'section'; categoryId: string; sectionId: string };
+
 export type QuickAddDateShortcut = 'none' | 'today' | 'tomorrow' | 'monday';
+
 export function getQuickAddDefaults(
   origin: QuickAddOrigin,
   today: CalendarDate,
@@ -29,12 +33,14 @@ export function getQuickAddDefaults(
   }
   return { dueDate: null, categoryId: null, sectionId: null };
 }
+
 export function getQuickAddStartDate(
   date: CalendarDate | null,
   today: CalendarDate,
 ): CalendarDate {
   return date ?? today;
 }
+
 export function getQuickAddShortcutDate(
   shortcut: QuickAddDateShortcut,
   today: CalendarDate,
