@@ -1,0 +1,125 @@
+#!/bin/sh
+set -eu
+
+if [ "$#" -eq 0 ]; then
+  echo 'Usage: scripts/with-heavy-lock <command> [arguments...]' >&2
+  exit 2
+fi
+
+project_directory=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+wait_minutes=${HEAVY_LOCK_WAIT_MINUTES:-30}
+maximum_minutes=${HEAVY_LOCK_MAX_MINUTES:-45}
+
+validate_positive_integer() {
+  case "$2" in
+    ''|*[!0-9]*|0*)
+      echo "$1 must be a positive integer without leading zeros." >&2
+      exit 2
+      ;;
+  esac
+}
+
+validate_positive_integer HEAVY_LOCK_WAIT_MINUTES "$wait_minutes"
+validate_positive_integer HEAVY_LOCK_MAX_MINUTES "$maximum_minutes"
+wait_seconds=${HEAVY_LOCK_WAIT_SECONDS:-$((wait_minutes * 60))}
+maximum_seconds=${HEAVY_LOCK_MAX_SECONDS:-$((maximum_minutes * 60))}
+validate_positive_integer HEAVY_LOCK_WAIT_SECONDS "$wait_seconds"
+validate_positive_integer HEAVY_LOCK_MAX_SECONDS "$maximum_seconds"
+command_name=$1
+command_description="$*"
+container_name=
+timeout_diagnostics=
+
+record_incident() {
+  incident_seconds=$1
+  incident_cause=$2
+  incident_script="$project_directory/scripts/incidents/record_incident.py"
+  if [ ! -f "$incident_script" ]; then
+    return
+  fi
+  incident_minutes=$(((incident_seconds + 59) / 60))
+  if ! timeout --kill-after=2s 10s python3 "$incident_script" \
+    --type environment --minutes "$incident_minutes" \
+    --cause "$incident_cause" --source orchestrator 9>&-; then
+    echo 'Could not record the heavy-lock incident.' >&2
+  fi
+}
+
+remove_command_containers() {
+  if [ -z "$container_name" ]; then
+    return
+  fi
+  container_ids=$(timeout --kill-after=2s 10s docker ps -aq \
+    --filter "name=^/${container_name}$" 9>&-) || return 1
+  if [ -n "$container_ids" ]; then
+    timeout --kill-after=2s 10s docker rm -f "$container_name" 9>&- || return 1
+  fi
+  remaining_containers=$(timeout --kill-after=2s 10s docker ps -q \
+    --filter "name=^/${container_name}$" 9>&-) || return 1
+  if [ -n "$remaining_containers" ]; then
+    echo 'The command container is still running after cleanup.' >&2
+    return 1
+  fi
+}
+
+finish() {
+  previous_status=$?
+  trap - EXIT
+  if ! remove_command_containers; then
+    echo 'Could not verify removal of the command container.' >&2
+    if [ "$previous_status" -eq 0 ]; then
+      previous_status=1
+    fi
+  fi
+  if [ -n "$timeout_diagnostics" ]; then
+    rm -f "$timeout_diagnostics"
+  fi
+  exit "$previous_status"
+}
+
+exec 9>/tmp/adp-pesado.lock
+lock_status=0
+flock --exclusive --timeout "$wait_seconds" --conflict-exit-code 124 9 || lock_status=$?
+if [ "$lock_status" -ne 0 ]; then
+  echo "Heavy lock not acquired within $wait_seconds seconds: $command_description" >&2
+  record_incident "$wait_seconds" "Lock wait expired: $command_description"
+  exit "$lock_status"
+fi
+
+case "$command_name" in
+  ./docker/app/run|docker/app/run|"$project_directory/docker/app/run")
+    if [ "${2:-}" != build ]; then
+      # El nombre evita detener los contenedores de otros trabajadores.
+      # Replica el entorno de docker/app/run para poder nombrar su contenedor.
+      container_name="adp-heavy-$(id -u)-$$"
+      cd "$project_directory"
+      export PWD="$project_directory"
+      export APP_UID=$(id -u)
+      export APP_GID=$(id -g)
+      export DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+      shift
+      set -- docker compose run --rm --pull never --name "$container_name" app "$@"
+    fi
+    ;;
+esac
+trap finish EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+trap 'exit 129' HUP
+
+command_status=0
+timeout_diagnostics=$(mktemp)
+# Se separan los avisos de timeout para distinguir un exit 137 de una muerte forzada.
+# Los hijos no heredan el candado; solo este supervisor lo mantiene hasta la limpieza.
+LC_ALL=C timeout --verbose --kill-after=5s "${maximum_seconds}s" \
+  sh -c 'exec 2>&8 8>&-; exec "$@"' sh "$@" \
+  8>&2 2>"$timeout_diagnostics" 9>&- || command_status=$?
+if [ -s "$timeout_diagnostics" ]; then
+  cat "$timeout_diagnostics" >&2
+fi
+if grep -q 'sending signal' "$timeout_diagnostics"; then
+  command_status=124
+  echo "Command exceeded the heavy-lock limit of $maximum_seconds seconds: $command_description" >&2
+  record_incident "$maximum_seconds" "Command time limit expired: $command_description"
+fi
+exit "$command_status"

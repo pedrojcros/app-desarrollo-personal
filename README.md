@@ -126,8 +126,19 @@ densidad originales:
 
 ```sh
 ./docker/app/run npm run start -- --port 8090
-flock /tmp/adp-pesado.lock ./docker/app/run env EXPO_PORT=8090 npm run test:e2e
+scripts/with-heavy-lock ./docker/app/run env EXPO_PORT=8090 npm run test:e2e
 ```
+
+El reinicio tiene un máximo de 420 segundos de arranque, configurable con
+`ANDROID_RESET_TIMEOUT_SECONDS`, y comprueba `emulator-5554` y
+`sys.boot_completed=1` sin reiniciar el servidor ADB compartido del puerto 5037.
+El candado espera hasta `HEAVY_LOCK_WAIT_MINUTES` (30 por defecto) y limita la
+orden a `HEAVY_LOCK_MAX_MINUTES` (45 por defecto), con muerte forzada 5 segundos
+después. Al vencer, elimina y comprueba el contenedor de esa orden si usaba
+`./docker/app/run`, devuelve 124 y registra la incidencia si está disponible
+`scripts/incidents/record_incident.py`. Para pruebas rápidas se pueden usar
+`HEAVY_LOCK_WAIT_SECONDS` y `HEAVY_LOCK_MAX_SECONDS`, enteros positivos que
+prevalecen sobre los minutos. Los hijos no heredan el candado.
 
 Los flujos cubren iniciar sesión, crear una tarea rápida desde Hoy, marcarla y
 deshacer, crear un hábito semanal, crear una categoría con sección y tarea,
