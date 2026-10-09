@@ -42,10 +42,11 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-09, 19:15.*
+*Actualizado: 2026-10-09, 20:30.*
 
 - **La versión 1 está publicada** (2026-10-09): el humano pasó `develop` a `main` (PR #67), la CI hizo la copia cifrada, aplicó las migraciones y publicó la web de producción, y la etiqueta es [`v1.0.0`](https://github.com/pedrojcros/app-desarrollo-personal/releases/tag/v1.0.0). El humano ya entra con su usuario de producción. Falta el APK (`eas build --profile preview`), cuando quiera instalarla en el móvil.
 - **Esa publicación incluye** la 1.x (RF-09, RF-10, RF-13, RF-14, RF-16, RF-17, RF-22) y **los recordatorios completos (1.1, R1 a R5)**, que solo funcionan en la app instalada (en Expo Go se desactivan). Queda R6: la comprobación del humano en su móvil con el APK (lista en el buzón).
+- **Aprobada la mejora del flujo de trabajo** (DEC-45, [propuesta](propuestas/mejora-del-flujo.md)): registro de incidencias, medida de tokens por encargo, orquestador con sesiones cortas, regla para dividir y Maestro solo al cerrar. Falta aplicarla.
 - **El repositorio es público** desde el 2026-10-09 (DEC-44) y la CI gasta unos 17 minutos menos por PR: se podrá volver a privado cuando el ritmo de cambios baje.
 - **Arreglado (encargo 046, PR #65):** en Android el teclado ya no tapa la barra del añadir rápido; tiene su flujo de Maestro. La pasada completa de Maestro a 360 dp a veces se corta porque ADB pierde el emulador (problema del entorno de pruebas, no de la app).
 
@@ -54,8 +55,9 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 Para retomar en una sesión nueva (`/ejecutar-plan`; activa la cafeína al empezar):
 
-1. Preguntar al humano por los detalles visuales del buzón (2026-10-09) y, si quiere, encargarlos.
-2. Lo que queda del plan tras la 1.1 (RF-04 y la versión 2) es decisión del humano: preguntarle.
+1. **Aplicar DEC-45 antes que nada**: encargos A (registro de incidencias), B (medida por encargo) y C (reinicio del emulador y tiempo máximo en el candado) a la vez, y después D (documentación del orquestador, `trampas.md` y este fichero más corto). Detalle en el apartado 4 de la [propuesta](propuestas/mejora-del-flujo.md#4-cómo-se-aplicaría-si-se-aprueba). En una sesión nueva: es la propia DEC-45.
+2. Los detalles visuales del buzón ya tienen tarjeta (`ADP-27`): encargarlos cuando el humano lo diga.
+3. Lo que queda del plan tras la 1.1 (RF-04 y la versión 2) es decisión del humano: preguntarle.
 
 
 ## Pendiente del humano
@@ -72,7 +74,7 @@ Para retomar en una sesión nueva (`/ejecutar-plan`; activa la cafeína al empez
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-45**.
+  chat. Siguiente número libre: **DEC-46**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
