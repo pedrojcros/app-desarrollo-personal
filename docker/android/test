@@ -38,10 +38,6 @@ read_density() {
 
 run_suite() {
   suite_name=$1
-  frequency_option_y=64%
-  if [ "$suite_name" = 360dp ]; then
-    frequency_option_y=58%
-  fi
   e2e_password=$(node scripts/e2e/prepare-user.mjs)
   export e2e_password
   # Cada tamaño usa una sesión nueva y borra la sesión anterior de Expo Go.
@@ -52,7 +48,6 @@ run_suite() {
     -e "EXPO_PORT=$expo_port" \
     -e "EMAIL=$email" \
     -e "PASSWORD=$e2e_password" \
-    -e "FREQUENCY_OPTION_Y=$frequency_option_y" \
     --test-output-dir "/tmp/maestro-results/$suite_name" \
     /workspace/e2e/critical-paths.yaml || maestro_status=$?
   # Maestro guarda todas las variables -e en commands.json, incluida la clave.
