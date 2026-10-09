@@ -31,6 +31,48 @@ describe('realistic student data', () => {
     ).toBe(true);
   });
 
+  it('places household and health tasks in their categories with pending items', () => {
+    const data = generateRealistic();
+    const expectedCategories = [
+      ['Lavar las sábanas', 'Casa'],
+      ['Sacar la basura', 'Casa'],
+      ['Limpiar la cocina', 'Casa'],
+      ['Ordenar el escritorio', 'Casa'],
+      ['Reservar pista para el viernes', 'Salud'],
+      ['Revisar la bicicleta', 'Salud'],
+      ['Ir al entrenamiento', 'Salud'],
+      ['Llamar al dentista', 'Salud'],
+    ];
+    for (const [taskName, categoryName] of expectedCategories) {
+      const task = data.tasks.find(
+        (task: { name: string }) => task.name === taskName,
+      );
+      const category = data.categories.find(
+        (category: { name: string }) => category.name === categoryName,
+      );
+      expect(task.category_id).toBe(category.id);
+      const section = data.sections.find(
+        (section: { id: string }) => section.id === task.section_id,
+      );
+      expect(section.category_id).toBe(category.id);
+    }
+    for (const categoryName of ['Salud', 'Casa']) {
+      const category = data.categories.find(
+        (category: { name: string }) => category.name === categoryName,
+      );
+      const pendingTasks = data.tasks.filter(
+        (task: { status: string; category_id: string }) =>
+          task.status === 'pending' && task.category_id === category.id,
+      );
+      expect(pendingTasks.length).toBeGreaterThanOrEqual(2);
+    }
+    const backpack = data.tasks.find(
+      (task: { name: string }) => task.name === 'Mirar una mochila nueva',
+    );
+    expect(backpack.category_id).toBeNull();
+    expect(backpack.section_id).toBeNull();
+  });
+
   it('has ten habits with the requested active frequencies and swimming time', () => {
     const data = generateRealistic();
     expect(data.habits).toHaveLength(10);

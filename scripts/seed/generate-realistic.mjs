@@ -61,60 +61,59 @@ const HABIT_TEMPLATES = [
 ];
 const TASK_GROUPS = [
   {
-    names: [
-      'Entregar práctica de cálculo',
-      'Pedir tutoría de física',
-      'Devolver libro a la biblioteca',
-      'Lavar las sábanas',
-      'Renovar el abono de transporte',
+    tasks: [
+      { name: 'Entregar práctica de cálculo', category: 0 },
+      { name: 'Pedir tutoría de física', category: 0 },
+      { name: 'Devolver libro a la biblioteca', category: 0 },
+      { name: 'Lavar las sábanas', category: 2 },
+      { name: 'Renovar el abono de transporte', category: 2 },
     ],
     offset: -7,
-    category: 0,
   },
   {
-    names: ['Revisar apuntes de álgebra', 'Ir a la tutoría', 'Sacar la basura'],
+    tasks: [
+      { name: 'Revisar apuntes de álgebra', category: 0 },
+      { name: 'Ir a la tutoría', category: 0 },
+      { name: 'Sacar la basura', category: 2 },
+    ],
     offset: 0,
-    category: 0,
   },
   {
-    names: [
-      'Preparar exposición de historia',
-      'Entregar ensayo de literatura',
-      'Estudiar el parcial de cálculo',
-      'Reservar pista para el viernes',
-      'Limpiar la cocina',
-      'Hacer la matrícula',
-      'Comprar regalo de cumpleaños',
-      'Revisar la bicicleta',
+    tasks: [
+      { name: 'Preparar exposición de historia', category: 0 },
+      { name: 'Entregar ensayo de literatura', category: 0 },
+      { name: 'Estudiar el parcial de cálculo', category: 0 },
+      { name: 'Reservar pista para el viernes', category: 1 },
+      { name: 'Limpiar la cocina', category: 2 },
+      { name: 'Hacer la matrícula', category: 0 },
+      { name: 'Comprar regalo de cumpleaños', category: 3 },
+      { name: 'Revisar la bicicleta', category: 1 },
     ],
     offset: 2,
-    category: 0,
   },
   {
-    names: [
-      'Comprar leche',
-      'Comprar huevos',
-      'Comprar fruta',
-      'Comprar arroz',
-      'Comprar jabón',
-      'Mirar una mochila nueva',
+    tasks: [
+      { name: 'Comprar leche', category: 3 },
+      { name: 'Comprar huevos', category: 3 },
+      { name: 'Comprar fruta', category: 3 },
+      { name: 'Comprar arroz', category: 3 },
+      { name: 'Comprar jabón', category: 3 },
+      { name: 'Mirar una mochila nueva' },
     ],
     offset: null,
-    category: 3,
   },
   {
-    names: [
-      'Entregar resumen de biología',
-      'Hacer práctica de programación',
-      'Ir al entrenamiento',
-      'Ordenar el escritorio',
-      'Llamar al dentista',
-      'Asistir al seminario',
-      'Enviar trabajo de física',
-      'Devolver el préstamo',
+    tasks: [
+      { name: 'Entregar resumen de biología', category: 0 },
+      { name: 'Hacer práctica de programación', category: 0 },
+      { name: 'Ir al entrenamiento', category: 1 },
+      { name: 'Ordenar el escritorio', category: 2 },
+      { name: 'Llamar al dentista', category: 1 },
+      { name: 'Asistir al seminario', category: 0 },
+      { name: 'Enviar trabajo de física', category: 0 },
+      { name: 'Devolver el préstamo', category: 2 },
     ],
     offset: -30,
-    category: 0,
     resolved: true,
   },
 ];
@@ -218,19 +217,22 @@ function createHabitMarks(habit, context, habitIndex) {
   return marks;
 }
 
-function createTask(group, name, taskIndex, context) {
-  let dueDate = null;
-  if (group.offset !== null) {
-    let offset = group.offset;
-    if (offset !== 0) {
-      offset += taskIndex * 2;
-    }
-    // Las cinco vencidas deben seguir vencidas.
-    if (group.offset === -7) {
-      offset = -taskIndex - 1;
-    }
-    dueDate = addDays(context.today, offset);
+function getTaskDueDate(group, taskIndex, today) {
+  if (group.offset === null) {
+    return null;
   }
+  if (group.offset === -7) {
+    return addDays(today, -taskIndex - 1);
+  }
+  if (group.offset === 0) {
+    return today;
+  }
+  const offset = group.offset + taskIndex * 2;
+  return addDays(today, offset);
+}
+
+function createTask(group, template, taskIndex, context) {
+  const dueDate = getTaskDueDate(group, taskIndex, context.today);
   let status = 'pending';
   let markedAt = null;
   if (group.resolved) {
@@ -241,14 +243,15 @@ function createTask(group, name, taskIndex, context) {
     }
     markedAt = `${markedDate}T19:00:00Z`;
   }
-  let placement = createPlacement(group, context.categories, context.sections);
-  if (name === 'Mirar una mochila nueva') {
-    placement = { category_id: null, section_id: null };
-  }
+  const placement = createPlacement(
+    template,
+    context.categories,
+    context.sections,
+  );
   return {
     id: context.identifiers.nextUuid(),
     user_id: context.userId,
-    name,
+    name: template.name,
     due_date: dueDate,
     due_time: group.offset === 0 && taskIndex === 1 ? '12:00' : null,
     status,
@@ -281,8 +284,8 @@ export function generateRealistic({ userId, today }) {
   }
   const tasks = [];
   for (const group of TASK_GROUPS) {
-    for (let taskIndex = 0; taskIndex < group.names.length; taskIndex += 1) {
-      tasks.push(createTask(group, group.names[taskIndex], taskIndex, context));
+    for (let taskIndex = 0; taskIndex < group.tasks.length; taskIndex += 1) {
+      tasks.push(createTask(group, group.tasks[taskIndex], taskIndex, context));
     }
   }
   return {
