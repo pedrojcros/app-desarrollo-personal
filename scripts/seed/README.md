@@ -1,46 +1,101 @@
-# Datos sintéticos de un año
+# Datos sintéticos
 
-Siembra en el Supabase **local** un año de datos para medir el rendimiento
-(RNF-01). Es determinista: dos ejecuciones dan los mismos datos.
+La siembra es determinista respecto a `SEED_TODAY` (por defecto, hoy en la zona
+horaria del dispositivo) y el usuario. Reutiliza el usuario o lo crea mediante
+la API de administración, comprueba su correo e identificador antes del borrado
+y **borra únicamente sus datos** antes de insertar el perfil elegido.
 
-## Uso
+## Uso local
 
-Con Supabase arrancado:
+Con Supabase local arrancado:
 
 ```sh
 ./scripts/seed/seed-synthetic-year.sh
+SEED_PROFILE=realistic ./scripts/seed/seed-synthetic-year.sh
 ```
 
-Crea (o reutiliza) el usuario `seed@example.com`, **borra los datos que ya tenga
-ese usuario** y vuelve a sembrarlos. Si no pones contraseña, genera una y la
-muestra. Variables opcionales:
+El usuario local por defecto es `seed@example.com`. Para entrar con él, define
+`SEED_USER_PASSWORD` en el entorno antes de sembrar. Si no la defines, el
+envoltorio genera una contraseña local aleatoria, sin imprimirla.
 
-| Variable             | Para qué                                                              |
-| -------------------- | --------------------------------------------------------------------- |
-| `SEED_USER_EMAIL`    | Otro usuario de siembra (solo se tocan sus datos).                    |
-| `SEED_USER_PASSWORD` | Su contraseña.                                                        |
-| `SEED_TODAY`         | «Hoy» como `YYYY-MM-DD`; por defecto, hoy en la zona del dispositivo. |
+| Variable                | Para qué                                                      |
+| ----------------------- | ------------------------------------------------------------- |
+| `SEED_PROFILE`          | `year` (por defecto) o `realistic`; otros valores dan error.  |
+| `SEED_TARGET`           | `local` (por defecto) o `pruebas`; otros valores dan error.   |
+| `SEED_USER_EMAIL`       | Correo local alternativo; en pruebas solo `demo@example.com`. |
+| `SEED_USER_PASSWORD`    | Contraseña; obligatoria en pruebas, nunca se imprime.         |
+| `SEED_TODAY`            | «Hoy» como `YYYY-MM-DD`.                                      |
+| `SEED_API_URL`          | API local alternativa; obligatoria y exacta en pruebas.       |
+| `SUPABASE_ACCESS_TOKEN` | Token para obtener la clave de servicio de pruebas.           |
 
-## Qué genera
+El envoltorio pasa las variables por su nombre a Docker, sin incluir los
+secretos en la línea de comandos. No guarda la clave de servicio en archivos.
+
+## Perfiles
+
+`year` conserva los datos de rendimiento de RNF-01:
 
 - 8 categorías con 18 secciones.
 - 50 hábitos: 42 diarios, 3 por días de la semana, 3 cada N días y 2 mensuales.
   Seis cambian de regla a mitad de año, cinco empiezan tarde y tres están
-  archivados. Eso son unas 14.500 ocurrencias en el año (con 50 hábitos no caben
-  20.000: el máximo es 50 × 365 = 18.250), de las que unas 12.800 llevan marca
-  (la mayoría `done`, algunas `not_done`, el resto sin marcar).
-- 2.000 tareas: con fecha (vencidas, de hoy y futuras), sin fecha, hechas,
-  no hechas, pendientes y algunas archivadas.
+  archivados. Unas 14.500 ocurrencias y 12.800 marcas en un año.
+- 2.000 tareas con fecha y sin fecha, pendientes, resueltas y archivadas.
 
-## Seguridad
+`realistic` permite revisar la interfaz con datos de un estudiante:
 
-Se niega a funcionar (y sale con error sin escribir nada) si la URL de la API no
-es `localhost`, `127.0.0.1`, `[::1]` o un contenedor `supabase_*`. La clave de
-servicio se lee de `supabase status` en el momento y no se guarda.
+- Universidad, Salud, Casa y Compra, cada una con una sección, y elementos en
+  la Bandeja.
+- 10 hábitos: 5 diarios activos con horas o franjas, 2 por días de la semana
+  (Nadar los miércoles a las 17:00), 1 cada 3 días, 1 mensual y 1 archivado.
+- 30 tareas: 5 vencidas pendientes, 3 de hoy (una a las 12:00), 8 en las próximas
+  tres semanas, 6 sin fecha y 8 resueltas en el pasado, incluidas 2 hechas tarde.
+- Los 90 días anteriores a hoy de historial: aproximadamente 75 % hecho,
+  10 % no hecho y 15 % sin marcar. Leer antes de dormir tiene una racha de
+  14 días hechos hasta ayer; hoy queda sin marcar.
 
-## Prueba
+## Pruebas remotas
 
-`src/data/performance.integration.test.ts` siembra un usuario propio con este
-script y mide Hoy (< 500 ms), Pendientes y el historial de 30 días (< 1 s),
-con la mediana de 5 ejecuciones tras una de calentamiento. También comprueba que
-el script rechaza una URL que no es local.
+Solo el orquestador hace la primera siembra tras fusionar el PR. Para sembrar
+desde su ordenador mientras el flujo no está en `main`, en una shell **sin
+trazado de comandos** (`set -x` debe estar desactivado):
+
+```sh
+set +x
+set -a
+. "$HOME/.config/app-desarrollo-personal/secretos.env"
+set +a
+export SEED_USER_PASSWORD="$PRUEBAS_DEMO_PASSWORD"
+SEED_TARGET=pruebas SEED_PROFILE=realistic \
+  SEED_API_URL=https://oxkjbousfzkpkcrxdhqj.supabase.co \
+  ./scripts/seed/seed-synthetic-year.sh
+unset SEED_USER_PASSWORD
+```
+
+No escribas la contraseña ni el token en el comando. El correo por defecto en
+pruebas es `demo@example.com`. Cuando `seed-pruebas.yml` esté en `main`, también
+se podrá repetir desde Actions → **Sembrar demostración en pruebas** →
+**Run workflow**. Usa el entorno GitHub `pruebas` y su secreto
+`PRUEBAS_DEMO_PASSWORD`; se serializa con el despliegue y las copias de pruebas.
+
+## Seguridad y pruebas
+
+Sin `SEED_TARGET`, o con `local`, solo se aceptan `localhost`, `127.0.0.1`,
+`[::1]` o un contenedor `supabase_*`. La clave local se obtiene de
+`supabase status` en memoria.
+
+Con `SEED_TARGET=pruebas` se exige exactamente
+`https://oxkjbousfzkpkcrxdhqj.supabase.co`, el correo `demo@example.com` y una
+contraseña explícita. Antes de escribir, la CLI obtiene la clave `service_role`
+con `supabase projects api-keys --project-ref oxkjbousfzkpkcrxdhqj -o json`,
+usando el token del entorno; su salida se captura, nunca se imprime ni guarda.
+En Actions se emite `::add-mask::` inmediatamente al obtenerla. **Producción
+(`cidrlwpsqkygnuxiffsu.supabase.co`) se rechaza siempre.** Ningún otro destino
+remoto está permitido.
+
+`src/data/seed.test.ts` prueba la protección, la identidad y la gestión de claves,
+y `src/data/seed-profile.test.ts` comprueba el perfil realista, sin peticiones
+remotas. `src/data/seed.integration.test.ts` comprueba la resiembra y la
+conservación de los datos de otro usuario contra Supabase local.
+`src/data/performance.integration.test.ts` sigue usando `year` en Supabase local
+y comprueba las consultas de Hoy, Pendientes e historial, además del rechazo de
+una URL remota sin destino explícito.

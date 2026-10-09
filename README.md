@@ -176,6 +176,16 @@ de errores; no se usa Maestro Cloud. El
 Las imágenes propias tienen `pull_policy: never`: si faltan, constrúyelas.
 El emulador requiere KVM y se comprueba localmente, sin añadirlo a la CI.
 
+## Datos sintéticos
+
+Con Supabase local arrancado, `./scripts/seed/seed-synthetic-year.sh` conserva
+el perfil `year` de rendimiento. `SEED_PROFILE=realistic ./scripts/seed/seed-synthetic-year.sh` genera 4 categorías, 10 hábitos,
+30 tareas y 90 días de historial de un estudiante. Solo reemplaza los datos del
+usuario de siembra. Para entrar en local, proporciona `SEED_USER_PASSWORD`
+mediante el entorno; una contraseña local generada no se imprime.
+Los perfiles, las variables y la protección del destino se detallan en
+[scripts/seed/README.md](scripts/seed/README.md).
+
 ## Comprobaciones
 
 ```sh
