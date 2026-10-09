@@ -1,0 +1,40 @@
+name: Sembrar demostración en pruebas
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  seed:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: pruebas
+    concurrency:
+      group: deploy-pruebas-database
+      cancel-in-progress: false
+    env:
+      EXPO_NO_TELEMETRY: '1'
+      SUPABASE_TELEMETRY_DISABLED: '1'
+      DO_NOT_TRACK: '1'
+      SEED_TARGET: pruebas
+      SEED_PROFILE: realistic
+      SEED_USER_EMAIL: demo@example.com
+      SEED_API_URL: ${{ vars.EXPO_PUBLIC_SUPABASE_URL }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SEED_USER_PASSWORD: ${{ secrets.PRUEBAS_DEMO_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: Comprobar configuración de pruebas
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN"
+          test -n "$SEED_USER_PASSWORD"
+          test -n "$SEED_API_URL"
+      - name: Construir entorno Docker
+        run: ./docker/app/run build
+      - name: Instalar lockfile
+        run: ./docker/app/run npm ci
+      - name: Sembrar solo los datos del usuario de demostración
+        # El script captura la clave en memoria y emite ::add-mask:: antes de usarla.
+        run: ./scripts/seed/seed-synthetic-year.sh
