@@ -99,10 +99,12 @@ Construye las imágenes una vez (Linux x86_64 con `/dev/kvm` accesible):
 docker compose build android-emulator chrome-mcp
 ```
 
-Arranca el emulador y espera a que Android y Expo Go estén preparados:
+Prepara el emulador antes de los caminos críticos: esta orden recrea su
+contenedor, elimina los candados del AVD y espera a Android y Expo Go. Si lo
+comparte otro trabajador, pide turno al orquestador antes de ejecutarla:
 
 ```sh
-docker compose up -d --pull never --wait android-emulator
+./docker/android/reset
 ```
 
 Comprueba su visibilidad desde el ordenador; `adb` y el programa del emulador

@@ -1,0 +1,46 @@
+#!/bin/sh
+set -eu
+
+project_directory=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
+cd "$project_directory"
+export PWD="$project_directory"
+boot_timeout_seconds=${ANDROID_RESET_TIMEOUT_SECONDS:-420}
+
+case "$boot_timeout_seconds" in
+  ''|*[!0-9]*|0*)
+    echo 'ANDROID_RESET_TIMEOUT_SECONDS must be a positive integer without leading zeros.' >&2
+    exit 2
+    ;;
+esac
+
+# El AVD está en la capa del contenedor: recrearlo elimina sus candados antiguos.
+if ! timeout --kill-after=10s 60s docker compose rm -sf android-emulator; then
+  echo 'Could not remove the Android emulator container within 60 seconds.' >&2
+  exit 1
+fi
+
+if ! timeout --kill-after=10s "${boot_timeout_seconds}s" \
+  docker compose up -d --pull never --wait \
+  --wait-timeout "$boot_timeout_seconds" android-emulator; then
+  echo "Android emulator did not become ready within $boot_timeout_seconds seconds. Check docker compose logs android-emulator." >&2
+  exit 1
+fi
+
+# No se reinicia el servidor ADB compartido con el panel de Orca.
+if ! device_list=$(timeout --kill-after=2s 10s docker compose exec -T android-emulator adb devices); then
+  echo 'Could not query ADB devices within 10 seconds.' >&2
+  exit 1
+fi
+if ! printf '%s\n' "$device_list" | awk '$1 == "emulator-5554" && $2 == "device" { found = 1 } END { exit !found }'; then
+  echo 'ADB does not list emulator-5554 as a connected device.' >&2
+  exit 1
+fi
+
+boot_completed=$(timeout --kill-after=2s 10s docker compose exec -T android-emulator \
+  adb -s emulator-5554 shell getprop sys.boot_completed | tr -d '\r')
+if [ "$boot_completed" != 1 ]; then
+  echo 'Android emulator is connected but sys.boot_completed is not 1.' >&2
+  exit 1
+fi
+
+printf '%s\n' 'Android emulator ready: emulator-5554 connected, boot completed, Expo Go installed.'
