@@ -11,9 +11,9 @@ appId: host.exp.exponent
     when:
       visible: Todos los días
     commands:
-      # Maestro recibe límites invertidos en esta opción del selector emergente.
+      # El selector no expone la opción con etiqueta y cambia de posición según el ancho.
       - tapOn:
-          point: "26%,64%"
+          point: '26%,${FREQUENCY_OPTION_Y}'
 - hideKeyboard
 - assertVisible: Días de la semana
 - tapOn: Lunes
