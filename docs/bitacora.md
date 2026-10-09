@@ -4,9 +4,9 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
-### 2026-10-09 — Menos minutos de CI (DEC-44)
+### 2026-10-09 — Tarde: recordatorios completos, dos fallos de Android y repositorio público
 
-Se preparó el encargo 048 para reducir el gasto de Actions tras agotarse los minutos gratuitos del repositorio privado. La CI de PR omite su trabajo costoso si solo cambia documentación, el push a `develop` queda para el despliegue de pruebas, npm reutiliza su caché y la vista previa requiere `preview` o despacho manual. La rama y el PR siguen pendientes de CI; los tiempos previos medidos están en la descripción del PR.
+Con la versión 1 cerrada, se fusionaron R5 (pantalla de prueba de avisos, ajustada a que en Expo Go no hay recordatorios), una limpieza del añadir rápido y dos arreglos que encontró Maestro en Android: las opciones del selector de frecuencia no eran accesibles (el menú se pintaba fuera de su contenedor, PR #61) y **el teclado tapaba la barra del añadir rápido** (encargo 046). A media tarde se acabaron los minutos gratis de Actions; el humano decidió hacer público el repositorio y recortar la CI para poder volver a privado más adelante (DEC-44, PR #63).
 
 ### 2026-10-09 — La versión 1, completa
 
