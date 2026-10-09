@@ -37,7 +37,7 @@ Para pedir control sobre una idea, añade al final:
 
 - 2026-10-08 — **Para publicar la versión 1 (tú):** comprobación del orquestador. (1) Funcionalidades imprescindibles fusionadas y con sus criterios: sí, todas (T01 a T16). (2) Tests y CI de `develop` en verde: sí (483 unitarios y 202 de integración al cerrar T16; CI verde en cada fusión). (3) Tareas a medias que dependan de la versión: solo T13b, que añade los flujos de Maestro y no cambia la app. (4) Documentación y contexto al día: sí. (5) Qué cambia respecto a `main`: es la primera versión (inicio de sesión, hábitos con sus cuatro frecuencias, tareas, categorías con secciones, Hoy, Pendientes, Historial, marcar con Deshacer, añadir rápido y tres temas). (6) Migraciones: las de `supabase/migrations/` hasta `20261007200000_habit_rule_guard.sql`; la integración continua las aplica a producción desde `main`. Etiqueta propuesta: `v1.0.0`. Candidato: `6e9182c` (o `develop` tras fusionar T13b). Antes, crea tu usuario de producción (DEC-37).
 
-- 2026-10-09 — **VERSIÓN 1 LISTA PARA PUBLICAR (tú).** Comprobación del orquestador:
+- 2026-10-09 — **VERSIÓN 1 LISTA PARA PUBLICAR (tú).** **Hecho el mismo día:** publicada con el PR #67 y la etiqueta `v1.0.0`; queda solo el APK (paso d). Comprobación del orquestador:
   1. Funcionalidades imprescindibles fusionadas con sus criterios: **sí** (T01 a T16).
   2. Tests y CI de `develop` en verde: **sí** (commit `92411a4`: CI y despliegue a pruebas correctos; 627 tests unitarios e integración).
   3. Caminos críticos en el emulador: **sí**, los 8 flujos de Maestro a tamaño normal y a 360 dp (PR #50).
