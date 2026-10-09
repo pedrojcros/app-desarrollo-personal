@@ -111,6 +111,7 @@ class MeasureCommandTests(unittest.TestCase):
         self.assertIn('claude-sonnet-4-5', result.stdout)
         self.assertIn('500 nuevos', result.stdout)
         self.assertIn('media 1.050', result.stdout.lower())
+        self.assertIn('2 pasos', result.stdout)
 
     def test_missing_source_is_reported_without_failing_other_sources(self):
         result = self.run_measure(

@@ -143,6 +143,7 @@ def read_claude_session(session_file, task_key, folder, since):
     read_tokens = 0
     written_tokens = 0
     steps = 0
+    seen_message_ids = set()
     for record in read_json_lines(session_file):
         if record.get('type') != 'assistant' or record.get('isSidechain'):
             continue
@@ -153,6 +154,11 @@ def read_claude_session(session_file, task_key, folder, since):
         message = record.get('message', {})
         if not isinstance(message, dict):
             continue
+        message_id = message.get('id')
+        if message_id is not None:
+            if message_id in seen_message_ids:
+                continue
+            seen_message_ids.add(message_id)
         usage = message.get('usage', {})
         if not isinstance(usage, dict) or not usage:
             continue
