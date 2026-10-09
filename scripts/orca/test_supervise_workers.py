@@ -1,4 +1,7 @@
 import datetime
+import os
+import tempfile
+from pathlib import Path
 import unittest
 from unittest import mock
 
@@ -16,6 +19,30 @@ OLD_HISTORY = '\n'.join(f'old output line {number}' for number in range(30))
 QUOTA_SCREEN = "You've hit your usage limit. Try again at {time}\n2. Keep current model"
 START = datetime.datetime(2026, 10, 7, 16, 0)
 ONE_ROUND = datetime.timedelta(seconds=20)
+
+
+def setUpModule():
+    temporary_directory = tempfile.TemporaryDirectory()
+    unittest.addModuleCleanup(temporary_directory.cleanup)
+    incident_path = Path(temporary_directory.name) / 'incidents.jsonl'
+    environment_patch = mock.patch.dict(
+        os.environ, {'ADP_INCIDENTS_FILE': str(incident_path)}
+    )
+    environment_patch.start()
+    unittest.addModuleCleanup(environment_patch.stop)
+
+
+class SupervisorIsolationTests(unittest.TestCase):
+    def test_incident_writes_are_redirected_to_module_temporary_directory(self):
+        incident_file = os.environ.get('ADP_INCIDENTS_FILE')
+        self.assertIsNotNone(incident_file)
+        incident_path = Path(incident_file)
+        self.assertTrue(incident_path.parent.is_dir())
+        self.assertTrue(incident_path.parent.is_relative_to(Path(tempfile.gettempdir())))
+        supervise_workers.append_supervisor_incident(
+            'tool', 0, 'ejemplo', 'ejemplo', WORKER
+        )
+        self.assertTrue(incident_path.is_file())
 
 
 class SupervisorScreenTests(unittest.TestCase):
