@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { TextInput } from 'react-native';
 import { describeTaskSaveError } from '@/components/task-form/task-messages';
 import { useCreateTask } from '@/data/tasks';
@@ -40,6 +40,9 @@ export function useQuickAddDraft(
   const nameInput = useRef<TextInput>(null);
   const focusAfterSave = useRef(false);
   const disabled = saving || createTask.isPending || createHabit.isPending;
+  const setNameInputRef = useCallback((input: TextInput | null) => {
+    nameInput.current = input;
+  }, []);
 
   useEffect(() => {
     if (disabled || !focusAfterSave.current) {
@@ -154,25 +157,31 @@ export function useQuickAddDraft(
     close();
   }
   return {
-    today,
-    name,
-    setName,
-    kind,
-    setKind,
-    place,
-    setPlace,
-    dueDate,
-    setDueDate,
-    startDate,
-    setStartDate,
-    options,
-    setOptions,
-    error,
-    setError,
-    disabled,
-    nameInput,
-    submit,
-    openMore,
+    draft: {
+      today,
+      name,
+      kind,
+      place,
+      dueDate,
+      startDate,
+      options,
+    },
+    actions: {
+      setName,
+      setKind,
+      setPlace,
+      setDueDate,
+      setStartDate,
+      setOptions,
+      setError,
+      setNameInputRef,
+      submit,
+      openMore,
+    },
+    status: {
+      error,
+      disabled,
+    },
   };
 }
 
