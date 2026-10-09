@@ -42,10 +42,10 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-09, 17:25.*
+*Actualizado: 2026-10-09, 19:15.*
 
-- **La versión 1 está completa en `develop`** y lista para que el humano la publique (comprobación en el [buzón](buzon.md)). Los 8 caminos críticos de Maestro pasan a tamaño normal y a 360 dp.
-- **`develop` lleva además** la 1.x (RF-09, RF-10, RF-13, RF-14, RF-16, RF-17, RF-22) y **los recordatorios completos (1.1, R1 a R5)**, que solo funcionan en la app instalada (en Expo Go se desactivan). Queda R6: la comprobación del humano en su móvil con el APK (lista en el buzón).
+- **La versión 1 está publicada** (2026-10-09): el humano pasó `develop` a `main` (PR #67), la CI hizo la copia cifrada, aplicó las migraciones y publicó la web de producción, y la etiqueta es [`v1.0.0`](https://github.com/pedrojcros/app-desarrollo-personal/releases/tag/v1.0.0). El humano ya entra con su usuario de producción. Falta el APK (`eas build --profile preview`), cuando quiera instalarla en el móvil.
+- **Esa publicación incluye** la 1.x (RF-09, RF-10, RF-13, RF-14, RF-16, RF-17, RF-22) y **los recordatorios completos (1.1, R1 a R5)**, que solo funcionan en la app instalada (en Expo Go se desactivan). Queda R6: la comprobación del humano en su móvil con el APK (lista en el buzón).
 - **El repositorio es público** desde el 2026-10-09 (DEC-44) y la CI gasta unos 17 minutos menos por PR: se podrá volver a privado cuando el ritmo de cambios baje.
 - **Arreglado (encargo 046, PR #65):** en Android el teclado ya no tapa la barra del añadir rápido; tiene su flujo de Maestro. La pasada completa de Maestro a 360 dp a veces se corta porque ADB pierde el emulador (problema del entorno de pruebas, no de la app).
 
@@ -60,7 +60,7 @@ Para retomar en una sesión nueva (`/ejecutar-plan`; activa la cafeína al empez
 
 ## Pendiente del humano
 
-- **Publicar la versión 1:** ya se puede. Comprobación y pasos en el [buzón](buzon.md). Antes: crear tu usuario de producción (DEC-37, README «Crear el usuario real de producción»).
+- **APK de la versión 1:** `eas build --profile preview` cuando quieras instalarla en el móvil (gasta una de las 15 compilaciones gratis del mes).
 - **Recordatorios (R6):** al instalar el APK de la 1.1, la lista de comprobación del informe de R5 (permiso, aviso en punto, tras reiniciar, ahorro de batería, tocar el aviso).
 - Revisar el [buzón](buzon.md): lo que decidió el orquestador por su cuenta.
 - Revisar T01 en el móvil con Expo Go (H05) y los avisos de `npm audit` (antes de publicar y el 2026-10-14).

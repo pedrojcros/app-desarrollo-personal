@@ -4,6 +4,10 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-09 — La versión 1, publicada
+
+El humano pasó `develop` a `main` con el PR #67 (fusión con commit de fusión, sin borrar `develop`). El despliegue a producción hizo la copia cifrada de la base, aplicó las migraciones y publicó la web en Vercel; la CI de `main` quedó en verde. El orquestador creó la etiqueta y la release [`v1.0.0`](https://github.com/pedrojcros/app-desarrollo-personal/releases/tag/v1.0.0). Al principio el humano no podía entrar; el orquestador comprobó que la web apuntaba a producción y que su usuario existía y estaba confirmado, y el humano lo resolvió por su cuenta. Falta el APK, que se compila cuando el humano quiera instalarla.
+
 ### 2026-10-09 — Tarde: recordatorios completos, dos fallos de Android y repositorio público
 
 Con la versión 1 cerrada, se fusionaron R5 (pantalla de prueba de avisos, ajustada a que en Expo Go no hay recordatorios), una limpieza del añadir rápido y dos arreglos que encontró Maestro en Android: las opciones del selector de frecuencia no eran accesibles (el menú se pintaba fuera de su contenedor, PR #61) y **el teclado tapaba la barra del añadir rápido** (encargo 046). A media tarde se acabaron los minutos gratis de Actions; el humano decidió hacer público el repositorio y recortar la CI para poder volver a privado más adelante (DEC-44, PR #63).
