@@ -134,6 +134,27 @@ class MeasureCommandTests(unittest.TestCase):
         self.assertIn('300 nuevos / 1.200 releídos', result.stdout)
         self.assertNotIn('2026-10-01', result.stdout)
 
+    def test_folder_matches_any_session_directory_including_descendants(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            session_path = Path(temporary_directory) / 'session.jsonl'
+            records = [
+                json.loads(line)
+                for line in (TEST_DATA_PATH / 'claude_session.jsonl').read_text().splitlines()
+            ]
+            records[0]['cwd'] = '/work/ADP-16-task/src'
+            records[1]['cwd'] = '/work/ADP-16-task/src'
+            records[-1]['cwd'] = '/other'
+            session_path.write_text(
+                ''.join(json.dumps(record) + '\n' for record in records),
+                encoding='utf-8',
+            )
+            result = self.run_measure(
+                'sessions', '--since', '2026-10-01', '--folder', '/work/ADP-16-task',
+                environment={'ADP_CLAUDE_SESSIONS': str(session_path)},
+            )
+        self.assertIn('2 pasos', result.stdout)
+        self.assertIn('500 nuevos', result.stdout)
+
     def test_missing_source_is_reported_without_failing_other_sources(self):
         result = self.run_measure(
             'task',

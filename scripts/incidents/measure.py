@@ -136,7 +136,7 @@ def read_claude_sessions(task_key=None, folder=None, since=None):
 
 def read_claude_session(session_file, task_key, folder, since):
     session_id = session_file.stem
-    working_directory = ''
+    working_directories = set()
     model = 'desconocido'
     activity_times = []
     new_tokens = 0
@@ -145,12 +145,14 @@ def read_claude_session(session_file, task_key, folder, since):
     steps = 0
     seen_message_ids = set()
     for record in read_json_lines(session_file):
-        if record.get('type') != 'assistant' or record.get('isSidechain'):
+        if record.get('isSidechain'):
             continue
-        record_session_id = record.get('sessionId', record.get('session_id', session_id))
-        if record_session_id != session_id:
-            session_id = record_session_id
-        working_directory = record.get('cwd', working_directory)
+        working_directory = record.get('cwd')
+        if working_directory:
+            working_directories.add(working_directory)
+        if record.get('type') != 'assistant':
+            continue
+        session_id = record.get('sessionId', record.get('session_id', session_id))
         message = record.get('message', {})
         if not isinstance(message, dict):
             continue
@@ -176,10 +178,20 @@ def read_claude_session(session_file, task_key, folder, since):
         steps += 1
     if not activity_times:
         return None
-    if task_key is not None and not path_contains_task(working_directory, task_key):
-        return None
-    if folder is not None and not is_same_folder(working_directory, folder):
-        return None
+    if task_key is not None:
+        matches_task = any(
+            path_contains_task(directory, task_key)
+            for directory in working_directories
+        )
+        if not matches_task:
+            return None
+    if folder is not None:
+        matches_folder = any(
+            is_same_folder(directory, folder)
+            for directory in working_directories
+        )
+        if not matches_folder:
+            return None
     return {
         'agent': 'Claude',
         'model': model,
@@ -195,7 +207,9 @@ def read_claude_session(session_file, task_key, folder, since):
 
 def is_same_folder(working_directory, folder):
     try:
-        return Path(working_directory).resolve() == folder.resolve()
+        resolved_directory = Path(working_directory).resolve()
+        resolved_folder = folder.resolve()
+        return resolved_directory.is_relative_to(resolved_folder)
     except OSError:
         return False
 

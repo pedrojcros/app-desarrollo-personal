@@ -78,7 +78,8 @@ Se incluyen las sesiones con actividad desde la fecha indicada, aunque hayan
 empezado antes. Los pasos, tokens, inicio y duración corresponden únicamente
 a la actividad desde esa fecha.
 
-`--folder RUTA` permite indicar otra carpeta de trabajo. Las fuentes se pueden
+`--folder RUTA` permite indicar otra carpeta de trabajo. Una sesión pertenece
+a esa carpeta si cualquiera de sus `cwd` está en ella o en una subcarpeta. Las fuentes se pueden
 redirigir para las pruebas o para una máquina distinta con `ADP_CODEX_SESSIONS`
 y `ADP_CLAUDE_SESSIONS`; `ADP_PULL_REQUESTS_FILE` sustituye la consulta a `gh`
 por un JSON con su respuesta. `ADP_INCIDENTS_FILE` conserva el significado
