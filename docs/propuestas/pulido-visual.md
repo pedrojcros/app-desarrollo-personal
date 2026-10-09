@@ -35,7 +35,7 @@ rediseño grande (propuesta aparte) · **Hecho** = ya está en `develop`.
 
 ## 3. Encargos
 
-### 060 — Datos de demostración en la web de pruebas (aprobado, DEC-49; puede ir ya)
+### 060 — Datos de demostración en la web de pruebas (**hecho** el 2026-10-10: `ADP-33`, PR #77, y su corrección 061)
 
 Para que el humano revise la app en `https://app-desarrollo-personal-pruebas.vercel.app` con datos parecidos a su uso real.
 
@@ -52,5 +52,11 @@ Para que el humano revise la app en `https://app-desarrollo-personal-pruebas.ver
 - **Agente:** Codex Sol (toca una protección de seguridad y la CI) · **Tamaño:** M · **Depende de:** nada.
 - **Ficheros reservados:** `scripts/seed/**`, `.github/workflows/seed-pruebas.yml`, `README.md` (sección de datos sintéticos y de despliegue).
 - **Hecho cuando:** los tests de la protección pasan; el perfil `realistic` tiene tests de sus recuentos; la ejecución manual del flujo deja el usuario de demostración con los datos del perfil, y el humano entra en la web de pruebas y los ve.
+
+**Estado (2026-10-10):** fusionado en `develop` (PR #77). La primera siembra en pruebas la hizo el orquestador desde su ordenador, porque GitHub solo ofrece «Run workflow» para los flujos que están en la rama por defecto (`main`): el botón de `seed-pruebas.yml` funcionará cuando `develop` pase a `main`. Mientras, se siembra con el envoltorio local (`scripts/seed/README.md`, «Pruebas remotas»).
+
+### 061 — Corrección de los datos de demostración (**hecho** el 2026-10-10: `ADP-34`, PR #78)
+
+Hallazgos menores de la revisión del 060: cada tarea en su categoría (antes todas en Universidad), «hoy» con la zona de `Europe/Madrid` al sembrar pruebas sin `SEED_TODAY` (el contenedor está en UTC), un cálculo muerto en las vencidas y el mensaje de producción con punto final. Encargo en [061](../agentes/encargos/061-correccion-datos-de-demostracion.md). Pruebas se volvió a sembrar al fusionar.
 
 *(El resto de encargos se escriben cuando la lista del apartado 2 esté completa.)*
