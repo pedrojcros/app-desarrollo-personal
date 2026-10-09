@@ -1,0 +1,14 @@
+node_modules/
+dist/
+coverage/
+.expo/
+.agents/
+.claude/
+docs/
+AGENTS.md
+CLAUDE.md
+.mcp.json
+scripts/orca/
+package-lock.json
+supabase/.temp/
+supabase/.branches/

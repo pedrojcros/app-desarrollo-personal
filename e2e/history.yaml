@@ -1,0 +1,10 @@
+appId: host.exp.exponent
+---
+- tapOn: Hoy
+- tapOn: Marcar E2E tarea rápida como hecho
+- extendedWaitUntil:
+    visible: Marcada como hecha
+    timeout: 10000
+- tapOn: Historial
+- assertVisible: Historial
+- assertVisible: E2E tarea rápida

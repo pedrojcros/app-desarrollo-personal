@@ -1,0 +1,34 @@
+#!/bin/sh
+set -eu
+
+download_archive() {
+  download_url="$1"
+  download_checksum="$2"
+  download_destination="$3"
+  curl --fail --location --retry 3 "$download_url" --output /tmp/android-download.zip
+  printf '%s  %s\n' "$download_checksum" /tmp/android-download.zip | sha1sum --check -
+  unzip -q /tmp/android-download.zip -d "$download_destination"
+  rm /tmp/android-download.zip
+}
+
+# URLs y SHA-1 publicados en los índices oficiales repository2-3.xml y sys-img2-3.xml de Google.
+mkdir -p "$ANDROID_HOME/cmdline-tools" "$ANDROID_HOME/system-images/android-36/google_apis"
+download_archive https://dl.google.com/android/repository/commandlinetools-linux-16111833_latest.zip \
+  e025545c62a8e64c7559119566a569fb1dec5f60 /tmp
+mv /tmp/cmdline-tools "$ANDROID_HOME/cmdline-tools/23.0"
+download_archive https://dl.google.com/android/repository/platform-tools_r37.0.1-linux.zip \
+  477254aa5f903c15cf51001717bdf347fb6b53e0 "$ANDROID_HOME"
+download_archive https://dl.google.com/android/repository/emulator-linux_x64-16428233.zip \
+  cd7362ea55dfb86a418958138dc396e74165dd01 "$ANDROID_HOME"
+download_archive https://dl.google.com/android/repository/sys-img/google_apis/x86_64-36_r07.zip \
+  c6bf44bdcd885bb902b4ba752d111a073ad7a817 "$ANDROID_HOME/system-images/android-36/google_apis"
+
+# Las releases oficiales de Maestro y Expo publican estos SHA-256; una sustitución aborta la construcción.
+curl --fail --location --retry 3 https://github.com/mobile-dev-inc/Maestro/releases/download/cli-2.11.0/maestro.zip \
+  --output /tmp/maestro.zip
+printf '%s  %s\n' 5384593cb4e7a106489e75a821d157dd43f4e438df6bc308b72e82c685e1283a /tmp/maestro.zip | sha256sum --check -
+unzip -q /tmp/maestro.zip -d /opt
+rm /tmp/maestro.zip
+curl --fail --location --retry 3 https://github.com/expo/expo-go-releases/releases/download/Expo-Go-56.0.4/Expo-Go-56.0.4.apk \
+  --output /opt/expo-go-56.0.4.apk
+printf '%s  %s\n' dd5eea2fb16ab83dd60b3d3767210702ecee3b67b4947e5e2367965e0d92a833 /opt/expo-go-56.0.4.apk | sha256sum --check -

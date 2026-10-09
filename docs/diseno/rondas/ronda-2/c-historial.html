@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Historial · Estilo C</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --background: #fffbeF;
+      --surface: #ffffff;
+      --surface-soft: #f4efdf;
+      --ink: #111111;
+      --muted: #4a4a4a;
+      --accent: #ffe14d;
+      --university: #8ab4ff;
+      --health: #6ee7a8;
+      --personal: #ffb86b;
+      --home: #ff8fb1;
+      --stroke: 1.5px solid var(--ink);
+      --shadow: 2px 2px 0 var(--ink);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      height: 100vh;
+      height: 100dvh;
+      margin: 0;
+      overflow: hidden;
+      background: var(--background);
+      color: var(--ink);
+      font-family: "Archivo", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { color: inherit; font: inherit; }
+
+    .app {
+      display: flex;
+      width: min(100%, 480px);
+      height: 100%;
+      flex-direction: column;
+      margin: 0 auto;
+      padding: 17px 16px 0;
+    }
+
+    .page-heading {
+      display: flex;
+      min-height: 52px;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .eyebrow {
+      margin: 0 0 3px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 27px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.05;
+    }
+
+    .week-total {
+      padding: 6px 8px;
+      border: var(--stroke);
+      background: var(--accent);
+      box-shadow: var(--shadow);
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .range-switch {
+      display: grid;
+      height: 40px;
+      flex: 0 0 40px;
+      grid-template-columns: 1fr 1fr 1.35fr;
+      gap: 4px;
+      margin: 8px 0 12px;
+      padding: 3px;
+      border: var(--stroke);
+      background: var(--surface-soft);
+    }
+
+    .range-button {
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .range-button[aria-pressed="true"] {
+      border: var(--stroke);
+      background: var(--surface);
+      box-shadow: 1px 1px 0 var(--ink);
+      font-weight: 800;
+    }
+
+    .range-button:focus-visible,
+    .nav-link:focus-visible {
+      outline: 3px solid var(--ink);
+      outline-offset: 2px;
+    }
+
+    .history-scroll {
+      min-height: 0;
+      flex: 1;
+      overflow: auto;
+      scrollbar-width: none;
+    }
+
+    .history-scroll::-webkit-scrollbar { display: none; }
+
+    .history-grid {
+      display: grid;
+      grid-template-columns: minmax(92px, 1fr) repeat(7, minmax(0, 31px));
+      align-items: stretch;
+    }
+
+    .grid-header {
+      min-height: 47px;
+      align-items: end;
+      padding-bottom: 6px;
+      border-bottom: var(--stroke);
+    }
+
+    .column-day {
+      display: flex;
+      height: 40px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .column-day strong {
+      display: grid;
+      width: 23px;
+      height: 23px;
+      place-items: center;
+      border-radius: 50%;
+      font-size: 11px;
+    }
+
+    .column-day.today {
+      color: var(--ink);
+    }
+
+    .column-day.today strong {
+      border: var(--stroke);
+      background: var(--accent);
+      box-shadow: 1px 1px 0 var(--ink);
+    }
+
+    .group-label {
+      display: flex;
+      height: 23px;
+      grid-column: 1 / -1;
+      align-items: center;
+      padding-left: 2px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+    }
+
+    .history-row {
+      display: contents;
+    }
+
+    .history-name,
+    .history-cell {
+      display: flex;
+      min-height: 47px;
+      align-items: center;
+      border-bottom: 1px solid rgba(17, 17, 17, 0.14);
+    }
+
+    .history-name {
+      gap: 7px;
+      padding-right: 5px;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    .history-name span:last-child {
+      max-width: 83px;
+    }
+
+    .mini-dot {
+      width: 8px;
+      height: 8px;
+      flex: 0 0 8px;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+    }
+
+    .health { background: var(--health); }
+    .university { background: var(--university); }
+    .personal { background: var(--personal); }
+
+    .history-cell {
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .history-cell.today {
+      background: rgba(255, 225, 77, 0.16);
+    }
+
+    .history-cell.done.health-mark { color: #137746; }
+    .history-cell.done.university-mark { color: #24569b; }
+    .history-cell.done.personal-mark { color: #8c4a00; }
+
+    .history-cell.not-done {
+      color: var(--ink);
+      font-size: 15px;
+    }
+
+    .history-cell.pending {
+      color: #a5a095;
+      font-size: 13px;
+    }
+
+    .history-cell.not-scheduled {
+      color: transparent;
+    }
+
+    .daily-progress {
+      display: grid;
+      grid-template-columns: minmax(92px, 1fr) repeat(7, minmax(0, 31px));
+      min-height: 34px;
+      align-items: center;
+      border-bottom: var(--stroke);
+      background: var(--surface-soft);
+    }
+
+    .progress-caption {
+      padding-left: 2px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .progress-value {
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .progress-value.today {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .legend {
+      display: flex;
+      min-height: 36px;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 600;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .legend-mark {
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .legend-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #a5a095;
+    }
+
+    .bottom-nav {
+      display: grid;
+      min-height: 69px;
+      flex: 0 0 69px;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      margin: 0 -16px;
+      padding: 4px 7px 7px;
+      border-top: var(--stroke);
+      background: var(--surface);
+    }
+
+    .nav-link {
+      display: flex;
+      min-width: 0;
+      min-height: 52px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .nav-icon-wrap {
+      position: relative;
+      display: grid;
+      width: 39px;
+      height: 26px;
+      place-items: center;
+      border-radius: 999px;
+    }
+
+    .nav-link[aria-current="page"] {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .nav-link[aria-current="page"] .nav-icon-wrap {
+      background: var(--accent);
+      box-shadow: 1px 1px 0 var(--ink);
+    }
+
+    .nav-icon-wrap svg {
+      width: 19px;
+      height: 19px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .nav-count {
+      position: absolute;
+      top: -4px;
+      right: -1px;
+      display: grid;
+      width: 15px;
+      height: 15px;
+      place-items: center;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+      background: var(--personal);
+      color: var(--ink);
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    @media (min-width: 400px) {
+      .app {
+        padding-right: 20px;
+        padding-left: 20px;
+      }
+
+      .history-grid,
+      .daily-progress {
+        grid-template-columns: minmax(112px, 1fr) repeat(7, minmax(0, 1fr));
+      }
+
+      .history-name span:last-child { max-width: none; }
+      .bottom-nav { margin-right: -20px; margin-left: -20px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="page-heading">
+      <div>
+        <p class="eyebrow">Actividad reciente</p>
+        <h1>Historial</h1>
+      </div>
+      <span class="week-total">7 DÍAS</span>
+    </header>
+
+    <div class="range-switch" role="group" aria-label="Rango del historial">
+      <button class="range-button" type="button" aria-pressed="true">7 días</button>
+      <button class="range-button" type="button" aria-pressed="false">30 días</button>
+      <button class="range-button" type="button" aria-pressed="false">Personalizado</button>
+    </div>
+
+    <section class="history-scroll" aria-label="Marcas de los últimos siete días">
+      <div class="history-grid">
+        <div class="grid-header"></div>
+        <div class="column-day"><span>X</span><strong>30</strong></div>
+        <div class="column-day"><span>J</span><strong>1</strong></div>
+        <div class="column-day"><span>V</span><strong>2</strong></div>
+        <div class="column-day"><span>S</span><strong>3</strong></div>
+        <div class="column-day"><span>D</span><strong>4</strong></div>
+        <div class="column-day"><span>L</span><strong>5</strong></div>
+        <div class="column-day today"><span>M</span><strong>6</strong></div>
+
+        <div class="group-label">Hábitos</div>
+
+        <div class="history-row">
+          <div class="history-name"><span class="mini-dot health"></span><span>Meditar 10 min</span></div>
+          <div class="history-cell done health-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell done health-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell done health-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell not-done" aria-label="No hecha">×</div>
+          <div class="history-cell done health-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell done health-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell done health-mark today" aria-label="Hecha hoy">✓</div>
+        </div>
+
+        <div class="history-row">
+          <div class="history-name"><span class="mini-dot health"></span><span>Beber 2 L de agua</span></div>
+          <div class="history-cell done health-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell done health-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell done health-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell done health-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell not-done" aria-label="No hecha">×</div>
+          <div class="history-cell done health-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell pending today" aria-label="Sin marcar hoy">•</div>
+        </div>
+
+        <div class="history-row">
+          <div class="history-name"><span class="mini-dot health"></span><span>Ir al gimnasio</span></div>
+          <div class="history-cell done health-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell not-scheduled" aria-label="No toca"></div>
+          <div class="history-cell done health-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell not-scheduled" aria-label="No toca"></div>
+          <div class="history-cell not-scheduled" aria-label="No toca"></div>
+          <div class="history-cell done health-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell not-scheduled today" aria-label="No toca hoy"></div>
+        </div>
+
+        <div class="history-row">
+          <div class="history-name"><span class="mini-dot university"></span><span>Repasar apuntes de Redes</span></div>
+          <div class="history-cell done university-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell done university-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell not-done" aria-label="No hecha">×</div>
+          <div class="history-cell not-scheduled" aria-label="No toca"></div>
+          <div class="history-cell not-scheduled" aria-label="No toca"></div>
+          <div class="history-cell done university-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell not-done today" aria-label="No hecha hoy">×</div>
+        </div>
+
+        <div class="history-row">
+          <div class="history-name"><span class="mini-dot personal"></span><span>Leer 20 minutos</span></div>
+          <div class="history-cell done personal-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell done personal-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell done personal-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell not-done" aria-label="No hecha">×</div>
+          <div class="history-cell done personal-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell done personal-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell pending today" aria-label="Sin marcar hoy">•</div>
+        </div>
+
+        <div class="group-label">Tareas</div>
+
+        <div class="history-row">
+          <div class="history-name"><span class="mini-dot university"></span><span>Pagar la matrícula</span></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell done university-mark" aria-label="Hecha">✓</div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled today" aria-label="Sin tarea"></div>
+        </div>
+
+        <div class="history-row">
+          <div class="history-name"><span class="mini-dot personal"></span><span>Llamar al dentista</span></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell pending today" aria-label="Sin marcar hoy">•</div>
+        </div>
+
+        <div class="history-row">
+          <div class="history-name"><span class="mini-dot university"></span><span>Entregar práctica de Redes</span></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell not-scheduled" aria-label="Sin tarea"></div>
+          <div class="history-cell pending today" aria-label="Sin marcar hoy">•</div>
+        </div>
+      </div>
+
+      <div class="daily-progress" aria-label="Porcentaje de tareas y hábitos hechos cada día">
+        <span class="progress-caption">Hecho</span>
+        <span class="progress-value">100%</span>
+        <span class="progress-value">100%</span>
+        <span class="progress-value">80%</span>
+        <span class="progress-value">67%</span>
+        <span class="progress-value">75%</span>
+        <span class="progress-value">100%</span>
+        <span class="progress-value today">17%</span>
+      </div>
+    </section>
+
+    <div class="legend" aria-label="Leyenda">
+      <span class="legend-item"><span class="legend-mark">✓</span>Hecha</span>
+      <span class="legend-item"><span class="legend-mark">×</span>No hecha</span>
+      <span class="legend-item"><span class="legend-dot"></span>Sin marcar</span>
+    </div>
+
+    <nav class="bottom-nav" aria-label="Navegación principal">
+      <a class="nav-link" href="#">
+        <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><path d="m3 6 1 1 2-2m-3 7 1 1 2-2m-3 7 1 1 2-2"/></svg></span>
+        Hoy
+      </a>
+      <a class="nav-link" href="#">
+        <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M3 8.5 5.5 4h13L21 8.5v10a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z"/><path d="M3 9h5l2 3h4l2-3h5"/></svg></span>
+        Bandeja
+      </a>
+      <a class="nav-link" href="#">
+        <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+        Categorías
+      </a>
+      <a class="nav-link" href="#">
+        <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M8 4h8M8 20h8M6 4h12v16H6z"/><path d="M9 8h6m-6 4h6m-6 4h4"/></svg><span class="nav-count">2</span></span>
+        Pendientes
+      </a>
+      <a class="nav-link" href="#" aria-current="page">
+        <span class="nav-icon-wrap"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5m4-1v5l3 2"/></svg></span>
+        Historial
+      </a>
+    </nav>
+  </main>
+  <script>
+    const rangeButtons = document.querySelectorAll(".range-button");
+
+    rangeButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        rangeButtons.forEach((rangeButton) => {
+          rangeButton.setAttribute("aria-pressed", "false");
+        });
+        button.setAttribute("aria-pressed", "true");
+      });
+    });
+  </script>
+</body>
+</html>

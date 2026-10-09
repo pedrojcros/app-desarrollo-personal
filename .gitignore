@@ -1,0 +1,35 @@
+# Sistema y editores
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+.idea/
+.vscode/
+*.iml
+
+# Configuración personal de Claude Code
+.claude/settings.local.json
+
+# Secretos locales (el .env.example sí se versiona)
+.env
+.env.*
+!.env.example
+
+# Se añade lo propio de cada parte (dependencias, compilados) en la primera tarea
+
+# Expo y herramientas de desarrollo
+node_modules/
+.expo/
+dist/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+supabase/.temp/
+supabase/.branches/
+android/
+ios/
+.vercel/
+.backup/
+
+# Ficheros generados por Python
+__pycache__/
+*.pyc

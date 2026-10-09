@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>P3 · Agenda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..800&display=swap">
+<style>
+  /* P3 · Agenda, con la paleta B1 (blanco monocromo).
+     El color solo aparece en las categorías; los botones son negros. */
+
+  :root {
+    --background: #FFFFFF;
+    --surface: #F6F6F5;
+    --surface-strong: #EDEDEC;
+    --border: #E3E3E1;
+    --text: #0B0B0B;
+    --text-soft: #6F6F6B;
+    --accent: #0B0B0B;
+    --not-done: #A3A3A0;
+    --category-university: #2563EB;
+    --category-health: #059669;
+    --category-personal: #D97706;
+    --category-home: #E11D48;
+
+    --page-gutter: 16px;
+    --hour-width: 38px;
+    --rail-width: 30px;
+    --column-gap: 6px;
+    --block-gap: 6px;
+    --counter-line: 18px;
+    --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --leave-delay: 80ms;
+  }
+
+  [data-category="university"] { --category: var(--category-university); }
+  [data-category="health"] { --category: var(--category-health); }
+  [data-category="personal"] { --category: var(--category-personal); }
+  [data-category="home"] { --category: var(--category-home); }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  html { background: var(--background); -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--text);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+    font-size: 15px;
+    line-height: 1.3;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  a { color: inherit; -webkit-tap-highlight-color: transparent; }
+  p, h1, h2, ol, ul { margin: 0; padding: 0; }
+  ol, ul { list-style: none; }
+  svg { display: block; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* La pantalla del móvil. En un navegador de ordenador se queda en una columna centrada. */
+  .screen {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    max-width: 480px;
+    margin: 0 auto;
+    overflow: hidden;
+    background: var(--background);
+  }
+
+  @media (min-width: 481px) {
+    .screen { border-inline: 1px solid var(--border); }
+  }
+
+  /* Cabecera */
+
+  .header {
+    flex: none;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px var(--page-gutter) 0;
+  }
+
+  .header-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .date-day,
+  .date-full {
+    display: block;
+    font-size: 34px;
+    line-height: 36px;
+    letter-spacing: -0.04em;
+  }
+
+  .date-day { font-weight: 800; }
+  .date-full { font-weight: 500; color: var(--text-soft); }
+
+  .add-button {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    background: var(--accent);
+    color: var(--background);
+    transition: transform 120ms ease-out;
+  }
+
+  .add-button:active { transform: scale(0.92); }
+
+  .day-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-soft);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: var(--counter-line);
+  }
+
+  .ring-track { fill: none; stroke: var(--border); }
+  .ring-progress { fill: none; stroke: var(--category); stroke-linecap: round; }
+
+  .day-ring .ring-progress {
+    stroke: var(--accent);
+    transition: stroke-dasharray 520ms var(--ease-out);
+  }
+
+  /* El número que sube: una tira con las cifras de 0 a 8 que se desplaza en vertical. */
+  .counter {
+    display: inline-block;
+    height: var(--counter-line);
+    overflow: hidden;
+    vertical-align: top;
+    color: var(--text);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .counter-strip {
+    display: block;
+    transform: translateY(calc(var(--value) * var(--counter-line) * -1));
+    transition: transform 520ms var(--ease-out);
+  }
+
+  .counter-strip span {
+    display: block;
+    height: var(--counter-line);
+    line-height: var(--counter-line);
+  }
+
+  /* Navegación: pestañas arriba, desplazables si no caben */
+
+  .tabs {
+    position: relative;
+    flex: none;
+    margin-top: 12px;
+  }
+
+  .tabs-list {
+    display: flex;
+    gap: 2px;
+    padding: 0 var(--page-gutter) 0 calc(var(--page-gutter) - 10px);
+    overflow-x: auto;
+    scrollbar-width: none;
+    box-shadow: inset 0 -1px 0 var(--border);
+  }
+
+  .tabs-list::-webkit-scrollbar { display: none; }
+
+  /* El degradado avisa de que hay más pestañas a la derecha. */
+  .tabs::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 1px;
+    width: 28px;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), var(--background));
+    pointer-events: none;
+    transition: opacity 160ms ease-out;
+  }
+
+  .tabs.is-at-end::after { opacity: 0; }
+
+  .tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 44px;
+    padding: 0 10px;
+    color: var(--text-soft);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .tab[aria-current="page"] { color: var(--text); font-weight: 700; }
+
+  .tab[aria-current="page"]::after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    bottom: 0;
+    left: 10px;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+    background: var(--accent);
+  }
+
+  .badge {
+    display: grid;
+    place-items: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--accent);
+    color: var(--background);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  /* Agenda */
+
+  .agenda {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+  }
+
+  .agenda::-webkit-scrollbar { display: none; }
+
+  .agenda-content {
+    position: relative;
+    padding-bottom: 104px;
+  }
+
+  /* La línea de tiempo. Los separadores de franja la tapan, así que cada franja tiene su tramo. */
+  .timeline {
+    position: absolute;
+    top: 0;
+    bottom: 104px;
+    left: calc(var(--page-gutter) + var(--hour-width) + var(--column-gap) + var(--rail-width) / 2 - 1px);
+    width: 2px;
+    background: linear-gradient(to bottom, var(--border) calc(100% - 44px), rgba(227, 227, 225, 0));
+  }
+
+  .period {
+    position: relative;
+    z-index: 1;
+    display: flow-root;
+    transition: height 220ms var(--ease-out), opacity 180ms ease-out;
+  }
+
+  .period-label {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px var(--page-gutter) 6px;
+    background: var(--background);
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    line-height: 16px;
+    text-transform: uppercase;
+  }
+
+  .period-label::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .slot,
+  .now-marker {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--hour-width) var(--rail-width) minmax(0, 1fr);
+    column-gap: var(--column-gap);
+    padding: 0 var(--page-gutter);
+  }
+
+  .slot {
+    margin-bottom: var(--block-gap);
+    transition: height 220ms var(--ease-out), margin-bottom 220ms var(--ease-out), opacity 180ms ease-out;
+  }
+
+  .slot-hour,
+  .slot-node {
+    display: flex;
+    align-items: center;
+    height: 36px;
+  }
+
+  .slot-hour {
+    justify-content: flex-end;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .slot-node { justify-content: center; }
+
+  /* Tarea: un punto. El borde blanco lo separa de la línea de tiempo. */
+  .node-dot {
+    width: 20px;
+    height: 20px;
+    border: 4px solid var(--background);
+    border-radius: 50%;
+    background: var(--category);
+  }
+
+  /* Hábito: un anillo con su cumplimiento de los últimos 30 días. */
+  .node-ring {
+    width: var(--rail-width);
+    height: var(--rail-width);
+    padding: 2px;
+    border-radius: 50%;
+    background: var(--background);
+  }
+
+  /* El bloque: borde izquierdo del color de la categoría */
+
+  .block {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    min-height: 54px;
+    padding: 8px 6px 8px 16px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--border);
+    transition: transform 220ms var(--ease-out);
+  }
+
+  .block::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 4px;
+    background: var(--category);
+    transition: width 200ms var(--ease-out);
+  }
+
+  .block-text {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    transition: opacity 160ms ease-out 40ms;
+  }
+
+  .block-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+    line-height: 20px;
+    text-wrap: balance;
+  }
+
+  .block-detail {
+    margin-top: 1px;
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+  }
+
+  .block-actions {
+    position: relative;
+    display: flex;
+    flex: none;
+    transition: opacity 160ms ease-out 40ms;
+  }
+
+  /* Dos botones redondos pequeños: se ven de 34 px y se tocan en 44 px. */
+  .mark-button {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 22px;
+  }
+
+  .mark-circle {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    transition: transform 100ms ease-out;
+  }
+
+  .mark-button:active .mark-circle { transform: scale(0.88); }
+
+  .mark-done .mark-circle {
+    background: var(--accent);
+    color: var(--background);
+  }
+
+  .mark-not-done .mark-circle {
+    border: 1.5px solid var(--not-done);
+    background: var(--background);
+    color: var(--text);
+  }
+
+  /* Al marcar: el color de la categoría (o el de «no hecho») inunda el bloque y este sale. */
+
+  .slot[data-result] .block {
+    transform: translateX(32px);
+    transition: transform 200ms ease-in var(--leave-delay);
+  }
+
+  .slot[data-result] .block::before {
+    width: 100%;
+    transition: width 130ms ease-out;
+  }
+
+  .slot[data-result="not-done"] .block::before { background: var(--not-done); }
+
+  .slot[data-result] .block-text,
+  .slot[data-result] .block-actions {
+    opacity: 0;
+    transition: opacity 90ms ease-in;
+  }
+
+  .slot.is-collapsed,
+  .period.is-collapsed {
+    opacity: 0;
+    transition: height 200ms ease var(--leave-delay), margin-bottom 200ms ease var(--leave-delay), opacity 160ms ease-in 100ms;
+  }
+
+  .slot.is-collapsed { margin-bottom: 0; }
+
+  /* La marca de «ahora» */
+
+  .now-marker {
+    align-items: center;
+    height: 24px;
+    margin-bottom: 2px;
+  }
+
+  .now-label {
+    justify-self: end;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .now-dot {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 24px;
+  }
+
+  .now-dot-core {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: now-beat 2.4s ease-in-out infinite;
+  }
+
+  .now-dot::before {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    animation: now-pulse 2.4s ease-out infinite;
+  }
+
+  .now-line {
+    height: 2px;
+    margin-right: calc(var(--page-gutter) * -1);
+    border-radius: 1px 0 0 1px;
+    background: var(--accent);
+  }
+
+  @keyframes now-beat {
+    0%, 40%, 100% { transform: scale(1); }
+    16% { transform: scale(1.18); }
+  }
+
+  @keyframes now-pulse {
+    0% { opacity: 0.4; transform: scale(1); }
+    75%, 100% { opacity: 0; transform: scale(2.3); }
+  }
+
+  /* Cuando no queda nada pendiente */
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 36px var(--page-gutter) 0;
+    color: var(--text-soft);
+    font-size: 14px;
+    font-weight: 500;
+    animation: appear 260ms ease-out 200ms both;
+  }
+
+  .empty-state svg { color: var(--text); }
+
+  @keyframes appear {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* El aviso con Deshacer */
+
+  .toast {
+    position: absolute;
+    right: 0;
+    bottom: 14px;
+    left: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    max-width: calc(100% - 2 * var(--page-gutter));
+    min-height: 52px;
+    margin: 0 auto;
+    padding: 4px 6px 4px 14px;
+    border-radius: 14px;
+    background: var(--accent);
+    color: var(--background);
+    box-shadow: 0 8px 24px rgba(11, 11, 11, 0.2);
+    transition: transform 240ms var(--ease-out), opacity 180ms ease-out, visibility 0s;
+  }
+
+  .toast:not(.is-visible) {
+    opacity: 0;
+    transform: translateY(24px);
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform 240ms var(--ease-out), opacity 180ms ease-out, visibility 0s linear 240ms;
+  }
+
+  .toast-badge {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    border-radius: 50%;
+  }
+
+  .toast[data-result="done"] .toast-badge { background: var(--category); color: var(--background); }
+  .toast[data-result="not-done"] .toast-badge { background: var(--not-done); color: var(--text); }
+  .toast[data-result="done"] .toast-icon-not-done,
+  .toast[data-result="not-done"] .toast-icon-done { display: none; }
+
+  .toast-message {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    white-space: nowrap;
+  }
+
+  .toast-separator {
+    margin: 0 -2px 0 8px;
+    color: var(--not-done);
+  }
+
+  .toast-undo {
+    min-height: 44px;
+    padding: 0 10px;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 20px;
+  }
+
+  .toast-undo:focus-visible { outline-color: var(--background); outline-offset: -4px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="screen">
+
+  <header class="header">
+    <h1 class="date">
+      <span class="date-day">Martes</span>
+      <span class="date-full">6 de octubre<span class="visually-hidden"> de 2026</span></span>
+    </h1>
+    <div class="header-side">
+      <button class="add-button" type="button" aria-label="Crear una tarea o un hábito">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      </button>
+      <p class="day-progress">
+        <svg class="day-ring" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+          <circle class="ring-track" cx="9" cy="9" r="7.5" stroke-width="3"/>
+          <circle class="ring-progress" id="day-ring-progress" cx="9" cy="9" r="7.5" stroke-width="3" pathLength="100" stroke-dasharray="25 100" transform="rotate(-90 9 9)"/>
+        </svg>
+        <span aria-hidden="true"><span class="counter"><span class="counter-strip" id="day-counter-strip" style="--value: 2"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></span></span> de 8 marcadas</span>
+        <span class="visually-hidden" id="day-progress-description">2 de 8 marcadas</span>
+      </p>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs" aria-label="Secciones de la app">
+    <ul class="tabs-list" id="tabs-list">
+      <li><a class="tab" href="#hoy" aria-current="page">Hoy</a></li>
+      <li><a class="tab" href="#bandeja">Bandeja</a></li>
+      <li><a class="tab" href="#pendientes" aria-label="Pendientes, 2 de días anteriores">Pendientes<span class="badge" aria-hidden="true">2</span></a></li>
+      <li><a class="tab" href="#historial">Historial</a></li>
+      <li><a class="tab" href="#categorias">Categorías</a></li>
+    </ul>
+  </nav>
+
+  <main class="agenda">
+    <div class="agenda-content" id="agenda">
+      <span class="timeline" aria-hidden="true"></span>
+
+      <section class="period" aria-labelledby="period-untimed">
+        <h2 class="period-label" id="period-untimed">Sin hora</h2>
+        <ol>
+          <li class="slot" data-category="personal">
+            <span class="slot-hour" aria-hidden="true"></span>
+            <span class="slot-node"><span class="node-dot" role="img" aria-label="Tarea"></span></span>
+            <div class="block">
+              <div class="block-text">
+                <p class="block-title">Comprar proteína</p>
+                <p class="block-detail">Personal</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-done" type="button" data-result="done" aria-label="Marcar «Comprar proteína» como hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                </button>
+                <button class="mark-button mark-not-done" type="button" data-result="not-done" aria-label="Marcar «Comprar proteína» como no hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+                </button>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="period" aria-labelledby="period-morning">
+        <h2 class="period-label" id="period-morning">Mañana</h2>
+        <ol>
+          <li class="now-marker">
+            <span class="now-label">Ahora</span>
+            <span class="now-dot" aria-hidden="true"><span class="now-dot-core"></span></span>
+            <span class="now-line" aria-hidden="true"></span>
+          </li>
+
+          <li class="slot" data-category="personal">
+            <time class="slot-hour" datetime="10:00">10:00</time>
+            <span class="slot-node"><span class="node-dot" role="img" aria-label="Tarea"></span></span>
+            <div class="block">
+              <div class="block-text">
+                <p class="block-title">Llamar al dentista</p>
+                <p class="block-detail">Personal</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-done" type="button" data-result="done" aria-label="Marcar «Llamar al dentista» como hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                </button>
+                <button class="mark-button mark-not-done" type="button" data-result="not-done" aria-label="Marcar «Llamar al dentista» como no hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+                </button>
+              </div>
+            </div>
+          </li>
+
+          <li class="slot" data-category="health">
+            <span class="slot-hour" aria-hidden="true"></span>
+            <span class="slot-node">
+              <span class="node-ring" role="img" aria-label="Hábito: lo has cumplido el 80 % de los últimos 30 días">
+                <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+                  <circle class="ring-track" cx="13" cy="13" r="10.5" stroke-width="4"/>
+                  <circle class="ring-progress" cx="13" cy="13" r="10.5" stroke-width="4" pathLength="100" stroke-dasharray="80 100" transform="rotate(-90 13 13)"/>
+                </svg>
+              </span>
+            </span>
+            <div class="block">
+              <div class="block-text">
+                <p class="block-title">Beber 2 L de agua</p>
+                <p class="block-detail">Salud · 80&nbsp;%</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-done" type="button" data-result="done" aria-label="Marcar «Beber 2 L de agua» como hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                </button>
+                <button class="mark-button mark-not-done" type="button" data-result="not-done" aria-label="Marcar «Beber 2 L de agua» como no hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+                </button>
+              </div>
+            </div>
+          </li>
+
+          <!-- Ya marcada al abrir la pantalla: no sale en la lista, pero Deshacer la devuelve aquí. -->
+          <li class="slot" id="slot-meditate" data-category="health" data-result="done" hidden>
+            <span class="slot-hour" aria-hidden="true"></span>
+            <span class="slot-node">
+              <span class="node-ring" role="img" aria-label="Hábito: lo has cumplido el 70 % de los últimos 30 días">
+                <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+                  <circle class="ring-track" cx="13" cy="13" r="10.5" stroke-width="4"/>
+                  <circle class="ring-progress" cx="13" cy="13" r="10.5" stroke-width="4" pathLength="100" stroke-dasharray="70 100" transform="rotate(-90 13 13)"/>
+                </svg>
+              </span>
+            </span>
+            <div class="block">
+              <div class="block-text">
+                <p class="block-title">Meditar 10 min</p>
+                <p class="block-detail">Salud · 70&nbsp;%</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-done" type="button" data-result="done" aria-label="Marcar «Meditar 10 min» como hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                </button>
+                <button class="mark-button mark-not-done" type="button" data-result="not-done" aria-label="Marcar «Meditar 10 min» como no hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+                </button>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="period" aria-labelledby="period-afternoon">
+        <h2 class="period-label" id="period-afternoon">Tarde</h2>
+        <ol>
+          <li class="slot" data-category="health">
+            <time class="slot-hour" datetime="18:30">18:30</time>
+            <span class="slot-node">
+              <span class="node-ring" role="img" aria-label="Hábito: lo has cumplido el 60 % de los últimos 30 días">
+                <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+                  <circle class="ring-track" cx="13" cy="13" r="10.5" stroke-width="4"/>
+                  <circle class="ring-progress" cx="13" cy="13" r="10.5" stroke-width="4" pathLength="100" stroke-dasharray="60 100" transform="rotate(-90 13 13)"/>
+                </svg>
+              </span>
+            </span>
+            <div class="block">
+              <div class="block-text">
+                <p class="block-title">Ir al gimnasio</p>
+                <p class="block-detail">Salud · 60&nbsp;%</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-done" type="button" data-result="done" aria-label="Marcar «Ir al gimnasio» como hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                </button>
+                <button class="mark-button mark-not-done" type="button" data-result="not-done" aria-label="Marcar «Ir al gimnasio» como no hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+                </button>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="period" aria-labelledby="period-night">
+        <h2 class="period-label" id="period-night">Noche</h2>
+        <ol>
+          <li class="slot" data-category="university">
+            <time class="slot-hour" datetime="23:59">23:59</time>
+            <span class="slot-node"><span class="node-dot" role="img" aria-label="Tarea"></span></span>
+            <div class="block">
+              <div class="block-text">
+                <p class="block-title">Entregar práctica de Redes</p>
+                <p class="block-detail">Universidad</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-done" type="button" data-result="done" aria-label="Marcar «Entregar práctica de Redes» como hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                </button>
+                <button class="mark-button mark-not-done" type="button" data-result="not-done" aria-label="Marcar «Entregar práctica de Redes» como no hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+                </button>
+              </div>
+            </div>
+          </li>
+
+          <li class="slot" data-category="personal">
+            <span class="slot-hour" aria-hidden="true"></span>
+            <span class="slot-node">
+              <span class="node-ring" role="img" aria-label="Hábito: lo has cumplido el 45 % de los últimos 30 días">
+                <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true">
+                  <circle class="ring-track" cx="13" cy="13" r="10.5" stroke-width="4"/>
+                  <circle class="ring-progress" cx="13" cy="13" r="10.5" stroke-width="4" pathLength="100" stroke-dasharray="45 100" transform="rotate(-90 13 13)"/>
+                </svg>
+              </span>
+            </span>
+            <div class="block">
+              <div class="block-text">
+                <p class="block-title">Leer 20 minutos</p>
+                <p class="block-detail">Personal · 45&nbsp;%</p>
+              </div>
+              <div class="block-actions">
+                <button class="mark-button mark-done" type="button" data-result="done" aria-label="Marcar «Leer 20 minutos» como hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+                </button>
+                <button class="mark-button mark-not-done" type="button" data-result="not-done" aria-label="Marcar «Leer 20 minutos» como no hecha">
+                  <span class="mark-circle"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span>
+                </button>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <div class="empty-state" id="empty-state" hidden>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+        <p>Hoy no queda nada pendiente</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- El aviso ya está a la vista al abrir la pantalla: acaba de marcarse «Meditar 10 min». -->
+  <div class="toast is-visible" id="toast" role="status" aria-live="polite" data-result="done" data-category="health">
+    <span class="toast-badge" aria-hidden="true">
+      <svg class="toast-icon-done" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      <svg class="toast-icon-not-done" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </span>
+    <p class="toast-message"><span id="toast-text">Marcada como hecha</span><span class="toast-separator" aria-hidden="true">·</span></p>
+    <button class="toast-undo" id="undo-button" type="button">Deshacer</button>
+  </div>
+
+</div>
+
+<script>
+(function agendaPrototype() {
+  'use strict';
+
+  // Hoy hay 8 elementos: los 6 que se ven y los 2 que ya estaban marcados al abrir la pantalla.
+  const TOTAL_ITEMS_TODAY = 8;
+  const MARKED_ITEMS_AT_START = 2;
+  const LEAVE_DURATION_MILLISECONDS = 280;
+
+  const toastMessages = {
+    done: 'Marcada como hecha',
+    'not-done': 'Marcada como no hecha',
+  };
+
+  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  const agenda = document.getElementById('agenda');
+  const emptyState = document.getElementById('empty-state');
+  const toast = document.getElementById('toast');
+  const toastText = document.getElementById('toast-text');
+  const undoButton = document.getElementById('undo-button');
+  const dayCounterStrip = document.getElementById('day-counter-strip');
+  const dayRingProgress = document.getElementById('day-ring-progress');
+  const dayProgressDescription = document.getElementById('day-progress-description');
+  const tabs = document.getElementById('tabs');
+  const tabsList = document.getElementById('tabs-list');
+  const meditateSlot = document.getElementById('slot-meditate');
+
+  let markedCount = MARKED_ITEMS_AT_START;
+
+  // Solo se puede deshacer la última marca, como en cualquier aviso de este tipo.
+  let lastMark = {
+    slot: meditateSlot,
+    collapsedElement: meditateSlot,
+    result: 'done',
+  };
+
+  // Un solo temporizador por elemento: si el usuario marca y deshace muy rápido, el último gana.
+  const pendingTimers = new Map();
+
+  function leaveDuration() {
+    if (reducedMotionQuery.matches) {
+      return 0;
+    }
+    return LEAVE_DURATION_MILLISECONDS;
+  }
+
+  function runAfterTransition(element, callback) {
+    window.clearTimeout(pendingTimers.get(element));
+    const timerId = window.setTimeout(callback, leaveDuration());
+    pendingTimers.set(element, timerId);
+  }
+
+  function forceStyleRecalculation(element) {
+    // Leer una medida obliga al navegador a calcular los estilos de partida antes de animar.
+    element.getBoundingClientRect();
+  }
+
+  // Marcar
+
+  function handleAgendaClick(event) {
+    const button = event.target.closest('.mark-button');
+    if (!button) {
+      return;
+    }
+    const slot = button.closest('.slot');
+    markSlot(slot, button.dataset.result);
+  }
+
+  function markSlot(slot, result) {
+    const isAlreadyMarked = slot.hasAttribute('data-result');
+    if (isAlreadyMarked) {
+      return;
+    }
+
+    const collapsedElement = findElementToCollapse(slot);
+    slot.dataset.result = result;
+    collapseElement(collapsedElement);
+
+    lastMark = { slot, collapsedElement, result };
+    setMarkedCount(markedCount + 1);
+    showToast(slot, result);
+    refreshEmptyState();
+  }
+
+  // Si era lo último que quedaba en su franja, se va también el separador.
+  function findElementToCollapse(slot) {
+    const period = slot.closest('.period');
+    const hasNowMarker = period.querySelector('.now-marker') !== null;
+    const pendingSlots = period.querySelectorAll('.slot:not([data-result])');
+    const isLastPendingSlot = pendingSlots.length === 1;
+
+    if (isLastPendingSlot && !hasNowMarker) {
+      return period;
+    }
+    return slot;
+  }
+
+  function collapseElement(element) {
+    element.style.height = element.offsetHeight + 'px';
+    element.style.overflow = 'hidden';
+    forceStyleRecalculation(element);
+
+    element.classList.add('is-collapsed');
+    element.style.height = '0px';
+
+    runAfterTransition(element, function hideCollapsedElement() {
+      element.hidden = true;
+    });
+  }
+
+  // Deshacer
+
+  function undoLastMark() {
+    if (lastMark === null) {
+      return;
+    }
+    const markToUndo = lastMark;
+    lastMark = null;
+
+    restoreMark(markToUndo);
+    setMarkedCount(markedCount - 1);
+    hideToast();
+    refreshEmptyState();
+  }
+
+  function restoreMark(mark) {
+    const { slot, collapsedElement } = mark;
+
+    if (collapsedElement.hidden) {
+      showAsCollapsed(collapsedElement);
+    }
+
+    // Al quitar la marca, el bloque vuelve a su sitio desde la derecha y el color se retira.
+    slot.removeAttribute('data-result');
+    expandElement(collapsedElement);
+  }
+
+  // Un elemento oculto no tiene estilos previos: se pinta primero colapsado y sin animar.
+  function showAsCollapsed(element) {
+    element.style.transition = 'none';
+    element.hidden = false;
+    element.classList.add('is-collapsed');
+    element.style.height = '0px';
+    element.style.overflow = 'hidden';
+    forceStyleRecalculation(element);
+    element.style.transition = '';
+  }
+
+  function measureNaturalHeight(element) {
+    const heightBeforeMeasuring = element.style.height;
+    element.style.height = 'auto';
+    const naturalHeight = element.offsetHeight;
+    element.style.height = heightBeforeMeasuring;
+    return naturalHeight;
+  }
+
+  function expandElement(element) {
+    const naturalHeight = measureNaturalHeight(element);
+
+    element.classList.remove('is-collapsed');
+    element.style.height = naturalHeight + 'px';
+
+    runAfterTransition(element, function releaseHeight() {
+      element.style.height = '';
+      element.style.overflow = '';
+    });
+  }
+
+  // Progreso del día: el número sube (o baja) en vertical y el anillo se rellena.
+
+  function setMarkedCount(nextCount) {
+    markedCount = nextCount;
+
+    const percentage = (markedCount / TOTAL_ITEMS_TODAY) * 100;
+    dayCounterStrip.style.setProperty('--value', String(markedCount));
+    dayRingProgress.style.strokeDasharray = percentage + ' 100';
+    dayProgressDescription.textContent = markedCount + ' de ' + TOTAL_ITEMS_TODAY + ' marcadas';
+  }
+
+  function refreshEmptyState() {
+    const pendingSlots = agenda.querySelectorAll('.slot:not([data-result])');
+    emptyState.hidden = pendingSlots.length > 0;
+  }
+
+  // Aviso con Deshacer
+
+  function showToast(slot, result) {
+    const wasVisible = toast.classList.contains('is-visible');
+
+    toast.dataset.result = result;
+    toast.dataset.category = slot.dataset.category;
+    toastText.textContent = toastMessages[result];
+    toast.classList.add('is-visible');
+
+    if (wasVisible) {
+      bumpToast();
+    }
+  }
+
+  // Si ya había un aviso, el nuevo lo sustituye con un pequeño salto para que se note.
+  function bumpToast() {
+    if (reducedMotionQuery.matches) {
+      return;
+    }
+    const keyframes = [
+      { transform: 'translateY(8px)', opacity: 0.4 },
+      { transform: 'translateY(0)', opacity: 1 },
+    ];
+    toast.animate(keyframes, { duration: 220, easing: 'ease-out' });
+  }
+
+  function hideToast() {
+    toast.classList.remove('is-visible');
+  }
+
+  // Pestañas: el degradado de la derecha desaparece al llegar al final.
+
+  function refreshTabsFade() {
+    const furthestScroll = tabsList.scrollWidth - tabsList.clientWidth;
+    const isAtEnd = tabsList.scrollLeft >= furthestScroll - 4;
+    tabs.classList.toggle('is-at-end', isAtEnd);
+  }
+
+  agenda.addEventListener('click', handleAgendaClick);
+  undoButton.addEventListener('click', undoLastMark);
+  tabsList.addEventListener('scroll', refreshTabsFade, { passive: true });
+  window.addEventListener('resize', refreshTabsFade);
+  document.fonts.ready.then(refreshTabsFade);
+  refreshTabsFade();
+})();
+</script>
+</body>
+</html>

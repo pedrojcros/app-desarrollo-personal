@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Desarrollo personal",
+    "slug": "app-desarrollo-personal",
+    "scheme": "desarrollo-personal",
+    "version": "0.1.0",
+    "userInterfaceStyle": "automatic",
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-splash-screen",
+      "@react-native-community/datetimepicker",
+      "expo-font",
+      "expo-notifications"
+    ],
+    "android": {
+      "permissions": ["android.permission.USE_EXACT_ALARM"]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1f3bf29d-e451-4267-b441-6e133d21a224"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+node_modules
+.git
+.expo
+dist
+coverage
+.env
+.env.*
+docs
+.agents
+.claude

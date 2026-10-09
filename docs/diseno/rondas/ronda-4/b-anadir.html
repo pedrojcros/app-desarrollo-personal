@@ -1,0 +1,452 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Añadir rápido · Negro</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;650;700&display=swap" rel="stylesheet"><style>
+:root{
+  --background:#0E1813;--surface:#15221B;--raised:#1C2C23;--border:#27392F;--border-strong:#3A5043;
+  --text:#E9F1EB;--muted:#93A89A;--accent:#E8C468;--negative:#D9776A;
+  --university:#8DB8F2;--health:#7AD39A;--personal:#EFA66A;--home:#F2A7A0;
+  --shopping:#5CCFC4;--inbox:#A3B1A8;--keyboard-height:270px;
+}
+*{box-sizing:border-box}
+html{background:var(--background)}
+body{margin:0;min-height:100vh;background:var(--background);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+button{border:0;background:none;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+a{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
+svg{width:22px;height:22px;flex-shrink:0}
+[hidden]{display:none!important}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* cabecera */
+.screen-header{padding:28px 20px 12px}
+.eyebrow{margin:0 0 6px;font-size:12px;color:var(--muted);letter-spacing:.1px}
+.title-line{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{margin:0;font-size:34px;line-height:1.1;letter-spacing:-1.3px;font-weight:650}
+.progress{display:flex;flex-direction:column;align-items:flex-end;gap:7px;padding-bottom:4px}
+.progress-text{font-size:12px;color:var(--muted)}
+.progress-text strong{color:var(--accent);font-weight:650;font-size:13px}
+.squares{display:flex;gap:3px}
+.square{width:10px;height:10px;border-radius:3px;border:1.5px solid var(--border-strong)}
+.square.yes{background:var(--accent);border-color:var(--accent)}
+.square.no{background:var(--negative);border-color:var(--negative)}
+main{padding:0 20px 160px}
+
+/* listas sin cajitas */
+.section-title{display:flex;align-items:center;gap:12px;margin:18px 0 0;font-size:10.5px;font-weight:650;letter-spacing:1.7px;color:var(--muted);text-transform:uppercase}
+.section-title:after{content:'';flex:1;height:1px;background:var(--border)}
+.row{display:flex;align-items:center;gap:2px;min-height:64px;border-bottom:1px solid var(--border)}
+.task-text{flex:1;min-width:0;padding:10px 0}
+.task-name{display:block;font-size:15px;font-weight:500;line-height:20px;letter-spacing:-.15px}
+.meta{display:flex;align-items:center;gap:6px;margin-top:3px;font-size:11px;color:var(--muted)}
+.meta b{font-weight:600;color:#C5D6CA}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--category);flex-shrink:0}
+.mark{width:46px;height:46px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mark-disc{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.mark-disc svg{width:17px;height:17px;stroke-width:2.4}
+.mark.yes .mark-disc{background:var(--category);color:var(--background)}
+.mark.no .mark-disc{border:1.5px solid rgba(217,119,106,.5);color:var(--negative)}
+.mark.no svg{width:15px;height:15px}
+.mark:active .mark-disc{transform:scale(.92)}
+
+/* botón + y aviso */
+.floating{position:fixed;right:20px;bottom:146px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:18px;background:var(--accent);color:var(--background);box-shadow:0 8px 22px rgba(0,0,0,.4)}
+.floating svg{width:26px;height:26px;stroke-width:2.4}
+.toast{position:fixed;left:20px;right:20px;bottom:88px;height:50px;display:flex;align-items:center;gap:10px;padding:0 6px 0 14px;border:1px solid var(--border-strong);border-radius:14px;background:var(--raised);font-size:13px;box-shadow:0 8px 22px rgba(0,0,0,.35)}
+.toast>svg{width:17px;height:17px;color:var(--health);stroke-width:2.4}
+.toast button{margin-left:auto;min-height:44px;padding:0 12px;font-weight:700;font-size:13px;color:var(--accent)}
+
+/* navegación */
+.navigation{position:fixed;left:0;right:0;bottom:0;height:74px;display:flex;padding:8px 4px 8px;background:var(--surface);border-top:1px solid var(--border);z-index:3}
+.navigation a{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
+.nav-icon{position:relative;width:52px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center}
+.nav-icon svg{width:21px;height:21px}
+.navigation a.active{color:var(--accent);font-weight:600}
+.navigation a.active .nav-icon{background:var(--raised)}
+.badge{position:absolute;top:-3px;right:7px;min-width:15px;height:15px;border-radius:8px;background:var(--accent);color:var(--background);font-size:10px;font-weight:700;line-height:15px;text-align:center}
+
+/* iconos de categoría */
+.tile{width:38px;height:38px;border-radius:12px;background:var(--raised);color:var(--category);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tile svg{width:20px;height:20px}
+.tile.small{width:28px;height:28px;border-radius:9px}
+.tile.small svg{width:16px;height:16px}
+
+/* barra de añadir rápido */
+.scrim{position:fixed;left:0;right:0;top:0;bottom:var(--keyboard-height);background:rgba(3,8,5,.55);z-index:4}
+.sheet{position:fixed;left:0;right:0;top:0;bottom:var(--keyboard-height);z-index:5;display:flex;flex-direction:column;justify-content:flex-end;pointer-events:none}
+.sheet>*{pointer-events:auto}
+.menu-area{flex:0 1 auto;min-height:0;overflow-y:auto;padding-top:12px}
+.menu-area:empty{display:none}
+.menu{margin:0 12px 8px;padding:6px;border:1px solid var(--border-strong);border-radius:18px;background:#1A2A21;box-shadow:0 -10px 34px rgba(0,0,0,.5)}
+.menu-title{margin:2px 10px 4px;font-size:10.5px;font-weight:650;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase}
+.menu-item{width:100%;min-height:42px;display:flex;align-items:center;gap:12px;padding:0 10px;border-radius:12px;text-align:left;font-size:14.5px}
+.menu-item[aria-selected="true"]{background:var(--raised)}
+.menu-label{flex:1;min-width:0}
+.menu-item .check{width:18px;height:18px;color:var(--accent);opacity:0;stroke-width:2.4}
+.menu-item[aria-selected="true"] .check{opacity:1}
+.menu-item .caret-icon{width:17px;height:17px;color:var(--muted)}
+.menu-item[aria-expanded="true"] .caret-icon{transform:rotate(180deg)}
+.menu-item.plain{min-height:46px;padding-left:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px 50px;padding:2px 4px 4px 0}
+.chip{height:38px;padding:0 14px;border:1px solid var(--border-strong);border-radius:19px;font-size:13px;color:var(--text)}
+.chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:rgba(232,196,104,.1)}
+
+.composer{margin:0;padding:6px 16px 8px;border-top:1px solid #3F574A;border-radius:22px 22px 0 0;background:var(--surface);box-shadow:0 -12px 30px rgba(0,0,0,.35)}
+.handle{width:32px;height:3px;margin:0 auto 6px;border-radius:2px;background:#405448}
+.compose-title{display:flex;align-items:center;gap:10px;height:48px}
+.field{position:relative;flex:1;min-width:0;height:48px;display:flex;align-items:center;overflow:hidden}
+.field.long{justify-content:flex-end}
+.mirror-text{white-space:pre;font-size:23px;letter-spacing:-.5px;font-weight:500}
+.mirror-text.empty{color:#6C8274}
+.caret{display:inline-block;flex-shrink:0;width:2px;height:27px;margin-left:1px;border-radius:1px;background:var(--accent)}
+.field input{position:absolute;inset:0;width:100%;opacity:0;font-size:23px;border:0;background:none}
+.send{width:48px;height:48px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:15px;background:var(--accent);color:var(--background)}
+.send svg{width:24px;height:24px;stroke-width:2.4}
+.type-line{display:flex;align-items:center;justify-content:space-between;height:44px}
+.segmented{display:flex;gap:2px;padding:3px;border-radius:11px;background:var(--background)}
+.segmented button{height:34px;padding:0 16px;border-radius:8px;font-size:13px;font-weight:500;color:var(--muted)}
+.segmented button[aria-pressed="true"]{background:var(--raised);color:var(--accent);font-weight:650}
+.more{height:44px;display:flex;align-items:center;gap:5px;padding:0 4px 0 10px;font-size:13px;color:var(--muted)}
+.more svg{width:18px;height:18px}
+.more[aria-expanded="true"]{color:var(--accent)}
+.habit-options{display:flex;gap:8px;height:44px;align-items:center}
+.select-trigger{flex:1;min-width:0;height:38px;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 12px;border:1px solid var(--border-strong);border-radius:11px;background:var(--raised);font-size:13px}
+.select-trigger svg{width:16px;height:16px;color:var(--muted)}
+.select-trigger[aria-expanded="true"]{border-color:var(--accent)}
+.date-line{display:flex;align-items:center;height:44px;gap:2px}
+.start-label{padding:0 6px 0 2px;font-size:12px;color:var(--muted)}
+.date-chip{height:36px;padding:0 11px;border-radius:10px;font-size:13px;color:var(--muted);white-space:nowrap}
+.date-chip[aria-pressed="true"]{background:var(--raised);color:var(--accent);font-weight:650;box-shadow:inset 0 0 0 1px var(--border-strong)}
+.date-chip.calendar{width:42px;padding:0;display:flex;align-items:center;justify-content:center}
+.date-chip.calendar svg{width:18px;height:18px}
+.extra{display:flex;gap:8px;margin-bottom:6px}
+.extra input{flex:1;min-width:0;height:44px;padding:0 12px;border:1px solid var(--border-strong);border-radius:11px;background:var(--raised);color:var(--text);color-scheme:dark;font-size:14px}
+.category-trigger{width:100%;height:46px;display:flex;align-items:center;gap:10px;margin-top:2px;padding:0 4px 0 0;border-top:1px solid var(--border);font-size:13.5px}
+.category-trigger .category-label{flex:1;min-width:0;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.category-trigger>svg:last-child{width:18px;height:18px;color:var(--muted)}
+.category-trigger[aria-expanded="true"]>svg:last-child{transform:rotate(180deg);color:var(--accent)}
+.category-trigger[aria-expanded="true"]{color:var(--text)}
+
+/* teclado de Android (maqueta) */
+.keyboard{position:fixed;left:0;right:0;bottom:0;height:var(--keyboard-height);z-index:6;padding:0 4px;background:#1B211E}
+.suggestions{height:40px;display:flex;align-items:center;justify-content:space-evenly;font-size:15px;color:#D9E2DC}
+.suggestions span+span{padding-left:26px;border-left:1px solid #3E4942}
+.key-row{display:flex;justify-content:center;gap:4px;margin-bottom:5px}
+.key-row button{flex:1;height:42px;border-radius:6px;background:#2E3832;font-size:18px;color:#E9F1EB;box-shadow:0 1px 0 rgba(0,0,0,.45)}
+.key-row.third button.wide{flex:1.45;background:#252E29}
+.key-row.bottom button{font-size:13px;background:#252E29}
+.key-row.bottom .space{flex:4.4;background:#2E3832;font-size:12px;color:#B6C4BA}
+.key-row.bottom .enter{flex:1.3;background:#5C7A64;color:#0E1813}
+.key-row svg{width:20px;height:20px}
+.keyboard-footer{display:flex;align-items:center;justify-content:space-between;height:26px;padding:0 20px;color:#8FA196}
+.keyboard-footer svg{width:17px;height:17px}
+.home-bar{position:absolute;left:50%;bottom:6px;width:104px;height:4px;margin-left:-52px;border-radius:2px;background:#CCD5CF}
+
+@media(min-width:400px){.screen-header{padding-top:34px}.row{min-height:70px}.task-name{font-size:16px}.meta{font-size:12px}}
+@media(prefers-reduced-motion:no-preference){.caret{animation:blink 1.05s step-end infinite}@keyframes blink{50%{opacity:0}}}
+</style></head><body><header class="screen-header"><p class="eyebrow">Martes, 6 de octubre de 2026</p><div class="title-line"><h1>Hoy</h1><div class="progress" id="progress" aria-label="2 de 8 marcadas"><span class="progress-text"><strong id="progress-count">2 de 8</strong> marcadas</span><span class="squares" id="squares"><span class="square yes"></span><span class="square no"></span><span class="square"></span><span class="square"></span><span class="square"></span><span class="square"></span><span class="square"></span><span class="square"></span></span></div></div></header><main id="task-list"><section data-section="Sin hora"><h2 class="section-title">Sin hora</h2><div class="row" style="--category:var(--personal)"><div class="task-text"><span class="task-name">Comprar proteína</span><span class="meta"><i class="dot"></i><span>Personal · Tarea</span></span></div><button type="button" class="mark yes" aria-label="Marcar Comprar proteína como hecho"><span class="mark-disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></button><button type="button" class="mark no" aria-label="Marcar Comprar proteína como no hecho"><span class="mark-disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button></div></section><section data-section="Mañana"><h2 class="section-title">Mañana</h2><div class="row" style="--category:var(--personal)"><div class="task-text"><span class="task-name">Llamar al dentista</span><span class="meta"><i class="dot"></i><span><b>10:00</b> · Personal · Tarea</span></span></div><button type="button" class="mark yes" aria-label="Marcar Llamar al dentista como hecho"><span class="mark-disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></button><button type="button" class="mark no" aria-label="Marcar Llamar al dentista como no hecho"><span class="mark-disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button></div><div class="row" style="--category:var(--health)"><div class="task-text"><span class="task-name">Beber 2 L de agua</span><span class="meta"><i class="dot"></i><span>Salud · Hábito</span></span></div><button type="button" class="mark yes" aria-label="Marcar Beber 2 L de agua como hecho"><span class="mark-disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></button><button type="button" class="mark no" aria-label="Marcar Beber 2 L de agua como no hecho"><span class="mark-disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button></div></section><section data-section="Tarde"><h2 class="section-title">Tarde</h2><div class="row" style="--category:var(--health)"><div class="task-text"><span class="task-name">Ir al gimnasio</span><span class="meta"><i class="dot"></i><span><b>18:30</b> · Salud · Hábito</span></span></div><button type="button" class="mark yes" aria-label="Marcar Ir al gimnasio como hecho"><span class="mark-disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></button><button type="button" class="mark no" aria-label="Marcar Ir al gimnasio como no hecho"><span class="mark-disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button></div></section><section data-section="Noche"><h2 class="section-title">Noche</h2><div class="row" style="--category:var(--university)"><div class="task-text"><span class="task-name">Entregar práctica de Redes</span><span class="meta"><i class="dot"></i><span><b>23:59</b> · Universidad · Tarea</span></span></div><button type="button" class="mark yes" aria-label="Marcar Entregar práctica de Redes como hecho"><span class="mark-disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></button><button type="button" class="mark no" aria-label="Marcar Entregar práctica de Redes como no hecho"><span class="mark-disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button></div><div class="row" style="--category:var(--personal)"><div class="task-text"><span class="task-name">Leer 20 minutos</span><span class="meta"><i class="dot"></i><span>Personal · Hábito</span></span></div><button type="button" class="mark yes" aria-label="Marcar Leer 20 minutos como hecho"><span class="mark-disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></button><button type="button" class="mark no" aria-label="Marcar Leer 20 minutos como no hecho"><span class="mark-disc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></span></button></div></section></main><nav class="navigation" aria-label="Navegación principal"><a href="b-hoy.html" class="active" aria-current="page"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></span>Hoy</a><a href="#bandeja"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></span>Bandeja</a><a href="b-categorias.html"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg></span>Categorías</a><a href="#pendientes"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="badge">2</span></span>Pendientes</a><a href="#historial"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg></span>Historial</a></nav><div class="scrim" id="scrim" hidden></div><div class="sheet"><div class="menu-area" id="menu-area"><div class="menu" id="menu-category" role="listbox" aria-label="Categoría" hidden><button type="button" class="menu-item" role="option" aria-selected="false" data-category="inbox"><span class="tile small" style="--category:var(--inbox)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></span><span class="menu-label">Bandeja de entrada</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button><button type="button" class="menu-item" role="option" aria-selected="false" data-category="shopping" aria-expanded="false"><span class="tile small" style="--category:var(--shopping)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 11-1 9"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4"/><path d="M4.5 15.5h15"/><path d="m5 11 4-7"/><path d="m9 11 1 9"/></svg></span><span class="menu-label">Lista de la compra</span><svg class="caret-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="chips" data-chips="shopping" hidden><button type="button" class="chip" aria-pressed="false" data-section="Mercadona">Mercadona</button><button type="button" class="chip" aria-pressed="false" data-section="Lidl">Lidl</button><button type="button" class="chip" aria-pressed="false" data-section="Sin sección">Sin sección</button></div><button type="button" class="menu-item" role="option" aria-selected="false" data-category="university" aria-expanded="false"><span class="tile small" style="--category:var(--university)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg></span><span class="menu-label">Universidad</span><svg class="caret-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="chips" data-chips="university" hidden><button type="button" class="chip" aria-pressed="false" data-section="Redes">Redes</button><button type="button" class="chip" aria-pressed="false" data-section="Bases de datos">Bases de datos</button><button type="button" class="chip" aria-pressed="false" data-section="Sin sección">Sin sección</button></div><button type="button" class="menu-item" role="option" aria-selected="false" data-category="health"><span class="tile small" style="--category:var(--health)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></span><span class="menu-label">Salud</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button><button type="button" class="menu-item" role="option" aria-selected="false" data-category="personal"><span class="tile small" style="--category:var(--personal)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="menu-label">Personal</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button><button type="button" class="menu-item" role="option" aria-selected="false" data-category="home"><span class="tile small" style="--category:var(--home)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span><span class="menu-label">Casa</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button></div><div class="menu" id="menu-frequency" role="listbox" aria-label="Se repite" hidden><p class="menu-title">Se repite</p><button type="button" class="menu-item plain" role="option" aria-selected="false" data-value="A diario"><span class="menu-label">A diario</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button><button type="button" class="menu-item plain" role="option" aria-selected="false" data-value="Días de la semana"><span class="menu-label">Días de la semana</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button><button type="button" class="menu-item plain" role="option" aria-selected="false" data-value="Cada 2 días"><span class="menu-label">Cada 2 días</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button><button type="button" class="menu-item plain" role="option" aria-selected="false" data-value="Cada mes"><span class="menu-label">Cada mes</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button></div><div class="menu" id="menu-when" role="listbox" aria-label="Cuándo" hidden><p class="menu-title">Cuándo</p><button type="button" class="menu-item plain" role="option" aria-selected="false" data-value="Mañana"><span class="menu-label">Mañana</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button><button type="button" class="menu-item plain" role="option" aria-selected="false" data-value="Tarde"><span class="menu-label">Tarde</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button><button type="button" class="menu-item plain" role="option" aria-selected="false" data-value="Noche"><span class="menu-label">Noche</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button><button type="button" class="menu-item plain" role="option" aria-selected="false" data-value="A una hora"><span class="menu-label">A una hora</span><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button></div></div><form class="composer" id="composer" autocomplete="off"><div class="handle"></div><div class="compose-title"><div class="field" id="field"><span class="mirror-text" id="mirror-text">Comprar pilas</span><i class="caret"></i><input id="task-name" aria-label="Nombre de la tarea o hábito" value="Comprar pilas"></div><button type="submit" class="send" aria-label="Añadir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg></button></div><div class="type-line"><div class="segmented" role="group" aria-label="Tipo"><button type="button" data-mode="task" aria-pressed="true">Tarea</button><button type="button" data-mode="habit" aria-pressed="false">Hábito</button></div><button type="button" class="more" id="more" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>Más</button></div><div class="habit-options" id="habit-options" hidden><button type="button" class="select-trigger" id="frequency-trigger" data-menu="frequency" aria-expanded="false"><span id="frequency-label">A diario</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button><button type="button" class="select-trigger" id="when-trigger" data-menu="when" aria-expanded="false"><span id="when-label">Mañana</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button></div><div class="date-line" id="date-line"><span class="start-label" id="start-label" hidden>Empieza</span><button type="button" class="date-chip" data-date="Sin fecha" aria-pressed="false">Sin fecha</button><button type="button" class="date-chip" data-date="Hoy" aria-pressed="true">Hoy</button><button type="button" class="date-chip" data-date="Mañana" aria-pressed="false">Mañana</button><button type="button" class="date-chip" data-date="Lunes" aria-pressed="false">Lunes</button><button type="button" class="date-chip calendar" id="calendar" aria-label="Elegir otra fecha" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg></button></div><div class="extra" id="date-extra" hidden><input type="date" id="custom-date" aria-label="Otra fecha"></div><div class="extra" id="more-extra" hidden><input id="notes" aria-label="Notas" placeholder="Notas"><input type="time" id="exact-time" aria-label="Hora exacta"></div><button type="button" class="category-trigger" id="category-trigger" data-menu="category" aria-haspopup="listbox" aria-expanded="false"><span class="tile small" id="category-tile" style="--category:var(--inbox)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></span><span class="category-label" id="category-label">Bandeja de entrada</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button></form></div><div class="keyboard" aria-label="Teclado de Android (maqueta)"><div class="suggestions"><span>pilas</span><span>Pilas</span><span>pila</span></div><div class="key-row"><button type="button" tabindex="-1" data-key="q">q</button><button type="button" tabindex="-1" data-key="w">w</button><button type="button" tabindex="-1" data-key="e">e</button><button type="button" tabindex="-1" data-key="r">r</button><button type="button" tabindex="-1" data-key="t">t</button><button type="button" tabindex="-1" data-key="y">y</button><button type="button" tabindex="-1" data-key="u">u</button><button type="button" tabindex="-1" data-key="i">i</button><button type="button" tabindex="-1" data-key="o">o</button><button type="button" tabindex="-1" data-key="p">p</button></div><div class="key-row"><button type="button" tabindex="-1" data-key="a">a</button><button type="button" tabindex="-1" data-key="s">s</button><button type="button" tabindex="-1" data-key="d">d</button><button type="button" tabindex="-1" data-key="f">f</button><button type="button" tabindex="-1" data-key="g">g</button><button type="button" tabindex="-1" data-key="h">h</button><button type="button" tabindex="-1" data-key="j">j</button><button type="button" tabindex="-1" data-key="k">k</button><button type="button" tabindex="-1" data-key="l">l</button><button type="button" tabindex="-1" data-key="ñ">ñ</button></div><div class="key-row third"><button type="button" tabindex="-1" class="wide" data-key="shift" aria-label="Mayúsculas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18v-6H5l7-7 7 7h-4v6H9z"/></svg></button><button type="button" tabindex="-1" data-key="z">z</button><button type="button" tabindex="-1" data-key="x">x</button><button type="button" tabindex="-1" data-key="c">c</button><button type="button" tabindex="-1" data-key="v">v</button><button type="button" tabindex="-1" data-key="b">b</button><button type="button" tabindex="-1" data-key="n">n</button><button type="button" tabindex="-1" data-key="m">m</button><button type="button" tabindex="-1" class="wide" data-key="delete" aria-label="Borrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 5H9l-7 7 7 7h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z"/><path d="m18 9-6 6"/><path d="m12 9 6 6"/></svg></button></div><div class="key-row bottom"><button type="button" tabindex="-1" class="wide" data-key="numbers" style="flex:1.45">?123</button><button type="button" tabindex="-1" data-key=",">,</button><button type="button" tabindex="-1" class="space" data-key=" ">Español</button><button type="button" tabindex="-1" data-key=".">.</button><button type="button" tabindex="-1" class="enter" data-key="send" aria-label="Añadir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg></button></div><div class="keyboard-footer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 8h.01"/><path d="M12 12h.01"/><path d="M14 8h.01"/><path d="M16 12h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M7 16h10"/><path d="M8 12h.01"/><rect width="20" height="16" x="2" y="4" rx="2"/></svg></div><div class="home-bar"></div></div><script>
+const ICONS = {"sun": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41\"/></svg>", "inbox": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polyline points=\"22 12 16 12 14 15 10 15 8 12 2 12\"/><path d=\"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z\"/></svg>", "grid": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"7\" height=\"7\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"14\" y=\"14\" rx=\"1\"/><rect width=\"7\" height=\"7\" x=\"3\" y=\"14\" rx=\"1\"/></svg>", "clock": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/></svg>", "history": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"/><path d=\"M3 3v5h5\"/><path d=\"M12 7v5l4 2\"/></svg>", "plus": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"M12 5v14\"/></svg>", "check": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg>", "x": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/></svg>", "basket": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m15 11-1 9\"/><path d=\"m19 11-4-7\"/><path d=\"M2 11h20\"/><path d=\"m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.7-7.4\"/><path d=\"M4.5 15.5h15\"/><path d=\"m5 11 4-7\"/><path d=\"m9 11 1 9\"/></svg>", "cap": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z\"/><path d=\"M22 10v6\"/><path d=\"M6 12.5V16a6 3 0 0 0 12 0v-3.5\"/></svg>", "heart": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z\"/></svg>", "user": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/></svg>", "house": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg>", "chevron-down": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg>", "chevron-up": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m18 15-6-6-6 6\"/></svg>", "chevron-right": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m9 18 6-6-6-6\"/></svg>", "chevron-left": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m15 18-6-6 6-6\"/></svg>", "arrow-up": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m5 12 7-7 7 7\"/><path d=\"M12 19V5\"/></svg>", "calendar": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 2v4\"/><path d=\"M16 2v4\"/><rect width=\"18\" height=\"18\" x=\"3\" y=\"4\" rx=\"2\"/><path d=\"M3 10h18\"/></svg>", "ellipsis": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/><circle cx=\"5\" cy=\"12\" r=\"1\"/></svg>", "folder": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z\"/></svg>", "delete": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 5H9l-7 7 7 7h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Z\"/><path d=\"m18 9-6 6\"/><path d=\"m12 9 6 6\"/></svg>", "keyboard": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M10 8h.01\"/><path d=\"M12 12h.01\"/><path d=\"M14 8h.01\"/><path d=\"M16 12h.01\"/><path d=\"M18 8h.01\"/><path d=\"M6 8h.01\"/><path d=\"M7 16h10\"/><path d=\"M8 12h.01\"/><rect width=\"20\" height=\"16\" x=\"2\" y=\"4\" rx=\"2\"/></svg>", "shift": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 18v-6H5l7-7 7 7h-4v6H9z\"/></svg>"};
+const CATEGORIES = {"inbox": {"label": "Bandeja de entrada", "icon": "inbox", "color": "var(--inbox)", "sections": []}, "shopping": {"label": "Lista de la compra", "icon": "basket", "color": "var(--shopping)", "sections": ["Mercadona", "Lidl"]}, "university": {"label": "Universidad", "icon": "cap", "color": "var(--university)", "sections": ["Redes", "Bases de datos"]}, "health": {"label": "Salud", "icon": "heart", "color": "var(--health)", "sections": []}, "personal": {"label": "Personal", "icon": "user", "color": "var(--personal)", "sections": []}, "home": {"label": "Casa", "icon": "house", "color": "var(--home)", "sections": []}};
+
+// Crea una fila de tarea igual que las del HTML estático
+function createTaskRow(title, colorVariable, metaText, time) {
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.style.setProperty('--category', colorVariable);
+  const text = document.createElement('div');
+  text.className = 'task-text';
+  const name = document.createElement('span');
+  name.className = 'task-name';
+  name.textContent = title;
+  const meta = document.createElement('span');
+  meta.className = 'meta';
+  const dot = document.createElement('i');
+  dot.className = 'dot';
+  const metaLabel = document.createElement('span');
+  if (time) {
+    const timeLabel = document.createElement('b');
+    timeLabel.textContent = time;
+    metaLabel.append(timeLabel, ' · ');
+  }
+  metaLabel.append(metaText);
+  meta.append(dot, metaLabel);
+  text.append(name, meta);
+  row.append(text);
+  for (const outcome of ['yes', 'no']) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'mark ' + outcome;
+    button.setAttribute('aria-label', 'Marcar ' + title + (outcome === 'yes' ? ' como hecho' : ' como no hecho'));
+    const disc = document.createElement('span');
+    disc.className = 'mark-disc';
+    disc.innerHTML = outcome === 'yes' ? ICONS.check : ICONS.x;
+    button.append(disc);
+    row.append(button);
+  }
+  return row;
+}
+
+
+// Progreso del día: un cuadrito por tarea u hábito de hoy
+const progressStates = ['yes', 'no', null, null, null, null, null, null];
+
+function renderProgress() {
+  const markedCount = progressStates.filter(function(state) { return state !== null; }).length;
+  const label = markedCount + ' de ' + progressStates.length;
+  document.getElementById('progress-count').textContent = label;
+  document.getElementById('progress').setAttribute('aria-label', label + ' marcadas');
+  const squares = document.getElementById('squares');
+  squares.replaceChildren();
+  for (const state of progressStates) {
+    const square = document.createElement('span');
+    square.className = state ? 'square ' + state : 'square';
+    squares.append(square);
+  }
+}
+
+function addEmptySquare() {
+  progressStates.push(null);
+  renderProgress();
+}
+
+
+// Al enviar, la tarea aparece arriba de la lista de Hoy
+window.onTaskAdded = function(task) {
+  const category = CATEGORIES[task.category];
+  const where = task.section ? category.label + ' › ' + task.section : category.label;
+  const row = createTaskRow(task.title, category.color, task.date + ' · ' + where + ' · ' + task.kindLabel, null);
+  document.querySelector('[data-section="Sin hora"] .section-title').after(row);
+  addEmptySquare();
+};
+
+
+// Barra de añadir rápido: los menús se abren siempre hacia arriba, sobre la barra
+const composerState = {mode: 'task', date: 'Hoy', category: 'inbox', section: null, frequency: 'A diario', moment: 'Mañana'};
+const composerForm = document.getElementById('composer');
+const nameInput = document.getElementById('task-name');
+const mirrorText = document.getElementById('mirror-text');
+const field = document.getElementById('field');
+const scrim = document.getElementById('scrim');
+const menuTriggers = {
+  category: document.getElementById('category-trigger'),
+  frequency: document.getElementById('frequency-trigger'),
+  when: document.getElementById('when-trigger'),
+};
+let placeholderText = 'Añadir otra…';
+let openMenuName = null;
+
+function renderField() {
+  const value = nameInput.value;
+  const isEmpty = value.length === 0;
+  mirrorText.textContent = isEmpty ? placeholderText : value;
+  mirrorText.classList.toggle('empty', isEmpty);
+  field.classList.toggle('long', field.scrollWidth > field.clientWidth);
+}
+
+function typeIntoName(newValue) {
+  nameInput.value = newValue;
+  renderField();
+}
+
+function closeMenus() {
+  openMenuName = null;
+  scrim.hidden = true;
+  for (const menu of document.querySelectorAll('.menu')) menu.hidden = true;
+  for (const trigger of Object.values(menuTriggers)) trigger.setAttribute('aria-expanded', 'false');
+}
+
+function toggleMenu(menuName) {
+  const wasOpen = openMenuName === menuName;
+  closeMenus();
+  if (wasOpen) return;
+  openMenuName = menuName;
+  scrim.hidden = false;
+  document.getElementById('menu-' + menuName).hidden = false;
+  menuTriggers[menuName].setAttribute('aria-expanded', 'true');
+}
+
+function categoryLabel() {
+  const category = CATEGORIES[composerState.category];
+  if (!composerState.section) return category.label;
+  return category.label + ' › ' + composerState.section;
+}
+
+function renderCategory() {
+  const category = CATEGORIES[composerState.category];
+  const tile = document.getElementById('category-tile');
+  tile.style.setProperty('--category', category.color);
+  tile.innerHTML = ICONS[category.icon];
+  document.getElementById('category-label').textContent = categoryLabel();
+  for (const item of document.querySelectorAll('[data-category]')) {
+    item.setAttribute('aria-selected', String(item.dataset.category === composerState.category));
+  }
+  for (const chip of document.querySelectorAll('.chip')) {
+    const chipsOwner = chip.parentElement.dataset.chips;
+    const chipSection = chip.dataset.section === 'Sin sección' ? null : chip.dataset.section;
+    const isSelected = chipsOwner === composerState.category
+      && chipSection === composerState.section
+      && composerState.sectionChosen;
+    chip.setAttribute('aria-pressed', String(isSelected));
+  }
+}
+
+function expandCategory(categoryId) {
+  for (const chips of document.querySelectorAll('.chips')) {
+    const shouldShow = chips.dataset.chips === categoryId && chips.hidden;
+    chips.hidden = !shouldShow;
+    const item = document.querySelector('[data-category="' + chips.dataset.chips + '"]');
+    item.setAttribute('aria-expanded', String(shouldShow));
+  }
+}
+
+for (const trigger of Object.values(menuTriggers)) {
+  trigger.addEventListener('click', function() { toggleMenu(trigger.dataset.menu); });
+}
+scrim.addEventListener('click', closeMenus);
+
+for (const item of document.querySelectorAll('[data-category]')) {
+  item.addEventListener('click', function() {
+    const category = CATEGORIES[item.dataset.category];
+    if (category.sections.length > 0) {
+      expandCategory(item.dataset.category);
+      return;
+    }
+    composerState.category = item.dataset.category;
+    composerState.section = null;
+    composerState.sectionChosen = true;
+    renderCategory();
+    closeMenus();
+  });
+}
+
+for (const chip of document.querySelectorAll('.chip')) {
+  chip.addEventListener('click', function() {
+    composerState.category = chip.parentElement.dataset.chips;
+    composerState.section = chip.dataset.section === 'Sin sección' ? null : chip.dataset.section;
+    composerState.sectionChosen = true;
+    renderCategory();
+    closeMenus();
+  });
+}
+
+function bindSimpleMenu(menuName, stateKey, labelId) {
+  const menu = document.getElementById('menu-' + menuName);
+  function markSelected() {
+    for (const item of menu.querySelectorAll('[data-value]')) {
+      item.setAttribute('aria-selected', String(item.dataset.value === composerState[stateKey]));
+    }
+  }
+  for (const item of menu.querySelectorAll('[data-value]')) {
+    item.addEventListener('click', function() {
+      composerState[stateKey] = item.dataset.value;
+      document.getElementById(labelId).textContent = item.dataset.value;
+      markSelected();
+      closeMenus();
+      if (item.dataset.value === 'A una hora') {
+        document.getElementById('more-extra').hidden = false;
+        document.getElementById('more').setAttribute('aria-expanded', 'true');
+        document.getElementById('exact-time').focus();
+      }
+    });
+  }
+  markSelected();
+}
+bindSimpleMenu('frequency', 'frequency', 'frequency-label');
+bindSimpleMenu('when', 'moment', 'when-label');
+
+function selectDate(dateName) {
+  composerState.date = dateName;
+  for (const chip of document.querySelectorAll('[data-date]')) {
+    chip.setAttribute('aria-pressed', String(chip.dataset.date === dateName));
+  }
+  document.getElementById('calendar').setAttribute('aria-pressed', 'false');
+}
+
+for (const chip of document.querySelectorAll('[data-date]')) {
+  chip.addEventListener('click', function() { selectDate(chip.dataset.date); });
+}
+
+document.getElementById('calendar').addEventListener('click', function(event) {
+  const extra = document.getElementById('date-extra');
+  extra.hidden = !extra.hidden;
+  event.currentTarget.setAttribute('aria-pressed', String(!extra.hidden));
+});
+
+document.getElementById('custom-date').addEventListener('change', function(event) {
+  composerState.date = event.target.value;
+  for (const chip of document.querySelectorAll('[data-date]')) chip.setAttribute('aria-pressed', 'false');
+  document.getElementById('calendar').setAttribute('aria-pressed', 'true');
+});
+
+document.getElementById('more').addEventListener('click', function(event) {
+  const extra = document.getElementById('more-extra');
+  extra.hidden = !extra.hidden;
+  event.currentTarget.setAttribute('aria-expanded', String(!extra.hidden));
+});
+
+for (const modeButton of document.querySelectorAll('[data-mode]')) {
+  modeButton.addEventListener('click', function() {
+    composerState.mode = modeButton.dataset.mode;
+    const isHabit = composerState.mode === 'habit';
+    for (const other of document.querySelectorAll('[data-mode]')) {
+      other.setAttribute('aria-pressed', String(other === modeButton));
+    }
+    closeMenus();
+    document.getElementById('habit-options').hidden = !isHabit;
+    document.getElementById('start-label').hidden = !isHabit;
+    document.querySelector('[data-date="Sin fecha"]').hidden = isHabit;
+    if (isHabit && composerState.date === 'Sin fecha') selectDate('Hoy');
+  });
+}
+
+nameInput.addEventListener('input', renderField);
+
+composerForm.addEventListener('submit', function(event) {
+  event.preventDefault();
+  const title = nameInput.value.trim();
+  if (title === '') {
+    nameInput.focus();
+    return;
+  }
+  const category = CATEGORIES[composerState.category];
+  const kind = composerState.mode === 'task' ? 'Tarea' : 'Hábito';
+  const task = {title: title, category: composerState.category, section: composerState.section, date: composerState.date, kindLabel: kind};
+  closeMenus();
+  window.onTaskAdded(task);
+  placeholderText = 'Añadida a ' + category.label + '. ¿Otra?';
+  typeIntoName('');
+  nameInput.focus({preventScroll: true});
+});
+
+// Teclado de maqueta: escribe en el mismo campo
+let uppercase = false;
+const keyboardKeys = document.querySelectorAll('[data-key]');
+for (const key of keyboardKeys) {
+  key.addEventListener('mousedown', function(event) { event.preventDefault(); });
+  key.addEventListener('click', function() {
+    const value = key.dataset.key;
+    if (value === 'send') { composerForm.requestSubmit(); return; }
+    if (value === 'delete') { typeIntoName(nameInput.value.slice(0, -1)); return; }
+    if (value === 'numbers') return;
+    if (value === 'shift') {
+      uppercase = !uppercase;
+      for (const letterKey of keyboardKeys) {
+        if (letterKey.dataset.key.length !== 1 || !/\p{L}/u.test(letterKey.dataset.key)) continue;
+        letterKey.textContent = uppercase ? letterKey.dataset.key.toUpperCase() : letterKey.dataset.key;
+      }
+      return;
+    }
+    const typed = uppercase ? value.toUpperCase() : value;
+    typeIntoName(nameInput.value + typed);
+    uppercase = false;
+    for (const letterKey of keyboardKeys) {
+      if (/\p{L}/u.test(letterKey.dataset.key) && letterKey.dataset.key.length === 1) letterKey.textContent = letterKey.dataset.key;
+    }
+  });
+}
+
+composerState.sectionChosen = false;
+expandCategory('shopping');
+renderCategory();
+renderField();
+toggleMenu('category');
+nameInput.focus({preventScroll: true});
+
+</script></body></html>

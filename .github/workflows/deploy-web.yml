@@ -1,0 +1,123 @@
+name: Preparar y publicar web
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      migrate:
+        default: false
+        type: boolean
+    outputs:
+      url:
+        value: ${{ jobs.deploy.outputs.url }}
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: inputs.environment == 'pruebas' || (inputs.environment == 'produccion' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      group: deploy-${{ inputs.environment }}-${{ inputs.migrate && 'database' || github.ref }}
+      cancel-in-progress: false
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ steps.publish.outputs.url }}
+    outputs:
+      url: ${{ steps.publish.outputs.url }}
+    env:
+      EXPO_NO_TELEMETRY: '1'
+      EXPO_NO_DOTENV: '1'
+      SUPABASE_TELEMETRY_DISABLED: '1'
+      VERCEL_TELEMETRY_DISABLED: '1'
+      DO_NOT_TRACK: '1'
+      EXPO_PUBLIC_SUPABASE_URL: ${{ vars.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: Comprobar acceso a Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: test -n "$VERCEL_TOKEN"
+      - name: Construir entorno Docker
+        run: ./docker/app/run build
+      - name: Instalar lockfile
+        run: ./docker/app/run npm ci
+      - name: Copia cifrada antes de tocar producción
+        if: inputs.migrate && inputs.environment == 'produccion'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          mkdir -p .backup
+          APP_UID=$(id -u)
+          APP_GID=$(id -g)
+          DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+          export APP_UID APP_GID DOCKER_GID
+          docker compose run --rm -e SUPABASE_PROJECT_REF -e SUPABASE_ACCESS_TOKEN -e SUPABASE_DB_PASSWORD -e BACKUP_PASSPHRASE app sh scripts/backup/create.sh .backup/produccion.tar.gz.gpg
+      - name: Conservar copia previa durante 90 días
+        if: inputs.migrate && inputs.environment == 'produccion'
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: backup-produccion-before-migration-${{ github.run_id }}
+          path: .backup/produccion.tar.gz.gpg
+          retention-days: 90
+          if-no-files-found: error
+      - name: Aplicar migraciones al entorno
+        if: inputs.migrate
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          APP_UID=$(id -u)
+          APP_GID=$(id -g)
+          DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+          export APP_UID APP_GID DOCKER_GID
+          # Las migraciones independientes de ramas paralelas pueden fusionarse en distinto orden que sus fechas.
+          docker compose run --rm -e SUPABASE_ACCESS_TOKEN -e SUPABASE_DB_PASSWORD -e SUPABASE_PROJECT_REF app sh -eu -c 'npx --no-install supabase link --project-ref "$SUPABASE_PROJECT_REF"; npx --no-install supabase db push --include-all --yes'
+      - name: Exportar web y preparar Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOY_TARGET: ${{ inputs.environment == 'produccion' && 'production' || 'preview' }}
+        run: |
+          APP_UID=$(id -u)
+          APP_GID=$(id -g)
+          DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+          export APP_UID APP_GID DOCKER_GID
+          docker compose run --rm -e EXPO_NO_DOTENV -e EXPO_PUBLIC_SUPABASE_URL -e EXPO_PUBLIC_SUPABASE_ANON_KEY app npx expo export --platform web
+          docker compose run --rm -e VERCEL_TOKEN -e VERCEL_TELEMETRY_DISABLED -e VERCEL_ORG_ID -e VERCEL_PROJECT_ID -e EXPO_PUBLIC_SUPABASE_URL -e DEPLOY_TARGET app sh -eu -c 'npx --yes vercel@62.7.0 pull --yes --environment "$DEPLOY_TARGET"; npx --yes vercel@62.7.0 build --target "$DEPLOY_TARGET"'
+      - name: Publicar solo la exportación preparada
+        id: publish
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOY_TARGET: ${{ inputs.environment == 'produccion' && 'production' || 'preview' }}
+        run: |
+          APP_UID=$(id -u)
+          APP_GID=$(id -g)
+          DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+          export APP_UID APP_GID DOCKER_GID
+          deployment_url=$(docker compose run --rm -T -e VERCEL_TOKEN -e VERCEL_TELEMETRY_DISABLED -e VERCEL_ORG_ID -e VERCEL_PROJECT_ID -e EXPO_PUBLIC_SUPABASE_URL -e DEPLOY_TARGET app sh -eu -c 'if [ "$DEPLOY_TARGET" = production ]; then npx --yes vercel@62.7.0 deploy --prebuilt --yes --prod; else npx --yes vercel@62.7.0 deploy --prebuilt --yes --target preview; fi')
+          case "$deployment_url" in
+            https://*.vercel.app) ;;
+            *) printf '%s\n' 'Invalid deployment URL' >&2; exit 1 ;;
+          esac
+          printf 'url=%s\n' "$deployment_url" >> "$GITHUB_OUTPUT"
+      - name: Actualizar alias estable de pruebas
+        if: inputs.migrate && inputs.environment == 'pruebas'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOYMENT_URL: ${{ steps.publish.outputs.url }}
+        run: |
+          APP_UID=$(id -u)
+          APP_GID=$(id -g)
+          DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+          export APP_UID APP_GID DOCKER_GID
+          docker compose run --rm -e VERCEL_TOKEN -e VERCEL_TELEMETRY_DISABLED -e VERCEL_ORG_ID -e VERCEL_PROJECT_ID -e EXPO_PUBLIC_SUPABASE_URL -e DEPLOYMENT_URL app sh -eu -c 'npx --yes vercel@62.7.0 alias set "$DEPLOYMENT_URL" app-desarrollo-personal-pruebas.vercel.app'

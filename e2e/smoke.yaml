@@ -1,0 +1,18 @@
+appId: host.exp.exponent
+---
+# El emulador resuelve 10.0.2.2 al anfitrión, donde Expo sirve la app por la red host.
+- openLink: exp://10.0.2.2:${EXPO_PORT}
+# El aviso de Expo Go solo aparece en la primera apertura de la app.
+- extendedWaitUntil:
+    visible: Continue|Hoy
+    timeout: 120000
+- runFlow:
+    when:
+      visible: Continue
+    commands:
+      - tapOn: Continue
+      - pressKey: BACK
+- extendedWaitUntil:
+    visible: Hoy
+    timeout: 120000
+- assertVisible: Hoy

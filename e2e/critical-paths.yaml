@@ -1,0 +1,21 @@
+appId: host.exp.exponent
+---
+# Un solo Maestro mantiene el driver y ejecuta los caminos en orden.
+- runFlow:
+    file: login.yaml
+- runFlow:
+    file: smoke.yaml
+- runFlow:
+    file: quick-task.yaml
+- runFlow:
+    file: mark-today.yaml
+- runFlow:
+    file: create-habit.yaml
+- runFlow:
+    file: category-section-task.yaml
+- runFlow:
+    file: mark-pending.yaml
+- runFlow:
+    file: history.yaml
+- runFlow:
+    file: quick-add-keyboard.yaml

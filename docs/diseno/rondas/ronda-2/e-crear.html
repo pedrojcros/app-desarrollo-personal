@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E · Mostaza — Crear</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --background: #F2C14E;
+    --surface: #FFF1C9;
+    --surface-2: #F7D477;
+    --border: #1C1A14;
+    --text: #1C1A14;
+    --text-soft: #5C4A1F;
+    --accent: #1C1A14;
+    --not-done: #B42318;
+    --university: #1D4ED8;
+    --health: #047857;
+    --personal: #C2410C;
+    --home: #9D174D;
+    --divider: rgba(28, 26, 20, 0.14);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    width: 100%;
+    max-width: 480px;
+    height: 100vh;
+    min-height: 700px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--background);
+    color: var(--text);
+    font-family: "Bricolage Grotesque", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.25;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  svg.icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+  /* Cabecera */
+  .header { display: flex; align-items: flex-start; justify-content: space-between; padding: 22px 20px 6px; }
+  .title { font-size: 36px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
+  .date { margin-top: 4px; font-size: 15px; font-weight: 500; color: var(--text-soft); }
+  .progress { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; padding-top: 6px; }
+  .progress-pill { background: var(--accent); color: var(--background); font-size: 15px; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+  .progress-label { font-size: 12px; font-weight: 500; color: var(--text-soft); }
+
+  /* Barra de pestañas */
+  .tabbar { display: flex; background: var(--surface); border-top: 1.5px solid var(--border); padding: 8px 4px 10px; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; min-height: 52px; color: var(--text-soft); font-size: 11.5px; font-weight: 600; }
+  .tab-icon { position: relative; width: 56px; height: 32px; border-radius: 16px; display: grid; place-items: center; }
+  .tab-icon svg.icon { width: 22px; height: 22px; }
+  .tab[aria-current="page"] { color: var(--text); font-weight: 800; }
+  .tab[aria-current="page"] .tab-icon { background: var(--accent); color: var(--background); }
+  .badge { position: absolute; top: -3px; right: 3px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--not-done); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; border: 1.5px solid var(--surface); }
+
+  /* Hoy, de fondo */
+  .background { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  .scrim { position: absolute; inset: 0; background: rgba(28, 26, 20, 0.5); }
+  .list { flex: 1; overflow: hidden; padding: 8px 16px 0; }
+  .group { margin-top: 14px; }
+  .group-label { padding: 0 4px 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-soft); }
+  .card { list-style: none; background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px; }
+  .row { min-height: 64px; padding: 14px 16px; font-weight: 650; }
+  .meta, .actions { display: none; }
+
+  /* Hoja */
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; top: 14px; display: flex; flex-direction: column; background: var(--surface); border: 1.5px solid var(--border); border-bottom: 0; border-radius: 28px 28px 0 0; }
+  .grabber { width: 40px; height: 4px; margin: 8px auto 0; border-radius: 2px; background: rgba(28, 26, 20, 0.3); }
+  .sheet-top { display: flex; align-items: center; justify-content: space-between; padding: 2px 8px 0 20px; }
+  .sheet-title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+  .close { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; }
+  .segmented { display: flex; gap: 2px; margin: 0 20px; padding: 3px; background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 16px; }
+  .segment { flex: 1; min-height: 40px; border-radius: 12px; font-size: 15px; font-weight: 600; color: var(--text-soft); }
+  .segment[aria-pressed="true"] { background: var(--accent); color: var(--background); font-weight: 700; }
+
+  .form { flex: 1; overflow-y: auto; padding: 0 20px 16px; }
+  .field { margin-top: 12px; }
+  #when { flex-wrap: nowrap; gap: 6px; }
+  #when .chip { flex: 1; justify-content: center; padding: 0 4px; font-size: 13.5px; white-space: nowrap; }
+  .field-label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-soft); }
+  .input, .picker { width: 100%; min-height: 48px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #FFF9E6; border: 1.5px solid var(--border); border-radius: 14px; font: inherit; font-size: 16px; font-weight: 500; color: var(--text); text-align: left; }
+  .input::placeholder { color: var(--text-soft); opacity: 0.7; }
+  .input:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+  textarea.input { min-height: 76px; padding: 12px 14px; resize: none; display: block; line-height: 1.35; }
+  .picker { position: relative; }
+  .picker input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+  .picker svg.icon { width: 20px; height: 20px; color: var(--text-soft); }
+  .picker-empty { color: var(--text-soft); opacity: 0.8; }
+  .pair { display: flex; gap: 10px; }
+  .pair > * { flex: 1; min-width: 0; }
+  .hint { margin-top: 6px; font-size: 12.5px; font-weight: 500; color: var(--text-soft); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { min-height: 44px; padding: 0 14px; display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--border); border-radius: 22px; background: transparent; font-size: 14.5px; font-weight: 600; }
+  .chip[aria-pressed="true"] { background: var(--accent); color: var(--background); font-weight: 700; }
+  .chip .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--category-color); flex: none; box-shadow: 0 0 0 1.5px var(--surface); }
+  .chip[aria-pressed="true"] .dot { box-shadow: 0 0 0 1.5px var(--background); }
+  [data-category="university"] { --category-color: var(--university); }
+  [data-category="health"] { --category-color: var(--health); }
+  [data-category="personal"] { --category-color: var(--personal); }
+  [data-category="home"] { --category-color: var(--home); }
+  .weekdays { display: flex; justify-content: space-between; margin-top: 10px; }
+  .weekday { width: 40px; height: 44px; border-radius: 22px; border: 1.5px solid var(--border); font-size: 14px; font-weight: 700; }
+  .weekday[aria-pressed="true"] { background: var(--accent); color: var(--background); }
+  .hidden { display: none !important; }
+
+  .footer { padding: 12px 20px 16px; border-top: 1.5px solid var(--divider); background: var(--surface); }
+  .submit { width: 100%; min-height: 54px; border-radius: 27px; background: var(--accent); color: var(--background); font-size: 17px; font-weight: 800; letter-spacing: -0.01em; }
+</style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+      <symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+      <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="background" aria-hidden="true">
+    <header class="header">
+    <div>
+      <h1 class="title">Hoy, martes</h1>
+      <p class="date">6 de octubre de 2026</p>
+    </div>
+    <div class="progress">
+      <span class="progress-pill" id="progress-count">2 de 8</span>
+      <span class="progress-label">marcadas</span>
+    </div>
+  </header>
+    <main class="list">
+    <section class="group">
+      <h2 class="group-label">Sin hora</h2>
+      <ul class="card">
+        <li class="row" data-category="personal" data-name="Comprar proteína">
+          <div class="row-text">
+            <p class="name">Comprar proteína</p>
+            <p class="meta"><span class="category"><span class="dot"></span>Personal</span></p>
+          </div>
+          <div class="actions">
+            <button tabindex="-1" class="mark mark-done" data-action="done" aria-label="Marcar como hecha: Comprar proteína"><svg class="icon"><use href="#i-check"/></svg></button>
+            <button tabindex="-1" class="mark mark-not-done" data-action="not-done" aria-label="Marcar como no hecha: Comprar proteína"><svg class="icon"><use href="#i-x"/></svg></button>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="group">
+      <h2 class="group-label">Mañana</h2>
+      <ul class="card">
+        <li class="row" data-category="personal" data-name="Llamar al dentista">
+          <div class="row-text">
+            <p class="name">Llamar al dentista</p>
+            <p class="meta"><span>10:00</span><span aria-hidden="true">·</span><span class="category"><span class="dot"></span>Personal</span></p>
+          </div>
+          <div class="actions">
+            <button tabindex="-1" class="mark mark-done" data-action="done" aria-label="Marcar como hecha: Llamar al dentista"><svg class="icon"><use href="#i-check"/></svg></button>
+            <button tabindex="-1" class="mark mark-not-done" data-action="not-done" aria-label="Marcar como no hecha: Llamar al dentista"><svg class="icon"><use href="#i-x"/></svg></button>
+          </div>
+        </li>
+        <li class="row" data-category="health" data-name="Beber 2 L de agua">
+          <div class="row-text">
+            <p class="name">Beber 2 L de agua</p>
+            <p class="meta"><span class="category"><span class="dot"></span>Salud</span></p>
+          </div>
+          <div class="actions">
+            <button tabindex="-1" class="mark mark-done" data-action="done" aria-label="Marcar como hecha: Beber 2 L de agua"><svg class="icon"><use href="#i-check"/></svg></button>
+            <button tabindex="-1" class="mark mark-not-done" data-action="not-done" aria-label="Marcar como no hecha: Beber 2 L de agua"><svg class="icon"><use href="#i-x"/></svg></button>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="group">
+      <h2 class="group-label">Tarde</h2>
+      <ul class="card">
+        <li class="row" data-category="health" data-name="Ir al gimnasio">
+          <div class="row-text">
+            <p class="name">Ir al gimnasio</p>
+            <p class="meta"><span>18:30</span><span aria-hidden="true">·</span><span class="category"><span class="dot"></span>Salud</span></p>
+          </div>
+          <div class="actions">
+            <button tabindex="-1" class="mark mark-done" data-action="done" aria-label="Marcar como hecha: Ir al gimnasio"><svg class="icon"><use href="#i-check"/></svg></button>
+            <button tabindex="-1" class="mark mark-not-done" data-action="not-done" aria-label="Marcar como no hecha: Ir al gimnasio"><svg class="icon"><use href="#i-x"/></svg></button>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="group">
+      <h2 class="group-label">Noche</h2>
+      <ul class="card">
+        <li class="row" data-category="university" data-name="Entregar práctica de Redes">
+          <div class="row-text">
+            <p class="name">Entregar práctica de Redes</p>
+            <p class="meta"><span>23:59</span><span aria-hidden="true">·</span><span class="category"><span class="dot"></span>Universidad</span></p>
+          </div>
+          <div class="actions">
+            <button tabindex="-1" class="mark mark-done" data-action="done" aria-label="Marcar como hecha: Entregar práctica de Redes"><svg class="icon"><use href="#i-check"/></svg></button>
+            <button tabindex="-1" class="mark mark-not-done" data-action="not-done" aria-label="Marcar como no hecha: Entregar práctica de Redes"><svg class="icon"><use href="#i-x"/></svg></button>
+          </div>
+        </li>
+        <li class="row" data-category="personal" data-name="Leer 20 minutos">
+          <div class="row-text">
+            <p class="name">Leer 20 minutos</p>
+            <p class="meta"><span class="category"><span class="dot"></span>Personal</span></p>
+          </div>
+          <div class="actions">
+            <button tabindex="-1" class="mark mark-done" data-action="done" aria-label="Marcar como hecha: Leer 20 minutos"><svg class="icon"><use href="#i-check"/></svg></button>
+            <button tabindex="-1" class="mark mark-not-done" data-action="not-done" aria-label="Marcar como no hecha: Leer 20 minutos"><svg class="icon"><use href="#i-x"/></svg></button>
+          </div>
+        </li>
+      </ul>
+    </section>
+  </main>
+  </div>
+  <div class="scrim"></div>
+
+  <section class="sheet" role="dialog" aria-label="Crear tarea o hábito">
+    <div class="grabber"></div>
+    <div class="sheet-top">
+      <h2 class="sheet-title">Crear</h2>
+      <button class="close" aria-label="Cerrar"><svg class="icon"><use href="#i-x"/></svg></button>
+    </div>
+
+    <div class="segmented" role="group" aria-label="Tipo">
+      <button class="segment" id="mode-task" aria-pressed="false">Tarea</button>
+      <button class="segment" id="mode-habit" aria-pressed="true">Hábito</button>
+    </div>
+
+    <div class="form">
+      <div class="field">
+        <label class="field-label" for="name">Nombre</label>
+        <input class="input" id="name" type="text" value="Ir al gimnasio" placeholder="¿Qué quieres hacer?">
+      </div>
+
+      <div class="field task-only hidden">
+        <label class="field-label" for="notes">Notas <span style="text-transform:none;letter-spacing:0;font-weight:500">(opcional)</span></label>
+        <textarea class="input" id="notes" placeholder="Detalles, enlaces, lo que necesites recordar"></textarea>
+      </div>
+
+      <div class="field habit-only">
+        <span class="field-label">Frecuencia</span>
+        <div class="chips" id="frequency">
+          <button class="chip" data-value="daily" aria-pressed="false">A diario</button>
+          <button class="chip" data-value="weekdays" aria-pressed="true">Días de la semana</button>
+          <button class="chip" data-value="interval" aria-pressed="false">Cada N días</button>
+          <button class="chip" data-value="monthly" aria-pressed="false">Cada mes</button>
+        </div>
+        <div class="weekdays" id="weekdays-row" role="group" aria-label="Días de la semana">
+          <button class="weekday" aria-pressed="true" aria-label="Lunes">L</button>
+          <button class="weekday" aria-pressed="false" aria-label="Martes">M</button>
+          <button class="weekday" aria-pressed="true" aria-label="Miércoles">X</button>
+          <button class="weekday" aria-pressed="false" aria-label="Jueves">J</button>
+          <button class="weekday" aria-pressed="true" aria-label="Viernes">V</button>
+          <button class="weekday" aria-pressed="false" aria-label="Sábado">S</button>
+          <button class="weekday" aria-pressed="false" aria-label="Domingo">D</button>
+        </div>
+        <div class="hidden" id="interval-row" style="margin-top:10px">
+          <label class="field-label" for="interval-days">Repetir cada (días)</label>
+          <input class="input" id="interval-days" type="number" min="2" value="3" inputmode="numeric">
+        </div>
+        <p class="hint hidden" id="monthly-hint">Se repite el mismo día de cada mes que la fecha de inicio.</p>
+      </div>
+
+      <div class="field habit-only">
+        <span class="field-label">Cuándo</span>
+        <div class="chips" id="when">
+          <button class="chip" data-value="morning" aria-pressed="false">Mañana</button>
+          <button class="chip" data-value="afternoon" aria-pressed="false">Tarde</button>
+          <button class="chip" data-value="night" aria-pressed="false">Noche</button>
+          <button class="chip" data-value="time" aria-pressed="true">Una hora</button>
+        </div>
+        <div class="picker" id="habit-time-picker" style="margin-top:10px">
+          <span id="habit-time-text">18:30</span>
+          <svg class="icon"><use href="#i-clock"/></svg>
+          <input type="time" id="habit-time" value="18:30" aria-label="Hora">
+        </div>
+      </div>
+
+      <div class="field task-only hidden">
+        <div class="pair">
+          <div>
+            <span class="field-label">Fecha</span>
+            <div class="picker">
+              <span id="task-date-text" class="picker-empty">Sin fecha</span>
+              <svg class="icon"><use href="#i-calendar"/></svg>
+              <input type="date" id="task-date" aria-label="Fecha">
+            </div>
+          </div>
+          <div>
+            <span class="field-label">Hora</span>
+            <div class="picker">
+              <span id="task-time-text" class="picker-empty">Sin hora</span>
+              <svg class="icon"><use href="#i-clock"/></svg>
+              <input type="time" id="task-time" aria-label="Hora">
+            </div>
+          </div>
+        </div>
+        <p class="hint">Sin fecha, la tarea va a la Bandeja.</p>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Categoría</span>
+        <div class="chips" id="category">
+          <button class="chip task-only hidden" data-value="none" aria-pressed="false">Sin categoría · Bandeja</button>
+          <button class="chip" data-category="university" data-value="university" aria-pressed="false"><span class="dot"></span>Universidad</button>
+          <button class="chip" data-category="health" data-value="health" aria-pressed="true"><span class="dot"></span>Salud</button>
+          <button class="chip" data-category="personal" data-value="personal" aria-pressed="false"><span class="dot"></span>Personal</button>
+          <button class="chip" data-category="home" data-value="home" aria-pressed="false"><span class="dot"></span>Casa</button>
+        </div>
+      </div>
+
+      <div class="field habit-only">
+        <span class="field-label">Fecha de inicio</span>
+        <div class="picker">
+          <span id="start-date-text">Hoy · 6 de octubre de 2026</span>
+          <svg class="icon"><use href="#i-calendar"/></svg>
+          <input type="date" id="start-date" value="2026-10-06" aria-label="Fecha de inicio">
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <button class="submit" id="submit">Crear</button>
+    </div>
+  </section>
+
+<script>
+  var MONTHS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  var TODAY = "2026-10-06";
+
+  var modeTask = document.getElementById("mode-task");
+  var modeHabit = document.getElementById("mode-habit");
+  var categoryChips = document.querySelectorAll("#category .chip");
+  var categoryByMode = { habit: "health", task: "none" };
+  var currentMode = "habit";
+
+  function formatDate(isoDate) {
+    var parts = isoDate.split("-");
+    var day = Number(parts[2]);
+    var month = MONTHS[Number(parts[1]) - 1];
+    return day + " de " + month + " de " + parts[0];
+  }
+
+  function selectOne(chips, selected) {
+    chips.forEach(function (chip) {
+      chip.setAttribute("aria-pressed", chip === selected ? "true" : "false");
+    });
+  }
+
+  function selectedCategoryValue() {
+    var selected = document.querySelector("#category .chip[aria-pressed='true']");
+    return selected.getAttribute("data-value");
+  }
+
+  function setMode(mode) {
+    if (mode === currentMode) {
+      return;
+    }
+    categoryByMode[currentMode] = selectedCategoryValue();
+    currentMode = mode;
+    modeTask.setAttribute("aria-pressed", mode === "task" ? "true" : "false");
+    modeHabit.setAttribute("aria-pressed", mode === "habit" ? "true" : "false");
+    document.querySelectorAll(".task-only").forEach(function (element) {
+      element.classList.toggle("hidden", mode !== "task");
+    });
+    document.querySelectorAll(".habit-only").forEach(function (element) {
+      element.classList.toggle("hidden", mode !== "habit");
+    });
+    var remembered = categoryByMode[mode];
+    categoryChips.forEach(function (chip) {
+      if (chip.getAttribute("data-value") === remembered) {
+        selectOne(categoryChips, chip);
+      }
+    });
+  }
+
+  modeTask.addEventListener("click", function () { setMode("task"); });
+  modeHabit.addEventListener("click", function () { setMode("habit"); });
+
+  function makeSingleChoice(containerId, onChange) {
+    var chips = document.querySelectorAll("#" + containerId + " .chip");
+    chips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        selectOne(chips, chip);
+        if (onChange) {
+          onChange(chip.getAttribute("data-value"));
+        }
+      });
+    });
+  }
+
+  makeSingleChoice("category");
+  makeSingleChoice("frequency", function (value) {
+    document.getElementById("weekdays-row").classList.toggle("hidden", value !== "weekdays");
+    document.getElementById("interval-row").classList.toggle("hidden", value !== "interval");
+    document.getElementById("monthly-hint").classList.toggle("hidden", value !== "monthly");
+  });
+  makeSingleChoice("when", function (value) {
+    document.getElementById("habit-time-picker").classList.toggle("hidden", value !== "time");
+  });
+
+  document.querySelectorAll(".weekday").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var isPressed = button.getAttribute("aria-pressed") === "true";
+      button.setAttribute("aria-pressed", isPressed ? "false" : "true");
+    });
+  });
+
+  // Los campos de fecha y hora son un input nativo invisible sobre un texto bonito.
+  function bindPicker(inputId, textId, format) {
+    var input = document.getElementById(inputId);
+    var text = document.getElementById(textId);
+    input.addEventListener("change", function () {
+      if (!input.value) {
+        return;
+      }
+      text.textContent = format(input.value);
+      text.classList.remove("picker-empty");
+    });
+  }
+
+  function keepValue(value) {
+    return value;
+  }
+
+  function formatStartDate(value) {
+    var prefix = value === TODAY ? "Hoy · " : "";
+    return prefix + formatDate(value);
+  }
+
+  bindPicker("habit-time", "habit-time-text", keepValue);
+  bindPicker("task-time", "task-time-text", keepValue);
+  bindPicker("task-date", "task-date-text", formatDate);
+  bindPicker("start-date", "start-date-text", formatStartDate);
+</script>
+</body>
+</html>

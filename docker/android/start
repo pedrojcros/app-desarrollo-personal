@@ -1,0 +1,43 @@
+#!/bin/sh
+set -eu
+
+# Un reinicio del mismo contenedor debe esperar también a esta instalación de Expo Go.
+rm -f /tmp/android-ready
+
+stop_emulator() {
+  kill "$emulator_process" 2>/dev/null || true
+}
+
+# Fuerza KVM para que un equipo sin aceleración falle en vez de arrancar lentamente.
+emulator -avd adp-pixel -port 5554 -accel on -no-window -no-audio \
+  -no-boot-anim -no-snapshot -no-metrics -gpu swiftshader &
+emulator_process=$!
+trap stop_emulator EXIT
+trap 'exit 143' TERM
+trap 'exit 130' INT
+
+attempt=0
+while [ "$attempt" -lt 180 ]; do
+  if ! kill -0 "$emulator_process" 2>/dev/null; then
+    wait "$emulator_process"
+    exit 1
+  fi
+  boot_completed=$(adb -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+  if [ "$boot_completed" = 1 ]; then
+    adb -s emulator-5554 install -r /opt/expo-go-56.0.4.apk
+    adb -s emulator-5554 shell input keyevent 82
+    # Tras recrear Docker, Maestro falló con el transporte anterior del servidor ADB compartido.
+    # Reconecta solo este emulador, sin reiniciar el servidor que usa Orca.
+    adb -s emulator-5554 reconnect
+    adb -s emulator-5554 wait-for-device
+    touch /tmp/android-ready
+    echo 'Android boot completed; Expo Go 56.0.4 installed.'
+    wait "$emulator_process"
+    exit 0
+  fi
+  attempt=$((attempt + 1))
+  sleep 2
+done
+
+echo 'Android boot timed out.' >&2
+exit 1

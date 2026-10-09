@@ -1,0 +1,57 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+      args:
+        APP_UID: ${APP_UID:-1000}
+        APP_GID: ${APP_GID:-1000}
+    user: '${APP_UID:-1000}:${APP_GID:-1000}'
+    group_add:
+      - '${DOCKER_GID:-0}'
+    network_mode: host
+    working_dir: ${PWD}
+    volumes:
+      - ${PWD}:${PWD}
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      BROWSER: none
+      REACT_NATIVE_PACKAGER_HOSTNAME: ${REACT_NATIVE_PACKAGER_HOSTNAME:-}
+      EXPO_NO_TELEMETRY: '1'
+      SUPABASE_TELEMETRY_DISABLED: '1'
+      DO_NOT_TRACK: '1'
+    stdin_open: true
+    tty: true
+  android-emulator:
+    image: adp-android:36-r7-maestro-2.11.0
+    pull_policy: never
+    build:
+      context: .
+      dockerfile: docker/android/Dockerfile
+    platform: linux/amd64
+    network_mode: host
+    devices:
+      - /dev/kvm:/dev/kvm
+    volumes:
+      - ${PWD}/e2e:/workspace/e2e:ro
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'test -f /tmp/android-ready && test "$$(adb -s emulator-5554 shell getprop sys.boot_completed | tr -d "\r")" = 1',
+        ]
+      interval: 5s
+      timeout: 5s
+      start_period: 120s
+      retries: 48
+    stop_grace_period: 20s
+  chrome-mcp:
+    image: adp-chrome-mcp:1.10.1
+    pull_policy: never
+    build:
+      context: .
+      dockerfile: docker/chrome-mcp/Dockerfile
+    network_mode: host
+    stdin_open: true
+    init: true
+    shm_size: 1gb

@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E · Mostaza — Historial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --background: #F2C14E;
+    --surface: #FFF1C9;
+    --surface-2: #F7D477;
+    --border: #1C1A14;
+    --text: #1C1A14;
+    --text-soft: #5C4A1F;
+    --accent: #1C1A14;
+    --not-done: #B42318;
+    --university: #1D4ED8;
+    --health: #047857;
+    --personal: #C2410C;
+    --home: #9D174D;
+    --divider: rgba(28, 26, 20, 0.14);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    width: 100%;
+    max-width: 480px;
+    height: 100vh;
+    min-height: 700px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--background);
+    color: var(--text);
+    font-family: "Bricolage Grotesque", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.25;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  svg.icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+
+  /* Cabecera */
+  .header { padding: 22px 20px 4px; }
+  .title { font-size: 36px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
+  .date { margin-top: 4px; font-size: 15px; font-weight: 500; color: var(--text-soft); }
+  .range { display: flex; gap: 2px; margin: 12px 16px 0; padding: 3px; background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 16px; }
+  .range-option { flex: 1; min-height: 40px; padding: 0 4px; border-radius: 12px; font-size: 13.5px; font-weight: 600; color: var(--text-soft); }
+  .range-option[aria-pressed="true"] { background: var(--accent); color: var(--background); font-weight: 700; }
+
+  /* Tabla */
+  .content { flex: 1; overflow-y: auto; padding: 12px 16px 96px; }
+  .table { position: relative; background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px; padding: 0 12px; overflow: hidden; }
+  .today-band { position: absolute; top: 0; bottom: 0; right: 12px; width: calc((100% - 24px) / 7); background: var(--surface-2); }
+  .days { position: relative; display: grid; grid-template-columns: repeat(7, 1fr); padding: 10px 0 8px; border-bottom: 1.5px solid var(--border); }
+  .day { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .day-letter { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: var(--text-soft); }
+  .day-number { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+  .day-today .day-letter, .day-today .day-number { color: var(--text); }
+  .ring-box { position: relative; width: 34px; height: 34px; display: grid; place-items: center; }
+  .ring { position: absolute; inset: 0; width: 34px; height: 34px; fill: none; stroke-width: 3.5; stroke-linecap: round; }
+  .ring-track { stroke: rgba(28, 26, 20, 0.14); }
+  .ring-value { stroke: var(--accent); }
+  .ring-number { position: relative; font-size: 10.5px; font-weight: 800; letter-spacing: -0.02em; }
+  .section-label { position: relative; padding: 12px 0 2px; font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-soft); }
+  .items { position: relative; list-style: none; }
+  .item { padding: 8px 0 8px; border-bottom: 1.5px solid var(--divider); }
+  .items .item:last-child { border-bottom: 0; }
+  .item-head { display: flex; flex-direction: column; gap: 1px; margin-bottom: 5px; }
+  .item-name { font-size: 14.5px; font-weight: 650; letter-spacing: -0.01em; }
+  .item-meta { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 500; color: var(--text-soft); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--category-color); flex: none; }
+  .cells { display: grid; grid-template-columns: repeat(7, 1fr); }
+  .cell { height: 34px; display: grid; place-items: center; }
+  .mark-done, .mark-not-done { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; }
+  .mark-done { background: var(--category-color); color: var(--surface); }
+  .mark-not-done { color: var(--not-done); border: 1.5px solid var(--not-done); }
+  .mark-done svg.icon { width: 16px; height: 16px; stroke-width: 3; }
+  .mark-not-done svg.icon { width: 14px; height: 14px; stroke-width: 3; }
+  .mark-pending { width: 6px; height: 6px; border-radius: 50%; background: var(--text-soft); opacity: 0.55; }
+  [data-category="university"] { --category-color: var(--university); }
+  [data-category="health"] { --category-color: var(--health); }
+  [data-category="personal"] { --category-color: var(--personal); }
+  [data-category="home"] { --category-color: var(--home); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 12px 4px 0; font-size: 12px; font-weight: 500; color: var(--text-soft); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .mark-done, .legend .mark-not-done { width: 16px; height: 16px; }
+  .legend .mark-done svg.icon { width: 10px; height: 10px; }
+  .legend .mark-not-done svg.icon { width: 9px; height: 9px; }
+  .legend .mark-done { --category-color: var(--accent); }
+  .legend .mark-pending { opacity: 0.7; }
+
+  .fab { position: absolute; right: 16px; bottom: 82px; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--background); box-shadow: 0 6px 18px rgba(28, 26, 20, 0.28); }
+  .fab svg.icon { width: 28px; height: 28px; stroke-width: 2.5; }
+  /* Barra de pestañas */
+  .tabbar { display: flex; background: var(--surface); border-top: 1.5px solid var(--border); padding: 8px 4px 10px; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; min-height: 52px; color: var(--text-soft); font-size: 11.5px; font-weight: 600; }
+  .tab-icon { position: relative; width: 56px; height: 32px; border-radius: 16px; display: grid; place-items: center; }
+  .tab-icon svg.icon { width: 22px; height: 22px; }
+  .tab[aria-current="page"] { color: var(--text); font-weight: 800; }
+  .tab[aria-current="page"] .tab-icon { background: var(--accent); color: var(--background); }
+  .badge { position: absolute; top: -3px; right: 3px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--not-done); color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; border: 1.5px solid var(--surface); }
+</style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
+      <symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+      <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></symbol>
+    </defs>
+  </svg>
+
+  <header class="header">
+    <h1 class="title">Historial</h1>
+    <p class="date">Del 30 de septiembre al 6 de octubre</p>
+  </header>
+
+  <div class="range" role="group" aria-label="Rango de días">
+    <button class="range-option" aria-pressed="true">7 días</button>
+    <button class="range-option" aria-pressed="false">30 días</button>
+    <button class="range-option" aria-pressed="false">Personalizado</button>
+  </div>
+
+  <main class="content">
+    <div class="table">
+      <div class="today-band" aria-hidden="true"></div>
+      <div class="days"><div class="day"><span class="day-letter">X</span><span class="day-number">30</span><span class="ring-box" aria-label="100 por ciento"><svg class="ring" viewBox="0 0 34 34" aria-hidden="true"><circle class="ring-track" cx="17" cy="17" r="13"/><circle class="ring-value" cx="17" cy="17" r="13" stroke-dasharray="81.7 81.7" transform="rotate(-90 17 17)"/></svg><span class="ring-number">100</span></span></div><div class="day"><span class="day-letter">J</span><span class="day-number">1</span><span class="ring-box" aria-label="80 por ciento"><svg class="ring" viewBox="0 0 34 34" aria-hidden="true"><circle class="ring-track" cx="17" cy="17" r="13"/><circle class="ring-value" cx="17" cy="17" r="13" stroke-dasharray="65.3 81.7" transform="rotate(-90 17 17)"/></svg><span class="ring-number">80</span></span></div><div class="day"><span class="day-letter">V</span><span class="day-number">2</span><span class="ring-box" aria-label="80 por ciento"><svg class="ring" viewBox="0 0 34 34" aria-hidden="true"><circle class="ring-track" cx="17" cy="17" r="13"/><circle class="ring-value" cx="17" cy="17" r="13" stroke-dasharray="65.3 81.7" transform="rotate(-90 17 17)"/></svg><span class="ring-number">80</span></span></div><div class="day"><span class="day-letter">S</span><span class="day-number">3</span><span class="ring-box" aria-label="67 por ciento"><svg class="ring" viewBox="0 0 34 34" aria-hidden="true"><circle class="ring-track" cx="17" cy="17" r="13"/><circle class="ring-value" cx="17" cy="17" r="13" stroke-dasharray="54.7 81.7" transform="rotate(-90 17 17)"/></svg><span class="ring-number">67</span></span></div><div class="day"><span class="day-letter">D</span><span class="day-number">4</span><span class="ring-box" aria-label="33 por ciento"><svg class="ring" viewBox="0 0 34 34" aria-hidden="true"><circle class="ring-track" cx="17" cy="17" r="13"/><circle class="ring-value" cx="17" cy="17" r="13" stroke-dasharray="27.0 81.7" transform="rotate(-90 17 17)"/></svg><span class="ring-number">33</span></span></div><div class="day"><span class="day-letter">L</span><span class="day-number">5</span><span class="ring-box" aria-label="80 por ciento"><svg class="ring" viewBox="0 0 34 34" aria-hidden="true"><circle class="ring-track" cx="17" cy="17" r="13"/><circle class="ring-value" cx="17" cy="17" r="13" stroke-dasharray="65.3 81.7" transform="rotate(-90 17 17)"/></svg><span class="ring-number">80</span></span></div><div class="day day-today"><span class="day-letter">M</span><span class="day-number">6</span><span class="ring-box" aria-label="25 por ciento"><svg class="ring" viewBox="0 0 34 34" aria-hidden="true"><circle class="ring-track" cx="17" cy="17" r="13"/><circle class="ring-value" cx="17" cy="17" r="13" stroke-dasharray="20.4 81.7" transform="rotate(-90 17 17)"/></svg><span class="ring-number">25</span></span></div></div>
+      <h2 class="section-label">Hábitos</h2>
+      <ul class="items">
+      <li class="item" data-category="health">
+        <p class="item-head"><span class="item-name">Meditar 10 min</span><span class="item-meta"><span class="dot"></span>Salud · A diario</span></p>
+        <div class="cells"><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="no hecha"><span class="mark-not-done" title="no hecha"><svg class="icon"><use href="#i-x"/></svg></span></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell cell-today" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span></div>
+      </li>
+      <li class="item" data-category="health">
+        <p class="item-head"><span class="item-name">Beber 2 L de agua</span><span class="item-meta"><span class="dot"></span>Salud · A diario</span></p>
+        <div class="cells"><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="no hecha"><span class="mark-not-done" title="no hecha"><svg class="icon"><use href="#i-x"/></svg></span></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="no hecha"><span class="mark-not-done" title="no hecha"><svg class="icon"><use href="#i-x"/></svg></span></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell cell-today" role="img" aria-label="sin marcar"><span class="mark-pending"></span></span></div>
+      </li>
+      <li class="item" data-category="health">
+        <p class="item-head"><span class="item-name">Ir al gimnasio</span><span class="item-meta"><span class="dot"></span>Salud · L, X y V</span></p>
+        <div class="cells"><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no hecha"><span class="mark-not-done" title="no hecha"><svg class="icon"><use href="#i-x"/></svg></span></span><span class="cell cell-today" role="img" aria-label="no toca"></span></div>
+      </li>
+      <li class="item" data-category="university">
+        <p class="item-head"><span class="item-name">Repasar apuntes de Redes</span><span class="item-meta"><span class="dot"></span>Universidad · L a V</span></p>
+        <div class="cells"><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="no hecha"><span class="mark-not-done" title="no hecha"><svg class="icon"><use href="#i-x"/></svg></span></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell cell-today" role="img" aria-label="no hecha"><span class="mark-not-done" title="no hecha"><svg class="icon"><use href="#i-x"/></svg></span></span></div>
+      </li>
+      <li class="item" data-category="personal">
+        <p class="item-head"><span class="item-name">Leer 20 minutos</span><span class="item-meta"><span class="dot"></span>Personal · A diario</span></p>
+        <div class="cells"><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="sin marcar"><span class="mark-pending"></span></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell cell-today" role="img" aria-label="sin marcar"><span class="mark-pending"></span></span></div>
+      </li>
+      </ul>
+      <h2 class="section-label">Tareas</h2>
+      <ul class="items">
+      <li class="item" data-category="university">
+        <p class="item-head"><span class="item-name">Pagar la matrícula</span><span class="item-meta"><span class="dot"></span>Universidad · Jueves 1</span></p>
+        <div class="cells"><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="hecha"><span class="mark-done" title="hecha"><svg class="icon"><use href="#i-check"/></svg></span></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell cell-today" role="img" aria-label="no toca"></span></div>
+      </li>
+      <li class="item" data-category="personal">
+        <p class="item-head"><span class="item-name">Llamar al dentista</span><span class="item-meta"><span class="dot"></span>Personal · Hoy 10:00</span></p>
+        <div class="cells"><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell cell-today" role="img" aria-label="sin marcar"><span class="mark-pending"></span></span></div>
+      </li>
+      <li class="item" data-category="university">
+        <p class="item-head"><span class="item-name">Entregar práctica de Redes</span><span class="item-meta"><span class="dot"></span>Universidad · Hoy 23:59</span></p>
+        <div class="cells"><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell" role="img" aria-label="no toca"></span><span class="cell cell-today" role="img" aria-label="sin marcar"><span class="mark-pending"></span></span></div>
+      </li>
+      </ul>
+      <div style="height:8px"></div>
+    </div>
+    <div class="legend">
+      <span><span class="mark-done"><svg class="icon"><use href="#i-check"/></svg></span>Hecha</span>
+      <span><span class="mark-not-done"><svg class="icon"><use href="#i-x"/></svg></span>No hecha</span>
+      <span><span class="mark-pending"></span>Sin marcar</span>
+      <span>Celda vacía: no toca</span>
+    </div>
+  </main>
+
+  <button class="fab" aria-label="Crear tarea o hábito"><svg class="icon"><use href="#i-plus"/></svg></button>
+
+  <nav class="tabbar" aria-label="Navegación principal">
+    <a class="tab" href="e-hoy.html" style="text-decoration:none">
+      <span class="tab-icon"><svg class="icon"><use href="#i-sun"/></svg></span>Hoy
+    </a>
+    <a class="tab" href="#" style="text-decoration:none">
+      <span class="tab-icon"><svg class="icon"><use href="#i-inbox"/></svg></span>Bandeja
+    </a>
+    <a class="tab" href="#" style="text-decoration:none">
+      <span class="tab-icon"><svg class="icon"><use href="#i-grid"/></svg></span>Categorías
+    </a>
+    <a class="tab" href="#" style="text-decoration:none">
+      <span class="tab-icon"><svg class="icon"><use href="#i-clock"/></svg><span class="badge">2</span></span>Pendientes
+    </a>
+    <a class="tab" aria-current="page" href="e-historial.html" style="text-decoration:none">
+      <span class="tab-icon"><svg class="icon"><use href="#i-history"/></svg></span>Historial
+    </a>
+  </nav>
+
+<script>
+  // Selector de rango: solo cambia cuál está marcado.
+  var rangeOptions = document.querySelectorAll(".range-option");
+  rangeOptions.forEach(function (option) {
+    option.addEventListener("click", function () {
+      rangeOptions.forEach(function (other) {
+        other.setAttribute("aria-pressed", other === option ? "true" : "false");
+      });
+    });
+  });
+</script>
+</body>
+</html>
