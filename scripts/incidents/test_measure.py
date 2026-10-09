@@ -192,6 +192,50 @@ class MeasureCommandTests(unittest.TestCase):
         self.assertIn('(el primero abierto en 1 h, el último fusionado en 5 h)', result.stdout)
         self.assertIn('12 min perdidos', result.stdout)
 
+    def test_invalid_json_line_warns_and_preserves_valid_activity(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            session_path = Path(temporary_directory) / 'session.jsonl'
+            valid_lines = (TEST_DATA_PATH / 'claude_session.jsonl').read_text()
+            session_path.write_text('{invalid JSON\n' + valid_lines, encoding='utf-8')
+            result = self.run_measure(
+                'sessions', '--since', '2026-10-01', '--folder', '/work/ADP-16-task',
+                environment={'ADP_CLAUDE_SESSIONS': str(session_path)},
+            )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn('2 pasos', result.stdout)
+        self.assertIn('500 nuevos', result.stdout)
+        self.assertIn('línea JSON no válida', result.stderr)
+
+    def test_jira_preserves_single_pull_request_and_lists_multiple_models(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            source_path = Path(temporary_directory)
+            claude_path = source_path / 'claude'
+            claude_path.mkdir()
+            session_lines = (TEST_DATA_PATH / 'claude_session.jsonl').read_text()
+            (claude_path / 'first.jsonl').write_text(session_lines, encoding='utf-8')
+            second_lines = session_lines.replace('claude-sonnet-4-5', 'claude-opus-4-6')
+            (claude_path / 'second.jsonl').write_text(second_lines, encoding='utf-8')
+            pull_requests_path = source_path / 'pull_requests.json'
+            pull_requests_path.write_text(json.dumps([{
+                'number': 70, 'title': 'ADP-16', 'createdAt': '2026-10-01T10:00:00Z',
+                'mergedAt': '2026-10-01T11:00:00Z',
+            }]), encoding='utf-8')
+            result = self.run_measure(
+                'task', 'ADP-16', '--jira',
+                environment={
+                    'ADP_CODEX_SESSIONS': str(source_path / 'absent'),
+                    'ADP_CLAUDE_SESSIONS': str(claude_path),
+                    'ADP_PULL_REQUESTS_FILE': str(pull_requests_path),
+                    'ADP_INCIDENTS_FILE': str(source_path / 'absent-incidents'),
+                },
+            )
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(len(result.stdout.strip().splitlines()), 1)
+        self.assertIn('Claude claude-opus-4-6, Claude claude-sonnet-4-5', result.stdout)
+        self.assertIn('2 sesiones', result.stdout)
+        self.assertIn('1.000 nuevos / 4.200 releídos', result.stdout)
+        self.assertIn('PR #70, abierto en 30 min, fusionado en 1 h 30 min', result.stdout)
+
     def test_missing_source_is_reported_without_failing_other_sources(self):
         result = self.run_measure(
             'task',
