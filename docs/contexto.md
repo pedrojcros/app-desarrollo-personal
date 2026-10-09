@@ -42,19 +42,19 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-09, 17:20.*
+*Actualizado: 2026-10-09, 17:25.*
 
 - **La versión 1 está completa en `develop`** y lista para que el humano la publique (comprobación en el [buzón](buzon.md)). Los 8 caminos críticos de Maestro pasan a tamaño normal y a 360 dp.
 - **`develop` lleva además** la 1.x (RF-09, RF-10, RF-13, RF-14, RF-16, RF-17, RF-22) y **los recordatorios completos (1.1, R1 a R5)**, que solo funcionan en la app instalada (en Expo Go se desactivan). Queda R6: la comprobación del humano en su móvil con el APK (lista en el buzón).
 - **El repositorio es público** desde el 2026-10-09 (DEC-44) y la CI gasta unos 17 minutos menos por PR: se podrá volver a privado cuando el ritmo de cambios baje.
-- **En marcha o recién terminado:** el arreglo del teclado que tapa el añadir rápido en Android (encargo 046).
+- **Arreglado (encargo 046, PR #65):** en Android el teclado ya no tapa la barra del añadir rápido; tiene su flujo de Maestro. La pasada completa de Maestro a 360 dp a veces se corta porque ADB pierde el emulador (problema del entorno de pruebas, no de la app).
 
 
 ## Lo siguiente
 
 Para retomar en una sesión nueva (`/ejecutar-plan`; activa la cafeína al empezar):
 
-1. Si el encargo 046 (teclado en Android) no está fusionado, revisar su PR y fusionarlo.
+1. Preguntar al humano por los detalles visuales del buzón (2026-10-09) y, si quiere, encargarlos.
 2. Lo que queda del plan tras la 1.1 (RF-04 y la versión 2) es decisión del humano: preguntarle.
 
 
