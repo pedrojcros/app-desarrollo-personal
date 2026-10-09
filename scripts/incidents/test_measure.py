@@ -113,6 +113,27 @@ class MeasureCommandTests(unittest.TestCase):
         self.assertIn('media 1.050', result.stdout.lower())
         self.assertIn('2 pasos', result.stdout)
 
+    def test_sessions_counts_only_activity_since_date_in_crossing_session(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            session_path = Path(temporary_directory) / 'session.jsonl'
+            records = [
+                json.loads(line)
+                for line in (TEST_DATA_PATH / 'claude_session.jsonl').read_text().splitlines()
+            ]
+            records[-1]['timestamp'] = '2026-10-02T09:40:00Z'
+            session_path.write_text(
+                ''.join(json.dumps(record) + '\n' for record in records),
+                encoding='utf-8',
+            )
+            result = self.run_measure(
+                'sessions', '--since', '2026-10-02', '--folder', '/work/ADP-16-task',
+                environment={'ADP_CLAUDE_SESSIONS': str(session_path)},
+            )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn('1 pasos', result.stdout)
+        self.assertIn('300 nuevos / 1.200 releídos', result.stdout)
+        self.assertNotIn('2026-10-01', result.stdout)
+
     def test_missing_source_is_reported_without_failing_other_sources(self):
         result = self.run_measure(
             'task',

@@ -74,6 +74,10 @@ desde una fecha:
 python3 scripts/incidents/measure.py sessions --since 2026-10-01
 ```
 
+Se incluyen las sesiones con actividad desde la fecha indicada, aunque hayan
+empezado antes. Los pasos, tokens, inicio y duración corresponden únicamente
+a la actividad desde esa fecha.
+
 `--folder RUTA` permite indicar otra carpeta de trabajo. Las fuentes se pueden
 redirigir para las pruebas o para una máquina distinta con `ADP_CODEX_SESSIONS`
 y `ADP_CLAUDE_SESSIONS`; `ADP_PULL_REQUESTS_FILE` sustituye la consulta a `gh`
@@ -83,6 +87,6 @@ mostrar los datos de las otras fuentes.
 
 Los contadores de Codex son acumulados por sesión: se toma el último registro,
 y los tokens nuevos se calculan restando los tokens releídos de la entrada
-total. Claude registra uso por paso, por lo que se suman sus registros. En
+total. Claude registra uso por paso, por lo que se suma una sola vez cada `message.id`, aunque aparezca repetido. En
 `test_data/` hay sesiones pequeñas inventadas para probar ambos formatos sin
 acceder a los directorios personales.

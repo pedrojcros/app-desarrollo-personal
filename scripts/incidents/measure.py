@@ -165,6 +165,9 @@ def read_claude_session(session_file, task_key, folder, since):
         timestamp = parse_datetime(record.get('timestamp'))
         if timestamp is None:
             continue
+        if since is not None:
+            if timestamp.date() < since:
+                continue
         activity_times.append(timestamp)
         model = message.get('model', model)
         new_tokens += usage.get('input_tokens', 0)
@@ -177,14 +180,12 @@ def read_claude_session(session_file, task_key, folder, since):
         return None
     if folder is not None and not is_same_folder(working_directory, folder):
         return None
-    if since is not None and activity_times[0].date() < since:
-        return None
     return {
         'agent': 'Claude',
         'model': model,
         'session': session_id,
-        'started_at': activity_times[0],
-        'last_activity': activity_times[-1],
+        'started_at': min(activity_times),
+        'last_activity': max(activity_times),
         'new_tokens': new_tokens,
         'read_tokens': read_tokens,
         'written_tokens': written_tokens,
