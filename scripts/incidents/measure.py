@@ -162,7 +162,9 @@ def read_claude_session(session_file, task_key, folder, since):
                 continue
             seen_message_ids.add(message_id)
         usage = message.get('usage', {})
-        if not isinstance(usage, dict) or not usage:
+        if not isinstance(usage, dict):
+            continue
+        if not usage:
             continue
         timestamp = parse_datetime(record.get('timestamp'))
         if timestamp is None:
@@ -307,16 +309,16 @@ def summarize_sessions(sessions):
         summary['new_tokens'] += session['new_tokens']
         summary['read_tokens'] += session['read_tokens']
         summary['written_tokens'] += session['written_tokens']
-        if session['started_at'] and (
-            summary['first_activity'] is None
-            or session['started_at'] < summary['first_activity']
-        ):
-            summary['first_activity'] = session['started_at']
-        if session['last_activity'] and (
-            summary['last_activity'] is None
-            or session['last_activity'] > summary['last_activity']
-        ):
-            summary['last_activity'] = session['last_activity']
+        started_at = session['started_at']
+        first_activity = summary['first_activity']
+        if started_at is not None:
+            if first_activity is None or started_at < first_activity:
+                summary['first_activity'] = started_at
+        last_activity = session['last_activity']
+        summary_last_activity = summary['last_activity']
+        if last_activity is not None:
+            if summary_last_activity is None or last_activity > summary_last_activity:
+                summary['last_activity'] = last_activity
     return summaries
 
 
@@ -334,12 +336,15 @@ def print_task_report(task_key, jira):
     if not summaries:
         print('Sesiones: no encontradas')
     for (agent, model), summary in sorted(summaries.items()):
+        new_tokens_text = format_number(summary['new_tokens'])
+        read_tokens_text = format_number(summary['read_tokens'])
+        written_tokens_text = format_number(summary['written_tokens'])
+        first_activity_text = format_timestamp(summary['first_activity'])
+        last_activity_text = format_timestamp(summary['last_activity'])
         print(f"{agent} {model}: {summary['sessions']} sesiones · "
-              f"{format_number(summary['new_tokens'])} nuevos / "
-              f"{format_number(summary['read_tokens'])} releídos / "
-              f"{format_number(summary['written_tokens'])} escritos")
-        print(f"  Actividad: {format_timestamp(summary['first_activity'])} → "
-              f"{format_timestamp(summary['last_activity'])}")
+              f"{new_tokens_text} nuevos / {read_tokens_text} releídos / "
+              f"{written_tokens_text} escritos")
+        print(f"  Actividad: {first_activity_text} → {last_activity_text}")
     print(f'PR encontrados: {len(pull_requests)}')
     for pull_request in pull_requests:
         created_at = parse_datetime(pull_request.get('createdAt'))
@@ -348,8 +353,10 @@ def print_task_report(task_key, jira):
             (session['started_at'] for session in sessions if session['started_at']),
             default=None,
         )
-        print(f"PR #{pull_request['number']}: apertura {format_elapsed(first_activity, created_at)} · "
-              f"fusión {format_elapsed(first_activity, merged_at)}")
+        opening_duration = format_elapsed(first_activity, created_at)
+        merge_duration = format_elapsed(first_activity, merged_at)
+        print(f"PR #{pull_request['number']}: apertura {opening_duration} · "
+              f"fusión {merge_duration}")
     print(f'Minutos perdidos: {incident_minutes}')
 
 
@@ -421,10 +428,13 @@ def print_sessions_report(since, folder):
     for session in sorted(sessions, key=lambda item: item['started_at']):
         duration = format_elapsed(session['started_at'], session['last_activity'])
         average_read_tokens = session['read_tokens'] // max(1, session['steps'])
-        print(f"{format_timestamp(session['started_at'])} · {duration} · "
-              f"{session['steps']} pasos · {format_number(session['new_tokens'])} nuevos / "
-              f"{format_number(session['read_tokens'])} releídos · "
-              f"media {format_number(average_read_tokens)} releídos por paso · {session['model']}")
+        started_at_text = format_timestamp(session['started_at'])
+        new_tokens_text = format_number(session['new_tokens'])
+        read_tokens_text = format_number(session['read_tokens'])
+        average_read_tokens_text = format_number(average_read_tokens)
+        print(f"{started_at_text} · {duration} · {session['steps']} pasos · "
+              f"{new_tokens_text} nuevos / {read_tokens_text} releídos · "
+              f"media {average_read_tokens_text} releídos por paso · {session['model']}")
 
 
 def main():
