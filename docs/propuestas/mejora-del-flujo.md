@@ -1,5 +1,7 @@
 # Propuesta: mejorar el flujo de trabajo antes de la siguiente versión
 
+> **Aprobada el 2026-10-09 con los valores por defecto (DEC-45).** Falta aplicarla: encargos A a D del apartado 4.
+
 *Claude (Opus 5.5), sin papel de orquestador, 2026-10-09 por la tarde, a
 petición del humano. Es una **propuesta**: nada de esto está aprobado ni
 aplicado. El humano decide en el apartado 5; lo demás es la recomendación.*
