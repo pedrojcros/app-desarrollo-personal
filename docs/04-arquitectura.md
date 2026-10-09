@@ -148,5 +148,8 @@ Los términos del dominio se definen en [03-casos-de-uso](03-casos-de-uso.md#voc
 | Vencida | `overdue` |
 | Pendientes de días anteriores | `pastPending` |
 | Historial | `history` |
+| Progreso, periodo | `progress`, `ProgressPeriod` |
+| Porcentaje de cumplimiento | `completion` |
+| Racha | `streak` |
 | Archivar | `archive` |
 | Hoy | `today` |

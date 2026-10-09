@@ -49,7 +49,8 @@ Las 15 funcionalidades imprescindibles están en [02-funcionalidades](02-funcion
 ## Después de la versión 1 (confirmado, no se construye ahora)
 
 - **Versión 1.1 — Recordatorios** en el propio móvil, locales y sin servidor: «en 4 días entregas la práctica» (DEC-24). Es lo primero después de la versión 1.
-- **Versión 2 — Conexión con Google Calendar**: la aplicación crea eventos en el calendario (por ejemplo, la sesión de natación de los miércoles o la entrega de una práctica).
+- **Versión 1.2 — Progreso** (DEC-46): porcentaje de cumplimiento, rachas y mapa de cada hábito, y un resumen por periodo de hábitos y tareas, con los datos que ya se guardan. Diseño en [propuestas/progreso](propuestas/progreso.md).
+- **Versión 2 — Conexión con Google Calendar**, con la duración de los hábitos (RF-04): la aplicación crea eventos en el calendario (por ejemplo, la sesión de natación de los miércoles o la entrega de una práctica).
 - **Google Play**: cuando el humano lo decida (DEC-18).
 
 ## Fuera de alcance
@@ -59,7 +60,7 @@ Las 15 funcionalidades imprescindibles están en [02-funcionalidades](02-funcion
 | Fuera de alcance | Por qué | ¿Cuándo se reconsidera? |
 |---|---|---|
 | Otros usuarios, cuentas, compartir | Es una herramienta personal; evita autenticación y privacidad ajena | Cuando el autor quiera compartirla |
-| Estadísticas e interfaces interactivas del progreso | Valiosas, pero el historial tiene que existir antes | Primera versión posterior a la 1 |
+| ~~Estadísticas e interfaces interactivas del progreso~~ | *Entran en la versión 1.2 (DEC-46).* Siguen fuera los gráficos de varios años, exportar estadísticas y los objetivos con metas numéricas | Cuando el uso diario lo pida |
 | Integración con Todoist | Dependencia de un tercero que se quiere abandonar | Solo si hace falta migrar datos |
 | Conexión con Google Calendar | Exige cuenta de Google y permisos de su API | Versión 2 |
 | Uso sin conexión (marcar sin cobertura) | La versión 1 necesita internet: sin conexión se ve lo ya cargado, pero no se puede marcar (DEC-25) | Si el uso diario lo pide (D-01 en [06-riesgos](06-riesgos.md)) |
@@ -87,5 +88,5 @@ Ideas que han aparecido y quedan para después de la versión 1.
 | Idea | Quién la propuso | Fecha |
 |---|---|---|
 | Recordatorios con antelación para entregas de la universidad | Humano | 2026-10-05 |
-| Estadísticas e interfaces interactivas del progreso | Humano | 2026-10-05 |
+| ~~Estadísticas e interfaces interactivas del progreso~~ (planificadas en la 1.2, DEC-46) | Humano | 2026-10-05 |
 | Conexión con Google Calendar (versión 2) y Google Play (cuando el humano decida) | Humano | 2026-10-05 |
