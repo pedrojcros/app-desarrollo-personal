@@ -13,6 +13,25 @@ case "$boot_timeout_seconds" in
     ;;
 esac
 
+# Los worktrees antiguos pueden conservar el emulador en otro proyecto Compose.
+# Solo se retiran contenedores del servicio y de la imagen de este proyecto.
+if ! emulator_image=$(timeout --kill-after=2s 10s docker compose config --images android-emulator); then
+  echo 'Could not resolve the Android emulator image.' >&2
+  exit 1
+fi
+if ! emulator_containers=$(timeout --kill-after=2s 10s docker ps -aq \
+  --filter 'label=com.docker.compose.service=android-emulator' \
+  --filter "ancestor=$emulator_image"); then
+  echo 'Could not find existing Android emulator containers.' >&2
+  exit 1
+fi
+for emulator_container in $emulator_containers; do
+  if ! timeout --kill-after=10s 60s docker rm -f "$emulator_container"; then
+    echo "Could not remove Android emulator container $emulator_container within 60 seconds." >&2
+    exit 1
+  fi
+done
+
 # El AVD está en la capa del contenedor: recrearlo elimina sus candados antiguos.
 if ! timeout --kill-after=10s 60s docker compose rm -sf android-emulator; then
   echo 'Could not remove the Android emulator container within 60 seconds.' >&2

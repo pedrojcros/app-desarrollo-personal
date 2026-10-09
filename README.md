@@ -100,7 +100,9 @@ docker compose build android-emulator chrome-mcp
 ```
 
 Prepara el emulador antes de los caminos críticos: esta orden recrea su
-contenedor, elimina los candados del AVD y espera a Android y Expo Go. Si lo
+contenedor, retira emuladores de proyectos anteriores, elimina los candados del
+AVD y espera a Android y Expo Go. El proyecto Compose tiene el nombre fijo
+`app-desarrollo-personal`, para compartir el emulador entre worktrees. Si lo
 comparte otro trabajador, pide turno al orquestador antes de ejecutarla:
 
 ```sh
