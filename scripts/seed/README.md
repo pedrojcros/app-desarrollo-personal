@@ -1,7 +1,10 @@
 # Datos sintéticos
 
-La siembra es determinista respecto a `SEED_TODAY` (por defecto, hoy en la zona
-horaria del dispositivo) y el usuario. Reutiliza el usuario o lo crea mediante
+La siembra es determinista respecto a `SEED_TODAY` y el usuario. Si no se indica,
+el envoltorio calcula hoy en la zona del anfitrión para local y en
+`Europe/Madrid` para pruebas, antes de llamar a Docker. Una fecha explícita se
+respeta tal cual. La llamada directa al script `.mjs` conserva su valor por
+defecto: hoy en la zona del proceso. Reutiliza el usuario o lo crea mediante
 la API de administración, comprueba su correo e identificador antes del borrado
 y **borra únicamente sus datos** antes de insertar el perfil elegido.
 

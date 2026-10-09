@@ -28,6 +28,15 @@ fi
 
 export SEED_USER_PASSWORD
 
+if [ -z "${SEED_TODAY:-}" ]; then
+  if [ "${SEED_TARGET:-local}" = pruebas ]; then
+    SEED_TODAY=$(TZ=Europe/Madrid date +%F)
+  else
+    SEED_TODAY=$(date +%F)
+  fi
+fi
+export SEED_TODAY
+
 # `-e NOMBRE` sin valor copia la variable del anfitrión; `-T` evita exigir terminal.
 exec docker compose run --rm -T \
   -e SEED_USER_PASSWORD -e SEED_USER_EMAIL -e SEED_TODAY -e SEED_API_URL \

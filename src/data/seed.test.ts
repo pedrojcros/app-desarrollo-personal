@@ -1,6 +1,9 @@
 import { describe, expect, it } from '@jest/globals';
 import { execFileSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 function runModule(source: string) {
   return execFileSync('node', ['--input-type=module'], {
@@ -54,6 +57,19 @@ describe('seed destination protection', () => {
       expect(
         validateConfiguration({ ...demo, target, apiUrl: productionUrl }),
       ).toContain('production');
+    },
+  );
+
+  it.each(['', 'local', 'pruebas', 'unknown'])(
+    'reports production for a trailing-dot hostname with target %s',
+    (target) => {
+      const configuration = { ...demo, target, apiUrl: productionUrl };
+      const result = validateConfiguration({
+        ...configuration,
+        apiUrl: `${productionUrl}.`,
+      });
+      expect(result).toBe(validateConfiguration(configuration));
+      expect(result).toContain('production');
     },
   );
 
@@ -259,4 +275,50 @@ describe('seed entry point safety', () => {
     expect(result.calledCli).toBe(false);
     expect(result.leaked).toBe(false);
   });
+});
+
+describe('seed shell wrapper today', () => {
+  it.each([
+    { target: 'pruebas', today: '', expected: '2026-10-11' },
+    { target: 'local', today: '', expected: '2026-10-10' },
+    { target: '', today: '', expected: '2026-10-10' },
+    { target: 'pruebas', today: '2026-01-02', expected: '2026-01-02' },
+    { target: 'local', today: '2026-01-02', expected: '2026-01-02' },
+  ])(
+    'passes $expected for target $target and today "$today"',
+    (configuration) => {
+      const directory = mkdtempSync(join(tmpdir(), 'seed-wrapper-'));
+      try {
+        writeFileSync(
+          join(directory, 'docker'),
+          '#!/bin/sh\nprintenv SEED_TODAY\n',
+          { mode: 0o700 },
+        );
+        // Simula la medianoche madrileña mientras el anfitrión sigue en el día anterior.
+        writeFileSync(
+          join(directory, 'date'),
+          '#!/bin/sh\nif [ "${TZ:-}" = Europe/Madrid ]; then\n  echo 2026-10-11\nelse\n  echo 2026-10-10\nfi\n',
+          { mode: 0o700 },
+        );
+        const output = execFileSync(
+          'sh',
+          ['scripts/seed/seed-synthetic-year.sh'],
+          {
+            encoding: 'utf8',
+            env: {
+              ...process.env,
+              PATH: `${directory}:${process.env.PATH}`,
+              TZ: 'UTC',
+              SEED_TARGET: configuration.target,
+              SEED_TODAY: configuration.today,
+              SEED_USER_PASSWORD: randomUUID(),
+            },
+          },
+        );
+        expect(output.trim()).toBe(configuration.expected);
+      } finally {
+        rmSync(directory, { recursive: true });
+      }
+    },
+  );
 });
