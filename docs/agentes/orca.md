@@ -37,6 +37,15 @@ python3 scripts/orca/supervise_workers.py --idle-minutes 8
 
 Cada 20 segundos repasa la terminal de cada trabajador vivo: envía el Enter si el encargo se quedó escrito sin enviar (el campo `draft` de `orca terminal read`, dentro de `result.terminal`), concede a Copilot los permisos **de sesión** para rutas del proyecto o de su worktree y resuelve dos esperas de Codex: reintenta «Selected model is at capacity» cada cinco minutos (hasta tres veces) y, ante «You've hit your usage limit», mantiene el modelo y continúa un minuto después de la hora indicada. Estas acciones automáticas imprimen una línea informativa y no despiertan al orquestador. **Termina avisando** si no puede leer la hora de la cuota, se agotan los reintentos o alguien pide otra cosa (un permiso de Claude, una ruta de fuera) o lleva ocho minutos con la pantalla quieta. Solo actúa ante lo que es **actual**: el aviso debe estar entre las últimas 15 líneas no vacías de la pantalla y la pantalla no debe haber cambiado desde la vuelta anterior (el historial con un aviso viejo se ignora). Al reanudar tras la cuota olvida el estado del trabajador. La espera de cuota no cuenta como inactividad. Termina también cuando no queda ningún trabajador vivo. Cada vez que termine, actúa y vuelve a lanzarlo. Lo pidió el humano el 2026-10-06, después de que un trabajador pasara diez minutos sin arrancar sin que nadie lo viera.
 
+## Limpiar worktrees al cerrar (DEC-50)
+
+```bash
+python3 scripts/orca/clean_worktrees.py           # solo enseña qué sobra, por ruta
+python3 scripts/orca/clean_worktrees.py --apply   # borra los que se pueden borrar
+```
+
+Borra con `orca worktree rm` (sin `--force`) **solo** los worktrees cuyo `HEAD` real ya está en `origin/develop` y que no tienen nada sin guardar, y lo vuelve a comprobar justo antes de cada borrado. Nunca toca la carpeta principal (la obtiene con git, no se fía solo de Orca), los worktrees con un trabajador o una terminal abiertos (si no puede saberlo, los trata como en uso), las carpetas sueltas ni las ocultas. Lo que tiene cambios, ficheros sueltos o commits sin fusionar lo enseña para que decida el humano.
+
 ## Ciclo mínimo
 
 ```bash

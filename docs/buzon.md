@@ -63,6 +63,11 @@ Para pedir control sobre una idea, añade al final:
   3. La primera siembra en pruebas (y la de después del 061) la hice yo desde el portátil, con tu «ok».
   4. El 061 reparte las tareas por categoría a juicio del trabajador; «Renovar el abono de transporte» y «Devolver el préstamo» quedaron en Casa.
 
+- 2026-10-13 — **Decidido por el orquestador (revísalo cuando quieras), limpieza (DEC-50):**
+  1. El 062 se hizo con Codex Luna y, al salir con huecos de seguridad, la corrección (063) con Codex Sol, como dice DEC-41.
+  2. Fusioné el #81 con tres detalles menores pendientes (no son de seguridad): van al encargo 064, no a esta sesión, porque pediste apagar al terminar.
+  3. Los dos worktrees con ficheros sueltos (`propuesta-recordatorios` y `revision-t05`) **no** los he borrado: decide tú.
+
 ## Procesadas
 
 | Fecha | Idea | Qué se hizo |

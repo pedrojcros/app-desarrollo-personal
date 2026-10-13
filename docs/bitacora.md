@@ -4,6 +4,14 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-13 — Limpieza de worktrees (DEC-50)
+
+El humano notó el ordenador cargado y preguntó por las carpetas de `~/orca/workspaces/`: eran worktrees de trabajadores y revisores ya fusionados, del 7 al 9 de octubre, que nadie recogía. Lo que más memoria gastaba era otra cosa: Brave y el Supabase local (unos 2 GB), que se paró. Aceptó las tres piezas de DEC-50: un script de limpieza, un paso al cerrar cada sesión y ofrecer parar Supabase.
+
+El script (`ADP-35`) lo escribió Codex Luna (PR #80) y la revisión de Sonnet lo paró: la carpeta principal solo la protegía un dato de Orca, antes de borrar solo volvía a mirar `git status`, la salida nombraba `revision-orquestador` como «app-desarrollo-personal» y los tests seguían en verde aunque se rompiera la protección (por ejemplo, borrar todo). La corrección (encargo 063, Codex Sol, PR #81, que sustituye al #80) obtiene la principal con git, revalida todo antes de cada borrado, enseña rutas y sus tests detectan 29 de 34 mutaciones; las 5 que quedan son de cobertura. Tres detalles menores quedan para el encargo 064.
+
+Estreno: borró 6 worktrees (unos 3 GB) y dejó para el humano los dos con ficheros sueltos y la carpeta suelta de `root`. Lección: un script que borra pide revisión con mutaciones; con ellas apareció lo que los tests no veían.
+
 ### 2026-10-10 — Madrugada: datos de demostración en la web de pruebas
 
 Sesión corta de orquestador (unas dos horas) para el encargo 060 del pulido visual (DEC-49). Se creó la épica `ADP-32` («Versión 1.1.1 — Pulido visual») y se fusionaron:
