@@ -31,7 +31,6 @@ class CleanWorktreesTests(unittest.TestCase):
         self.orca_failure = False
         self.truncated_command = None
         self.omitted_command = None
-        self.before_apply = None
         self.merge_code = None
         patcher = mock.patch.object(subprocess, 'run', side_effect=self.run_command)
         patcher.start()
@@ -86,10 +85,6 @@ class CleanWorktreesTests(unittest.TestCase):
             elif arguments[:2] == ['terminal', 'list']:
                 result = {'terminals': self.terminals}
             elif arguments[:2] == ['orchestration', 'worker-list']:
-                if self.before_apply is not None:
-                    callback = self.before_apply
-                    self.before_apply = None
-                    callback()
                 result = {'workers': self.workers, 'page': {'hasMore': False}}
                 if self.worker_pages is not None:
                     page_index = 1 if '--cursor' in arguments else 0
@@ -125,7 +120,10 @@ class CleanWorktreesTests(unittest.TestCase):
             for path in [self.main_path, self.root]:
                 with self.subTest(flag=flag, path=path):
                     worktree = self.worktree(path)
-                    worktree['isMainWorktree'] = flag
+                    if flag is None:
+                        del worktree['isMainWorktree']
+                    else:
+                        worktree['isMainWorktree'] = flag
                     self.assertEqual(self.classify(worktree).group, 'principal')
 
     def test_unknown_or_missing_worker_liveness_is_in_use_but_exited_is_free(self):
@@ -177,7 +175,46 @@ class CleanWorktreesTests(unittest.TestCase):
         code, output = self.run_main(['--apply'])
         self.assertEqual(code, 0)
         self.assertEqual(self.removed, [f'path:{self.worktree_path}'])
-        self.assertIn(str(self.worktree_path), output)
+        self.assertIn(
+            f'topic ({self.worktree_path}) [app-desarrollo-personal]: resultado de borrado',
+            output,
+        )
+
+    def test_apply_does_not_promote_previously_ineligible_worktrees(self):
+        self.workers = [self.worker()]
+        classification = self.classify()
+        self.assertEqual(classification.group, 'en uso')
+        self.workers = []
+        with redirect_stdout(io.StringIO()):
+            clean_worktrees.apply_removals([classification], self.root)
+        self.assertEqual(self.removed, [])
+
+    def test_command_failure_in_status_continues_to_other_worktrees(self):
+        self.statuses[str(self.worktree_path)] = clean_worktrees.CommandFailure('status failed')
+        later_path = self.root / 'later'
+        later_path.mkdir()
+        self.worktrees.append(self.worktree(later_path))
+        code, output = self.run_main(['--apply'])
+        self.assertEqual(code, 1)
+        self.assertIn('error al clasificar', output)
+        self.assertEqual(self.removed, [f'path:{later_path}'])
+
+    def test_apply_reloads_activity_before_each_candidate(self):
+        later_path = self.root / 'later'
+        later_path.mkdir()
+        classifications = [self.classify(), self.classify(self.worktree(later_path))]
+        original_run_command = self.run_command
+
+        def run_with_new_worker(command, **options):
+            result = original_run_command(command, **options)
+            if command[1:3] == ['worktree', 'rm']:
+                self.workers = [self.worker(later_path)]
+            return result
+
+        with mock.patch.object(subprocess, 'run', side_effect=run_with_new_worker):
+            with redirect_stdout(io.StringIO()):
+                clean_worktrees.apply_removals(classifications, self.root)
+        self.assertEqual(self.removed, [f'path:{self.worktree_path}'])
 
     def test_dry_run_with_eligible_worktree_never_removes(self):
         code, output = self.run_main()

@@ -43,7 +43,7 @@ class Activity:
 def run_command(command, cwd=None):
     completed = subprocess.run(command, cwd=cwd, capture_output=True, text=True)
     if completed.returncode != 0:
-        raise CommandFailure(completed.stderr.strip() or 'falló una orden externa')
+        raise CommandFailure(completed.stderr.strip() or 'External command failed')
     return completed.stdout
 
 
@@ -53,7 +53,7 @@ def run_orca(*arguments):
     try:
         return json.loads(output)
     except json.JSONDecodeError as error:
-        raise CommandFailure('Orca devolvió JSON no válido') from error
+        raise CommandFailure('Orca returned invalid JSON') from error
 
 
 def git_output(path, *arguments):
@@ -65,10 +65,10 @@ def get_result(response):
     if not isinstance(response, dict):
         raise CommandFailure('Orca response must be a dictionary')
     if response.get('ok') is False:
-        raise CommandFailure('Orca indicó que la orden falló')
+        raise CommandFailure('Orca command failed')
     result = response.get('result')
     if not isinstance(result, dict):
-        raise CommandFailure('Orca devolvió una respuesta inesperada')
+        raise CommandFailure('Orca returned an unexpected response')
     return result
 
 
@@ -84,7 +84,7 @@ def load_worktrees():
     require_complete_list(result)
     worktrees = result.get('worktrees')
     if not isinstance(worktrees, list):
-        raise CommandFailure('Orca no devolvió la lista de worktrees')
+        raise CommandFailure('Orca did not return the worktree list')
     return worktrees
 
 
@@ -98,14 +98,14 @@ def load_workers():
         result = get_result(run_orca(*arguments))
         page_workers = result.get('workers')
         if not isinstance(page_workers, list):
-            raise CommandFailure('Orca no devolvió la lista de trabajadores')
+            raise CommandFailure('Orca did not return the worker list')
         workers.extend(page_workers)
         page = result.get('page') or {}
         if not page.get('hasMore'):
             return workers
         cursor = page.get('nextCursor')
         if not cursor:
-            raise CommandFailure('Orca indicó otra página sin cursor')
+            raise CommandFailure('Orca reported another page without a cursor')
 
 
 def load_terminals():
@@ -113,7 +113,7 @@ def load_terminals():
     require_complete_list(result)
     terminals = result.get('terminals')
     if not isinstance(terminals, list):
-        raise CommandFailure('Orca no devolvió la lista de terminales')
+        raise CommandFailure('Orca did not return the terminal list')
     return terminals
 
 
@@ -217,7 +217,7 @@ def is_ancestor(head, base, repository_path):
         return True
     if completed.returncode == 1:
         return False
-    raise CommandFailure(completed.stderr.strip() or 'git merge-base falló')
+    raise CommandFailure(completed.stderr.strip() or 'git merge-base failed')
 
 
 def missing_commit_count(head, base, repository_path):
@@ -227,7 +227,10 @@ def missing_commit_count(head, base, repository_path):
 
 def find_main_worktree(repository_path):
     output = git_output(repository_path, 'worktree', 'list', '--porcelain')
-    first_line = output.splitlines()[0] if output.splitlines() else ''
+    lines = output.splitlines()
+    if not lines:
+        raise CommandFailure('Git returned an empty worktree list')
+    first_line = lines[0]
     if not first_line.startswith('worktree '):
         raise CommandFailure('Git did not identify the main worktree')
     return Path(first_line[len('worktree '):])
@@ -238,7 +241,6 @@ def classify_worktree(worktree, workers, terminals, repository_path, activity_un
     main_path = find_main_worktree(repository_path)
     if worktree.get('isMainWorktree') or path_is_within(main_path, worktree_path):
         return Classification(worktree, 'principal', 'worktree principal')
-    worktree_path = Path(worktree['path'])
     activity = Activity(workers, terminals, activity_unknown)
     activity_reason = find_activity_reason(worktree_path, activity)
     if activity_reason:
@@ -288,7 +290,9 @@ def collect_snapshot():
     worktrees = load_worktrees()
     activity = load_activity()
     repository_root = find_repository_root()
-    return Snapshot(worktrees, activity.workers, activity.terminals, repository_root, activity.unknown)
+    return Snapshot(
+        worktrees, activity.workers, activity.terminals, repository_root, activity.unknown,
+    )
 
 
 def worktree_label(worktree):
@@ -306,9 +310,12 @@ def print_classification(classification):
     print(f"{name}: {classification.group} — {classification.reason}")
 
 
-def remove_worktree(worktree_path):
+def remove_worktree(worktree):
+    worktree_path = Path(worktree['path'])
+    label = worktree_label(worktree)
     response = get_result(run_orca('worktree', 'rm', '--worktree', f'path:{worktree_path}'))
-    print(f'{worktree_path}: resultado de borrado: {json.dumps(response, ensure_ascii=False)}')
+    result_text = json.dumps(response, ensure_ascii=False)
+    print(f'{label}: resultado de borrado: {result_text}')
 
 
 def apply_removals(classifications, repository_path):
@@ -327,7 +334,7 @@ def apply_removals(classifications, repository_path):
             if current.group != 'se puede borrar':
                 print(f'{label}: omitido; {current.group} — {current.reason}')
                 continue
-            remove_worktree(Path(worktree['path']))
+            remove_worktree(worktree)
         except (CommandFailure, OSError) as error:
             print(f'{label}: fallo al comprobar o borrar: {error}')
             failed = True
@@ -335,8 +342,12 @@ def apply_removals(classifications, repository_path):
 
 
 def parse_arguments(arguments):
-    parser = argparse.ArgumentParser(description='Informa de worktrees de Orca que se pueden limpiar.')
-    parser.add_argument('--apply', action='store_true', help='borra los worktrees que se pueden borrar')
+    parser = argparse.ArgumentParser(
+        description='Informa de worktrees de Orca que se pueden limpiar.',
+    )
+    parser.add_argument(
+        '--apply', action='store_true', help='borra los worktrees que se pueden borrar',
+    )
     return parser.parse_args(arguments)
 
 
