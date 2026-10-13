@@ -42,7 +42,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-10, sesión de orquestador (madrugada).*
+*Actualizado: 2026-10-13, sesión de orquestador.*
 
 - **La versión 1 está publicada** (2026-10-09, PR #67, etiqueta [`v1.0.0`](https://github.com/pedrojcros/app-desarrollo-personal/releases/tag/v1.0.0)), con la 1.x y los recordatorios (1.1, R1 a R5), que solo funcionan en la app instalada. Falta el APK y, con él, R6: la comprobación del humano en su móvil (lista en el buzón).
 - **DEC-45 aplicada** (encargos A a D; el E, el orquestador por eventos, queda para diseñarlo con el arquitecto):
@@ -54,6 +54,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 - **`ADP-27` hecho** (PR #73 y #74): el título «Hoy» ya no sale dos veces y sigue siendo un encabezado accesible; la fecha del añadir rápido sale con formato. El «doble engranaje» no era de la app: es la burbuja «Tools» de Expo Go, que solo existe en desarrollo.
 - **El repositorio es público** desde el 2026-10-09 (DEC-44): se podrá volver a privado cuando el ritmo de cambios baje.
 - **La web de pruebas tiene datos de demostración** (060 y 061, PR #77 y #78, DEC-49): usuario `demo@example.com` (contraseña en `secretos.env`) con 10 hábitos, 30 tareas y 90 días de historial. Para volver a sembrar, el botón de Actions `seed-pruebas.yml` cuando llegue a `main`; mientras, el envoltorio local de `scripts/seed/README.md`.
+- **Limpieza al cerrar cada sesión** (DEC-50, PR #81): `scripts/orca/clean_worktrees.py` enseña y, con `--apply`, borra los worktrees ya fusionados y sin nada sin guardar; estrenado el 2026-10-13 con 6 carpetas viejas (unos 3 GB). El orquestador ofrece además parar el Supabase local al cerrar.
 - **La versión 1.2, «Progreso», está planificada** (DEC-46): porcentaje, rachas y mapa de cada hábito, y un resumen por periodo en Historial, sin migraciones ni dependencias. Diseño y encargos 055 a 059 en [propuestas/progreso](propuestas/progreso.md). Google Calendar, con RF-04, pasa a la versión 2.
 
 
@@ -62,6 +63,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 Para retomar en una sesión nueva:
 
 1. **Pulido visual (1.1.1) antes de la 1.2** (DEC-48, épica `ADP-32`): los datos de demostración ya están en la web de pruebas (060 y 061 hechos); el humano revisa allí la app y cuenta lo que no le gusta en una sesión de `/arquitecto`, que lo apunta y clasifica en [propuestas/pulido-visual](propuestas/pulido-visual.md) y escribe los encargos.
+   - Encargo **064** pequeño (Codex Luna) con los tres detalles menores de la última revisión del script de limpieza: carpetas sueltas junto a la principal, datos raros de Orca sin capturar y tres tests que faltan ([bitácora](bitacora.md), 2026-10-13).
 2. **Después, ejecutar la 1.2 con `/ejecutar-plan`** cuando el humano lo diga. Lo primero, la épica y todas sus tarjetas en «Por hacer» (DEC-47). Olas 055 a 057, 058 y 059 ([propuesta](propuestas/progreso.md#3-encargos-para-la-ejecución)). Al cerrar, Maestro una sola vez y la primera retrospectiva (DEC-45).
 3. **Después de esa retrospectiva, con el arquitecto:** el diseño del orquestador por eventos (DEC-45, encargo E) y la versión 2 (Google Calendar).
 
@@ -72,6 +74,7 @@ Para retomar en una sesión nueva:
 - **Recordatorios (R6):** al instalar el APK de la 1.1, la lista de comprobación del informe de R5 (permiso, aviso en punto, tras reiniciar, ahorro de batería, tocar el aviso).
 - **Revisar la app en la web de pruebas** (`https://app-desarrollo-personal-pruebas.vercel.app`, primero la sesión de Vercel; después `demo@example.com`) y contar lo que no guste al arquitecto.
 - **Secreto `PRUEBAS_DEMO_PASSWORD` de GitHub:** puede haberse guardado vacío (se puso con `!`, sin teclado). Volver a ponerlo desde `secretos.env` antes de usar el botón de `seed-pruebas.yml`.
+- **Dos worktrees con ficheros sueltos** que el script no borra: `propuesta-recordatorios` (borrador de la propuesta, la versión final está en `docs/propuestas/recordatorios.md`) y `revision-t05` (informe de la revisión de T05). Decir si se guardan o se borran; y la carpeta vacía `ADP-3-base-de-datos-y-acceso`, que es de `root`, se borra con `sudo rmdir` en una terminal normal.
 - Revisar el [buzón](buzon.md): lo que decidió el orquestador por su cuenta.
 - Revisar T01 en el móvil con Expo Go (H05) y los avisos de `npm audit` (antes de publicar y el 2026-10-14).
 - Cuando T15 esté en uso, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
@@ -82,7 +85,7 @@ Para retomar en una sesión nueva:
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-50**.
+  chat. Siguiente número libre: **DEC-51**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 

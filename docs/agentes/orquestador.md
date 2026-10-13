@@ -322,6 +322,8 @@ Hoy el humano no ha pedido programar nada él mismo. Si lo pide, se apunta aquí
 - Quita el modo cafeína (DEC-42): para la tarea en segundo plano de `systemd-inhibit`, salvo que el humano pida apagar el ordenador.
 
 - Todos los trabajadores están liberados o retenidos a propósito (`worker-list --terminal-state reclaimable` no devuelve nada).
+- **Limpieza (DEC-50):** `python3 scripts/orca/clean_worktrees.py` enseña los worktrees que sobran. Los que ya están en `origin/develop` y no tienen nada sin guardar se borran con `--apply`; de los demás (ficheros sueltos, cambios sin commit, ramas sin fusionar) se pregunta al humano qué hacer, sin borrarlos.
+- **Si no queda nadie trabajando, ofrece parar el Supabase local** (`./docker/app/run npx supabase stop`; los datos se quedan en sus volúmenes de Docker), que es lo que más memoria gasta.
 - La [bitácora](../bitacora.md) tiene la entrada de la sesión y [contexto](../contexto.md), los apartados *Ahora mismo* y *Lo siguiente* al día.
 - **Al cerrar una ola, propón al humano abrir una sesión nueva de orquestador** (DEC-39 y DEC-45): una conversación larga hace que cada paso cueste más. Ver [Sesiones cortas](#sesiones-cortas-dec-45).
 - Tu rama `docs/sesion-<fecha>` tiene su PR abierto o fusionado.
