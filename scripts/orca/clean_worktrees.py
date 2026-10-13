@@ -33,6 +33,13 @@ class Snapshot:
     activity_unknown: bool = False
 
 
+@dataclass
+class Activity:
+    workers: list
+    terminals: list
+    unknown: bool
+
+
 def run_command(command, cwd=None):
     completed = subprocess.run(command, cwd=cwd, capture_output=True, text=True)
     if completed.returncode != 0:
@@ -55,6 +62,8 @@ def git_output(path, *arguments):
 
 
 def get_result(response):
+    if not isinstance(response, dict):
+        raise CommandFailure('Orca response must be a dictionary')
     if response.get('ok') is False:
         raise CommandFailure('Orca indicó que la orden falló')
     result = response.get('result')
@@ -63,9 +72,16 @@ def get_result(response):
     return result
 
 
+def require_complete_list(result):
+    host_scope = result.get('hostScope') or {}
+    if result.get('truncated') or host_scope.get('omittedHostIds'):
+        raise CommandFailure('Orca list is incomplete')
+
+
 def load_worktrees():
     response = run_orca('worktree', 'list')
     result = get_result(response)
+    require_complete_list(result)
     worktrees = result.get('worktrees')
     if not isinstance(worktrees, list):
         raise CommandFailure('Orca no devolvió la lista de worktrees')
@@ -94,6 +110,7 @@ def load_workers():
 
 def load_terminals():
     result = get_result(run_orca('terminal', 'list'))
+    require_complete_list(result)
     terminals = result.get('terminals')
     if not isinstance(terminals, list):
         raise CommandFailure('Orca no devolvió la lista de terminales')
@@ -102,6 +119,7 @@ def load_terminals():
 
 def load_activity():
     try:
+        load_worktrees()
         workers = load_workers()
     except (CommandFailure, OSError):
         return Activity([], [], True)
@@ -110,13 +128,6 @@ def load_activity():
     except (CommandFailure, OSError):
         return Activity(workers, [], True)
     return Activity(workers, terminals, False)
-
-
-@dataclass
-class Activity:
-    workers: list
-    terminals: list
-    unknown: bool
 
 
 def find_repository_root():
@@ -128,7 +139,9 @@ def path_is_within(candidate, parent):
     try:
         candidate.resolve().relative_to(parent.resolve())
         return True
-    except (OSError, ValueError):
+    except OSError:
+        return True
+    except ValueError:
         return False
 
 
@@ -182,7 +195,7 @@ def find_activity_reason(worktree_path, activity):
     return None
 
 
-def list_saved_files(status_output):
+def describe_changed_files(status_output):
     paths = []
     for line in status_output.splitlines():
         if len(line) > 3:
@@ -212,8 +225,18 @@ def missing_commit_count(head, base, repository_path):
     return int(output.strip())
 
 
+def find_main_worktree(repository_path):
+    output = git_output(repository_path, 'worktree', 'list', '--porcelain')
+    first_line = output.splitlines()[0] if output.splitlines() else ''
+    if not first_line.startswith('worktree '):
+        raise CommandFailure('Git did not identify the main worktree')
+    return Path(first_line[len('worktree '):])
+
+
 def classify_worktree(worktree, workers, terminals, repository_path, activity_unknown=False):
-    if worktree.get('isMainWorktree'):
+    worktree_path = Path(worktree['path'])
+    main_path = find_main_worktree(repository_path)
+    if worktree.get('isMainWorktree') or path_is_within(main_path, worktree_path):
         return Classification(worktree, 'principal', 'worktree principal')
     worktree_path = Path(worktree['path'])
     activity = Activity(workers, terminals, activity_unknown)
@@ -227,9 +250,9 @@ def classify_worktree(worktree, workers, terminals, repository_path, activity_un
         return Classification(
             worktree,
             'con cosas sin guardar',
-            f'ficheros: {list_saved_files(status_output)}',
+            f'ficheros: {describe_changed_files(status_output)}',
         )
-    head = worktree.get('head')
+    head = git_output(worktree_path, 'rev-parse', 'HEAD').strip()
     if not head:
         return Classification(worktree, 'sin fusionar', 'no se pudo identificar HEAD')
     base = 'origin/develop'
@@ -243,14 +266,18 @@ def classify_worktree(worktree, workers, terminals, repository_path, activity_un
     return Classification(worktree, 'se puede borrar', 'limpio y contenido en origin/develop')
 
 
-def find_loose_directories(worktrees, repository_root):
-    registered_paths = {Path(worktree['path']).resolve() for worktree in worktrees if not worktree.get('isMainWorktree')}
+def find_loose_directories(worktrees):
+    registered_paths = set()
+    for worktree in worktrees:
+        registered_paths.add(Path(worktree['path']).resolve())
     parent_paths = {path.parent for path in registered_paths}
     loose_paths = []
     for parent_path in parent_paths:
         if not parent_path.is_dir():
             continue
         for child_path in parent_path.iterdir():
+            if child_path.name.startswith('.'):
+                continue
             if child_path.is_dir() and child_path.resolve() not in registered_paths:
                 loose_paths.append(child_path)
     return sorted(set(loose_paths))
@@ -264,9 +291,18 @@ def collect_snapshot():
     return Snapshot(worktrees, activity.workers, activity.terminals, repository_root, activity.unknown)
 
 
+def worktree_label(worktree):
+    path = Path(worktree['path'])
+    name = f'{path.name} ({path})'
+    display_name = worktree.get('displayName')
+    if display_name and display_name != path.name:
+        name += f' [{display_name}]'
+    return name
+
+
 def print_classification(classification):
     worktree = classification.worktree
-    name = worktree.get('displayName') or worktree.get('path')
+    name = worktree_label(worktree)
     print(f"{name}: {classification.group} — {classification.reason}")
 
 
@@ -275,28 +311,25 @@ def remove_worktree(worktree_path):
     print(f'{worktree_path}: resultado de borrado: {json.dumps(response, ensure_ascii=False)}')
 
 
-def apply_removals(classifications, snapshot):
+def apply_removals(classifications, repository_path):
     failed = False
     for classification in classifications:
         if classification.group != 'se puede borrar':
             continue
-        worktree_path = Path(classification.worktree['path'])
-        if not worktree_path.exists():
-            print(f'{worktree_path}: omitido; la ruta ya no existe')
-            continue
+        worktree = classification.worktree
+        label = worktree_label(worktree)
         try:
-            status_output = git_output(worktree_path, 'status', '--porcelain')
+            activity = load_activity()
+            current = classify_worktree(
+                worktree, activity.workers, activity.terminals,
+                repository_path, activity.unknown,
+            )
+            if current.group != 'se puede borrar':
+                print(f'{label}: omitido; {current.group} — {current.reason}')
+                continue
+            remove_worktree(Path(worktree['path']))
         except (CommandFailure, OSError) as error:
-            print(f'{worktree_path}: fallo al comprobar cambios: {error}')
-            failed = True
-            continue
-        if status_output:
-            print(f'{worktree_path}: omitido; aparecieron cambios sin guardar')
-            continue
-        try:
-            remove_worktree(worktree_path)
-        except (CommandFailure, OSError) as error:
-            print(f'{worktree_path}: fallo al borrar: {error}')
+            print(f'{label}: fallo al comprobar o borrar: {error}')
             failed = True
     return 1 if failed else 0
 
@@ -315,28 +348,40 @@ def main(arguments=None):
         print(f'No se pudo clasificar: {error}', file=sys.stderr)
         return 1
     classifications = []
+    failed = False
     for worktree in snapshot.worktrees:
-        classification = classify_worktree(
-            worktree,
-            snapshot.workers,
-            snapshot.terminals,
-            snapshot.root,
-            snapshot.activity_unknown,
-        )
+        try:
+            classification = classify_worktree(
+                worktree, snapshot.workers, snapshot.terminals,
+                snapshot.root, snapshot.activity_unknown,
+            )
+        except (CommandFailure, OSError) as error:
+            classification = Classification(worktree, 'error al clasificar', str(error))
+            failed = True
         if classification.group == 'principal':
             continue
         classifications.append(classification)
         print_classification(classification)
-    loose_directories = find_loose_directories(snapshot.worktrees, snapshot.root)
-    for loose_directory in loose_directories:
-        print(f'{loose_directory}: carpeta suelta, no es un worktree')
-    deletable_count = sum(item.group == 'se puede borrar' for item in classifications)
+    try:
+        loose_directories = find_loose_directories(snapshot.worktrees)
+        for loose_directory in loose_directories:
+            print(f'{loose_directory}: carpeta suelta, no es un worktree')
+    except OSError as error:
+        print(f'No se pudieron listar las carpetas sueltas: {error}')
+        failed = True
+    deletable_count = 0
+    for classification in classifications:
+        if classification.group == 'se puede borrar':
+            deletable_count += 1
     decision_count = len(classifications) - deletable_count
     print(f'{deletable_count} se pueden borrar, {decision_count} necesitan que decidas')
     if options.apply:
-        return apply_removals(classifications, snapshot)
+        removal_code = apply_removals(classifications, snapshot.root)
+        if failed:
+            return 1
+        return removal_code
     print('Para borrar los worktrees elegibles: python3 scripts/orca/clean_worktrees.py --apply')
-    return 0
+    return 1 if failed else 0
 
 
 if __name__ == '__main__':
