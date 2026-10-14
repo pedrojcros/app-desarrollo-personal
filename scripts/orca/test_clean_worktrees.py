@@ -32,6 +32,7 @@ class CleanWorktreesTests(unittest.TestCase):
         self.truncated_command = None
         self.omitted_command = None
         self.merge_code = None
+        self.remove_failures = set()
         patcher = mock.patch.object(subprocess, 'run', side_effect=self.run_command)
         patcher.start()
         self.addCleanup(patcher.stop)
@@ -92,6 +93,8 @@ class CleanWorktreesTests(unittest.TestCase):
             elif arguments[:2] == ['worktree', 'rm']:
                 self.assertNotIn('--force', arguments)
                 self.removed.append(arguments[3])
+                if arguments[3] in self.remove_failures:
+                    return subprocess.CompletedProcess(command, 2, '', 'remove failed')
                 result = {'removed': True}
             else:
                 raise AssertionError(f'Unexpected Orca arguments: {arguments}')
@@ -283,12 +286,73 @@ class CleanWorktreesTests(unittest.TestCase):
         with mock.patch.object(Path, 'resolve', side_effect=OSError('cannot resolve')):
             self.assertTrue(clean_worktrees.path_is_within(self.worktree_path, self.root))
 
+    def test_worker_without_path_is_unverifiable_and_keeps_worktree_in_use(self):
+        worker = {}
+        self.assertIsNone(clean_worktrees.worker_path(worker))
+        self.workers = [worker]
+        activity = clean_worktrees.load_activity()
+        self.assertEqual(clean_worktrees.find_activity_reason(self.worktree_path, activity),
+                         'tiene un trabajador activo o no verificable')
+
+    def test_terminal_without_path_is_unverifiable_and_keeps_worktree_in_use(self):
+        terminal = {}
+        self.assertIsNone(clean_worktrees.terminal_path(terminal))
+        self.terminals = [terminal]
+        activity = clean_worktrees.load_activity()
+        self.assertEqual(clean_worktrees.find_activity_reason(self.worktree_path, activity),
+                         'tiene una terminal abierta')
+
+    def test_malformed_worker_or_terminal_list_marks_activity_unknown(self):
+        self.workers = [None]
+        self.assertTrue(clean_worktrees.load_activity().unknown)
+        self.workers = []
+        self.terminals = [None]
+        self.assertTrue(clean_worktrees.load_activity().unknown)
+
+    def test_malformed_worktree_is_an_error_and_later_worktrees_are_classified(self):
+        later_path = self.root / 'later'
+        later_path.mkdir()
+        self.worktrees = [None, {'displayName': 'missing path'}, self.worktree(later_path)]
+        code, output = self.run_main()
+        self.assertEqual(code, 1)
+        self.assertEqual(output.count('error al clasificar'), 2)
+        self.assertIn(str(later_path), output)
+
+    def test_loose_directories_skip_worktrees_without_paths(self):
+        self.assertEqual(clean_worktrees.find_loose_directories([{}], self.root), [])
+
+    def test_loose_directories_skip_siblings_of_main_worktree(self):
+        projects_path = self.root / 'projects'
+        main_path = projects_path / 'app'
+        sibling_path = projects_path / 'otro'
+        workspace_path = self.root / 'workspaces' / 'app'
+        loose_path = workspace_path.parent / 'loose'
+        for directory_path in [main_path, sibling_path, workspace_path, loose_path]:
+            directory_path.mkdir(parents=True)
+        self.main_path = main_path
+        main_worktree = self.worktree(main_path)
+        workspace_worktree = self.worktree(workspace_path)
+        result = clean_worktrees.find_loose_directories(
+            [main_worktree, workspace_worktree], self.root,
+        )
+        self.assertEqual(result, [loose_path])
+
+    def test_failed_removal_continues_and_returns_nonzero(self):
+        later_path = self.root / 'later'
+        later_path.mkdir()
+        self.worktrees.append(self.worktree(later_path))
+        self.remove_failures.add(f'path:{self.worktree_path}')
+        code, output = self.run_main(['--apply'])
+        self.assertEqual(code, 1)
+        self.assertIn('fallo al comprobar o borrar', output)
+        self.assertEqual(self.removed, [f'path:{self.worktree_path}', f'path:{later_path}'])
+
     def test_loose_directories_ignore_hidden_folders(self):
         (self.root / '.orca-worktree-trash').mkdir()
         loose_path = self.root / 'loose'
         loose_path.mkdir()
         result = clean_worktrees.find_loose_directories(
-            [self.worktree(), self.worktree(self.main_path)],
+            [self.worktree(), self.worktree(self.main_path)], self.root,
         )
         self.assertEqual(result, [loose_path])
 
