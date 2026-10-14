@@ -148,6 +148,17 @@ describe('CategorySelect', () => {
 
     const group = screen.getByLabelText('Elegir categoría y sección');
     expect(group.props.className).toContain('bottom-full');
+    expect(group.props.className).toContain('absolute');
+  });
+
+  it('opens downwards in the form flow', () => {
+    renderSelect(inbox, 'down');
+
+    fireEvent.press(screen.getByRole('button', { name: /Categoría/ }));
+
+    const group = screen.getByLabelText('Elegir categoría y sección');
+    expect(group.props.className).not.toContain('absolute');
+    expect(group.props.className).not.toContain('top-full');
   });
 
   it('says so when the categories could not be loaded', () => {
@@ -170,6 +181,25 @@ it('reports opening and closing to its parent', () => {
       <CategorySelect
         value={inbox}
         onChange={() => {}}
+        onOpenChange={onOpenChange}
+      />
+    </ThemeScope>,
+  );
+  fireEvent.press(screen.getByRole('button', { name: /Categoría/ }));
+  expect(onOpenChange).toHaveBeenLastCalledWith(true);
+  fireEvent.press(screen.getByRole('radio', { name: 'Bandeja de entrada' }));
+  expect(onOpenChange).toHaveBeenLastCalledWith(false);
+});
+
+it('reports opening and closing to its parent when the list floats upwards', () => {
+  mockCategories([]);
+  const onOpenChange = jest.fn();
+  render(
+    <ThemeScope themeName="white">
+      <CategorySelect
+        value={inbox}
+        onChange={() => {}}
+        openDirection="up"
         onOpenChange={onOpenChange}
       />
     </ThemeScope>,

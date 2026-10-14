@@ -204,7 +204,9 @@ export function CategorySelect({
     borderColor: colors.border,
   };
   const panelPlacementClassName =
-    openDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2';
+    openDirection === 'up'
+      ? 'absolute bottom-full left-0 mb-2 w-72'
+      : 'mt-2 w-72';
   const pillLabel = chosenPlace.sectionName
     ? `${chosenPlace.label} › ${chosenPlace.sectionName}`
     : chosenPlace.label;
@@ -231,7 +233,7 @@ export function CategorySelect({
         <View
           role="radiogroup"
           accessibilityLabel="Elegir categoría y sección"
-          className={`absolute left-0 z-20 w-72 bg-surface ${panelPlacementClassName}`}
+          className={`z-20 bg-surface ${panelPlacementClassName}`}
           style={panelStyle}
         >
           <OptionList
