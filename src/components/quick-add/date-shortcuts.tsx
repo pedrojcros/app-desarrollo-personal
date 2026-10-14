@@ -30,14 +30,20 @@ export function DateShortcuts({
   isHabit,
   disabled,
   onChange,
+  onOpenChange,
 }: {
   value: CalendarDate | null;
   today: CalendarDate;
   isHabit: boolean;
   disabled: boolean;
+  onOpenChange(isOpen: boolean): void;
   onChange(date: CalendarDate | null): void;
 }) {
   const [calendarOpen, setCalendarOpen] = useState(false);
+  function changeCalendarOpen(nextIsOpen: boolean): void {
+    onOpenChange(nextIsOpen);
+    setCalendarOpen(nextIsOpen);
+  }
   const { colors, shape } = useTheme();
   const availableShortcuts = shortcuts.filter(
     (shortcut) => !isHabit || shortcut.value !== 'none',
@@ -67,7 +73,7 @@ export function DateShortcuts({
           accessibilityLabel="Calendario"
           aria-expanded={calendarOpen}
           disabled={disabled}
-          onPress={() => setCalendarOpen(!calendarOpen)}
+          onPress={() => changeCalendarOpen(!calendarOpen)}
         >
           <Text>Calendario</Text>
         </Button>
@@ -90,7 +96,7 @@ export function DateShortcuts({
             minimumDate={isHabit ? today : undefined}
             onChange={(date) => {
               onChange(date);
-              setCalendarOpen(false);
+              changeCalendarOpen(false);
             }}
           />
         </View>

@@ -17,14 +17,17 @@ export function DateField({
   onChange,
   minimumDate,
   maximumDate,
+  onOpenChange,
 }: DateFieldProps) {
   function openPicker() {
+    onOpenChange?.(true);
     DateTimePickerAndroid.open({
       value: toDeviceDate(value),
       mode: 'date',
       minimumDate: minimumDate ? toDeviceDate(minimumDate) : undefined,
       maximumDate: maximumDate ? toDeviceDate(maximumDate) : undefined,
       onChange: (event, selectedDate) => {
+        onOpenChange?.(false);
         if (event.type !== 'set' || selectedDate === undefined) {
           return;
         }
@@ -48,14 +51,21 @@ export function DateField({
     </View>
   );
 }
-export function TimeField({ label, value, onChange }: TimeFieldProps) {
+export function TimeField({
+  label,
+  value,
+  onChange,
+  onOpenChange,
+}: TimeFieldProps) {
   function openPicker() {
     const initialTime = new Date(`2000-01-01T${value}:00`);
+    onOpenChange?.(true);
     DateTimePickerAndroid.open({
       value: initialTime,
       mode: 'time',
       is24Hour: true,
       onChange: (event, selectedTime) => {
+        onOpenChange?.(false);
         if (event.type !== 'set' || selectedTime === undefined) {
           return;
         }

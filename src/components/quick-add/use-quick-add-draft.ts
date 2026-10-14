@@ -9,16 +9,40 @@ import { getQuickAddStartDate } from '@/domain/quick-add';
 import type { QuickHabitOptions } from './habit-options';
 import type { QuickAddDefaults } from './quick-add-provider';
 
+// El borrador solo conserva lo escrito. El lugar y las fechas salen siempre
+// de la pantalla desde la que se abre el menú.
+export interface QuickAddDraft {
+  name: string;
+  kind: 'task' | 'habit';
+  options: QuickHabitOptions;
+}
+
+export interface QuickAddDraftStorage {
+  restored?: QuickAddDraft;
+  save(draft: QuickAddDraft): void;
+  clear(): void;
+}
+
+interface QuickAddDraftActions {
+  close(): void;
+  draftStorage: QuickAddDraftStorage;
+  // Avisa de que se está guardando o de que el campo aún no recuperó el foco.
+  onSubmittingChange(isSubmitting: boolean): void;
+}
+
 export function useQuickAddDraft(
   defaults: QuickAddDefaults,
-  close: () => void,
+  { close, draftStorage, onSubmittingChange }: QuickAddDraftActions,
 ) {
+  const savedDraft = draftStorage.restored;
   const today = useToday();
   const router = useRouter();
   const createTask = useCreateTask();
   const createHabit = useCreateHabit();
-  const [name, setName] = useState('');
-  const [kind, setKind] = useState<'task' | 'habit'>('task');
+  const [name, setName] = useState(savedDraft?.name ?? '');
+  const [kind, setKind] = useState<'task' | 'habit'>(
+    savedDraft?.kind ?? 'task',
+  );
   const [place, setPlace] = useState({
     categoryId: defaults.categoryId,
     sectionId: defaults.sectionId,
@@ -27,13 +51,15 @@ export function useQuickAddDraft(
   const [startDate, setStartDate] = useState(
     getQuickAddStartDate(defaults.dueDate, today),
   );
-  const [options, setOptions] = useState<QuickHabitOptions>({
-    frequency: 'daily',
-    weekdays: [],
-    intervalText: '1',
-    moment: 'none',
-    timeOfDay: '09:00',
-  });
+  const [options, setOptions] = useState<QuickHabitOptions>(
+    savedDraft?.options ?? {
+      frequency: 'daily',
+      weekdays: [],
+      intervalText: '1',
+      moment: 'none',
+      timeOfDay: '09:00',
+    },
+  );
   const [error, setError] = useState<string>();
   const [saving, setSaving] = useState(false);
   const submissionInProgress = useRef(false);
@@ -51,7 +77,17 @@ export function useQuickAddDraft(
     // Android debe recibir el foco después de volver a habilitar el campo.
     nameInput.current?.focus();
     focusAfterSave.current = false;
-  }, [disabled]);
+    onSubmittingChange(false);
+  }, [disabled, onSubmittingChange]);
+
+  const { save: saveDraft, clear: clearDraft } = draftStorage;
+  useEffect(() => {
+    if (name.trim() === '') {
+      clearDraft();
+      return;
+    }
+    saveDraft({ name, kind, options });
+  }, [saveDraft, clearDraft, name, kind, options]);
 
   function validate(): string | undefined {
     const trimmedName = name.trim();
@@ -108,6 +144,9 @@ export function useQuickAddDraft(
       return;
     }
     submissionInProgress.current = true;
+    // Desactivar el campo con foco oculta el teclado un instante en Android:
+    // hasta que el foco vuelve, ese aviso no debe cerrar el menú.
+    onSubmittingChange(true);
     setSaving(true);
     try {
       if (kind === 'task') {
@@ -122,7 +161,6 @@ export function useQuickAddDraft(
         await createHabit.mutateAsync(buildHabitInput());
       }
       setName('');
-      focusAfterSave.current = true;
     } catch (failure) {
       if (kind === 'habit') {
         setError(
@@ -134,6 +172,7 @@ export function useQuickAddDraft(
       }
     } finally {
       submissionInProgress.current = false;
+      focusAfterSave.current = true;
       setSaving(false);
     }
   }
@@ -154,6 +193,9 @@ export function useQuickAddDraft(
       }
       router.push({ pathname: '/tareas/nueva', params: routeParameters });
     }
+    // El formulario completo ya lleva el nombre: sin borrar el borrador,
+    // saldría duplicado al volver.
+    clearDraft();
     close();
   }
   return {

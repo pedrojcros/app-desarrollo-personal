@@ -30,14 +30,13 @@ Match the goal to a category, then the skill, then load that leaf's `SKILL.md`.
 - `expo-native-ui` — screens, styling, semantic colors, native controls, SF Symbols, media, layout
 - `expo-router` — navigation: file-based routes, tabs / stacks / modals / sheets, links, headers
 - `expo-animation` — motion and gestures: Reanimated worklets, Gesture Handler, screen transitions, sheet and press feedback, haptics, and fixing animation that stutters on device
-- `expo-ui` — native UI components via `@expo/ui`: BottomSheet, Picker, Slider, Switch, Menu, Button, FieldGroup (grouped form sections), List / ListItem, and more — real SwiftUI on iOS, Jetpack Compose on Android. The universal layer needs SDK 56+ and runs in Expo Go; the drop-in replacements (`@gorhom/bottom-sheet`, `datetimepicker`, …) and platform-specific layers also exist on SDK 55.
 - `expo-design-system` — one visual source of truth: design tokens (color, spacing, typography, radius, shadow, motion), reusable component conventions, and audits for drift (hardcoded colors, spacing, fonts)
 - `expo-tailwind-setup` — Tailwind / NativeWind styling
 - `expo-data-fetching` — network requests, React Query / SWR, caching, offline, route loaders
 - `expo-dom` — run web code or reuse a web library inside native
 - `expo-web-to-native` — migrate an existing web / React app to a native iOS / Android app
 
-> **Component selection rule:** whenever you need a UI component (list rows, bottom sheets, pickers, sliders, menus, buttons, segmented controls, toggles), **consult `expo-ui` first** to check whether `@expo/ui` has a native equivalent before reaching for a React Native built-in or a community library. Native `@expo/ui` components give the best platform fit, and on SDK 56+ the universal ones run in Expo Go with no custom build. Load `expo-ui` alongside `expo-native-ui` for any app that renders lists, detail sheets, or form controls. One exception: `@expo/ui` `List` renders native grouped rows (an iOS Settings screen), **not** a virtualized list — use `FlatList` / `FlashList` for large datasets.
+In this project, UI components come from React Native Reusables (`src/components/ui`); `@expo/ui` is not an approved dependency.
 
 **Ship & operate**
 - `eas-app-stores` — build and submit iOS/Android apps (Expo and other React Native projects, plus existing native apps), TestFlight, versions, and store metadata
@@ -62,7 +61,7 @@ Match the goal to a category, then the skill, then load that leaf's `SKILL.md`.
 
 Some everyday phrasings don't obviously map to a skill name — translate before routing:
 
-- "Make it look native" → grouped controls / settings forms = `expo-ui`; screens, styling = `expo-native-ui`; motion = `expo-animation`; navigation = `expo-router`.
+- "Make it look native" → screens, styling = `expo-native-ui`; motion = `expo-animation`; navigation = `expo-router`.
 - "Make the screens consistent" / "clean up the styling" / "set up a theme or design tokens" → `expo-design-system`.
 - "It looks AI-generated" / "too generic, not native" → `expo-design-system` (named native-slop tells + audit), with `expo-native-ui` for the platform idioms.
 - "Ship it" / "get an .ipa or .apk" / "release to the stores" / "put my Swift app on TestFlight" → `eas-app-stores` (build + submit, TestFlight, versions, store metadata).

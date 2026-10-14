@@ -89,7 +89,7 @@ CLAUDE.md      importa este fichero para Claude Code
 README.md      para humanos: qué es y cómo arrancar
 docs/          toda la documentación; índice en docs/README.md
 .agents/skills/ skills automáticas de los agentes (Claude las lee por el enlace .claude/skills)
-.agents/skills-a-demanda/ skills que solo se usan si el encargo las pide por su ruta
+.agents/skills-a-demanda/ skills que se piden en el encargo; cualquier trabajador puede leer otra si le hace falta
 src/domain/    lógica pura: fechas, ocurrencias y reglas de cada vista; sin React ni Supabase
 src/data/      la única capa que habla con Supabase: lecturas, escrituras y hooks de TanStack Query
 src/app/       rutas y pantallas (Expo Router)
@@ -162,7 +162,7 @@ Antes de dar un encargo por terminado, los tests de la parte que has tocado tien
 
 ## Skills del proyecto
 
-Las **automáticas** viven en `.agents/skills/` (Claude las lee por el enlace `.claude/skills`); las **a demanda**, en `.agents/skills-a-demanda/`, y solo se usan si el encargo las pide por su ruta. Qué hay y cuándo usar cada una: [automáticas](.agents/skills/README.md) y [a demanda](.agents/skills-a-demanda/README.md).
+Solo las cinco skills de `.agents/skills/` se activan automáticamente (Claude las lee por `.claude/skills`). El resto está a demanda: el encargo las pide y cualquier trabajador puede leer otra skill de esa carpeta si cree que le hace falta; debe decirlo en su informe. Las skills y plugins sincronizados desde claude.ai no son del proyecto y no se usan. Fichas: [automáticas](.agents/skills/README.md) y [a demanda](.agents/skills-a-demanda/README.md).
 
 - **Mandan este fichero y el encargo.** Si una skill dice otra cosa (ramas, idioma de los commits, dependencias), se sigue `AGENTS.md`.
 - **Cuando una skill dice «your human partner», «the user» o «ask the user», para un trabajador es el orquestador**: pregúntale con `orca orchestration ask`, como explica tu preámbulo de Orca.

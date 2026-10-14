@@ -33,8 +33,8 @@ function ThemedTabsLayout() {
 const routes = {
   '(tabs)/_layout': ThemedTabsLayout,
   '(tabs)/hoy': () => <Text>Today screen</Text>,
-  '(tabs)/bandeja': () => <Text>Inbox screen</Text>,
-  '(tabs)/categorias': () => <Text>Categories screen</Text>,
+  '(tabs)/proximo': () => <Text>Upcoming screen</Text>,
+  '(tabs)/listas': () => <Text>Lists screen</Text>,
   '(tabs)/pendientes': () => <Text>Pending screen</Text>,
   '(tabs)/historial': () => <Text>History screen</Text>,
   ajustes: () => <Text>Settings screen</Text>,
@@ -49,10 +49,25 @@ describe('Tabs layout', () => {
   });
 
   it('keeps the header title on the other tabs', async () => {
-    renderRouter(routes, { initialUrl: '/bandeja' });
-    await screen.findByText('Inbox screen');
+    renderRouter(routes, { initialUrl: '/listas' });
+    await screen.findByText('Lists screen');
 
-    expect(screen.getAllByRole('heading', { name: 'Bandeja' })).toHaveLength(1);
+    expect(screen.getAllByRole('heading', { name: 'Listas' })).toHaveLength(1);
+  });
+
+  it('has five tabs: Today, Upcoming, Lists, Pending and History', async () => {
+    renderRouter(routes, { initialUrl: '/hoy' });
+    await screen.findByText('Today screen');
+
+    const tabs = screen.getAllByLabelText(/, tab, \d of \d$/);
+    const tabLabels = tabs.map((tab) => tab.props.accessibilityLabel);
+    expect(tabLabels).toEqual([
+      'Hoy, tab, 1 of 5',
+      'Próximo, tab, 2 of 5',
+      'Listas, tab, 3 of 5',
+      'Pendientes, tab, 4 of 5',
+      'Historial, tab, 5 of 5',
+    ]);
   });
 
   // Guarda, no regresión: el segundo engranaje que se ve en Expo Go es la

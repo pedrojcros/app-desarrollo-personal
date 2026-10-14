@@ -31,6 +31,10 @@ appId: host.exp.exponent
 - assertVisible:
     id: com.google.android.inputmethod.latin:id/key_pos_space
 - takeScreenshot: quick-add-keyboard-after-send
+# Atrás oculta el teclado y eso cierra el menú sin perder lo escrito.
+- inputText: E2E borrador tras atras
 - pressKey: BACK
-- tapOn: Cerrar añadir rápido
-- assertVisible: E2E barra sobre teclado
+- assertNotVisible: Cerrar añadir rápido
+- assertNotVisible: E2E borrador tras atras
+- tapOn: Añadir tarea o hábito
+- assertVisible: E2E borrador tras atras

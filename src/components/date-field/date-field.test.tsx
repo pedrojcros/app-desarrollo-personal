@@ -60,3 +60,40 @@ it('sends an HH:MM time and ignores dismissal', () => {
   );
   expect(onChange).toHaveBeenCalledWith('09:45');
 });
+
+it.each(['date', 'time'] as const)(
+  'reports %s picker opening and cancellation',
+  (mode) => {
+    jest.mocked(DateTimePickerAndroid.open).mockClear();
+    const onOpenChange = jest.fn();
+    const onChange = jest.fn();
+    render(
+      <ThemeScope themeName="white">
+        {mode === 'date' ? (
+          <DateField
+            label="Selector"
+            value="2026-10-06"
+            onChange={onChange}
+            onOpenChange={onOpenChange}
+          />
+        ) : (
+          <TimeField
+            label="Selector"
+            value="08:30"
+            onChange={onChange}
+            onOpenChange={onOpenChange}
+          />
+        )}
+      </ThemeScope>,
+    );
+    fireEvent.press(screen.getByRole('button', { name: 'Selector' }));
+    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+    const options = jest.mocked(DateTimePickerAndroid.open).mock.calls[0][0];
+    options.onChange?.({
+      type: 'dismissed',
+      nativeEvent: { timestamp: 0, utcOffset: 0 },
+    });
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+    expect(onChange).not.toHaveBeenCalled();
+  },
+);

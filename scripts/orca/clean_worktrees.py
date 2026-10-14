@@ -99,6 +99,8 @@ def load_workers():
         page_workers = result.get('workers')
         if not isinstance(page_workers, list):
             raise CommandFailure('Orca did not return the worker list')
+        if any(not isinstance(worker, dict) for worker in page_workers):
+            raise CommandFailure('Orca returned an invalid worker')
         workers.extend(page_workers)
         page = result.get('page') or {}
         if not page.get('hasMore'):
@@ -114,6 +116,8 @@ def load_terminals():
     terminals = result.get('terminals')
     if not isinstance(terminals, list):
         raise CommandFailure('Orca did not return the terminal list')
+    if any(not isinstance(terminal, dict) for terminal in terminals):
+        raise CommandFailure('Orca returned an invalid terminal')
     return terminals
 
 
@@ -237,6 +241,8 @@ def find_main_worktree(repository_path):
 
 
 def classify_worktree(worktree, workers, terminals, repository_path, activity_unknown=False):
+    if not isinstance(worktree, dict) or not worktree.get('path'):
+        raise CommandFailure('Orca returned an invalid worktree')
     worktree_path = Path(worktree['path'])
     main_path = find_main_worktree(repository_path)
     if worktree.get('isMainWorktree') or path_is_within(main_path, worktree_path):
@@ -268,11 +274,18 @@ def classify_worktree(worktree, workers, terminals, repository_path, activity_un
     return Classification(worktree, 'se puede borrar', 'limpio y contenido en origin/develop')
 
 
-def find_loose_directories(worktrees):
+def find_loose_directories(worktrees, repository_path):
     registered_paths = set()
+    parent_paths = set()
+    main_path = find_main_worktree(repository_path)
     for worktree in worktrees:
-        registered_paths.add(Path(worktree['path']).resolve())
-    parent_paths = {path.parent for path in registered_paths}
+        if not isinstance(worktree, dict) or not worktree.get('path'):
+            continue
+        worktree_path = Path(worktree['path']).resolve()
+        registered_paths.add(worktree_path)
+        if path_is_within(main_path, worktree_path):
+            continue
+        parent_paths.add(worktree_path.parent)
     loose_paths = []
     for parent_path in parent_paths:
         if not parent_path.is_dir():
@@ -296,6 +309,8 @@ def collect_snapshot():
 
 
 def worktree_label(worktree):
+    if not isinstance(worktree, dict) or not worktree.get('path'):
+        return 'worktree desconocido'
     path = Path(worktree['path'])
     name = f'{path.name} ({path})'
     display_name = worktree.get('displayName')
@@ -374,7 +389,7 @@ def main(arguments=None):
         classifications.append(classification)
         print_classification(classification)
     try:
-        loose_directories = find_loose_directories(snapshot.worktrees)
+        loose_directories = find_loose_directories(snapshot.worktrees, snapshot.root)
         for loose_directory in loose_directories:
             print(f'{loose_directory}: carpeta suelta, no es un worktree')
     except OSError as error:

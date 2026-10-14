@@ -14,6 +14,7 @@ interface UpwardChoiceProps<Value extends string> {
   choices: Choice<Value>[];
   onChange(value: Value): void;
   disabled?: boolean;
+  onOpenChange?: (isOpen: boolean) => void;
 }
 export function UpwardChoice<Value extends string>({
   label,
@@ -21,8 +22,13 @@ export function UpwardChoice<Value extends string>({
   choices,
   onChange,
   disabled,
+  onOpenChange,
 }: UpwardChoiceProps<Value>) {
   const [isOpen, setIsOpen] = useState(false);
+  function changeOpenState(nextIsOpen: boolean): void {
+    onOpenChange?.(nextIsOpen);
+    setIsOpen(nextIsOpen);
+  }
   const { colors, shape } = useTheme();
   const selectedChoice = choices.find((choice) => choice.value === value);
   return (
@@ -50,7 +56,7 @@ export function UpwardChoice<Value extends string>({
                 aria-checked={choice.value === value}
                 onPress={() => {
                   onChange(choice.value);
-                  setIsOpen(false);
+                  changeOpenState(false);
                 }}
               >
                 <Text>{choice.label}</Text>
@@ -65,7 +71,7 @@ export function UpwardChoice<Value extends string>({
         accessibilityLabel={label}
         aria-expanded={isOpen}
         disabled={disabled}
-        onPress={() => setIsOpen(!isOpen)}
+        onPress={() => changeOpenState(!isOpen)}
       >
         <Text>{selectedChoice?.label}</Text>
       </Button>

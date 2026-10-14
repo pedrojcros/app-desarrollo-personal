@@ -65,7 +65,7 @@ src/domain/      Lógica pura: fechas de calendario, motor de ocurrencias y regl
                  cada vista. Sin React, sin Supabase, sin entrada ni salida.
 src/data/        La ÚNICA capa que habla con Supabase: cliente, lecturas y escrituras por
                  entidad, y los hooks de TanStack Query que usan las pantallas.
-src/app/         Rutas y pantallas (Expo Router): hoy, bandeja, categorías, pendientes,
+src/app/         Rutas y pantallas (Expo Router): hoy, próximo, listas, bandeja, pendientes,
                  historial, login. Usan src/data y src/components, nunca Supabase.
 src/components/  Componentes compartidos. En src/components/ui, los de React Native
                  Reusables; fuera, los propios (aviso con «Deshacer», selector de categoría…).

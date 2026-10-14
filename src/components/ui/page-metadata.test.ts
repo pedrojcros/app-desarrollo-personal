@@ -5,7 +5,7 @@ import { getPageTitle } from './page-metadata';
 it.each([
   ['/hoy', 'Hoy'],
   ['/bandeja', 'Bandeja'],
-  ['/categorias', 'Categorías'],
+  ['/listas', 'Listas'],
   ['/pendientes', 'Pendientes'],
   ['/historial', 'Historial'],
   ['/ajustes', 'Ajustes'],
