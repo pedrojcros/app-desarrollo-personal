@@ -1,3 +1,5 @@
+// `output` lo aporta Maestro al ejecutar el script.
+/* global output */
 const today = new Date();
 const isoWeekday = today.getDay() || 7;
 const daysUntilNextMonday = 8 - isoWeekday;

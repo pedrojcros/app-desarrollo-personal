@@ -2,8 +2,8 @@ appId: host.exp.exponent
 ---
 - tapOn: Añadir tarea o hábito
 - tapOn: Hábito
-- inputText: E2E hábito semanal
-# La entrada Unicode de Maestro ya ha ocultado el teclado; Back cerraría la barra.
+- inputText: E2E habito semanal
+# Texto ASCII a propósito: un inputText con acentos hace que Maestro cambie el método de entrada y oculte el teclado.
 - tapOn: Frecuencia
 - tapOn: Días de la semana
 - assertVisible: Días de la semana
@@ -17,4 +17,4 @@ appId: host.exp.exponent
 - tapOn: Enviar
 - hideKeyboard
 - pressKey: BACK
-- assertVisible: E2E hábito semanal
+- assertVisible: E2E habito semanal
