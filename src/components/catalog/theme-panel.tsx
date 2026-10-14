@@ -1,7 +1,14 @@
-import { History, Inbox, LayoutGrid, Sun, Clock } from 'lucide-react-native';
+import {
+  History,
+  CalendarDays,
+  LayoutGrid,
+  Sun,
+  Clock,
+} from 'lucide-react-native';
 import { useState, type ReactNode } from 'react';
 import { View } from 'react-native';
 
+import { UpcomingWeekSection } from '@/components/upcoming/upcoming-list';
 import { Button } from '@/components/ui/button';
 import { DayProgress, type DayOutcome } from '@/components/ui/day-progress';
 import { FloatingButton } from '@/components/ui/floating-button';
@@ -234,10 +241,10 @@ function TabBarSample() {
       <TabBarItem label="Hoy">
         <TabIcon icon={Sun} focused />
       </TabBarItem>
-      <TabBarItem label="Bandeja">
-        <TabIcon icon={Inbox} focused={false} />
+      <TabBarItem label="Próximo">
+        <TabIcon icon={CalendarDays} focused={false} />
       </TabBarItem>
-      <TabBarItem label="Categorías">
+      <TabBarItem label="Listas">
         <TabIcon icon={LayoutGrid} focused={false} />
       </TabBarItem>
       <TabBarItem label="Pendientes">
@@ -328,6 +335,42 @@ export function ThemePanel() {
       </CatalogSection>
       <CatalogSection title="Filas de lista">
         <ListRowStates />
+      </CatalogSection>
+      <CatalogSection title="Próximo">
+        <UpcomingWeekSection
+          week={{
+            weekStart: '2026-10-19',
+            isCurrentWeek: false,
+            days: [
+              {
+                date: '2026-10-21',
+                items: [
+                  {
+                    target: {
+                      kind: 'occurrence',
+                      habitId: 'swim',
+                      date: '2026-10-21',
+                    },
+                    name: 'Nadar',
+                    date: '2026-10-21',
+                    sortTime: '17:00',
+                    categoryId: null,
+                    sectionId: null,
+                    status: 'pending',
+                    markedAt: null,
+                  },
+                ],
+              },
+            ],
+          }}
+          categories={[]}
+          onOpen={doNothing}
+        />
+        <UpcomingWeekSection
+          week={{ weekStart: '2026-10-26', isCurrentWeek: false, days: [] }}
+          categories={[]}
+          onOpen={doNothing}
+        />
       </CatalogSection>
       <CatalogSection title="Progreso">
         <ProgressStates />

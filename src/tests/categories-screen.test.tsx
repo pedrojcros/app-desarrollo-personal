@@ -5,6 +5,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react-native';
+import { router } from 'expo-router';
 
 import {
   countCategoryContents,
@@ -14,11 +15,15 @@ import {
   useRenameCategory,
   type Category,
 } from '@/data/categories';
+import { useCategoryView } from '@/data/category-view';
 import { useCreateSection, useDeleteSection } from '@/data/sections';
 import { ThemeScope } from '@/theme/theme-scope';
 
-import CategoriesScreen from '../app/(tabs)/categorias';
+import ListsScreen from '../app/(tabs)/listas';
 
+jest.mock('expo-router', () => ({ router: { push: jest.fn() } }));
+jest.mock('@/data/use-today', () => ({ useToday: () => '2026-10-09' }));
+jest.mock('@/data/category-view', () => ({ useCategoryView: jest.fn() }));
 jest.mock('@/data/categories', () => ({
   countCategoryContents: jest.fn(),
   useCategories: jest.fn(),
@@ -65,9 +70,16 @@ function mockMutation(
 function renderScreen() {
   render(
     <ThemeScope themeName="white" preference="white">
-      <CategoriesScreen />
+      <ListsScreen />
     </ThemeScope>,
   );
+}
+
+function mockInboxView(pendingCount: number) {
+  const items = Array.from({ length: pendingCount }, () => ({}));
+  jest
+    .mocked(useCategoryView)
+    .mockReturnValue({ data: { items }, isPending: false } as never);
 }
 
 function mockLoaded(categories: Category[]) {
@@ -79,7 +91,7 @@ function mockLoaded(categories: Category[]) {
   });
 }
 
-describe('Categories screen', () => {
+describe('Lists screen', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     mockMutation(useCreateCategory, createCategoryMutate);
@@ -87,6 +99,7 @@ describe('Categories screen', () => {
     mockMutation(useRenameCategory, renameCategoryMutate);
     mockMutation(useCreateSection, createSectionMutate);
     mockMutation(useDeleteSection, deleteSectionMutate);
+    mockInboxView(3);
   });
 
   it('says there are no categories yet', () => {
@@ -142,14 +155,64 @@ describe('Categories screen', () => {
   });
 
   // CU-07, escenario 5: la Bandeja no es una categoría y no tiene cómo eliminarse.
-  it('does not offer the Inbox as a category to delete', () => {
+  it('shows the Inbox first, without a way to delete it', () => {
     mockLoaded([shoppingList]);
     renderScreen();
 
-    expect(screen.queryByText('Bandeja de entrada')).toBeNull();
-    expect(screen.queryByText('Bandeja')).toBeNull();
-    const deleteButtons = screen.getAllByLabelText(/^Eliminar la categoría /);
+    expect(screen.getByText('Bandeja de entrada')).toBeTruthy();
+    const deleteButtons = screen.getAllByLabelText(/^Eliminar /);
     expect(deleteButtons).toHaveLength(1);
+    expect(deleteButtons[0].props.accessibilityLabel).toBe(
+      'Eliminar la categoría Lista de la compra',
+    );
+  });
+
+  it('shows how many pending items the Inbox holds', () => {
+    mockInboxView(3);
+    mockLoaded([]);
+    renderScreen();
+
+    expect(screen.getByText('3 pendientes')).toBeTruthy();
+  });
+
+  it('says singular when the Inbox holds one pending item', () => {
+    mockInboxView(1);
+    mockLoaded([]);
+    renderScreen();
+
+    expect(screen.getByText('1 pendiente')).toBeTruthy();
+  });
+
+  it('says nothing is pending when the Inbox is empty', () => {
+    mockInboxView(0);
+    mockLoaded([]);
+    renderScreen();
+
+    expect(screen.getByText('Nada pendiente')).toBeTruthy();
+  });
+
+  it('opens the Inbox view when its row is pressed', () => {
+    mockLoaded([]);
+    renderScreen();
+
+    fireEvent.press(
+      screen.getByRole('button', {
+        name: 'Abrir Bandeja de entrada, 3 pendientes',
+      }),
+    );
+
+    expect(router.push).toHaveBeenCalledWith('/bandeja');
+  });
+
+  it('keeps the Inbox row when the categories fail to load', () => {
+    mockCategoriesQuery({
+      isPending: false,
+      isError: true,
+      refetch: jest.fn(),
+    });
+    renderScreen();
+
+    expect(screen.getByText('Bandeja de entrada')).toBeTruthy();
   });
 
   it('creates a category with the chosen name, icon and color', () => {

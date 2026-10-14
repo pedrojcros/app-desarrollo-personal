@@ -1,5 +1,5 @@
 import { Send } from 'lucide-react-native';
-import { TextInput, View } from 'react-native';
+import { Platform, TextInput, View } from 'react-native';
 import { CategorySelect } from '@/components/category-select';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
@@ -8,14 +8,26 @@ import { useTheme } from '@/theme/theme-context';
 import { DateShortcuts } from './date-shortcuts';
 import { HabitOptions } from './habit-options';
 import type { QuickAddDefaults } from './quick-add-provider';
-import { useQuickAddDraft } from './use-quick-add-draft';
+import type { QuickAddSelector } from './quick-add-selector';
+import {
+  useQuickAddDraft,
+  type QuickAddDraftStorage,
+} from './use-quick-add-draft';
 
 export function QuickAddBar({
   defaults,
+  isModalShown,
   close,
+  draftStorage,
+  onSelectorOpenChange,
+  onSubmittingChange,
 }: {
   defaults: QuickAddDefaults;
+  isModalShown: boolean;
   close(): void;
+  draftStorage: QuickAddDraftStorage;
+  onSelectorOpenChange(selector: QuickAddSelector, isOpen: boolean): void;
+  onSubmittingChange(isSubmitting: boolean): void;
 }) {
   const { colors, fonts } = useTheme();
   const {
@@ -33,23 +45,30 @@ export function QuickAddBar({
       openMore,
     },
     status: { error, disabled },
-  } = useQuickAddDraft(defaults, close);
+  } = useQuickAddDraft(defaults, {
+    close,
+    draftStorage,
+    isModalShown,
+    onSubmittingChange,
+  });
   // El preflight de Tailwind pinta de gris el campo vacío en la web y no llega
   // al contraste mínimo; el color en línea lo corrige.
   const nameColor =
     name === '' ? colors['muted-foreground'] : colors.foreground;
   return (
-    <View className="gap-3 bg-surface p-4">
+    <View className="gap-2 bg-surface px-4 py-2">
       <View className="flex-row items-center gap-3">
         <TextInput
           ref={setNameInputRef}
-          autoFocus
+          autoFocus={Platform.OS !== 'android'}
+          autoComplete="off"
+          importantForAutofill="no"
           accessibilityLabel="Nombre"
           placeholder="¿Qué quieres añadir?"
           placeholderTextColor={colors['muted-foreground']}
           selectionColor={colors['accent-text']}
-          className="min-h-12 min-w-0 flex-1 text-title text-foreground"
-          style={{ fontFamily: fonts.heading, color: nameColor }}
+          className="min-h-11 min-w-0 flex-1 text-body text-foreground"
+          style={{ fontFamily: fonts.regular, color: nameColor }}
           value={name}
           editable={!disabled}
           onChangeText={setName}
@@ -83,6 +102,9 @@ export function QuickAddBar({
           aria-checked={kind === 'task'}
           disabled={disabled}
           onPress={() => {
+            onSelectorOpenChange('frequency', false);
+            onSelectorOpenChange('moment', false);
+            onSelectorOpenChange('time', false);
             setKind('task');
             setError(undefined);
           }}
@@ -114,6 +136,7 @@ export function QuickAddBar({
       {kind === 'habit' ? (
         <HabitOptions
           value={options}
+          onSelectorOpenChange={onSelectorOpenChange}
           onChange={setOptions}
           disabled={disabled}
         />
@@ -121,6 +144,7 @@ export function QuickAddBar({
       <DateShortcuts
         value={kind === 'habit' ? startDate : dueDate}
         today={today}
+        onOpenChange={(isOpen) => onSelectorOpenChange('date', isOpen)}
         isHabit={kind === 'habit'}
         disabled={disabled}
         onChange={(date) => {
@@ -131,7 +155,12 @@ export function QuickAddBar({
           }
         }}
       />
-      <CategorySelect value={place} onChange={setPlace} openDirection="up" />
+      <CategorySelect
+        value={place}
+        onChange={setPlace}
+        openDirection="up"
+        onOpenChange={(isOpen) => onSelectorOpenChange('category', isOpen)}
+      />
     </View>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import { DateField } from '@/components/date-field';
+import { formatFullDate } from '@/components/date-field/format';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import {
@@ -16,20 +17,33 @@ const shortcuts: { value: QuickAddDateShortcut; label: string }[] = [
   { value: 'tomorrow', label: 'Mañana' },
   { value: 'monday', label: 'Lunes' },
 ];
+function describeDate(date: CalendarDate | null): string {
+  if (date === null) {
+    return 'Sin fecha';
+  }
+  return formatFullDate(date);
+}
+
 export function DateShortcuts({
   value,
   today,
   isHabit,
   disabled,
   onChange,
+  onOpenChange,
 }: {
   value: CalendarDate | null;
   today: CalendarDate;
   isHabit: boolean;
   disabled: boolean;
+  onOpenChange(isOpen: boolean): void;
   onChange(date: CalendarDate | null): void;
 }) {
   const [calendarOpen, setCalendarOpen] = useState(false);
+  function changeCalendarOpen(nextIsOpen: boolean): void {
+    onOpenChange(nextIsOpen);
+    setCalendarOpen(nextIsOpen);
+  }
   const { colors, shape } = useTheme();
   const availableShortcuts = shortcuts.filter(
     (shortcut) => !isHabit || shortcut.value !== 'none',
@@ -59,13 +73,13 @@ export function DateShortcuts({
           accessibilityLabel="Calendario"
           aria-expanded={calendarOpen}
           disabled={disabled}
-          onPress={() => setCalendarOpen(!calendarOpen)}
+          onPress={() => changeCalendarOpen(!calendarOpen)}
         >
           <Text>Calendario</Text>
         </Button>
       </View>
       <Text variant="caption" className="text-muted-foreground">
-        {value ?? 'Sin fecha'}
+        {describeDate(value)}
       </Text>
       {calendarOpen ? (
         <View
@@ -82,7 +96,7 @@ export function DateShortcuts({
             minimumDate={isHabit ? today : undefined}
             onChange={(date) => {
               onChange(date);
-              setCalendarOpen(false);
+              changeCalendarOpen(false);
             }}
           />
         </View>

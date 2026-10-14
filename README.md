@@ -99,10 +99,14 @@ Construye las imágenes una vez (Linux x86_64 con `/dev/kvm` accesible):
 docker compose build android-emulator chrome-mcp
 ```
 
-Arranca el emulador y espera a que Android y Expo Go estén preparados:
+Prepara el emulador antes de los caminos críticos: esta orden recrea su
+contenedor, retira emuladores de proyectos anteriores, elimina los candados del
+AVD y espera a Android y Expo Go. El proyecto Compose tiene el nombre fijo
+`app-desarrollo-personal`, para compartir el emulador entre worktrees. Si lo
+comparte otro trabajador, pide turno al orquestador antes de ejecutarla:
 
 ```sh
-docker compose up -d --pull never --wait android-emulator
+./docker/android/reset
 ```
 
 Comprueba su visibilidad desde el ordenador; `adb` y el programa del emulador
@@ -124,8 +128,19 @@ densidad originales:
 
 ```sh
 ./docker/app/run npm run start -- --port 8090
-flock /tmp/adp-pesado.lock ./docker/app/run env EXPO_PORT=8090 npm run test:e2e
+scripts/with-heavy-lock ./docker/app/run env EXPO_PORT=8090 npm run test:e2e
 ```
+
+El reinicio tiene un máximo de 420 segundos de arranque, configurable con
+`ANDROID_RESET_TIMEOUT_SECONDS`, y comprueba `emulator-5554` y
+`sys.boot_completed=1` sin reiniciar el servidor ADB compartido del puerto 5037.
+El candado espera hasta `HEAVY_LOCK_WAIT_MINUTES` (30 por defecto) y limita la
+orden a `HEAVY_LOCK_MAX_MINUTES` (45 por defecto), con muerte forzada 5 segundos
+después. Al vencer, elimina y comprueba el contenedor de esa orden si usaba
+`./docker/app/run`, devuelve 124 y registra la incidencia si está disponible
+`scripts/incidents/record_incident.py`. Para pruebas rápidas se pueden usar
+`HEAVY_LOCK_WAIT_SECONDS` y `HEAVY_LOCK_MAX_SECONDS`, enteros positivos que
+prevalecen sobre los minutos. Los hijos no heredan el candado.
 
 Los flujos cubren iniciar sesión, crear una tarea rápida desde Hoy, marcarla y
 deshacer, crear un hábito semanal, crear una categoría con sección y tarea,
@@ -160,6 +175,16 @@ de errores; no se usa Maestro Cloud. El
 [MCP desactiva estadísticas y CrUX](https://github.com/ChromeDevTools/chrome-devtools-mcp#usage-statistics).
 Las imágenes propias tienen `pull_policy: never`: si faltan, constrúyelas.
 El emulador requiere KVM y se comprueba localmente, sin añadirlo a la CI.
+
+## Datos sintéticos
+
+Con Supabase local arrancado, `./scripts/seed/seed-synthetic-year.sh` conserva
+el perfil `year` de rendimiento. `SEED_PROFILE=realistic ./scripts/seed/seed-synthetic-year.sh` genera 4 categorías, 10 hábitos,
+30 tareas y 90 días de historial de un estudiante. Solo reemplaza los datos del
+usuario de siembra. Para entrar en local, proporciona `SEED_USER_PASSWORD`
+mediante el entorno; una contraseña local generada no se imprime.
+Los perfiles, las variables y la protección del destino se detallan en
+[scripts/seed/README.md](scripts/seed/README.md).
 
 ## Comprobaciones
 
@@ -226,11 +251,29 @@ El proyecto Vercel es `app-desarrollo-personal`, en el equipo
 despliegue de preparación automáticamente; apunta a **pruebas** y está protegido.
 El primer push humano a `main` lo sustituirá por la web de producción.
 
+### Usuario de demostración en pruebas
+
+Abre [la web de pruebas](https://app-desarrollo-personal-pruebas.vercel.app).
+Vercel puede pedir primero su sesión, porque esta web está protegida. Después,
+entra en la app con `demo@example.com`; su contraseña está en
+`~/.config/app-desarrollo-personal/secretos.env` como `PRUEBAS_DEMO_PASSWORD`.
+
+Para volver a sembrar, cuando `seed-pruebas.yml` esté en la rama por defecto
+`main`, abre Actions → **Sembrar demostración en pruebas** → **Run workflow**.
+Es un flujo únicamente manual, del entorno `pruebas`, que usa el perfil
+`realistic` y comparte el candado del despliegue y las copias de pruebas.
+Mientras no esté en `main`, el orquestador puede usar el envoltorio local con
+las variables exportadas desde `secretos.env`, siguiendo
+[estas instrucciones](scripts/seed/README.md#pruebas-remotas).
+**Solo se borran los datos de `demo@example.com`** para reemplazarlos;
+los demás usuarios se conservan y producción siempre se rechaza.
+
 ### Configuración por entorno
 
 Los entornos de GitHub `pruebas` y `produccion` contienen los secretos
 `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, `VERCEL_TOKEN`, `EXPO_TOKEN` y
-`BACKUP_PASSPHRASE`. `produccion` solo permite la rama `main`.
+`BACKUP_PASSPHRASE`. Además, `pruebas` tiene `PRUEBAS_DEMO_PASSWORD` para la
+siembra manual. `produccion` solo permite la rama `main`.
 Sus variables públicas son `SUPABASE_PROJECT_REF`, `EXPO_PUBLIC_SUPABASE_URL`,
 `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `VERCEL_ORG_ID` y `VERCEL_PROJECT_ID`.
 No se guardan sus valores en git. EAS tiene las dos variables `EXPO_PUBLIC_*`

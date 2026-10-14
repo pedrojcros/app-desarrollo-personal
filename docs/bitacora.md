@@ -4,6 +4,118 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-14 (noche) — Cierre de la 1.1.1: Android y Maestro en verde
+
+El cierre lo empezó Codex porque Claude llegó al 97 % de su cuota, y Codex también se quedó sin cuota a mitad. Lo terminó la sesión de Claude:
+
+- **Lo que hizo Codex:** fusionó el 077 (#98) y lanzó el 073. Tras tres fallos de Maestro, lanzó el **078** (`ADP-49`, PR #99).
+- **El 078 encontró un fallo real en Android:** tras guardar, un «teclado oculto» tardío cerraba el añadir rápido. Ahora la protección dura hasta que el teclado vuelve, y el foco se pide tras `onShow`. Revisado por Sonnet y fusionado. Caso límite aceptado: justo tras guardar, a veces hacen falta dos atrás.
+- **Trampas de Maestro 2.11** (en [trampas](agentes/trampas.md)):
+  - `inputText` con caracteres no ASCII cambia el teclado y lo oculta;
+  - `clearText` no existe: es `eraseText`;
+  - tras `docker/android/reset`, el emulador va saturado unos 8 minutos.
+- **Antes de seguir, la sesión de Claude:**
+  - guardó el trabajo sin commitear del 073 (`2923269`);
+  - paró los supervisores y las sesiones de Codex sin cuota, para que no reanudaran a la vez al renovarse;
+  - abrió un run nuevo, porque el anterior quedó atado a la terminal del Codex principal.
+- **El 073 lo terminó Claude Sonnet** con una 4.ª ejecución completa en verde: 10 flujos a tamaño normal y 10 a 360 dp (#100). RF-41 hecha.
+- El humano pidió **no apagar el ordenador**; anula la nota anterior del Codex.
+
+### 2026-10-14 — Ejecución de la 1.1.1, «Pulido y Próximo»
+
+Sesión de orquestador con `/ejecutar-plan` («ejecuta la 1.1.1, sin la 1.2»). Se crearon las tarjetas `ADP-36` a `ADP-48` en la épica `ADP-32` y se fusionaron diez PR: 064 (#85), 065 (#86), 070 (#87), 071 (#88), 068 (#89), 066 con su corrección 076 (#90), 075 (#91), 072 (#93), 074 (#94, de la sesión de arquitecto) y 069 (#95). Cada PR lo revisó un subagente de Sonnet, o el orquestador si era diminuto, y lo que usa pantalla se comprobó en la web a 360×800 (pedido del humano: siempre en formato móvil).
+
+- **Relevo del cierre a Codex por la cuota de Claude:** fusionados el 067 (#96) y el 077 (#98); el 073 quedó detenido tras dos intentos de Maestro (System UI del emulador y vuelta al lanzador tras Enter/Atrás en `quick-task.yaml`, sin crash de Expo identificado). Se pidió al humano permiso para diagnosticar el flujo y continuar; RF-41 no se da por verificada. La verificación local secuencial pasó con 777 unitarios, 222 de integración, 292 de dominio en Madrid y otros 292 en Los Ángeles, TypeScript, lint y exportación web.
+- **Continuación del cierre y apagado:** el humano pidió «cuando acabes todo apaga el ordenador». El terminal principal reanudó el diagnóstico y lanzó el [078](agentes/encargos/078-quick-add-android.md) (`ADP-49`, Sol) tras un tercer fallo del 073, con el menú desapareciendo antes de Enviar. El 073 paró su Expo y devolvió el emulador; conserva e2e para el cierre. El apagado lo hará el terminal principal cuando todo esté guardado y cerrado.
+- **Copilot rechazó dos veces el encargo al arrancar** («Managed account policy is still loading»); el 068 pasó a Codex Luna.
+- **Contrato de caché de Próximo:** lo que cuelga de `['views', ...]` guarda listas planas que se parchean al marcar, así que el 075 añadió `getUpcomingItems` y `groupUpcomingItems` y el 072 agrupa al leer con `select`.
+- **Autorizaciones del orquestador** (en el [buzón](buzon.md)): `onOpenChange` opcional en `category-select` y `date-field` (066); `readOnly` en `ListRow` (072); mocks oficiales de Reanimated en `jest.setup.js` (067).
+- **Correcciones de interfaz que pidieron las revisiones**, para la skill `pantallas-app` (DEC-56):
+  - el borrador del añadir rápido conserva solo lo escrito; lugar y fecha salen siempre de la pantalla;
+  - un teclado que se oculta mientras se guarda no cierra el menú;
+  - en la web, la altura de referencia del teclado se toma al abrir y solo con un campo con foco;
+  - un hijo `flex-1` dentro de un `ScrollView` puede quedar con altura 0: comprobarlo a 360 px, no fiarse de los tests;
+  - las etiquetas accesibles de las filas deben incluir lo que el usuario ve (hora, categoría, contador);
+  - los `select` de TanStack Query, con referencia estable;
+  - las listas desplegables de formularios, en el flujo y no flotando.
+- **Test inestable:** `category-view-screen.test.tsx` falló dos veces bajo carga; la CI del #93 pasó al relanzarla.
+
+### 2026-10-14 — Skills y MCP: cinco automáticas, Expo sin `@expo/ui` y no al MCP de memoria (DEC-52 a DEC-56)
+
+Sesión de arquitecto. El humano preguntó si conviene el MCP de memoria de datamcp y pidió revisar si hay skills que se solapan o se estorban. Detalle en la [propuesta](propuestas/skills-y-mcp.md).
+
+- **El MCP, no** (recomendación): es un servicio de terceros, choca con las prohibiciones 9 y 10 y repite lo que ya hacen `contexto.md`, la bitácora y las decisiones.
+- **Las skills:** el hallazgo importante es que `expo-overview`, `expo-native-ui` y `expo-design-system` mandan usar `@expo/ui`, una dependencia descartada. Eso afecta al encargo 069, el selector de categoría, así que la limpieza (encargo 074) va antes. Además, cada sesión de Claude, también las de los trabajadores, carga unas 70 skills sincronizadas de la cuenta de claude.ai que nadie había revisado. Algunas pisan las nuestras o llevan el trabajo fuera del repositorio (`TASKS.md`, Claude Docs, Notion).
+- **Tokens:** medido lo que gasta cada grupo de skills. Lo que más cuesta es el cuerpo de las que se activan solas. De ahí salen DEC-54 (solo cinco automáticas y perfiles por encargo) y DEC-55 (una skill propia y corta de diseño, en vez de fundir las de terceros).
+
+El humano aceptó todo con «ok»: las de Expo, a demanda; las de Emil Kowalski y Jakub Krehel, definitivas para diseño, sin skill propia encima; `find-skills`, global, porque la usa en otros proyectos; y, a petición suya, cualquier trabajador puede leer por su cuenta una skill a demanda y lo dice en su informe. Lo aplica el [encargo 074](agentes/encargos/074-skills-por-perfil.md).
+
+Después, el humano trajo cuatro candidatas de su búsqueda (DEC-56): Appllama queda fuera porque su plugin da de alta un MCP alojado; Vercel ya estaba; Callstack sigue fuera; y Metro MCP se aplaza a la retrospectiva. De «Expo Skills y crea la tuya propia», la comunidad tiene razón en lo segundo para las pantallas, así que se reabre DEC-55: habrá una skill propia y corta, `pantallas-app`, escrita al cerrar la 1.1.1 con lo que corrigieron sus revisiones.
+
+### 2026-10-14 — Cerrado el pulido visual: Hoy limpio, Próximo y Listas (DEC-51)
+
+Sesión de arquitecto. El humano había contado al orquestador nueve cosas que no le gustan (filas 2 a 10 de la [propuesta](propuestas/pulido-visual.md#2-lo-que-ve-el-humano)). El arquitecto las comprobó en el código. Dos eran fallos:
+
+- **Historial** no tiene desplazamiento, y la rejilla queda debajo de las fechas y los filtros, sin forma de llegar a ella. Por eso el humano creía que la pantalla estaba a medio hacer.
+- **El desplegable de categoría** flota con un `z-index` que en la web solo vale dentro de su contenedor, y los campos de después lo tapan.
+
+La idea que ordena la ronda: lo que más ocupaba en Hoy era el selector «Ir a otro día». La vista **Próximo** que pedía el humano lo hace mejor, así que Hoy puede quedarse solo con lo de hoy. Para que Próximo quepa sin pasar de cinco pestañas, Bandeja y Categorías se juntan en **Listas**. El humano aceptó los nueve valores por defecto («sí, continúa») y precisó el objetivo de Hoy: ver lo pendiente de hoy y marcarlo cómodamente, sin distracciones.
+
+Queda en RF-41, RN-46 y el escenario 11 de CU-03; RF-10 pasa a estar sustituida. Encargos 065 a 073, sin migraciones ni dependencias, antes de la 1.2.
+
+### 2026-10-13 — Limpieza de worktrees (DEC-50)
+
+El humano notó el ordenador cargado y preguntó por las carpetas de `~/orca/workspaces/`: eran worktrees de trabajadores y revisores ya fusionados, del 7 al 9 de octubre, que nadie recogía. Lo que más memoria gastaba era otra cosa: Brave y el Supabase local (unos 2 GB), que se paró. Aceptó las tres piezas de DEC-50: un script de limpieza, un paso al cerrar cada sesión y ofrecer parar Supabase.
+
+El script (`ADP-35`) lo escribió Codex Luna (PR #80) y la revisión de Sonnet lo paró: la carpeta principal solo la protegía un dato de Orca, antes de borrar solo volvía a mirar `git status`, la salida nombraba `revision-orquestador` como «app-desarrollo-personal» y los tests seguían en verde aunque se rompiera la protección (por ejemplo, borrar todo). La corrección (encargo 063, Codex Sol, PR #81, que sustituye al #80) obtiene la principal con git, revalida todo antes de cada borrado, enseña rutas y sus tests detectan 29 de 34 mutaciones; las 5 que quedan son de cobertura. Tres detalles menores quedan para el encargo 064.
+
+Estreno: borró 6 worktrees (unos 3 GB) y dejó para el humano los dos con ficheros sueltos y la carpeta suelta de `root`. Lección: un script que borra pide revisión con mutaciones; con ellas apareció lo que los tests no veían.
+
+### 2026-10-10 — Madrugada: datos de demostración en la web de pruebas
+
+Sesión corta de orquestador (unas dos horas) para el encargo 060 del pulido visual (DEC-49). Se creó la épica `ADP-32` («Versión 1.1.1 — Pulido visual») y se fusionaron:
+
+- el **060** (`ADP-33`, PR #77, Codex Sol): perfil `realistic`, protección que solo amplía el permiso al Supabase de pruebas y sigue rechazando producción, usuario `demo@example.com` y flujo manual `seed-pruebas.yml`;
+- el **061** (`ADP-34`, PR #78, Codex Sol): corrige cuatro hallazgos menores de la revisión del 060.
+
+El 060 lo revisó un subagente de **Opus** por tocar una protección de seguridad y la CI: no encontró forma de llegar a producción, pero sí que todas las tareas caían en Universidad y que «hoy» salía en UTC (de madrugada, las tareas de hoy se veían vencidas). El 061 lo revisó Sonnet.
+
+**Trampa nueva:** GitHub solo ofrece «Run workflow» para los flujos que están en la rama por defecto, y aquí es `main`. Por eso la primera siembra la hizo el orquestador desde su ordenador con el envoltorio local, y se repitió tras el 061 sin fijar la fecha para comprobar el arreglo en real (en UTC aún era el día 9 y sembró el 10). El inicio de sesión de demo se comprobó contra pruebas. El humano también aprobó fusionar el PR #76 (planificación de la 1.2).
+
+### 2026-10-09 — Noche: planificada la versión 1.2, «Progreso»
+
+Sesión de arquitecto para decidir qué viene tras la 1.1. Lo que quedaba del plan era RF-04 y Google Calendar, pero las estadísticas, uno de los tres problemas de la visión, no tenían plan. El arquitecto recomendó hacerlas antes que Google Calendar: no necesitan servidor, ni permisos de Google, ni migraciones, ni dependencias. El humano aceptó con «ok» los siete valores por defecto (DEC-46).
+
+El diseño reutiliza la rejilla del historial, que ya resuelve las ocurrencias, las marcas fuera de regla y los archivados: Progreso solo cuenta casillas, así que cuadra siempre con Registro y se actualiza solo al marcar. Funcionalidades RF-31 a RF-40, RNF-10 y CU-09; diseño y encargos 055 a 059 en la [propuesta](propuestas/progreso.md). El mapa del hábito es de 6 semanas en columnas de lunes a domingo, porque las casillas de 44 puntos no caben de otra forma en 360 dp. El humano preguntó cómo organizar Jira y aceptó la recomendación: toda la versión en «Por hacer» desde el principio, con una épica por versión y una tarjeta por encargo (DEC-47).
+
+### 2026-10-09 — Noche: DEC-45 aplicada y `ADP-27` cerrado
+
+Primera sesión de orquestador con el flujo nuevo, en unas tres horas y media. Se fusionaron:
+
+- el registro de incidencias (PR #70, Codex Luna);
+- el reinicio del emulador y el candado con tiempo máximo (PR #71, Codex Sol);
+- la medida por encargo (PR #72, Codex Luna con una corrección de Codex Sol);
+- los detalles visuales (PR #73, Claude Sonnet, y PR #74, Codex Luna).
+
+Cada PR lo revisó un **revisor aparte** (un subagente de Sonnet) y el orquestador solo leyó el veredicto.
+
+Las revisiones encontraron cuatro cosas que importan:
+
+- la medida contaba dos veces los pasos de Claude;
+- los tests del supervisor escribían datos falsos en el registro real (se vació);
+- el emulador quedaba en un proyecto de Compose distinto según la carpeta (ahora el nombre es fijo);
+- quitar el título repetido dejaba Hoy sin encabezado accesible.
+
+Copilot rechazó dos veces el encargo al arrancar («Managed account policy is still loading») y se pasó a Codex ([trampas](agentes/trampas.md)). La medida da el primer dato del flujo nuevo: esta sesión relee unos 170.000 tokens por paso, frente a los 500.000 de la anterior. Los encargos son del 049 al 054.
+
+### 2026-10-09 — Noche: mejora del flujo de trabajo (DEC-45)
+
+Antes de planificar la siguiente versión, el humano pidió a Claude, sin papel de orquestador, revisar el flujo con los problemas vividos y un bucle de retroalimentación, y valorar si dividir tareas compensa. Sumando los tokens que Codex y Claude guardan en el equipo salió lo que no se veía: **el orquestador gastó más que todos los trabajadores de Claude juntos** (cada paso relee 400.000 a 550.000 tokens porque sus sesiones duran días, y la sesión nueva por ola de DEC-39 no se cumplió), Maestro se llevó una cuarta parte de Codex y dos tareas se relanzaron cinco veces. El humano aprobó las 8 decisiones de la [propuesta](propuestas/mejora-del-flujo.md) (DEC-45). Los detalles visuales del buzón tienen ya tarjeta, `ADP-27`.
+
+### 2026-10-09 — La versión 1, publicada
+
+El humano pasó `develop` a `main` con el PR #67 (fusión con commit de fusión, sin borrar `develop`). El despliegue a producción hizo la copia cifrada de la base, aplicó las migraciones y publicó la web en Vercel; la CI de `main` quedó en verde. El orquestador creó la etiqueta y la release [`v1.0.0`](https://github.com/pedrojcros/app-desarrollo-personal/releases/tag/v1.0.0). Al principio el humano no podía entrar; el orquestador comprobó que la web apuntaba a producción y que su usuario existía y estaba confirmado, y el humano lo resolvió por su cuenta. Falta el APK, que se compila cuando el humano quiera instalarla.
+
 ### 2026-10-09 — Tarde: recordatorios completos, dos fallos de Android y repositorio público
 
 Con la versión 1 cerrada, se fusionaron R5 (pantalla de prueba de avisos, ajustada a que en Expo Go no hay recordatorios), una limpieza del añadir rápido y dos arreglos que encontró Maestro en Android: las opciones del selector de frecuencia no eran accesibles (el menú se pintaba fuera de su contenedor, PR #61) y **el teclado tapaba la barra del añadir rápido** (encargo 046). A media tarde se acabaron los minutos gratis de Actions; el humano decidió hacer público el repositorio y recortar la CI para poder volver a privado más adelante (DEC-44, PR #63).

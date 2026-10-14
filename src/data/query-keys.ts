@@ -10,6 +10,7 @@ export const queryKeys = {
   categories: () => ['categories'] as const,
   views: () => ['views'] as const,
   today: (date: CalendarDate) => ['views', 'today', date] as const,
+  upcoming: (today: CalendarDate) => ['views', 'upcoming', today] as const,
   categoryView: (categoryId: string | null) =>
     ['views', 'category', categoryId ?? 'inbox'] as const,
   pastPending: (today: CalendarDate) =>

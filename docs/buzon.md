@@ -37,7 +37,7 @@ Para pedir control sobre una idea, añade al final:
 
 - 2026-10-08 — **Para publicar la versión 1 (tú):** comprobación del orquestador. (1) Funcionalidades imprescindibles fusionadas y con sus criterios: sí, todas (T01 a T16). (2) Tests y CI de `develop` en verde: sí (483 unitarios y 202 de integración al cerrar T16; CI verde en cada fusión). (3) Tareas a medias que dependan de la versión: solo T13b, que añade los flujos de Maestro y no cambia la app. (4) Documentación y contexto al día: sí. (5) Qué cambia respecto a `main`: es la primera versión (inicio de sesión, hábitos con sus cuatro frecuencias, tareas, categorías con secciones, Hoy, Pendientes, Historial, marcar con Deshacer, añadir rápido y tres temas). (6) Migraciones: las de `supabase/migrations/` hasta `20261007200000_habit_rule_guard.sql`; la integración continua las aplica a producción desde `main`. Etiqueta propuesta: `v1.0.0`. Candidato: `6e9182c` (o `develop` tras fusionar T13b). Antes, crea tu usuario de producción (DEC-37).
 
-- 2026-10-09 — **VERSIÓN 1 LISTA PARA PUBLICAR (tú).** Comprobación del orquestador:
+- 2026-10-09 — **VERSIÓN 1 LISTA PARA PUBLICAR (tú).** **Hecho el mismo día:** publicada con el PR #67 y la etiqueta `v1.0.0`; queda solo el APK (paso d). Comprobación del orquestador:
   1. Funcionalidades imprescindibles fusionadas con sus criterios: **sí** (T01 a T16).
   2. Tests y CI de `develop` en verde: **sí** (commit `92411a4`: CI y despliegue a pruebas correctos; 627 tests unitarios e integración).
   3. Caminos críticos en el emulador: **sí**, los 8 flujos de Maestro a tamaño normal y a 360 dp (PR #50).
@@ -48,7 +48,45 @@ Para pedir control sobre una idea, añade al final:
   **Pasos:** (a) crea tu usuario de producción en Supabase (README, «Crear el usuario real de producción»); (b) pasa `develop` a `main` con un PR de `develop` contra `main` y fusiónalo tú; (c) crea la etiqueta `v1.0.0` sobre ese commit de `main`; (d) para el APK, `eas build --profile preview` cuando quieras instalarla (H04).
 - 2026-10-09 — **Lista R6 corregida** (recordatorios en el APK). La pantalla «Recordatorios (prueba)» solo existe en desarrollo, así que en el APK: el paso 2 («Probar en 10 segundos») se cambia por **una tarea de hoy con hora dentro de 62 minutos** (el aviso de «una hora antes» llega en 2 minutos), y el paso 7 («Poner al día») por **marcar la tarea como hecha antes de su aviso y comprobar que no llega**. El resto de la lista del PR #57 vale tal cual.
 
-- 2026-10-09 — **Detalles visuales vistos en el emulador (decide tú si se arreglan):** (1) en Hoy, el título «Hoy» sale dos veces (en la cabecera de la pestaña y en grande debajo); (2) el botón de Ajustes de la cabecera se ve con dos engranajes superpuestos; (3) bajo los atajos de fecha del añadir rápido aparece la fecha en bruto («2026-10-09») en vez de con formato. Captura: `docs/diseno/capturas/anadir-rapido/teclado-android-arreglado.png`.
+- 2026-10-09 — **Hecho el mismo día (`ADP-27`, PR #73 y #74).** **Detalles visuales vistos en el emulador (decide tú si se arreglan):** (1) en Hoy, el título «Hoy» sale dos veces (en la cabecera de la pestaña y en grande debajo); (2) el botón de Ajustes de la cabecera se ve con dos engranajes superpuestos; (3) bajo los atajos de fecha del añadir rápido aparece la fecha en bruto («2026-10-09») en vez de con formato. Captura: `docs/diseno/capturas/anadir-rapido/teclado-android-arreglado.png`.
+
+- 2026-10-09 (noche) — **Decidido por el orquestador al aplicar DEC-45 (revísalo cuando quieras):**
+  1. Los scripts se llaman en inglés (`scripts/incidents/record_incident.py`, `report.py`, `measure.py`), no `anotar.py`, `informe.py` y `medir.py` como decía la propuesta, por la regla de legibilidad.
+  2. El registro de incidencias vive en `logs/incidents.jsonl` de la carpeta principal y **no se sube a git**: si se subiera, cada línea del supervisor sería un cambio sin rama. Lo que viaja es la retrospectiva (`docs/retrospectivas/`).
+  3. `compose.yaml` fija `name: app-desarrollo-personal`, para que el emulador sea uno solo para todos los worktrees.
+  4. El «doble engranaje» no se arregla: es la burbuja «Tools» de Expo Go, que solo sale en desarrollo y se puede arrastrar. En el APK no aparece.
+  5. Los PR pequeños los revisa un subagente de Sonnet, y el diminuto (#74) lo revisé yo directamente.
+
+- 2026-10-10 (madrugada) — **Decidido por el orquestador (revísalo cuando quieras), encargos 060 y 061:**
+  1. Al 060 le añadí condiciones que la propuesta no fijaba: en pruebas solo vale `demo@example.com`, la contraseña nunca se genera ni se muestra, la clave de servicio se oculta en el registro de Actions y un envoltorio local permite sembrar pruebas mientras el flujo no está en `main`.
+  2. El 060 lo revisó un subagente de Opus (toca la protección de producción) y el 061, uno de Sonnet.
+  3. La primera siembra en pruebas (y la de después del 061) la hice yo desde el portátil, con tu «ok».
+  4. El 061 reparte las tareas por categoría a juicio del trabajador; «Renovar el abono de transporte» y «Devolver el préstamo» quedaron en Casa.
+
+- 2026-10-13 — **Decidido por el orquestador (revísalo cuando quieras), limpieza (DEC-50):**
+  1. El 062 se hizo con Codex Luna y, al salir con huecos de seguridad, la corrección (063) con Codex Sol, como dice DEC-41.
+  2. Fusioné el #81 con tres detalles menores pendientes (no son de seguridad): van al encargo 064, no a esta sesión, porque pediste apagar al terminar.
+  3. Los dos worktrees con ficheros sueltos (`propuesta-recordatorios` y `revision-t05`) **no** los he borrado: decide tú.
+
+- 2026-10-14 — **Decidido por el orquestador (lo pediste tú), `npm audit`:** 70 avisos (50 altos, 20 moderados), pero salen de solo seis fallos de raíz (`braces`, `node-forge`, `decode-uri-component`, `postcss-selector-parser`, `sprintf-js` y `uuid`), casi todos en herramientas de compilación y de tests, no en lo que corre en tu móvil. Para quitarlos, npm propone versiones mayores incompatibles con el stack fijado (incluso bajar Expo a la 44), así que **no se toca nada**. Se vuelve a mirar al subir de parche el SDK de Expo, o el 2026-11-14 si antes no hay subida.
+
+- 2026-10-14 — **Decidido por el orquestador (revísalo cuando quieras), ejecución de la 1.1.1:**
+  1. **Copilot no arranca:** rechazó el 068 dos veces seguidas al arrancar («Managed account policy is still loading») y además no puede actualizarse solo (permiso denegado en `/usr/lib/node_modules`). El 068 pasa a Codex Luna. Si vuelve a pasar, propondré dejar su puesto vacío.
+  2. **Al 066 le autoricé** dos props opcionales `onOpenChange` (en `category-select` y en `date-field`) para saber si hay un selector abierto cuando el teclado se cierra. Por eso el 069 empieza cuando el 066 esté fusionado.
+  3. **Borrador del añadir rápido (066, corrección 076):** al reabrir el menú se recupera solo lo escrito (nombre, tipo y opciones del hábito); el lugar y la fecha salen siempre de la pantalla desde la que lo abres, para que mañana no se reabra con la fecha de ayer. El borrador se borra al enviar y al pasar a «Más opciones».
+  4. **El 068 (Historial) se comprobó en la web a 360×800** con datos realistas antes de fusionarlo: la rejilla se ve entera al desplazar. Captura en `~/capturas-adp/adp-40-historial-desplazado.png`.
+  5. **Detalle menor pendiente del 064** (PR #85, fusionado): si git falla justo al buscar las carpetas sueltas, el script de limpieza sale con un error sin capturar (sin borrar nada). Se arregla en un encargo diminuto cuando haya hueco.
+
+- 2026-10-14 (noche) — **VERSIÓN 1.1.1 LISTA PARA PUBLICAR (tú).** Comprobación del orquestador:
+  1. Funcionalidades de la versión fusionadas con sus criterios: **sí** (065 a 073, más 064, 074 a 078; PR #85 a #100). RF-41 hecha.
+  2. Tests y CI: **sí**. Cada PR pasó la CI; la última verificación completa local (777 unitarios, 222 de integración, 292 de dominio en cada zona) es de `56bb01d`, y los PR posteriores (#99, #100) pasaron su CI. Despliegues a pruebas desde `develop` correctos.
+  3. Caminos críticos en el emulador: **sí**, 10 flujos a tamaño normal y a 360 dp (#100).
+  4. Tareas a medias que dependan de la versión: **ninguna**. Solo el PR #97 (documentación de la sesión), que se fusiona hoy.
+  5. Qué cambia respecto a `main` (`v1.0.0`): Hoy sin título ni fecha; vista nueva **Próximo**; pestaña **Listas** (Bandeja y categorías); añadir rápido compacto, sin autorrelleno, animado y que se cierra con el atrás; Historial que se desplaza; selector de categoría arreglado; y lo que había en `develop` desde la 1.0 (ADP-27, datos de demostración, herramientas de DEC-45 y DEC-50).
+  6. Migraciones: **ninguna nueva** respecto a `main`. Etiqueta propuesta: `v1.1.1`.
+  7. Retrospectiva: **no hecha**; se hará al cerrar la 1.2 (DEC-45), con los datos de las dos versiones.
+  **Pasos:** (a) PR de `develop` contra `main` y fusionarlo tú; (b) etiqueta `v1.1.1` sobre ese commit de `main`; (c) al llegar a `main`, ya funciona el botón «Run workflow» de `seed-pruebas.yml`.
+
 
 ## Procesadas
 

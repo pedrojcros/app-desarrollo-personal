@@ -58,6 +58,12 @@ Paras y preguntas al humano antes de:
 
 Mientras esperas una respuesta, **no te quedes parado**: sigue con todo lo que no dependa de ella. Registra la pregunta como puerta de decisión (`gate-create`, ver [orca](orca.md)) y avanza por otra rama del grafo de tareas.
 
+### Que no se pierdan horas esperando (DEC-45)
+
+- **Tanda de dudas antes de que el humano se vaya.** Si dice que se va, o lleva un rato sin contestar y queda trabajo para horas, antes de seguir le haces **todas** las preguntas que prevés para lo que queda, juntas, en lenguaje llano y cada una con su valor por defecto.
+- **Decisiones con plazo.** Una decisión **de bajo riesgo** (orden, textos, detalles de interfaz) lleva siempre un valor por defecto. Si el humano no contesta en **8 horas**, se aplica ese valor y queda anotado en el [buzón](../buzon.md) para que lo revise. **Nunca** se aplica sola una decisión de seguridad, producción, dinero, alcance, ADR o datos: esas esperan.
+- **Lo que se espera se anota.** Si una tarea queda parada esperando al humano, va al registro de incidencias con el tipo `waiting-human` (ver [Registro de incidencias](#registro-de-incidencias-y-retrospectiva-dec-45)).
+
 ## Autonomía por niveles (DEC-12)
 
 El humano quiere dejar trabajo e ideas y que el orquestador se apañe solo. Para eso, cada decisión tiene su nivel:
@@ -115,6 +121,20 @@ Un encargo bueno:
 
 Si un encargo necesita "y además", son dos.
 
+**Cuándo dividir una tarea (DEC-45).** Dividir cuesta el arranque de cada trabajador (entre 20.000 y 60.000 tokens nuevos) y otra ronda tuya de encargo, vigilancia, revisión y fusión; solo ahorra tiempo si las partes van a la vez.
+
+- **Se divide** si se cumplen las tres:
+  - las partes tocan **ficheros distintos**;
+  - pueden ir **a la vez**;
+  - cada una es de **más de una hora** (más de unos 150.000 tokens nuevos).
+- **No se divide:**
+  - una cadena de pasos que dependen unos de otros;
+  - una corrección pequeña;
+  - lo que necesita el emulador (solo hay uno).
+- **Lo pequeño de una misma zona se junta** en un solo encargo (como los tres detalles visuales de `ADP-27`).
+
+La regla es provisional: al cerrar cada versión se compara con los datos de `scripts/incidents/measure.py` y se ajusta.
+
 ### 5. Elige el agente
 
 **Vigente desde DEC-39 (2026-10-07): puestos fijos. Como mucho dos trabajadores de Codex, uno de Claude y uno de Copilot a la vez; el de Copilot, solo para encargos pequeños y mecánicos. Con la cuota de Claude alta, su puesto se queda vacío. El orquestador también gasta Claude: revisiones a Codex y estado guardado a menudo. Lo que sigue sobre el ciclo con Copilot (DEC-27) queda en suspenso.** **Ciclo de cuotas (DEC-27).** Cada agente gasta una cuota distinta, y la de Claude es la que se agota. Orden: **dos de Codex, uno de Claude y uno de Copilot**, y vuelta a empezar; pueden ir a la vez, dentro del tope de paralelismo. **Se sigue en ese orden, sin saltarse ningún turno**: el de Claude no se le da a Copilot, ni el de ninguno a otro. Si por error se salta uno, devuélvelo en el siguiente lanzamiento. Si a Codex se le acaba la cuota, usa Claude. **Excepción:** si una tarea necesita sí o sí un agente o un modelo concreto (por ejemplo, GPT Astra u Opus 5.5 al máximo, porque es importante), sáltate el ciclo y anota el motivo en el informe. Cuenta todo lo que se lanza: trabajadores de Orca y subagentes.
@@ -145,7 +165,7 @@ Los identificadores de modelo de Codex compruébalos en su ayuda o su configurac
 
 **Luna o Sol (DEC-41).** Lo mecánico y grande, con pasos fijados, va a Luna; lo denso (lógica central, SQL, seguridad, correcciones) a Sol; lo pequeño no se parte; lo diminuto, a Copilot.
 
-**Encargos cortos (DEC-39).** Cada trabajador arranca leyendo todo lo que le pides: pide **2 o 3 skills**, las que de verdad necesita, y **secciones concretas** de los documentos en vez de documentos enteros. Cada relanzamiento vuelve a pagar esa lectura: evita los fallos que obligan a relanzar.
+**Encargos cortos (DEC-39).** Cada trabajador arranca leyendo todo lo que le pides: pide **2 o 3 skills** a demanda, las del perfil del encargo ([perfiles](plantilla-encargo.md#perfiles-de-skills-dec-54), DEC-54), y **secciones concretas** de los documentos en vez de documentos enteros. Cada relanzamiento vuelve a pagar esa lectura: evita los fallos que obligan a relanzar.
 
 ### 6. Tope de paralelismo
 
@@ -184,6 +204,15 @@ Cuando se cierra una ola del plan o un hito, propón al humano publicar. No lo h
 - [ ] La documentación y [contexto](../contexto.md) reflejan lo que lleva la versión.
 - [ ] Qué cambia respecto a la versión anterior de `main`, en cinco líneas.
 - [ ] Las migraciones nuevas, listas para aplicarse a producción desde `main`, y la etiqueta de versión (`vX.Y.Z`) propuesta.
+- [ ] **Los caminos críticos de Maestro pasan** a tamaño normal y a 360 dp (ver abajo).
+- [ ] **La retrospectiva está hecha** (ver [Registro de incidencias](#registro-de-incidencias-y-retrospectiva-dec-45)).
+
+**Maestro, solo al cerrar (DEC-45).** Las tareas normales pasan sus tests unitarios y de integración, y no ejecutan Maestro. Los caminos críticos se ejecutan **una vez al cerrar una versión o una ola**, en un encargo de verificación:
+
+1. `docker/android/reset`, que deja el emulador limpio.
+2. Todos los flujos con `scripts/with-heavy-lock ./docker/app/run env EXPO_PORT=8090 npm run test:e2e`.
+
+Si algo falla, se abre un encargo de corrección. El emulador es uno solo: mientras haya varios trabajadores que lo necesiten, das tú los turnos (cada uno lo pide y lo devuelve con `ask`).
 
 ## Flujo de un encargo
 
@@ -192,11 +221,17 @@ Cuando se cierra una ola del plan o un hito, propón al humano publicar. No lo h
 1. **Elige la tarea** del plan respetando dependencias, y **crea o actualiza su ticket** según [jira](jira.md) (las tarjetas nuevas, con el MCP; los movimientos, con `python3 scripts/jira/jira.py`, DEC-40).
 2. **Escribe el encargo** con la [plantilla](plantilla-encargo.md), en `docs/agentes/encargos/NNN-titulo.md`. Que sea autosuficiente: pega los mensajes de error y los nombres exactos de los tests implicados, pon las restricciones explícitas («no toques el código de producción», «solo estos ficheros») y di qué debe devolver.
 3. **Lanza el trabajador** con `worker-start`. El texto íntegro del encargo va en `--spec`: el trabajador arranca en un worktree nuevo y **no verá un fichero que solo exista en el tuyo** sin commitear. El fichero del encargo sirve de registro. Con Copilot, comprueba a los 20 segundos que el encargo no se ha quedado aparcado (ver [orca](orca.md#trampas-conocidas)). **En el mismo paso, mueve su tarjeta:** `python3 scripts/jira/jira.py move ADP-NN en-curso` y `python3 scripts/jira/jira.py agent ADP-NN codex|claude|copilot` (DEC-40). Y un comentario con **quién, modelo y esfuerzo** (`jira.py comment ADP-NN "Quién: Codex · modelo gpt-6-luna · esfuerzo por defecto"`), que el humano quiere ver en cada tarjeta (2026-10-08). «En revisión» y «Listo» los pone solo el flujo de GitHub.
-4. **Espera** con `check --wait`, no con sondeos. Si pasa mucho tiempo sin señales, mira el estado (`worker-list`, `worker-show`, `worker-read`) antes de decidir nada.
-5. **Revisa** con la lista de más abajo. Los tests los ejecutas tú.
+4. **Espera** con `check --wait` en segundo plano, no con sondeos: te despiertas solo por algo que pide una decisión (pregunta, `worker_done`, PR listo, fallo), nunca para «ver cómo va». Si pasa mucho tiempo sin señales, mira el estado (`worker-list`, `worker-show`, `worker-read`) antes de decidir nada.
+5. **Revisa** con la lista de más abajo, **sin leer ficheros grandes enteros**: el diff con `--stat` y después solo lo que importa. La revisión larga (diff completo, tests, lista de revisión) la hace un **revisor aparte** (DEC-45), que te devuelve un veredicto y los hallazgos:
+   - Lo normal lo revisa un trabajador de Codex Luna o un subagente de Sonnet con la lista de revisión y `code-review-and-quality`.
+   - Lo delicado (seguridad, SQL, lógica central) lo revisa un modelo más fuerte, distinto del que lo escribió.
+   - Tú lees el veredicto, compruebas la CI y decides.
 6. **Si no está bien**, escribe un encargo de corrección. Si ya ha fallado dos veces, pregunta al humano.
 7. **Si está bien**, prepara el PR contra `develop` (o pide al trabajador que lo abra, si el encargo lo dice), fusiónalo si cumple la [política de merge](#política-de-merge), y cierra el ciclo del trabajador: reutilízalo, retenlo o libéralo (`worker-release`).
-8. **Tras la fusión**, el flujo de GitHub pasa la tarjeta a «Listo»; tú comprueba que lo ha hecho (`jira.py status`) y actualiza [contexto](../contexto.md) y la [bitácora](../bitacora.md).
+8. **Tras la fusión**:
+   - El flujo de GitHub pasa la tarjeta a «Listo»; comprueba que lo ha hecho (`jira.py status`).
+   - Pega la medida del encargo en su tarjeta: `jira.py comment ADP-NN "$(python3 scripts/incidents/measure.py task ADP-NN --jira)"`.
+   - Anota en tu rama de sesión el estado en [contexto](../contexto.md) y la [bitácora](../bitacora.md).
 
 Los detalles exactos de los comandos están en [orca](orca.md) y, sobre todo, en `orca skills get orchestration`, que es lo que manda.
 
@@ -210,7 +245,41 @@ Un cierre inesperado (Orca o la sesión del orquestador que se reinician, el mod
 
 ### Tus propios cambios en el repositorio
 
-Los encargos nuevos y las actualizaciones de documentación que haces tú no pueden ir directos a `develop`. Agrúpalos en **una rama tuya** (`docs/orquestador-<tema>`) y preséntalos como cualquier otro PR cuando cierres una tarea, no uno por encargo.
+Los encargos nuevos y las actualizaciones de documentación que haces tú no pueden ir directos a `develop`. **Un solo PR de documentación por sesión** (DEC-45):
+
+- Va todo a una rama `docs/sesion-<fecha>`: estado, bitácora, buzón y encargos.
+- Se fusiona al cerrar la sesión, no uno por cada cambio de estado.
+- Los encargos no necesitan estar en `develop` para lanzarse: van enteros en el `--spec` del trabajador.
+
+## Registro de incidencias y retrospectiva (DEC-45)
+
+Para saber qué hace perder tiempo y tokens, y arreglarlo, en vez de acumular trampas:
+
+- **Registro:** `logs/incidents.jsonl`, en la carpeta principal del repositorio y sin subirlo a git. Ver `scripts/incidents/README.md`.
+  - **Lo rellena el supervisor solo**, sin gastar tokens: encargos sin enviar, permisos, cuota, modelo saturado y trabajadores parados.
+  - **Tú anotas lo demás** con una orden corta, en cuanto pasa: emulador, test frágil, herramienta, esperar al humano, un fallo de la app que costó tiempo:
+
+    ```sh
+    python3 scripts/incidents/record_incident.py --type environment --minutes 20 --task ADP-NN --cause "..." --fix "..."
+    ```
+
+  - El envoltorio del candado (`scripts/with-heavy-lock`) anota solo las veces que vence.
+- **Medida:** `scripts/incidents/measure.py`, con los datos que ya están en el ordenador y sin enviarlos a nadie.
+  - `task ADP-NN` da el coste de un encargo: tokens, sesiones, tiempo hasta el PR y hasta la fusión.
+  - `sessions` da el coste de tus propias sesiones.
+- **Retrospectiva al cerrar cada versión**, de unos 10 minutos con el humano:
+  - Con `python3 scripts/incidents/report.py --since <fecha de la versión anterior>` y la medida de las sesiones del orquestador.
+  - Las **tres causas que más costaron** se convierten en encargos de mejora.
+  - Queda escrita en `docs/retrospectivas/vN.md`.
+  - Las trampas que se repiten van a [trampas](trampas.md).
+
+## Sesiones cortas (DEC-45)
+
+En la versión 1 cada paso del orquestador releía entre 400.000 y 550.000 tokens porque las sesiones duraban días: fue el mayor gasto de Claude. Por eso:
+
+- **Al cerrar cada ola**, guardas el estado (contexto, bitácora, buzón) y, si el humano está, le pides abrir una sesión nueva.
+- **Si no está**, lo dejas anotado y **no lanzas una ola nueva en la misma sesión pasadas unas 6 horas**: terminas lo que está en marcha y esperas a que abra otra.
+- **Objetivo:** que cada paso relea menos de 150.000 tokens. Lo compruebas con `measure.py sessions`.
 
 ## Lista de revisión
 
@@ -253,7 +322,10 @@ Hoy el humano no ha pedido programar nada él mismo. Si lo pide, se apunta aquí
 - Quita el modo cafeína (DEC-42): para la tarea en segundo plano de `systemd-inhibit`, salvo que el humano pida apagar el ordenador.
 
 - Todos los trabajadores están liberados o retenidos a propósito (`worker-list --terminal-state reclaimable` no devuelve nada).
+- **Limpieza (DEC-50):** `python3 scripts/orca/clean_worktrees.py` enseña los worktrees que sobran. Los que ya están en `origin/develop` y no tienen nada sin guardar se borran con `--apply`; de los demás (ficheros sueltos, cambios sin commit, ramas sin fusionar) se pregunta al humano qué hacer, sin borrarlos.
+- **Si no queda nadie trabajando, ofrece parar el Supabase local** (`./docker/app/run npx supabase stop`; los datos se quedan en sus volúmenes de Docker), que es lo que más memoria gasta.
 - La [bitácora](../bitacora.md) tiene la entrada de la sesión y [contexto](../contexto.md), los apartados *Ahora mismo* y *Lo siguiente* al día.
-- **Al cerrar una ola, propón al humano abrir una sesión nueva de orquestador** (DEC-39): una conversación larga hace que cada paso cueste más.
+- **Al cerrar una ola, propón al humano abrir una sesión nueva de orquestador** (DEC-39 y DEC-45): una conversación larga hace que cada paso cueste más. Ver [Sesiones cortas](#sesiones-cortas-dec-45).
+- Tu rama `docs/sesion-<fecha>` tiene su PR abierto o fusionado.
 - Jira refleja el estado real.
 - Le dices al humano, en cinco líneas: qué está hecho, qué PR le esperan, qué decisiones necesitas de él y qué lanzarías a continuación.

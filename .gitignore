@@ -33,3 +33,6 @@ ios/
 # Ficheros generados por Python
 __pycache__/
 *.pyc
+
+# Registro local de incidencias
+/logs/

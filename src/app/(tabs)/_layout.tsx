@@ -1,7 +1,7 @@
 import { Link, Tabs, usePathname } from 'expo-router';
 import {
+  CalendarDays,
   History,
-  Inbox,
   LayoutGrid,
   Settings,
   Sun,
@@ -80,15 +80,20 @@ export default function TabsLayout() {
       >
         <Tabs.Screen
           name="hoy"
-          options={{ title: 'Hoy', tabBarIcon: tabIcon(Sun) }}
+          options={{
+            title: 'Hoy',
+            // La pantalla ya trae su propio «Hoy» en grande.
+            headerTitle: '',
+            tabBarIcon: tabIcon(Sun),
+          }}
         />
         <Tabs.Screen
-          name="bandeja"
-          options={{ title: 'Bandeja', tabBarIcon: tabIcon(Inbox) }}
+          name="proximo"
+          options={{ title: 'Próximo', tabBarIcon: tabIcon(CalendarDays) }}
         />
         <Tabs.Screen
-          name="categorias"
-          options={{ title: 'Categorías', tabBarIcon: tabIcon(LayoutGrid) }}
+          name="listas"
+          options={{ title: 'Listas', tabBarIcon: tabIcon(LayoutGrid) }}
         />
         <Tabs.Screen
           name="pendientes"

@@ -24,6 +24,7 @@ type CategorySelectProps = {
   onChange: (value: CategorySelection) => void;
   /** 'up' abre la lista hacia arriba (sobre el teclado, en el añadir rápido); 'down', hacia abajo. */
   openDirection?: 'up' | 'down';
+  onOpenChange?: (isOpen: boolean) => void;
 };
 
 type ChosenPlace = {
@@ -174,16 +175,21 @@ export function CategorySelect({
   value,
   onChange,
   openDirection = 'down',
+  onOpenChange,
 }: CategorySelectProps) {
   const { shape, colors } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const categoriesQuery = useCategories();
   const chosenPlace = describeChosenPlace(value, categoriesQuery.data ?? []);
-  useCloseOnEscape(isOpen, () => setIsOpen(false));
+  function changeOpenState(nextIsOpen: boolean): void {
+    onOpenChange?.(nextIsOpen);
+    setIsOpen(nextIsOpen);
+  }
+  useCloseOnEscape(isOpen, () => changeOpenState(false));
 
   function selectAndClose(selection: CategorySelection): void {
     onChange(selection);
-    setIsOpen(false);
+    changeOpenState(false);
   }
 
   const panelStyle = {
@@ -198,7 +204,9 @@ export function CategorySelect({
     borderColor: colors.border,
   };
   const panelPlacementClassName =
-    openDirection === 'up' ? 'bottom-full mb-2' : 'top-full mt-2';
+    openDirection === 'up'
+      ? 'absolute bottom-full left-0 mb-2 w-72'
+      : 'mt-2 w-72';
   const pillLabel = chosenPlace.sectionName
     ? `${chosenPlace.label} › ${chosenPlace.sectionName}`
     : chosenPlace.label;
@@ -209,7 +217,7 @@ export function CategorySelect({
         role="button"
         aria-expanded={isOpen}
         accessibilityLabel={`Categoría: ${pillLabel}`}
-        onPress={() => setIsOpen(!isOpen)}
+        onPress={() => changeOpenState(!isOpen)}
         className="min-h-11 flex-row items-center gap-2 bg-surface px-3"
         style={pillStyle}
       >
@@ -225,7 +233,7 @@ export function CategorySelect({
         <View
           role="radiogroup"
           accessibilityLabel="Elegir categoría y sección"
-          className={`absolute left-0 z-20 w-72 bg-surface ${panelPlacementClassName}`}
+          className={`z-20 bg-surface ${panelPlacementClassName}`}
           style={panelStyle}
         >
           <OptionList

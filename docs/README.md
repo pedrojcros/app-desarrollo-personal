@@ -34,7 +34,7 @@ Para no cargar toda la documentación en cada tarea:
 | Estructura, convenciones o tecnología | 04-arquitectura y las ADR que cite |
 | Algo que no está decidido | decisiones, antes de preguntar |
 | Planificar o replanificar | agentes/arquitecto y agentes/checklist-defaults |
-| Repartir trabajo | agentes/orquestador, agentes/orca, agentes/jira |
+| Repartir trabajo | agentes/orquestador, agentes/orca, agentes/jira y, si algo se tuerce, agentes/trampas |
 
 ## Reglas de mantenimiento
 

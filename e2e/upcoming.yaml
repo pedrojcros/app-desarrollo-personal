@@ -1,0 +1,25 @@
+appId: host.exp.exponent
+---
+- runScript: upcoming-week-title.js
+- tapOn: Hoy
+- tapOn: Añadir tarea o hábito
+# El borrador de quick-add-keyboard.yaml sigue guardado: se borra antes de escribir.
+- eraseText: 60
+- inputText: E2E tarea proxima semana
+- tapOn: 'Fecha: Lunes'
+- tapOn: Enviar
+- extendedWaitUntil:
+    visible: '¿Qué quieres añadir?'
+    timeout: 10000
+- tapOn: Cerrar añadir rápido
+- tapOn: Próximo
+- assertVisible: ${output.nextWeekTitle}
+- assertVisible:
+    text: E2E tarea proxima semana
+    below: ${output.nextWeekTitle}
+- assertNotVisible: Marcar E2E tarea proxima semana como hecho
+- assertNotVisible: Marcar E2E tarea proxima semana como no hecho
+- tapOn:
+    text: E2E tarea proxima semana
+    below: ${output.nextWeekTitle}
+- assertVisible: Guardar cambios

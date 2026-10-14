@@ -20,9 +20,17 @@ import hashlib
 import json
 import re
 import subprocess
+import sys
 import time
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
+
+# El script también se ejecuta directamente desde scripts/orca.
+REPOSITORY_DIRECTORY = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPOSITORY_DIRECTORY))
+
+from scripts.incidents.incident_log import append_incident
 
 CHECK_INTERVAL_SECONDS = 20
 MAXIMUM_ENTER_ATTEMPTS = 3
@@ -223,6 +231,11 @@ def handle_quota_wait(worker, worker_state, current_time):
     if is_worker_waiting_for_quota(current_time, quota_retry_time):
         return CodexOutcome(CodexStatus.WAITING)
     continue_worker(worker, f'cuota recuperada; continúa ({quota_retry_time:%H:%M})')
+    quota_started_at = worker_state.get('quota_started_at', quota_retry_time)
+    quota_minutes = max(0, round((current_time - quota_started_at).total_seconds() / 60))
+    append_supervisor_incident(
+        'quota', quota_minutes, 'Espera por límite de cuota', 'continúa', worker
+    )
     # Se olvida todo lo anterior: si vuelve a pararse, se juzga como una situación nueva.
     worker_state.clear()
     return CodexOutcome(CodexStatus.ACTED)
@@ -234,6 +247,7 @@ def start_quota_wait(worker, worker_state, recent_text, current_time):
         alert = f'{worker_description(worker)} muestra el límite de cuota sin una hora legible'
         return CodexOutcome(CodexStatus.ALERT, alert)
     worker_state['quota_retry_time'] = retry_time
+    worker_state['quota_started_at'] = current_time
     has_keep_model_option = re.search(
         r'^\s*2[.)]\s+.*model',
         recent_text,
@@ -257,6 +271,9 @@ def retry_model_capacity(worker, worker_state, current_time):
         worker_state['capacity_retry_count'] = retry_count + 1
         worker_state['capacity_last_retry_time'] = current_time
         continue_worker(worker, f'modelo saturado; continúa (intento {retry_count + 1}/{CAPACITY_RETRY_LIMIT})')
+        append_supervisor_incident(
+            'tool', 0, 'El modelo está saturado', 'El supervisor envió continúa', worker
+        )
         return CodexOutcome(CodexStatus.ACTED)
     is_cooling_down = retry_count < CAPACITY_RETRY_LIMIT or current_time - last_retry_time < CAPACITY_RETRY_INTERVAL
     if is_cooling_down:
@@ -288,6 +305,46 @@ def handle_codex_wait(worker, text, worker_states, current_time):
     if detect_model_capacity(recent_text):
         return retry_model_capacity(worker, worker_state, current_time)
     return CodexOutcome(CodexStatus.NOTHING)
+
+
+def incident_task(worker):
+    worker_resource = worker.get('resource') or {}
+    worker_text = ' '.join(str(value) for value in worker_resource.values())
+    task_match = re.search(r'ADP-\d+', worker_text)
+    if task_match is not None:
+        return task_match.group(0)
+    worktree_directory = Path(worktree_path(worker))
+    if not worktree_directory.is_dir():
+        return ''
+    try:
+        branch_result = subprocess.run(
+            ['git', '-C', str(worktree_directory), 'branch', '--show-current'],
+            capture_output=True,
+            check=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return ''
+    branch_match = re.search(r'ADP-\d+', branch_result.stdout)
+    if branch_match is None:
+        return ''
+    return branch_match.group(0)
+
+
+def append_supervisor_incident(incident_type, minutes, cause, fix, worker):
+    incident_date = datetime.datetime.now().astimezone().isoformat(timespec='seconds')
+    try:
+        append_incident(
+            date=incident_date,
+            type=incident_type,
+            task=incident_task(worker),
+            minutes=minutes,
+            cause=cause,
+            fix=fix,
+            source='supervisor',
+        )
+    except (OSError, ValueError, subprocess.SubprocessError) as error:
+        print(time.strftime('%H:%M:%S'), f'AVISO: no se pudo guardar la incidencia: {error}', flush=True)
 
 
 def send_to_terminal(handle, *arguments):
@@ -334,6 +391,9 @@ def answer_copilot_permission(worker, text, allowed_roots):
     if not all_paths_allowed or option is None:
         return f'{worker_description(worker)} pide un permiso que no concedo solo: {paths}'
     send_to_terminal(worker['agentTerminalHandle'], '--text', option)
+    append_supervisor_incident(
+        'waiting-human', 0, 'Copilot solicitó permiso', 'Permiso concedido para esta sesión', worker
+    )
     print(time.strftime('%H:%M:%S'), worker_description(worker), f'permiso de sesión ({option}) para {paths[0]}', flush=True)
     return None
 
@@ -352,6 +412,9 @@ def submit_pending_draft(worker, terminal, enter_attempts):
     if enter_attempts[dispatch] > MAXIMUM_ENTER_ATTEMPTS:
         return f'{worker_description(worker)} sigue con el encargo sin enviar tras {MAXIMUM_ENTER_ATTEMPTS} Enter'
     send_to_terminal(worker['agentTerminalHandle'], '--enter')
+    append_supervisor_incident(
+        'environment', 0, 'El encargo quedó sin enviar', 'El supervisor pulsó Enter', worker
+    )
     print(time.strftime('%H:%M:%S'), worker_description(worker), 'tenía el encargo sin enviar: Enter', flush=True)
     return None
 
@@ -380,6 +443,12 @@ def supervise_worker(worker, repository_root, screen_history, enter_attempts, id
     text = screen_text(terminal)
     codex_outcome = handle_codex_wait(worker, text, worker_states, datetime.datetime.now())
     if codex_outcome.status == CodexStatus.ALERT:
+        incident_type = 'quota'
+        if 'cuota' not in codex_outcome.alert.lower():
+            incident_type = 'tool'
+        append_supervisor_incident(
+            incident_type, 0, codex_outcome.alert, 'Se avisó a quien orquesta', worker
+        )
         return codex_outcome.alert
     if codex_outcome.status != CodexStatus.NOTHING:
         screen_history.pop(worker['dispatchId'], None)
@@ -389,8 +458,22 @@ def supervise_worker(worker, repository_root, screen_history, enter_attempts, id
     if permission_problem:
         return permission_problem
     if any(marker in text for marker in CLAUDE_PERMISSION_MARKERS):
-        return f'{worker_description(worker)} espera una respuesta que necesita a quien orquesta'
-    return check_idle(worker, text, screen_history, idle_minutes)
+        alert = f'{worker_description(worker)} espera una respuesta que necesita a quien orquesta'
+        append_supervisor_incident(
+            'waiting-human', 0, alert, 'Se avisó a quien orquesta', worker
+        )
+        return alert
+    idle_problem = check_idle(worker, text, screen_history, idle_minutes)
+    if idle_problem:
+        dispatch = worker['dispatchId']
+        screen_state = screen_history.get(dispatch)
+        unchanged_since = screen_state[1] if screen_state is not None else time.time()
+        idle_seconds = max(0, time.time() - unchanged_since)
+        idle_minutes_lost = round(idle_seconds / 60)
+        append_supervisor_incident(
+            'stuck-agent', idle_minutes_lost, idle_problem, 'Se avisó a quien orquesta', worker
+        )
+    return idle_problem
 
 
 def main():
