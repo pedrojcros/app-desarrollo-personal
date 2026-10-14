@@ -24,6 +24,10 @@ Cosas que costaron tiempo y no deben costarlo dos veces. Salieron de [contexto](
 - **Un trabajador de Claude con Haiku pide permiso para cada orden** (no tiene el modo automático): no usar Haiku para trabajadores.
 - **El comprobador del modo automático de Claude Code puede caerse**: entonces solo funcionan las órdenes cubiertas por las reglas de `.claude/settings.local.json` (vigilancia y acciones de Orca).
 
+- **Un trabajador no puede lanzar a otro** (`nested_worker_depth_exceeded`, profundidad máxima 1): un orquestador de relevo lanzado como trabajador no puede repartir encargos.
+- **Un run queda atado a la terminal de su coordinador** (`consumer_fenced`): si otra sesión toma el relevo, abre su propio run con `run-create`.
+- **Al relevar a un orquestador sin cuota, para antes sus supervisores y trabajadores:** al renovarse la cuota, el supervisor les escribe «continúa» y se pisarían con el nuevo orquestador (2026-10-14).
+
 ## Cuotas de los agentes
 
 - **«Selected model is at capacity»** (Codex): el modelo está saturado, no es la cuota del humano. El turno se corta y el trabajador queda parado; el supervisor le escribe «continúa» solo (hasta tres veces) y avisa si no basta.
@@ -39,6 +43,8 @@ Cosas que costaron tiempo y no deben costarlo dos veces. Salieron de [contexto](
   - **Tras un apagado brusco, el emulador no arranca** («Running multiple emulators with the same AVD»): el AVD vive dentro del contenedor y conserva sus `.lock`.
   - **ADB pierde el emulador** a mitad de Maestro, sobre todo en la pasada a 360 dp.
   - Para que Maestro no pierda el dispositivo, todos los flujos van en una sola ejecución (`e2e/critical-paths.yaml`).
+- **Maestro 2.11 y el teclado:** `inputText` con caracteres no ASCII (acentos, «ñ») cambia el método de entrada y oculta el teclado, y eso cierra el añadir rápido. Los flujos escriben en ASCII y pulsan «Enviar». `clearText` no existe: es `eraseText` (2026-10-14).
+- **Tras `docker/android/reset`, el emulador va saturado unos 8 minutos** (carga alrededor de 29) y ADB falla a mitad de Maestro: esperar a que baje antes de lanzar los flujos (2026-10-14).
 - **El emulador es uno solo para todos los worktrees** desde el PR #71: `compose.yaml` fija `name: app-desarrollo-personal`. Un worktree creado antes de ese cambio no tiene el nombre fijado y tiene que usar `docker compose -p app-desarrollo-personal ...`.
 - **El emulador monta la carpeta `e2e/` del worktree que ejecutó `docker/android/reset`**: para probar los flujos de otro worktree, ejecuta `reset` desde ese worktree.
 - **`.gitignore` ignora cualquier carpeta `android/`**, también `docker/android/`: un fichero nuevo ahí se añade con `git add -f` (los que ya están se siguen sin problema).

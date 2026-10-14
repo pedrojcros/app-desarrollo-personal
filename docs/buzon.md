@@ -70,6 +70,24 @@ Para pedir control sobre una idea, añade al final:
 
 - 2026-10-14 — **Decidido por el orquestador (lo pediste tú), `npm audit`:** 70 avisos (50 altos, 20 moderados), pero salen de solo seis fallos de raíz (`braces`, `node-forge`, `decode-uri-component`, `postcss-selector-parser`, `sprintf-js` y `uuid`), casi todos en herramientas de compilación y de tests, no en lo que corre en tu móvil. Para quitarlos, npm propone versiones mayores incompatibles con el stack fijado (incluso bajar Expo a la 44), así que **no se toca nada**. Se vuelve a mirar al subir de parche el SDK de Expo, o el 2026-11-14 si antes no hay subida.
 
+- 2026-10-14 — **Decidido por el orquestador (revísalo cuando quieras), ejecución de la 1.1.1:**
+  1. **Copilot no arranca:** rechazó el 068 dos veces seguidas al arrancar («Managed account policy is still loading») y además no puede actualizarse solo (permiso denegado en `/usr/lib/node_modules`). El 068 pasa a Codex Luna. Si vuelve a pasar, propondré dejar su puesto vacío.
+  2. **Al 066 le autoricé** dos props opcionales `onOpenChange` (en `category-select` y en `date-field`) para saber si hay un selector abierto cuando el teclado se cierra. Por eso el 069 empieza cuando el 066 esté fusionado.
+  3. **Borrador del añadir rápido (066, corrección 076):** al reabrir el menú se recupera solo lo escrito (nombre, tipo y opciones del hábito); el lugar y la fecha salen siempre de la pantalla desde la que lo abres, para que mañana no se reabra con la fecha de ayer. El borrador se borra al enviar y al pasar a «Más opciones».
+  4. **El 068 (Historial) se comprobó en la web a 360×800** con datos realistas antes de fusionarlo: la rejilla se ve entera al desplazar. Captura en `~/capturas-adp/adp-40-historial-desplazado.png`.
+  5. **Detalle menor pendiente del 064** (PR #85, fusionado): si git falla justo al buscar las carpetas sueltas, el script de limpieza sale con un error sin capturar (sin borrar nada). Se arregla en un encargo diminuto cuando haya hueco.
+
+- 2026-10-14 (noche) — **VERSIÓN 1.1.1 LISTA PARA PUBLICAR (tú).** Comprobación del orquestador:
+  1. Funcionalidades de la versión fusionadas con sus criterios: **sí** (065 a 073, más 064, 074 a 078; PR #85 a #100). RF-41 hecha.
+  2. Tests y CI: **sí**. Cada PR pasó la CI; la última verificación completa local (777 unitarios, 222 de integración, 292 de dominio en cada zona) es de `56bb01d`, y los PR posteriores (#99, #100) pasaron su CI. Despliegues a pruebas desde `develop` correctos.
+  3. Caminos críticos en el emulador: **sí**, 10 flujos a tamaño normal y a 360 dp (#100).
+  4. Tareas a medias que dependan de la versión: **ninguna**. Solo el PR #97 (documentación de la sesión), que se fusiona hoy.
+  5. Qué cambia respecto a `main` (`v1.0.0`): Hoy sin título ni fecha; vista nueva **Próximo**; pestaña **Listas** (Bandeja y categorías); añadir rápido compacto, sin autorrelleno, animado y que se cierra con el atrás; Historial que se desplaza; selector de categoría arreglado; y lo que había en `develop` desde la 1.0 (ADP-27, datos de demostración, herramientas de DEC-45 y DEC-50).
+  6. Migraciones: **ninguna nueva** respecto a `main`. Etiqueta propuesta: `v1.1.1`.
+  7. Retrospectiva: **no hecha**; se hará al cerrar la 1.2 (DEC-45), con los datos de las dos versiones.
+  **Pasos:** (a) PR de `develop` contra `main` y fusionarlo tú; (b) etiqueta `v1.1.1` sobre ese commit de `main`; (c) al llegar a `main`, ya funciona el botón «Run workflow» de `seed-pruebas.yml`.
+
+
 ## Procesadas
 
 | Fecha | Idea | Qué se hizo |
