@@ -1,7 +1,6 @@
 import { Link, Tabs, usePathname } from 'expo-router';
 import {
   History,
-  Inbox,
   LayoutGrid,
   Settings,
   Sun,
@@ -88,12 +87,8 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="bandeja"
-          options={{ title: 'Bandeja', tabBarIcon: tabIcon(Inbox) }}
-        />
-        <Tabs.Screen
-          name="categorias"
-          options={{ title: 'Categorías', tabBarIcon: tabIcon(LayoutGrid) }}
+          name="listas"
+          options={{ title: 'Listas', tabBarIcon: tabIcon(LayoutGrid) }}
         />
         <Tabs.Screen
           name="pendientes"

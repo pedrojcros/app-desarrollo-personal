@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { CategoryRow } from '@/components/category-list/category-row';
+import { InboxRow } from '@/components/category-list/inbox-row';
 import { NewCategoryForm } from '@/components/category-list/new-category-form';
 import { useDeleteRequest } from '@/components/category-list/use-delete-request';
 import { ConfirmDialog } from '@/components/confirm-dialog';
@@ -40,7 +41,7 @@ function CategoryList({
   );
 }
 
-export default function CategoriesScreen() {
+export default function ListsScreen() {
   const [isCreating, setIsCreating] = useState(false);
   const categoriesQuery = useCategories();
   const deletion = useDeleteRequest();
@@ -72,6 +73,11 @@ export default function CategoriesScreen() {
   return (
     <View className="flex-1 bg-background">
       <ScrollView contentContainerClassName="gap-4 px-4 pb-8 pt-2">
+        <InboxRow />
+        {deletion.errorMessage ? (
+          <Text role="alert">{deletion.errorMessage}</Text>
+        ) : null}
+        {renderContent()}
         {isCreating ? (
           <NewCategoryForm onClose={() => setIsCreating(false)} />
         ) : (
@@ -84,10 +90,6 @@ export default function CategoriesScreen() {
             <Text>Nueva categoría</Text>
           </Button>
         )}
-        {deletion.errorMessage ? (
-          <Text role="alert">{deletion.errorMessage}</Text>
-        ) : null}
-        {renderContent()}
       </ScrollView>
       <ConfirmDialog
         visible={request !== null}

@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 const pageTitles: Record<string, string> = {
   '/hoy': 'Hoy',
   '/bandeja': 'Bandeja',
-  '/categorias': 'Categorías',
+  '/listas': 'Listas',
   '/pendientes': 'Pendientes',
   '/historial': 'Historial',
   '/ajustes': 'Ajustes',
