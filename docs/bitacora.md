@@ -4,6 +4,23 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-14 — Ejecución de la 1.1.1, «Pulido y Próximo»
+
+Sesión de orquestador con `/ejecutar-plan` («ejecuta la 1.1.1, sin la 1.2»). Se crearon las tarjetas `ADP-36` a `ADP-48` en la épica `ADP-32` y se fusionaron diez PR: 064 (#85), 065 (#86), 070 (#87), 071 (#88), 068 (#89), 066 con su corrección 076 (#90), 075 (#91), 072 (#93), 074 (#94, de la sesión de arquitecto) y 069 (#95). Cada PR lo revisó un subagente de Sonnet, o el orquestador si era diminuto, y lo que usa pantalla se comprobó en la web a 360×800 (pedido del humano: siempre en formato móvil).
+
+- **Copilot rechazó dos veces el encargo al arrancar** («Managed account policy is still loading»); el 068 pasó a Codex Luna.
+- **Contrato de caché de Próximo:** lo que cuelga de `['views', ...]` guarda listas planas que se parchean al marcar, así que el 075 añadió `getUpcomingItems` y `groupUpcomingItems` y el 072 agrupa al leer con `select`.
+- **Autorizaciones del orquestador** (en el [buzón](buzon.md)): `onOpenChange` opcional en `category-select` y `date-field` (066); `readOnly` en `ListRow` (072); mocks oficiales de Reanimated en `jest.setup.js` (067).
+- **Correcciones de interfaz que pidieron las revisiones**, para la skill `pantallas-app` (DEC-56):
+  - el borrador del añadir rápido conserva solo lo escrito; lugar y fecha salen siempre de la pantalla;
+  - un teclado que se oculta mientras se guarda no cierra el menú;
+  - en la web, la altura de referencia del teclado se toma al abrir y solo con un campo con foco;
+  - un hijo `flex-1` dentro de un `ScrollView` puede quedar con altura 0: comprobarlo a 360 px, no fiarse de los tests;
+  - las etiquetas accesibles de las filas deben incluir lo que el usuario ve (hora, categoría, contador);
+  - los `select` de TanStack Query, con referencia estable;
+  - las listas desplegables de formularios, en el flujo y no flotando.
+- **Test inestable:** `category-view-screen.test.tsx` falló dos veces bajo carga; la CI del #93 pasó al relanzarla.
+
 ### 2026-10-14 — Skills y MCP: cinco automáticas, Expo sin `@expo/ui` y no al MCP de memoria (DEC-52 a DEC-56)
 
 Sesión de arquitecto. El humano preguntó si conviene el MCP de memoria de datamcp y pidió revisar si hay skills que se solapan o se estorban. Detalle en la [propuesta](propuestas/skills-y-mcp.md).
