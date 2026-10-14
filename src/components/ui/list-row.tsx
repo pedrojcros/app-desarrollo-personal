@@ -19,15 +19,14 @@ export type ListRowSecondaryAction = {
 
 const NOT_YET_MARKABLE_LABEL = 'Todavía no se puede marcar';
 
-type ListRowProps = {
+type ListRowBaseProps = {
   title: string;
   // Texto de debajo del título: «10:00 · Personal · Tarea».
   meta: string;
   // Lo de la Bandeja de entrada no tiene categoría: usa los colores del acento.
   category?: CategoryColor;
   onPress?: () => void;
-  onMarkDone: () => void;
-  onMarkNotDone: () => void;
+  accessibilityLabel?: string;
   secondaryAction?: ListRowSecondaryAction;
   disabled?: boolean;
   // Desactiva solo ✓ y ✗ (un día que aún no ha llegado) y lo explica a los lectores de pantalla.
@@ -36,6 +35,12 @@ type ListRowProps = {
   donePressed?: boolean;
   notDonePressed?: boolean;
 };
+
+type ListRowProps = ListRowBaseProps &
+  (
+    | { readOnly: true; onMarkDone?: never; onMarkNotDone?: never }
+    | { readOnly?: false; onMarkDone: () => void; onMarkNotDone: () => void }
+  );
 
 type MarkProps = {
   label: string;
@@ -147,11 +152,16 @@ export function ListRow({
   markDisabled,
   donePressed,
   notDonePressed,
+  readOnly,
+  accessibilityLabel,
 }: ListRowProps) {
   const rowOpacityClassName = disabled ? 'opacity-50' : '';
   const TitleContainer = onPress === undefined ? View : Pressable;
   const titleRole = onPress === undefined ? undefined : 'button';
-  const titleLabel = onPress === undefined ? undefined : `Abrir ${title}`;
+  const titleLabel =
+    onPress === undefined
+      ? undefined
+      : (accessibilityLabel ?? `Abrir ${title}`);
   const areMarksDisabled = disabled || markDisabled;
   const doneLabel = markDisabled
     ? NOT_YET_MARKABLE_LABEL
@@ -189,22 +199,26 @@ export function ListRow({
           <Icon icon={secondaryAction.icon} color="muted-foreground" />
         </MarkButton>
       ) : null}
-      <MarkButton
-        label={doneLabel}
-        onPress={onMarkDone}
-        disabled={areMarksDisabled}
-        pressed={donePressed}
-      >
-        <DoneDisc category={category} />
-      </MarkButton>
-      <MarkButton
-        label={notDoneLabel}
-        onPress={onMarkNotDone}
-        disabled={areMarksDisabled}
-        pressed={notDonePressed}
-      >
-        <NotDoneDisc />
-      </MarkButton>
+      {!readOnly ? (
+        <>
+          <MarkButton
+            label={doneLabel}
+            onPress={onMarkDone}
+            disabled={areMarksDisabled}
+            pressed={donePressed}
+          >
+            <DoneDisc category={category} />
+          </MarkButton>
+          <MarkButton
+            label={notDoneLabel}
+            onPress={onMarkNotDone}
+            disabled={areMarksDisabled}
+            pressed={notDonePressed}
+          >
+            <NotDoneDisc />
+          </MarkButton>
+        </>
+      ) : null}
     </View>
   );
 }

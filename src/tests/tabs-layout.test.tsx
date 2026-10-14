@@ -33,6 +33,7 @@ function ThemedTabsLayout() {
 const routes = {
   '(tabs)/_layout': ThemedTabsLayout,
   '(tabs)/hoy': () => <Text>Today screen</Text>,
+  '(tabs)/proximo': () => <Text>Upcoming screen</Text>,
   '(tabs)/listas': () => <Text>Lists screen</Text>,
   '(tabs)/pendientes': () => <Text>Pending screen</Text>,
   '(tabs)/historial': () => <Text>History screen</Text>,
@@ -54,17 +55,18 @@ describe('Tabs layout', () => {
     expect(screen.getAllByRole('heading', { name: 'Listas' })).toHaveLength(1);
   });
 
-  it('has four tabs: Today, Lists, Pending and History', async () => {
+  it('has five tabs: Today, Upcoming, Lists, Pending and History', async () => {
     renderRouter(routes, { initialUrl: '/hoy' });
     await screen.findByText('Today screen');
 
     const tabs = screen.getAllByLabelText(/, tab, \d of \d$/);
     const tabLabels = tabs.map((tab) => tab.props.accessibilityLabel);
     expect(tabLabels).toEqual([
-      'Hoy, tab, 1 of 4',
-      'Listas, tab, 2 of 4',
-      'Pendientes, tab, 3 of 4',
-      'Historial, tab, 4 of 4',
+      'Hoy, tab, 1 of 5',
+      'Próximo, tab, 2 of 5',
+      'Listas, tab, 3 of 5',
+      'Pendientes, tab, 4 of 5',
+      'Historial, tab, 5 of 5',
     ]);
   });
 
