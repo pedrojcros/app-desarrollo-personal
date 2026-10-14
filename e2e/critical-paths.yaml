@@ -19,3 +19,5 @@ appId: host.exp.exponent
     file: history.yaml
 - runFlow:
     file: quick-add-keyboard.yaml
+- runFlow:
+    file: upcoming.yaml
