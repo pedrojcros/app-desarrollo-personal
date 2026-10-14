@@ -328,7 +328,7 @@ Promote a view into `src/components/` when **all** of these hold:
 
 Promotion path: inline JSX → component in `screens/<name>/` → `src/components/`. Move one step at a time, when the trigger fires - never speculatively. Wrong abstractions cost more than duplication; a second copy of a view is cheaper than a primitive with a bad API.
 
-Do **not** wrap platform components that already carry the design language (`Switch`, `DateTimePicker`, stack headers, `@expo/ui` views) just to route them through the system. Native styling *is* the design system for those.
+Do **not** wrap platform components that already carry the design language (`Switch`, `DateTimePicker`, stack headers) just to route them through the system. Native styling *is* the design system for those.
 
 ## Where Decisions Live
 
@@ -355,7 +355,7 @@ Recheck the rendered result after fixing a value; moving it into the theme does 
 
 Use these names to recognize common mistakes when building and reviewing:
 
-- **The Web Modal** - a custom centered dialog used for composing or picking. Prefer a native sheet (`formSheet`, `@expo/ui` BottomSheet) or menu; native confirmation alerts remain appropriate for consequential actions.
+- **The Web Modal** - a custom centered dialog used for composing or picking. Prefer a native sheet (`formSheet`) or menu; native confirmation alerts remain appropriate for consequential actions.
 - **Everything's a Card** - every row and section in its own white rounded shadowed box. Use grouped lists; group with background and hairlines, not borders.
 - **Emoji Iconography** - 🔥 ⚙️ ✨ as tab or button icons. SF Symbols on iOS, Material icons on Android.
 - **The Purple-Gradient Hero** - a decorative gradient intro pushing the task below the fold. Lead task screens with useful content; retain a hero when it serves the requested experience.
