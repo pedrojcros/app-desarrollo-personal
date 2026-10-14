@@ -77,7 +77,7 @@ Para pedir control sobre una idea, añade al final:
   4. **El 068 (Historial) se comprobó en la web a 360×800** con datos realistas antes de fusionarlo: la rejilla se ve entera al desplazar. Captura en `~/capturas-adp/adp-40-historial-desplazado.png`.
   5. **Detalle menor pendiente del 064** (PR #85, fusionado): si git falla justo al buscar las carpetas sueltas, el script de limpieza sale con un error sin capturar (sin borrar nada). Se arregla en un encargo diminuto cuando haya hueco.
 
-- 2026-10-14 (noche) — **VERSIÓN 1.1.1 LISTA PARA PUBLICAR (tú).** Comprobación del orquestador:
+- 2026-10-14 (noche) — **PUBLICADA** el mismo día (PR #101, etiqueta `v1.1.1`). Era: **VERSIÓN 1.1.1 LISTA PARA PUBLICAR (tú).** Comprobación del orquestador:
   1. Funcionalidades de la versión fusionadas con sus criterios: **sí** (065 a 073, más 064, 074 a 078; PR #85 a #100). RF-41 hecha.
   2. Tests y CI: **sí**. Cada PR pasó la CI; la última verificación completa local (777 unitarios, 222 de integración, 292 de dominio en cada zona) es de `56bb01d`, y los PR posteriores (#99, #100) pasaron su CI. Despliegues a pruebas desde `develop` correctos.
   3. Caminos críticos en el emulador: **sí**, 10 flujos a tamaño normal y a 360 dp (#100).

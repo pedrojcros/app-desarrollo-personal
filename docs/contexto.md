@@ -42,7 +42,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-14 (noche), sesión de orquestador: 1.1.1 cerrada en `develop`.*
+*Actualizado: 2026-10-14 (noche), sesión de orquestador: 1.1.1 publicada en `main`.*
 
 - **La versión 1 está publicada** (2026-10-09, PR #67, etiqueta [`v1.0.0`](https://github.com/pedrojcros/app-desarrollo-personal/releases/tag/v1.0.0)), con la 1.x y los recordatorios (1.1, R1 a R5), que solo funcionan en la app instalada. Falta el APK y, con él, R6: la comprobación del humano en su móvil (lista en el buzón).
 - **DEC-45 aplicada** (encargos A a D; el E, el orquestador por eventos, queda para diseñarlo con el arquitecto):
@@ -53,11 +53,11 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
   - las trampas, en [agentes/trampas](agentes/trampas.md).
 - **`ADP-27` hecho** (PR #73 y #74): el título «Hoy» ya no sale dos veces y sigue siendo un encabezado accesible; la fecha del añadir rápido sale con formato. El «doble engranaje» no era de la app: es la burbuja «Tools» de Expo Go, que solo existe en desarrollo.
 - **El repositorio es público** desde el 2026-10-09 (DEC-44): se podrá volver a privado cuando el ritmo de cambios baje.
-- **La web de pruebas tiene datos de demostración** (060 y 061, PR #77 y #78, DEC-49): usuario `demo@example.com` (contraseña en `secretos.env`) con 10 hábitos, 30 tareas y 90 días de historial. Para volver a sembrar, el botón de Actions `seed-pruebas.yml` cuando llegue a `main`; mientras, el envoltorio local de `scripts/seed/README.md`.
+- **La web de pruebas tiene datos de demostración** (060 y 061, PR #77 y #78, DEC-49): usuario `demo@example.com` (contraseña en `secretos.env`) con 10 hábitos, 30 tareas y 90 días de historial. Para volver a sembrar, el botón «Run workflow» de `seed-pruebas.yml` en Actions (ya está en `main`) o el envoltorio local de `scripts/seed/README.md`.
 - **Limpieza al cerrar cada sesión** (DEC-50, PR #81): `scripts/orca/clean_worktrees.py` enseña y, con `--apply`, borra los worktrees ya fusionados y sin nada sin guardar; estrenado el 2026-10-13 con 6 carpetas viejas (unos 3 GB). El orquestador ofrece además parar el Supabase local al cerrar.
 - **El pulido visual está cerrado y planificado** (DEC-51): Hoy sin título, fecha ni flechas; una vista nueva, **Próximo** (RF-41), con lo de las próximas cuatro semanas agrupado por semana; la pestaña **Listas**, que junta Bandeja y Categorías; el añadir rápido más pequeño, sin autorrelleno y que se cierra con el atrás; y los fallos del desplegable de categoría y de Historial. Encargos **065 a 073** en [propuestas/pulido-visual](propuestas/pulido-visual.md#065-a-073--la-ronda-de-dec-51), sin migraciones ni dependencias.
 - **Skills y MCP revisados** (DEC-52 a DEC-55, [propuesta](propuestas/skills-y-mcp.md)): **no** al MCP de memoria de datamcp. Las skills de Expo se quedan, pero sin las órdenes de usar `@expo/ui`. Solo cinco skills automáticas: el resto, a demanda, por los [perfiles](agentes/plantilla-encargo.md#perfiles-de-skills-dec-54) de la plantilla, y un trabajador puede leer otra si la necesita. Para diseño, las de Emil Kowalski y Jakub Krehel, y una skill propia y corta, `pantallas-app` (DEC-56), con nuestras reglas de pantallas. Las sincronizadas de claude.ai no se usan. Appllama y Callstack, no; Metro MCP, solo si la retrospectiva lo pide. Lo aplica el **encargo 074**, que va **antes del 069**.
-- **La 1.1.1, «Pulido y Próximo», está completa en `develop`** (épica `ADP-32`, PR #85 a #100): Hoy limpio, **Próximo** (RF-41, hecha), pestaña **Listas**, añadir rápido compacto, animado y que se cierra con el atrás, Historial que se desplaza y selector de categoría en el flujo. El 078 (`ADP-49`, #99) corrigió en Android un «teclado oculto» tardío que cerraba el menú tras guardar. **Maestro en verde**: 10 flujos a tamaño normal y 10 a 360 dp (#100). Sin migraciones nuevas. **Falta que el humano la pase a `main`** con la etiqueta `v1.1.1` (comprobación en el [buzón](buzon.md)).
+- **La 1.1.1, «Pulido y Próximo», está completa en `develop`** (épica `ADP-32`, PR #85 a #100): Hoy limpio, **Próximo** (RF-41, hecha), pestaña **Listas**, añadir rápido compacto, animado y que se cierra con el atrás, Historial que se desplaza y selector de categoría en el flujo. El 078 (`ADP-49`, #99) corrigió en Android un «teclado oculto» tardío que cerraba el menú tras guardar. **Maestro en verde**: 10 flujos a tamaño normal y 10 a 360 dp (#100). Sin migraciones nuevas. **Publicada** (PR #101, etiqueta [`v1.1.1`](https://github.com/pedrojcros/app-desarrollo-personal/releases/tag/v1.1.1)) y desplegada en producción.
 - **La versión 1.2, «Progreso», está planificada** (DEC-46): porcentaje, rachas y mapa de cada hábito, y un resumen por periodo en Historial, sin migraciones ni dependencias. Diseño y encargos 055 a 059 en [propuestas/progreso](propuestas/progreso.md). Google Calendar, con RF-04, pasa a la versión 2.
 
 
@@ -65,10 +65,10 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 Para retomar en una sesión nueva:
 
-1. **Publicar la 1.1.1** cuando el humano lo decida: PR de `develop` a `main` y etiqueta `v1.1.1` (comprobación en el [buzón](buzon.md)). La retrospectiva se hace al cerrar la 1.2.
-   - Al cerrar y antes de la 1.2, el arquitecto escribe el encargo de la skill **`pantallas-app`** (DEC-56), con lo que corrigieron las revisiones del pulido (lista en la [bitácora](bitacora.md), 2026-10-14, «Ejecución de la 1.1.1»).
+1. **Antes de la 1.2** (la 1.1.1 ya está publicada; la retrospectiva se hace al cerrar la 1.2):
+   - el arquitecto escribe el encargo de la skill **`pantallas-app`** (DEC-56), con lo que corrigieron las revisiones del pulido (lista en la [bitácora](bitacora.md), 2026-10-14, «Ejecución de la 1.1.1»).
    - Con permiso del humano: comprobar si Claude Code deja apagar **solo en este proyecto** las skills y plugins sincronizados de claude.ai (DEC-53.3), y apagarlas.
-   - Test inestable: `category-view-screen.test.tsx` («marking no hecho… Leche») falló dos veces bajo carga, una en la CI. Si vuelve a fallar, encargo pequeño para hacerlo robusto.
+   - **Encargo pequeño para el test inestable** `category-view-screen.test.tsx` («marking no hecho… Leche»): ha fallado tres veces, la última en la CI de `main` al publicar la 1.1.1.
 2. **Después, ejecutar la 1.2 con `/ejecutar-plan`** cuando el humano lo diga. Ojo: su encargo 057 parte de la `historial.tsx` que deja el 068. Lo primero, la épica y todas sus tarjetas en «Por hacer» (DEC-47). Olas 055 a 057, 058 y 059 ([propuesta](propuestas/progreso.md#3-encargos-para-la-ejecución)). Al cerrar, Maestro una sola vez y la primera retrospectiva (DEC-45), que dice también si hace falta el *spike* de Metro MCP (DEC-56).
 3. **Después de esa retrospectiva, con el arquitecto:** el diseño del orquestador por eventos (DEC-45, encargo E) y la versión 2 (Google Calendar).
 
@@ -77,10 +77,9 @@ Para retomar en una sesión nueva:
 
 - **APK de la versión 1** (aplazado por el humano el 2026-10-14): `eas build --profile preview` cuando quieras instalarla en el móvil (gasta una de las 15 compilaciones gratis del mes). Conviene antes de ejecutar la 1.2: Progreso tiene sentido con unos días de uso real.
 - **Recordatorios (R6):** al instalar el APK de la 1.1, la lista de comprobación del informe de R5 (permiso, aviso en punto, tras reiniciar, ahorro de batería, tocar el aviso).
-- **Decidir el paso a `main`** de la 1.1.1 cuando el orquestador lo proponga, tras el 073.
 - **Permiso para DEC-53.3:** comprobar si se pueden apagar solo en este proyecto las skills sincronizadas de claude.ai.
 - Opcional: decir si la barra de la llave, la cartera y la ubicación (fila 6 del pulido) salió en **Chrome** o en **Expo Go**. El arreglo no cambia; sirve para saber si en Chrome puede seguir saliendo.
-- La carpeta vacía `~/orca/workspaces/app-desarrollo-personal/ADP-3-base-de-datos-y-acceso` es de `root`: se borra con `sudo rmdir` en una terminal normal (los dos worktrees con ficheros sueltos se borraron el 2026-10-14, con permiso del humano).
+- La carpeta vacía `~/orca/workspaces/app-desarrollo-personal/ADP-3-base-de-datos-y-acceso` es de `root`: se borra con `sudo rmdir` en una terminal normal (los dos worktrees con ficheros sueltos se borraron el 2026-10-14, con permiso del humano). El worktree `cierre-1-1-1` solo guarda una fusión que ya está en `develop`: se puede borrar cuando quieras.
 - Revisar el [buzón](buzon.md): lo que decidió el orquestador por su cuenta.
 - Revisar T01 en el móvil con Expo Go (H05). Los avisos de `npm audit` los revisó el orquestador el 2026-10-14 (buzón): se vuelven a mirar el 2026-11-14 o al subir de parche Expo.
 - Cuando T15 esté en uso, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
