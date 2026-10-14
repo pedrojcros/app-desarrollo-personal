@@ -77,9 +77,16 @@ Para pedir control sobre una idea, añade al final:
   4. **El 068 (Historial) se comprobó en la web a 360×800** con datos realistas antes de fusionarlo: la rejilla se ve entera al desplazar. Captura en `~/capturas-adp/adp-40-historial-desplazado.png`.
   5. **Detalle menor pendiente del 064** (PR #85, fusionado): si git falla justo al buscar las carpetas sueltas, el script de limpieza sale con un error sin capturar (sin borrar nada). Se arregla en un encargo diminuto cuando haya hueco.
 
-- 2026-10-14 — **Comprobación para publicar la 1.1.1 en `main` (pendiente):** todos los cambios de aplicación están en `develop` (#85 a #96 y #98), sin migraciones nuevas respecto a `main`; etiqueta propuesta `v1.1.1`. Falta cerrar el 073: su primer intento de Maestro falló por System UI del emulador y el segundo volvió al lanzador después de Enter/Atrás en `quick-task.yaml`, sin crash de Expo identificado. Artefactos: `/tmp/adp-maestro-normal-failure.tar.gz`, `/tmp/adp-maestro-normal-failure-2.tar.gz`, capturas y logcat correspondientes; la continuación quedó autorizada con la orden de terminar y apagar, y el diagnóstico pasó al 078 tras el tercer fallo. No publicar ni dar RF-41 por hecha hasta que todos los flujos pasen a tamaño normal y a 360 dp, el PR de cierre y el #97 estén fusionados y la verificación completa y CI estén verdes. La retrospectiva está pendiente, pospuesta al cierre de la 1.2 según contexto; debe declararse en la checklist, no darse por hecha. Verificación local de `56bb01d` (Docker, secuencial): 777/777 unitarios, 222/222 de integración, 292/292 de dominio en cada zona (Madrid y Los Ángeles), TypeScript, lint y exportación web en verde. La primera ejecución bajo carga simultánea tuvo cuatro esperas unitarias y dos timeouts de integración; la repetición completa secuencial pasó sin cambiar tests.
+- 2026-10-14 (noche) — **VERSIÓN 1.1.1 LISTA PARA PUBLICAR (tú).** Comprobación del orquestador:
+  1. Funcionalidades de la versión fusionadas con sus criterios: **sí** (065 a 073, más 064, 074 a 078; PR #85 a #100). RF-41 hecha.
+  2. Tests y CI: **sí**. Cada PR pasó la CI; la última verificación completa local (777 unitarios, 222 de integración, 292 de dominio en cada zona) es de `56bb01d`, y los PR posteriores (#99, #100) pasaron su CI. Despliegues a pruebas desde `develop` correctos.
+  3. Caminos críticos en el emulador: **sí**, 10 flujos a tamaño normal y a 360 dp (#100).
+  4. Tareas a medias que dependan de la versión: **ninguna**. Solo el PR #97 (documentación de la sesión), que se fusiona hoy.
+  5. Qué cambia respecto a `main` (`v1.0.0`): Hoy sin título ni fecha; vista nueva **Próximo**; pestaña **Listas** (Bandeja y categorías); añadir rápido compacto, sin autorrelleno, animado y que se cierra con el atrás; Historial que se desplaza; selector de categoría arreglado; y lo que había en `develop` desde la 1.0 (ADP-27, datos de demostración, herramientas de DEC-45 y DEC-50).
+  6. Migraciones: **ninguna nueva** respecto a `main`. Etiqueta propuesta: `v1.1.1`.
+  7. Retrospectiva: **no hecha**; se hará al cerrar la 1.2 (DEC-45), con los datos de las dos versiones.
+  **Pasos:** (a) PR de `develop` contra `main` y fusionarlo tú; (b) etiqueta `v1.1.1` sobre ese commit de `main`; (c) al llegar a `main`, ya funciona el botón «Run workflow» de `seed-pruebas.yml`.
 
-- 2026-10-14 — **Reanudación autorizada y apagado final:** tras la orden del humano de terminar y apagar, el 078 (`ADP-49`, Sol) tiene el emulador para diagnosticar el añadir rápido antes de repetir Maestro. El 073 conserva sus cambios y espera; RF-41 continúa pendiente. El terminal principal apagará el ordenador al terminar; no se ha publicado en `main` ni iniciado la 1.2.
 
 ## Procesadas
 

@@ -4,6 +4,23 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-14 (noche) — Cierre de la 1.1.1: Android y Maestro en verde
+
+El cierre lo empezó Codex porque Claude llegó al 97 % de su cuota, y Codex también se quedó sin cuota a mitad. Lo terminó la sesión de Claude:
+
+- **Lo que hizo Codex:** fusionó el 077 (#98) y lanzó el 073. Tras tres fallos de Maestro, lanzó el **078** (`ADP-49`, PR #99).
+- **El 078 encontró un fallo real en Android:** tras guardar, un «teclado oculto» tardío cerraba el añadir rápido. Ahora la protección dura hasta que el teclado vuelve, y el foco se pide tras `onShow`. Revisado por Sonnet y fusionado. Caso límite aceptado: justo tras guardar, a veces hacen falta dos atrás.
+- **Trampas de Maestro 2.11** (en [trampas](agentes/trampas.md)):
+  - `inputText` con caracteres no ASCII cambia el teclado y lo oculta;
+  - `clearText` no existe: es `eraseText`;
+  - tras `docker/android/reset`, el emulador va saturado unos 8 minutos.
+- **Antes de seguir, la sesión de Claude:**
+  - guardó el trabajo sin commitear del 073 (`2923269`);
+  - paró los supervisores y las sesiones de Codex sin cuota, para que no reanudaran a la vez al renovarse;
+  - abrió un run nuevo, porque el anterior quedó atado a la terminal del Codex principal.
+- **El 073 lo terminó Claude Sonnet** con una 4.ª ejecución completa en verde: 10 flujos a tamaño normal y 10 a 360 dp (#100). RF-41 hecha.
+- El humano pidió **no apagar el ordenador**; anula la nota anterior del Codex.
+
 ### 2026-10-14 — Ejecución de la 1.1.1, «Pulido y Próximo»
 
 Sesión de orquestador con `/ejecutar-plan` («ejecuta la 1.1.1, sin la 1.2»). Se crearon las tarjetas `ADP-36` a `ADP-48` en la épica `ADP-32` y se fusionaron diez PR: 064 (#85), 065 (#86), 070 (#87), 071 (#88), 068 (#89), 066 con su corrección 076 (#90), 075 (#91), 072 (#93), 074 (#94, de la sesión de arquitecto) y 069 (#95). Cada PR lo revisó un subagente de Sonnet, o el orquestador si era diminuto, y lo que usa pantalla se comprobó en la web a 360×800 (pedido del humano: siempre en formato móvil).
