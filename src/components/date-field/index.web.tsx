@@ -24,6 +24,7 @@ export function DateField({
   onChange,
   minimumDate,
   maximumDate,
+  onOpenChange,
 }: DateFieldProps) {
   const inputId = useId();
   const inputStyle = useInputStyle();
@@ -54,6 +55,8 @@ export function DateField({
         min={minimumDate}
         max={maximumDate}
         onChange={handleChange}
+        onFocus={() => onOpenChange?.(true)}
+        onBlur={() => onOpenChange?.(false)}
         style={inputStyle}
         className="min-h-12 w-full border px-3 py-2 text-callout"
       />
@@ -63,7 +66,12 @@ export function DateField({
     </View>
   );
 }
-export function TimeField({ label, value, onChange }: TimeFieldProps) {
+export function TimeField({
+  label,
+  value,
+  onChange,
+  onOpenChange,
+}: TimeFieldProps) {
   const inputId = useId();
   const inputStyle = useInputStyle();
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -86,6 +94,8 @@ export function TimeField({ label, value, onChange }: TimeFieldProps) {
         type="time"
         value={value}
         onChange={handleChange}
+        onFocus={() => onOpenChange?.(true)}
+        onBlur={() => onOpenChange?.(false)}
         style={inputStyle}
         className="min-h-12 w-full border px-3 py-2 text-callout"
       />

@@ -98,3 +98,34 @@ it('uses a browser time input and sends HH:MM values', () => {
   changeInput('09:45');
   expect(onChange).toHaveBeenCalledWith('09:45');
 });
+
+it.each(['date', 'time'] as const)(
+  'reports %s input focus and blur',
+  (mode) => {
+    const onOpenChange = jest.fn();
+    act(() =>
+      root.render(
+        mode === 'date' ? (
+          <DateField
+            label="Selector"
+            value="2026-10-06"
+            onChange={() => {}}
+            onOpenChange={onOpenChange}
+          />
+        ) : (
+          <TimeField
+            label="Selector"
+            value="08:30"
+            onChange={() => {}}
+            onOpenChange={onOpenChange}
+          />
+        ),
+      ),
+    );
+    const input = container.querySelector('input')!;
+    act(() => input.focus());
+    expect(onOpenChange).toHaveBeenLastCalledWith(true);
+    act(() => input.blur());
+    expect(onOpenChange).toHaveBeenLastCalledWith(false);
+  },
+);

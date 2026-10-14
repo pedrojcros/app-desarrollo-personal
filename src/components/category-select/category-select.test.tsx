@@ -161,3 +161,21 @@ describe('CategorySelect', () => {
     ).toBeTruthy();
   });
 });
+
+it('reports opening and closing to its parent', () => {
+  mockCategories([]);
+  const onOpenChange = jest.fn();
+  render(
+    <ThemeScope themeName="white">
+      <CategorySelect
+        value={inbox}
+        onChange={() => {}}
+        onOpenChange={onOpenChange}
+      />
+    </ThemeScope>,
+  );
+  fireEvent.press(screen.getByRole('button', { name: /Categoría/ }));
+  expect(onOpenChange).toHaveBeenLastCalledWith(true);
+  fireEvent.press(screen.getByRole('radio', { name: 'Bandeja de entrada' }));
+  expect(onOpenChange).toHaveBeenLastCalledWith(false);
+});

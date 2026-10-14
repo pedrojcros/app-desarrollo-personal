@@ -24,6 +24,7 @@ type CategorySelectProps = {
   onChange: (value: CategorySelection) => void;
   /** 'up' abre la lista hacia arriba (sobre el teclado, en el añadir rápido); 'down', hacia abajo. */
   openDirection?: 'up' | 'down';
+  onOpenChange?: (isOpen: boolean) => void;
 };
 
 type ChosenPlace = {
@@ -174,16 +175,21 @@ export function CategorySelect({
   value,
   onChange,
   openDirection = 'down',
+  onOpenChange,
 }: CategorySelectProps) {
   const { shape, colors } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const categoriesQuery = useCategories();
   const chosenPlace = describeChosenPlace(value, categoriesQuery.data ?? []);
-  useCloseOnEscape(isOpen, () => setIsOpen(false));
+  function changeOpenState(nextIsOpen: boolean): void {
+    onOpenChange?.(nextIsOpen);
+    setIsOpen(nextIsOpen);
+  }
+  useCloseOnEscape(isOpen, () => changeOpenState(false));
 
   function selectAndClose(selection: CategorySelection): void {
     onChange(selection);
-    setIsOpen(false);
+    changeOpenState(false);
   }
 
   const panelStyle = {
@@ -209,7 +215,7 @@ export function CategorySelect({
         role="button"
         aria-expanded={isOpen}
         accessibilityLabel={`Categoría: ${pillLabel}`}
-        onPress={() => setIsOpen(!isOpen)}
+        onPress={() => changeOpenState(!isOpen)}
         className="min-h-11 flex-row items-center gap-2 bg-surface px-3"
         style={pillStyle}
       >
