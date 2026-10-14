@@ -1,46 +1,39 @@
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { DayProgress, type DayOutcome } from '@/components/ui/day-progress';
 import { Text } from '@/components/ui/text';
 import type { ViewItem } from '@/domain/items';
-import type { CalendarDate } from '@/domain/types';
-import { formatLongDate, getDayTitle } from '@/domain/views/today';
-
-import { DayNavigator } from './day-navigator';
 
 type TodayHeaderProps = {
-  date: CalendarDate;
-  today: CalendarDate;
   total: number;
   marked: ViewItem[];
-  onSelectDate: (date: CalendarDate) => void;
 };
+
+// Oculto a la vista pero presente para el lector de pantalla: un tamaño de un
+// punto, sin opacidad, y no `display: none`, que también lo quitaría del lector.
+const hiddenFromSight = StyleSheet.create({
+  heading: {
+    position: 'absolute',
+    width: 1,
+    height: 1,
+    overflow: 'hidden',
+    opacity: 0,
+  },
+});
 
 function toOutcome(item: ViewItem): DayOutcome {
   return item.status === 'done' ? 'done' : 'not-done';
 }
 
-export function TodayHeader({
-  date,
-  today,
-  total,
-  marked,
-  onSelectDate,
-}: TodayHeaderProps) {
+export function TodayHeader({ total, marked }: TodayHeaderProps) {
   const outcomes = marked.map(toOutcome);
 
   return (
-    <View>
-      <DayNavigator date={date} today={today} onSelectDate={onSelectDate} />
-      <View className="flex-row flex-wrap items-end justify-between gap-3 pb-3 pt-3">
-        <View>
-          <Text variant="caption">{formatLongDate(date)}</Text>
-          <Text variant="title" accessibilityRole="header">
-            {getDayTitle(date, today)}
-          </Text>
-        </View>
-        <DayProgress outcomes={outcomes} total={total} />
-      </View>
+    <View className="items-end pb-2 pt-2">
+      <Text accessibilityRole="header" style={hiddenFromSight.heading}>
+        Hoy
+      </Text>
+      <DayProgress outcomes={outcomes} total={total} />
     </View>
   );
 }
