@@ -68,6 +68,8 @@ Para pedir control sobre una idea, añade al final:
   2. Fusioné el #81 con tres detalles menores pendientes (no son de seguridad): van al encargo 064, no a esta sesión, porque pediste apagar al terminar.
   3. Los dos worktrees con ficheros sueltos (`propuesta-recordatorios` y `revision-t05`) **no** los he borrado: decide tú.
 
+- 2026-10-14 — **Decidido por el orquestador (lo pediste tú), `npm audit`:** 70 avisos (50 altos, 20 moderados), pero salen de solo seis fallos de raíz (`braces`, `node-forge`, `decode-uri-component`, `postcss-selector-parser`, `sprintf-js` y `uuid`), casi todos en herramientas de compilación y de tests, no en lo que corre en tu móvil. Para quitarlos, npm propone versiones mayores incompatibles con el stack fijado (incluso bajar Expo a la 44), así que **no se toca nada**. Se vuelve a mirar al subir de parche el SDK de Expo, o el 2026-11-14 si antes no hay subida.
+
 ## Procesadas
 
 | Fecha | Idea | Qué se hizo |

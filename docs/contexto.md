@@ -70,13 +70,12 @@ Para retomar en una sesión nueva:
 
 ## Pendiente del humano
 
-- **APK de la versión 1:** `eas build --profile preview` cuando quieras instalarla en el móvil (gasta una de las 15 compilaciones gratis del mes). Conviene antes de ejecutar la 1.2: Progreso tiene sentido con unos días de uso real.
+- **APK de la versión 1** (aplazado por el humano el 2026-10-14): `eas build --profile preview` cuando quieras instalarla en el móvil (gasta una de las 15 compilaciones gratis del mes). Conviene antes de ejecutar la 1.2: Progreso tiene sentido con unos días de uso real.
 - **Recordatorios (R6):** al instalar el APK de la 1.1, la lista de comprobación del informe de R5 (permiso, aviso en punto, tras reiniciar, ahorro de batería, tocar el aviso).
 - **Revisar la app en la web de pruebas** (`https://app-desarrollo-personal-pruebas.vercel.app`, primero la sesión de Vercel; después `demo@example.com`) y contar lo que no guste al arquitecto.
-- **Secreto `PRUEBAS_DEMO_PASSWORD` de GitHub:** puede haberse guardado vacío (se puso con `!`, sin teclado). Volver a ponerlo desde `secretos.env` antes de usar el botón de `seed-pruebas.yml`.
-- **Dos worktrees con ficheros sueltos** que el script no borra: `propuesta-recordatorios` (borrador de la propuesta, la versión final está en `docs/propuestas/recordatorios.md`) y `revision-t05` (informe de la revisión de T05). Decir si se guardan o se borran; y la carpeta vacía `ADP-3-base-de-datos-y-acceso`, que es de `root`, se borra con `sudo rmdir` en una terminal normal.
+- La carpeta vacía `~/orca/workspaces/app-desarrollo-personal/ADP-3-base-de-datos-y-acceso` es de `root`: se borra con `sudo rmdir` en una terminal normal (los dos worktrees con ficheros sueltos se borraron el 2026-10-14, con permiso del humano).
 - Revisar el [buzón](buzon.md): lo que decidió el orquestador por su cuenta.
-- Revisar T01 en el móvil con Expo Go (H05) y los avisos de `npm audit` (antes de publicar y el 2026-10-14).
+- Revisar T01 en el móvil con Expo Go (H05). Los avisos de `npm audit` los revisó el orquestador el 2026-10-14 (buzón): se vuelven a mirar el 2026-11-14 o al subir de parche Expo.
 - Cuando T15 esté en uso, el Chromium del sistema sobra (`sudo pacman -Rns chromium`, si no lo usa para otra cosa).
 - El ticket `ADP-1` es de prueba y se puede borrar a mano.
 
