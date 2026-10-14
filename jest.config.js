@@ -18,6 +18,7 @@ module.exports = {
     '^@react-native-async-storage/async-storage$':
       '<rootDir>/node_modules/@react-native-async-storage/async-storage/jest/async-storage-mock.js',
   },
+  setupFiles: ['<rootDir>/jest.setup.js'],
   testMatch: ['<rootDir>/src/**/*.test.ts', '<rootDir>/src/**/*.test.tsx'],
   testPathIgnorePatterns: ['/node_modules/', '\\.integration\\.test\\.'],
   transformIgnorePatterns,
