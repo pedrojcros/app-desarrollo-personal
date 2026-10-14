@@ -195,7 +195,7 @@ Se definen aquí una sola vez y los casos las enlazan.
 
 - **A1.** En el paso 3, si el usuario marca el elemento como **no hecho**: el sistema hace lo mismo con el estado «no hecha» (RN-02). Continúa en el paso 4.
 - **A2.** En el paso 3, si el usuario abre **«Marcadas hoy»** y **cambia un elemento** (de hecho a no hecho, o al revés) o lo **devuelve a pendiente**: el sistema guarda el cambio y el momento (RN-03, RN-04). Si vuelve a pendiente, reaparece en la lista. Termina el caso.
-- **A3.** En el paso 1, si el usuario elige **otro día**: el sistema muestra ese día. Si es **posterior a hoy**, se ve pero no se puede marcar nada (RN-05). Continúa en el paso 2.
+- **A3.** En el paso 1, si el usuario abre **Próximo** para ver lo que viene: el sistema muestra lo de las próximas semanas según RN-46, agrupado por semana y por día, sin poder marcar nada (RN-05). Si toca un elemento, se abre su ficha para cambiarlo (CU-06). Termina el caso. *(Antes, Hoy permitía elegir otro día; lo sustituye Próximo, DEC-51.)*
 - **A4.** En el paso 2, si **no hay nada pendiente** para ese día: el sistema muestra un mensaje de día libre. Termina el caso.
 - **A5.** En el paso 1, si el usuario abre una **categoría** o la **Bandeja de entrada** en lugar del día: el sistema muestra todo lo pendiente que contiene, con y sin fecha. El usuario marca desde ahí como en el paso 3; el sistema guarda como en el paso 4, quita el elemento de esa lista (RN-30) y muestra el aviso con Deshacer (RN-31). Termina el caso.
 - **A6.** En el paso 5, si el usuario pulsa **Deshacer** en el aviso: el sistema devuelve el elemento a su estado anterior y a su lista (RN-31). Termina el caso.
@@ -207,6 +207,7 @@ Se definen aquí una sola vez y los casos las enlazan.
 
 ### Reglas de negocio
 
+- **RN-46.** **Próximo** muestra lo que toca desde **mañana** hasta el **domingo de la cuarta semana siguiente a la actual** (las semanas van de lunes a domingo; si hoy es miércoles 14 de octubre, hasta el domingo 15 de noviembre). Lo que queda de la semana actual va bajo «Esta semana» (si hoy es domingo, no hay); cada semana siguiente, bajo «Semana del 19 al 25 de octubre». Muestra las tareas con fecha pendientes y las ocurrencias de los hábitos que **no** son diarios. No salen los hábitos que tocan todos los días: los de «todos los días», «cada 1 día» o los siete días de la semana, según su regla vigente en cada fecha. Los días sin nada no se muestran; una semana sin nada dice que está libre. *(DEC-51.)*
 - Aplican RN-01 a RN-09 y RN-28 a RN-32. En concreto: RN-07 y RN-08 explican por qué ni los hábitos de días pasados sin marcar ni las tareas vencidas salen aquí, y RN-32 por qué la ocurrencia de hoy se marca sin depender de la de ayer.
 
 ### Cómo se comprueba
@@ -221,6 +222,7 @@ Se definen aquí una sola vez y los casos las enlazan.
 - **Escenario 8: día futuro (E2).** Cuando el usuario intenta marcar una ocurrencia de mañana, entonces no se permite y el estado no cambia.
 - **Escenario 9: Deshacer (A6).** Dado que el usuario acaba de marcar «Leche» como hecha, cuando pulsa Deshacer, entonces «Leche» vuelve a estar pendiente en su lista.
 - **Escenario 10: ocurrencias independientes.** Dado que ayer «Lavarme los dientes» quedó sin marcar, cuando hoy el usuario marca la de hoy como hecha, entonces la de hoy queda hecha y la de ayer sigue sin marcar en «pendientes de días anteriores».
+- **Escenario 11: Próximo (A3).** Dado que hoy es miércoles 14 de octubre, «Nadar» toca los miércoles, «Lavarme los dientes» todos los días y «Entregar la práctica» tiene fecha el lunes 19, cuando el usuario abre Próximo, entonces ve «Entregar la práctica» en la semana del 19 al 25 y «Nadar» el miércoles 21, no ve «Lavarme los dientes» ni nada de hoy, y no puede marcar nada.
 
 ---
 
