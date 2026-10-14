@@ -1,4 +1,9 @@
-import { addDays, getIsoWeekday, parseCalendarDate } from '../calendar-date';
+import {
+  addDays,
+  compareCalendarDates,
+  getIsoWeekday,
+  parseCalendarDate,
+} from '../calendar-date';
 import type { Habit, HabitMark, Task } from '../entities';
 import { findRuleInForce } from '../recurrence';
 import {
@@ -60,12 +65,39 @@ export function getUpcomingRange(today: CalendarDate): {
 }
 
 export function getUpcomingWeeks(input: UpcomingInput): UpcomingWeek[] {
-  const range = getUpcomingRange(input.today);
-  const firstWeekStart = getFirstWeekStart(input.today, range.from);
-  const weekStarts = getWeekStarts(firstWeekStart, range.to);
-  const dayItems = getItemsByDate(input, range.from, range.to);
+  const items = getUpcomingItems(input);
+  return groupUpcomingItems(items, input.today);
+}
 
-  const currentWeekStart = getMondayOfWeek(input.today);
+/** Lista plana del rango, ordenada por fecha y, dentro del día, como en Hoy. */
+export function getUpcomingItems(input: UpcomingInput): ViewItem[] {
+  const range = getUpcomingRange(input.today);
+  const items = [
+    ...getHabitItems(input, range.from, range.to),
+    ...getTaskItems(input.tasks, range.from, range.to),
+  ];
+  const dayItems = getItemsByDate(items, range.from, range.to);
+  const days = [...dayItems.entries()];
+  days.sort(([firstDate], [secondDate]) =>
+    compareCalendarDates(firstDate, secondDate),
+  );
+  return days.flatMap(([, itemsOfDay]) => itemsOfDay);
+}
+
+/**
+ * Agrupa por semanas y días una lista plana ya filtrada. Existe aparte para
+ * que la caché de vistas guarde la lista plana (y se parchee al marcar) y la
+ * pantalla agrupe al leer. Ignora lo que no tiene fecha o cae fuera del rango.
+ */
+export function groupUpcomingItems(
+  items: ViewItem[],
+  today: CalendarDate,
+): UpcomingWeek[] {
+  const range = getUpcomingRange(today);
+  const firstWeekStart = getFirstWeekStart(today, range.from);
+  const weekStarts = getWeekStarts(firstWeekStart, range.to);
+  const dayItems = getItemsByDate(items, range.from, range.to);
+  const currentWeekStart = getMondayOfWeek(today);
 
   return weekStarts.map((weekStart) => {
     const days = getDaysForWeek(weekStart, range.from, dayItems);
@@ -126,12 +158,12 @@ function getWeekStarts(
   return weekStarts;
 }
 
-function getItemsByDate(
+function getHabitItems(
   input: UpcomingInput,
   rangeStart: CalendarDate,
   rangeEnd: CalendarDate,
-): Map<CalendarDate, ViewItem[]> {
-  const dayItems = new Map<CalendarDate, ViewItem[]>();
+): ViewItem[] {
+  const items: ViewItem[] = [];
   const markIndex = indexMarks(input.marks);
 
   for (const habit of input.habits) {
@@ -150,27 +182,58 @@ function getItemsByDate(
       if (isDailyRule(rule)) {
         continue;
       }
-      const item = occurrenceToViewItem(habit, occurrence, markIndex);
-      addItemToDate(dayItems, occurrence.date, item);
+      items.push(occurrenceToViewItem(habit, occurrence, markIndex));
     }
   }
+  return items;
+}
 
-  for (const task of input.tasks) {
+function getTaskItems(
+  tasks: Task[],
+  rangeStart: CalendarDate,
+  rangeEnd: CalendarDate,
+): ViewItem[] {
+  const items: ViewItem[] = [];
+
+  for (const task of tasks) {
     if (task.archivedOn !== null || task.status !== 'pending') {
       continue;
     }
     if (
       task.dueDate === null ||
-      task.dueDate < rangeStart ||
-      task.dueDate > rangeEnd
+      !isDateInRange(task.dueDate, rangeStart, rangeEnd)
     ) {
       continue;
     }
-    addItemToDate(dayItems, task.dueDate, taskToViewItem(task));
+    items.push(taskToViewItem(task));
+  }
+  return items;
+}
+
+function isDateInRange(
+  date: CalendarDate,
+  rangeStart: CalendarDate,
+  rangeEnd: CalendarDate,
+): boolean {
+  return date >= rangeStart && date <= rangeEnd;
+}
+
+function getItemsByDate(
+  items: ViewItem[],
+  rangeStart: CalendarDate,
+  rangeEnd: CalendarDate,
+): Map<CalendarDate, ViewItem[]> {
+  const dayItems = new Map<CalendarDate, ViewItem[]>();
+
+  for (const item of items) {
+    if (item.date === null || !isDateInRange(item.date, rangeStart, rangeEnd)) {
+      continue;
+    }
+    addItemToDate(dayItems, item.date, item);
   }
 
-  for (const items of dayItems.values()) {
-    items.sort(compareViewItemsForDay);
+  for (const itemsOfDay of dayItems.values()) {
+    itemsOfDay.sort(compareViewItemsForDay);
   }
   return dayItems;
 }

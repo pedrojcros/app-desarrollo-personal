@@ -4,8 +4,10 @@ import type { Habit, HabitMark, Task } from '../entities';
 import type { ViewItem } from '../items';
 import {
   formatWeekTitle,
+  getUpcomingItems,
   getUpcomingRange,
   getUpcomingWeeks,
+  groupUpcomingItems,
 } from './upcoming';
 
 function makeHabit(overrides: Partial<Habit> = {}): Habit {
@@ -356,6 +358,118 @@ describe('getUpcomingWeeks', () => {
       'Tarde',
     ]);
     expect(weeks.slice(2).every((week) => week.days.length === 0)).toBe(true);
+  });
+});
+
+describe('getUpcomingItems', () => {
+  it('returns a flat list ordered by date and then by time of day', () => {
+    const lateTask = makeTask({ id: 'late', name: 'Tarde', dueTime: '18:00' });
+    const earlyTask = makeTask({
+      id: 'early',
+      name: 'Temprano',
+      dueTime: '08:00',
+    });
+    const laterDayTask = makeTask({
+      id: 'later-day',
+      name: 'Otro día',
+      dueDate: '2026-10-16',
+    });
+
+    const items = getUpcomingItems({
+      habits: [makeHabit()],
+      marks: [],
+      tasks: [lateTask, laterDayTask, earlyTask],
+      today: '2026-10-14',
+    });
+
+    expect(items.slice(0, 4).map((item) => [item.date, item.name])).toEqual([
+      ['2026-10-16', 'Otro día'],
+      ['2026-10-19', 'Temprano'],
+      ['2026-10-19', 'Tarde'],
+      ['2026-10-21', 'Nadar'],
+    ]);
+  });
+});
+
+describe('groupUpcomingItems', () => {
+  const today = '2026-10-14';
+  const outsideRangeDates = ['2026-10-14', '2026-11-16'];
+
+  function makeItem(name: string, date: string | null): ViewItem {
+    return {
+      target: { kind: 'task', taskId: name },
+      name,
+      status: 'pending',
+      date,
+      sortTime: null,
+      categoryId: null,
+      sectionId: null,
+      markedAt: null,
+    };
+  }
+
+  it('returns every week of the range, empty when nothing is given', () => {
+    const weeks = groupUpcomingItems([], today);
+
+    expect(weeks.map((week) => week.weekStart)).toEqual([
+      '2026-10-12',
+      '2026-10-19',
+      '2026-10-26',
+      '2026-11-02',
+      '2026-11-09',
+    ]);
+    expect(weeks.map((week) => week.isCurrentWeek)).toEqual([
+      true,
+      false,
+      false,
+      false,
+      false,
+    ]);
+    expect(weeks.every((week) => week.days.length === 0)).toBe(true);
+  });
+
+  it('ignores items without date or outside the range', () => {
+    const outsideItems = outsideRangeDates.map((date) =>
+      makeItem('Fuera', date),
+    );
+    const undatedItem = makeItem('Sin fecha', null);
+    const insideItem = makeItem('Dentro', '2026-10-15');
+
+    const weeks = groupUpcomingItems(
+      [...outsideItems, undatedItem, insideItem],
+      today,
+    );
+
+    expect(weeks[0].days).toEqual([
+      { date: '2026-10-15', items: [insideItem] },
+    ]);
+    expect(weeks.slice(1).every((week) => week.days.length === 0)).toBe(true);
+  });
+
+  it('shows only the days with items and orders each day', () => {
+    const zebra = makeItem('Zebra', '2026-10-20');
+    const apple = makeItem('Manzana', '2026-10-20');
+    const nextWeek = makeItem('Otra', '2026-10-27');
+
+    const weeks = groupUpcomingItems([zebra, nextWeek, apple], today);
+
+    expect(weeks[1].days).toEqual([
+      { date: '2026-10-20', items: [apple, zebra] },
+    ]);
+    expect(weeks[2].days).toEqual([{ date: '2026-10-27', items: [nextWeek] }]);
+  });
+
+  it('is what getUpcomingWeeks returns for the items of getUpcomingItems', () => {
+    const input = {
+      habits: [makeHabit()],
+      marks: [],
+      tasks: [makeTask(), makeTask({ id: 'second', dueDate: '2026-10-16' })],
+      today,
+    };
+
+    const composedWeeks = groupUpcomingItems(getUpcomingItems(input), today);
+
+    expect(getUpcomingWeeks(input)).toEqual(composedWeeks);
   });
 });
 
