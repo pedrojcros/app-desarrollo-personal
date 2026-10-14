@@ -26,6 +26,7 @@ Lee el apartado «069 — Selector de categoría dentro de los formularios» de 
 2. Con `openDirection="up"` (añadir rápido) sigue flotando como ahora.
 3. `onOpenChange` sigue funcionando igual en las dos formas.
 4. Tests de las dos formas en `category-select.test.tsx`. Los de `src/components/quick-add/upward-choice.test.tsx` y `quick-add.test.tsx` siguen pasando sin tocarlos.
+5. **Comprobación en la web, en formato móvil:** el Supabase local ya está arrancado (no lo reinicies); siembra el usuario `seed@example.com` como dice `scripts/seed/README.md`, «Uso local» (`SEED_PROFILE=realistic`, con una contraseña local que generes sin imprimirla), arranca la web en el puerto **8094** (`./docker/app/run npx expo start --web --port 8094`; si no hay `.env`, `cp .env.example .env`) y, con el MCP `chrome-devtools`, **redimensiona siempre la ventana a 360×800 antes de mirar**. En «Nueva tarea» y en el formulario de hábito, abre la categoría: la lista se ve entera y se puede elegir. Guarda una captura en `~/capturas-adp/` y para ese servidor al terminar.
 
 ## Fuera de alcance
 
