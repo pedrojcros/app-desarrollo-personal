@@ -9,31 +9,50 @@ import { getQuickAddStartDate } from '@/domain/quick-add';
 import type { QuickHabitOptions } from './habit-options';
 import type { QuickAddDefaults } from './quick-add-provider';
 
+export interface QuickAddDraft {
+  name: string;
+  kind: 'task' | 'habit';
+  place: { categoryId: string | null; sectionId: string | null };
+  dueDate: string | null;
+  startDate: string;
+  options: QuickHabitOptions;
+}
+
 export function useQuickAddDraft(
   defaults: QuickAddDefaults,
   close: () => void,
+  savedDraft?: QuickAddDraft,
+  saveDraft?: (draft: QuickAddDraft) => void,
 ) {
   const today = useToday();
   const router = useRouter();
   const createTask = useCreateTask();
   const createHabit = useCreateHabit();
-  const [name, setName] = useState('');
-  const [kind, setKind] = useState<'task' | 'habit'>('task');
-  const [place, setPlace] = useState({
-    categoryId: defaults.categoryId,
-    sectionId: defaults.sectionId,
-  });
-  const [dueDate, setDueDate] = useState(defaults.dueDate);
-  const [startDate, setStartDate] = useState(
-    getQuickAddStartDate(defaults.dueDate, today),
+  const [name, setName] = useState(savedDraft?.name ?? '');
+  const [kind, setKind] = useState<'task' | 'habit'>(
+    savedDraft?.kind ?? 'task',
   );
-  const [options, setOptions] = useState<QuickHabitOptions>({
-    frequency: 'daily',
-    weekdays: [],
-    intervalText: '1',
-    moment: 'none',
-    timeOfDay: '09:00',
-  });
+  const [place, setPlace] = useState(
+    savedDraft?.place ?? {
+      categoryId: defaults.categoryId,
+      sectionId: defaults.sectionId,
+    },
+  );
+  const [dueDate, setDueDate] = useState(
+    savedDraft ? savedDraft.dueDate : defaults.dueDate,
+  );
+  const [startDate, setStartDate] = useState(
+    savedDraft?.startDate ?? getQuickAddStartDate(defaults.dueDate, today),
+  );
+  const [options, setOptions] = useState<QuickHabitOptions>(
+    savedDraft?.options ?? {
+      frequency: 'daily',
+      weekdays: [],
+      intervalText: '1',
+      moment: 'none',
+      timeOfDay: '09:00',
+    },
+  );
   const [error, setError] = useState<string>();
   const [saving, setSaving] = useState(false);
   const submissionInProgress = useRef(false);
@@ -52,6 +71,10 @@ export function useQuickAddDraft(
     nameInput.current?.focus();
     focusAfterSave.current = false;
   }, [disabled]);
+
+  useEffect(() => {
+    saveDraft?.({ name, kind, place, dueDate, startDate, options });
+  }, [saveDraft, name, kind, place, dueDate, startDate, options]);
 
   function validate(): string | undefined {
     const trimmedName = name.trim();

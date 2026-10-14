@@ -1,10 +1,14 @@
-import { jest, beforeEach, expect, it } from '@jest/globals';
+import { jest, beforeEach, afterEach, expect, it } from '@jest/globals';
 import {
+  act,
+  cleanupAsync,
   fireEvent,
   render,
   screen,
   waitFor,
 } from '@testing-library/react-native';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import { Keyboard, Platform, type KeyboardEventListener } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { formatFullDate } from '@/components/date-field/format';
 import { ThemeContext } from '@/theme/theme-context';
@@ -233,4 +237,149 @@ it('shows the chosen date formatted instead of as YYYY-MM-DD', () => {
   fireEvent.press(screen.getByLabelText('Fecha: Mañana'));
   expect(screen.getByText(formatFullDate('2026-10-08'))).toBeVisible();
   expect(screen.queryByText('2026-10-08')).toBeNull();
+});
+
+const subscribeKeyboard = Keyboard.addListener.bind(Keyboard);
+let hideKeyboard: KeyboardEventListener;
+beforeEach(() => {
+  hideKeyboard = () => {};
+  jest
+    .spyOn(Keyboard, 'addListener')
+    .mockImplementation((eventName, listener) => {
+      if (eventName === 'keyboardDidHide') {
+        hideKeyboard = listener;
+      }
+      return subscribeKeyboard(eventName, listener);
+    });
+});
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+function dismissSystemKeyboard() {
+  act(() => hideKeyboard({} as Parameters<KeyboardEventListener>[0]));
+}
+it('uses body typography and disables name autofill', () => {
+  openBar();
+  const nameField = screen.getByLabelText('Nombre');
+  expect(nameField.props.className).toContain('text-body');
+  expect(nameField.props.autoComplete).toBe('off');
+  expect(nameField.props.importantForAutofill).toBe('no');
+});
+it('disables interval autofill', () => {
+  openBar();
+  fireEvent.press(screen.getByText('Hábito'));
+  fireEvent.press(screen.getByLabelText('Frecuencia'));
+  fireEvent.press(screen.getByText('Cada N días'));
+  const intervalField = screen.getByLabelText('Cada cuántos días');
+  expect(intervalField.props.autoComplete).toBe('off');
+  expect(intervalField.props.importantForAutofill).toBe('no');
+});
+it('closes on system keyboard hide and restores the draft when reopened', () => {
+  openBar();
+  fireEvent.changeText(screen.getByLabelText('Nombre'), 'Leer un capítulo');
+  fireEvent.press(screen.getByLabelText('Fecha: Mañana'));
+  dismissSystemKeyboard();
+  expect(screen.queryByLabelText('Nombre')).toBeNull();
+  fireEvent.press(screen.getByLabelText('Añadir tarea o hábito'));
+  expect(screen.getByLabelText('Nombre')).toHaveDisplayValue(
+    'Leer un capítulo',
+  );
+  expect(screen.getByText(formatFullDate('2026-10-08'))).toBeVisible();
+});
+it.each([
+  'Calendario',
+  'Categoría: Bandeja de entrada',
+  'Frecuencia',
+  'Cuándo',
+])('keeps the bar when %s hides the keyboard', (selectorLabel) => {
+  openBar();
+  if (selectorLabel === 'Frecuencia' || selectorLabel === 'Cuándo') {
+    fireEvent.press(screen.getByText('Hábito'));
+  }
+  fireEvent.press(screen.getByLabelText(selectorLabel));
+  dismissSystemKeyboard();
+  expect(screen.getByLabelText('Nombre')).toBeVisible();
+});
+it('closes after the category selector has closed', () => {
+  openBar();
+  fireEvent.press(screen.getByLabelText('Categoría: Bandeja de entrada'));
+  dismissSystemKeyboard();
+  fireEvent.press(screen.getByRole('radio', { name: 'Bandeja de entrada' }));
+  dismissSystemKeyboard();
+  expect(screen.queryByLabelText('Nombre')).toBeNull();
+});
+
+it('closes after switching away from an open habit selector', () => {
+  openBar();
+  fireEvent.press(screen.getByText('Hábito'));
+  fireEvent.press(screen.getByLabelText('Frecuencia'));
+  fireEvent.press(screen.getByText('Tarea'));
+  dismissSystemKeyboard();
+  expect(screen.queryByLabelText('Nombre')).toBeNull();
+});
+it('keeps the draft while the native time picker hides the keyboard', () => {
+  jest.spyOn(DateTimePickerAndroid, 'open').mockImplementation(() => {});
+  openBar();
+  fireEvent.press(screen.getByText('Hábito'));
+  fireEvent.press(screen.getByLabelText('Cuándo'));
+  fireEvent.press(screen.getByText('Hora exacta'));
+  fireEvent.press(screen.getByLabelText('Hora exacta'));
+  dismissSystemKeyboard();
+  expect(screen.getByLabelText('Nombre')).toBeVisible();
+});
+
+it('closes on a restored web viewport and keeps the name after reopening', async () => {
+  jest.replaceProperty(Platform, 'OS', 'web');
+  const originalWindow = Object.getOwnPropertyDescriptor(globalThis, 'window');
+  const originalDocument = Object.getOwnPropertyDescriptor(
+    globalThis,
+    'document',
+  );
+  const viewport = Object.assign(new EventTarget(), {
+    height: 640,
+    offsetTop: 0,
+    scale: 1,
+  });
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: { visualViewport: viewport },
+  });
+  Object.defineProperty(globalThis, 'document', {
+    configurable: true,
+    value: new EventTarget(),
+  });
+  function resizeViewport(height: number) {
+    act(() => {
+      viewport.height = height;
+      viewport.dispatchEvent(new Event('resize'));
+    });
+  }
+  try {
+    openBar();
+    fireEvent.changeText(screen.getByLabelText('Nombre'), 'Leer en la web');
+    resizeViewport(320);
+    fireEvent.press(screen.getByLabelText('Categoría: Bandeja de entrada'));
+    resizeViewport(640);
+    expect(screen.getByLabelText('Nombre')).toBeVisible();
+    fireEvent.press(screen.getByRole('radio', { name: 'Bandeja de entrada' }));
+    resizeViewport(320);
+    resizeViewport(640);
+    expect(screen.queryByLabelText('Nombre')).toBeNull();
+    fireEvent.press(screen.getByLabelText('Añadir tarea o hábito'));
+    expect(screen.getByLabelText('Nombre')).toHaveDisplayValue(
+      'Leer en la web',
+    );
+  } finally {
+    await cleanupAsync();
+    if (originalWindow) {
+      Object.defineProperty(globalThis, 'window', originalWindow);
+    } else {
+      Reflect.deleteProperty(globalThis, 'window');
+    }
+    if (originalDocument) {
+      Object.defineProperty(globalThis, 'document', originalDocument);
+    } else {
+      Reflect.deleteProperty(globalThis, 'document');
+    }
+  }
 });

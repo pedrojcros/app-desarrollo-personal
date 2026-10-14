@@ -68,3 +68,32 @@ it('keeps the default web layout when visualViewport is unavailable', () => {
   const { result } = renderHook(useWebViewport);
   expect(result.current).toBeUndefined();
 });
+
+it('reports a keyboard dismissal only after a contracted viewport recovers', () => {
+  jest.replaceProperty(Platform, 'OS', 'web');
+  const viewport = Object.assign(new EventTarget(), {
+    height: 640,
+    offsetTop: 0,
+    scale: 1,
+  });
+  Object.defineProperty(globalThis, 'window', {
+    configurable: true,
+    value: { visualViewport: viewport },
+  });
+  const onKeyboardHide = jest.fn();
+  renderHook(() => useWebViewport(onKeyboardHide));
+  act(() => {
+    viewport.height = 600;
+    viewport.dispatchEvent(new Event('resize'));
+    viewport.height = 640;
+    viewport.dispatchEvent(new Event('resize'));
+  });
+  expect(onKeyboardHide).not.toHaveBeenCalled();
+  act(() => {
+    viewport.height = 320;
+    viewport.dispatchEvent(new Event('resize'));
+    viewport.height = 640;
+    viewport.dispatchEvent(new Event('resize'));
+  });
+  expect(onKeyboardHide).toHaveBeenCalledTimes(1);
+});

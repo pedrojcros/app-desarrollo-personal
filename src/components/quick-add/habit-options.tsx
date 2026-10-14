@@ -39,12 +39,17 @@ export function HabitOptions({
   value,
   onChange,
   disabled,
+  onSelectorOpenChange,
 }: {
   value: QuickHabitOptions;
   onChange(value: QuickHabitOptions): void;
   disabled: boolean;
+  onSelectorOpenChange(selector: string, isOpen: boolean): void;
 }) {
   function change(changes: Partial<QuickHabitOptions>): void {
+    if (changes.moment !== undefined && changes.moment !== 'exact') {
+      onSelectorOpenChange('time', false);
+    }
     onChange({ ...value, ...changes });
   }
   function toggleWeekday(weekday: IsoWeekday): void {
@@ -59,6 +64,7 @@ export function HabitOptions({
       <View className="z-30 flex-row gap-2">
         <UpwardChoice
           label="Frecuencia"
+          onOpenChange={(isOpen) => onSelectorOpenChange('frequency', isOpen)}
           value={value.frequency}
           choices={frequencies}
           disabled={disabled}
@@ -66,6 +72,7 @@ export function HabitOptions({
         />
         <UpwardChoice
           label="Cuándo"
+          onOpenChange={(isOpen) => onSelectorOpenChange('moment', isOpen)}
           value={value.moment}
           choices={moments}
           disabled={disabled}
@@ -99,6 +106,8 @@ export function HabitOptions({
       {value.frequency === 'every_n_days' ? (
         <TextField
           label="Cada cuántos días"
+          autoComplete="off"
+          importantForAutofill="no"
           keyboardType="number-pad"
           value={value.intervalText}
           editable={!disabled}
@@ -108,6 +117,7 @@ export function HabitOptions({
       {value.moment === 'exact' ? (
         <TimeField
           label="Hora exacta"
+          onOpenChange={(isOpen) => onSelectorOpenChange('time', isOpen)}
           value={value.timeOfDay}
           onChange={(timeOfDay) => change({ timeOfDay })}
         />
