@@ -5,6 +5,7 @@ it('groups all view caches for shared invalidation and optimistic patches', asyn
   const client = new QueryClient();
   const keys = [
     queryKeys.today('2026-10-07'),
+    queryKeys.upcoming('2026-10-07'),
     queryKeys.categoryView(null),
     queryKeys.categoryView('category'),
     queryKeys.pastPending('2026-10-07'),
@@ -23,7 +24,15 @@ it('groups all view caches for shared invalidation and optimistic patches', asyn
   );
   expect(queryKeys.categoryView(null)).toEqual(['views', 'category', 'inbox']);
   expect(queryKeys.today('2026-10-08')).not.toEqual(keys[0]);
-  expect(queryKeys.history('2026-10-02', '2026-10-07')).not.toEqual(keys[4]);
-  expect(queryKeys.history('2026-10-01', '2026-10-08')).not.toEqual(keys[4]);
+  expect(queryKeys.history('2026-10-02', '2026-10-07')).not.toEqual(keys[5]);
+  expect(queryKeys.history('2026-10-01', '2026-10-08')).not.toEqual(keys[5]);
+  expect(queryKeys.upcoming('2026-10-07')).toEqual([
+    'views',
+    'upcoming',
+    '2026-10-07',
+  ]);
+  expect(queryKeys.upcoming('2026-10-08')).not.toEqual(
+    queryKeys.upcoming('2026-10-07'),
+  );
   client.clear();
 });

@@ -1,5 +1,6 @@
 import { Link, Tabs, usePathname } from 'expo-router';
 import {
+  CalendarDays,
   History,
   LayoutGrid,
   Settings,
@@ -85,6 +86,10 @@ export default function TabsLayout() {
             headerTitle: '',
             tabBarIcon: tabIcon(Sun),
           }}
+        />
+        <Tabs.Screen
+          name="proximo"
+          options={{ title: 'Próximo', tabBarIcon: tabIcon(CalendarDays) }}
         />
         <Tabs.Screen
           name="listas"

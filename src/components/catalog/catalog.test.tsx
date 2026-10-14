@@ -22,6 +22,10 @@ describe('CatalogScreen', () => {
     render(<CatalogScreen />);
     const themeCount = themeNames.length;
 
+    expect(screen.getAllByText('Nadar')).toHaveLength(themeCount);
+    expect(screen.getAllByText('Semana libre')).toHaveLength(themeCount);
+    expect(screen.getAllByText('Miércoles 21')).toHaveLength(themeCount);
+    expect(screen.getAllByText('Listas')).toHaveLength(themeCount);
     expect(screen.getAllByText('Guardar')).toHaveLength(themeCount * 3);
     expect(screen.getAllByText('Comprar proteína')).toHaveLength(themeCount);
     expect(screen.getAllByText('Deshacer')).toHaveLength(themeCount * 2);
