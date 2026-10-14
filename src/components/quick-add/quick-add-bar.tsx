@@ -1,5 +1,5 @@
 import { Send } from 'lucide-react-native';
-import { TextInput, View } from 'react-native';
+import { Platform, TextInput, View } from 'react-native';
 import { CategorySelect } from '@/components/category-select';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
@@ -16,12 +16,14 @@ import {
 
 export function QuickAddBar({
   defaults,
+  isModalShown,
   close,
   draftStorage,
   onSelectorOpenChange,
   onSubmittingChange,
 }: {
   defaults: QuickAddDefaults;
+  isModalShown: boolean;
   close(): void;
   draftStorage: QuickAddDraftStorage;
   onSelectorOpenChange(selector: QuickAddSelector, isOpen: boolean): void;
@@ -43,7 +45,12 @@ export function QuickAddBar({
       openMore,
     },
     status: { error, disabled },
-  } = useQuickAddDraft(defaults, { close, draftStorage, onSubmittingChange });
+  } = useQuickAddDraft(defaults, {
+    close,
+    draftStorage,
+    isModalShown,
+    onSubmittingChange,
+  });
   // El preflight de Tailwind pinta de gris el campo vacío en la web y no llega
   // al contraste mínimo; el color en línea lo corrige.
   const nameColor =
@@ -53,7 +60,7 @@ export function QuickAddBar({
       <View className="flex-row items-center gap-3">
         <TextInput
           ref={setNameInputRef}
-          autoFocus
+          autoFocus={Platform.OS !== 'android'}
           autoComplete="off"
           importantForAutofill="no"
           accessibilityLabel="Nombre"

@@ -50,10 +50,12 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
   const [restoredDraft, setRestoredDraft] = useState<QuickAddDraft>();
   const openSelectors = useRef(new Set<QuickAddSelector>());
   const submitting = useRef(false);
+  const awaitingKeyboardAfterSave = useRef(false);
   // `defaults` sigue lleno mientras el menú se cierra animado: solo se vacía
   // cuando la animación termina y ya se puede desmontar el modal.
   const [defaults, setDefaults] = useState<QuickAddDefaults | null>(null);
   const [isClosing, setIsClosing] = useState(false);
+  const [isModalShown, setIsModalShown] = useState(false);
   const [origin, setOrigin] = useState<QuickAddOrigin>();
   const insets = useSafeAreaInsets();
   // En Android el diálogo ajusta sus propios insets, incluido el teclado.
@@ -67,6 +69,7 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
       setRestoredDraft(savedDraft.current);
       setOrigin(nextOrigin);
       setIsClosing(false);
+      setIsModalShown(false);
       setDefaults(nextDefaults);
     },
     [],
@@ -83,8 +86,10 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
   );
   const close = useCallback(() => {
     setIsClosing(true);
+    setIsModalShown(false);
     openSelectors.current.clear();
     submitting.current = false;
+    awaitingKeyboardAfterSave.current = false;
     Keyboard.dismiss();
   }, []);
   const closeOnKeyboardHide = useCallback(() => {
@@ -100,7 +105,13 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
   const isMenuOpen = defaults !== null && !isClosing;
   const viewportStyle = useWebViewport(isMenuOpen, closeOnKeyboardHide);
   const onSubmittingChange = useCallback((isSubmitting: boolean) => {
+    // Pedir foco no garantiza que el teclado haya terminado de ocultarse.
+    if (Platform.OS === 'android' && !isSubmitting) {
+      awaitingKeyboardAfterSave.current = true;
+      return;
+    }
     submitting.current = isSubmitting;
+    awaitingKeyboardAfterSave.current = false;
   }, []);
   const onSelectorOpenChange = useCallback(
     (selector: QuickAddSelector, isOpen: boolean) => {
@@ -116,11 +127,21 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
     if (!isMenuOpen || Platform.OS === 'web') {
       return;
     }
-    const subscription = Keyboard.addListener(
+    const hideSubscription = Keyboard.addListener(
       'keyboardDidHide',
       closeOnKeyboardHide,
     );
-    return () => subscription.remove();
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+      if (!awaitingKeyboardAfterSave.current) {
+        return;
+      }
+      awaitingKeyboardAfterSave.current = false;
+      submitting.current = false;
+    });
+    return () => {
+      hideSubscription.remove();
+      showSubscription.remove();
+    };
   }, [isMenuOpen, closeOnKeyboardHide]);
   useEffect(() => {
     if (!isMenuOpen || Platform.OS !== 'web') {
@@ -143,6 +164,7 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
           transparent
           visible
           onRequestClose={close}
+          onShow={() => setIsModalShown(true)}
           statusBarTranslucent={!usesAndroidWindowInsets}
           navigationBarTranslucent={!usesAndroidWindowInsets}
         >
@@ -175,6 +197,7 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
                 >
                   <QuickAddBar
                     defaults={defaults}
+                    isModalShown={isModalShown}
                     close={close}
                     draftStorage={draftStorage}
                     onSelectorOpenChange={onSelectorOpenChange}
