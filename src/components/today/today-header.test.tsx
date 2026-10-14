@@ -1,6 +1,7 @@
 import { expect, it } from '@jest/globals';
 import { render, screen } from '@testing-library/react-native';
 
+import type { ViewItem } from '@/domain/items';
 import { ThemeContext } from '@/theme/theme-context';
 import { themeColors, themeFonts, themeShapes } from '@/theme/tokens';
 
@@ -15,18 +16,22 @@ const themeValue = {
   shape: themeShapes.white,
 };
 
-it('expone el título Hoy como encabezado', () => {
+function renderHeader(total: number, marked: ViewItem[]) {
   render(
     <ThemeContext.Provider value={themeValue}>
-      <TodayHeader
-        date="2026-10-07"
-        today="2026-10-07"
-        total={0}
-        marked={[]}
-        onSelectDate={() => {}}
-      />
+      <TodayHeader total={total} marked={marked} />
     </ThemeContext.Provider>,
   );
+}
+
+it('expone el título Hoy como encabezado', () => {
+  renderHeader(0, []);
 
   expect(screen.getByRole('header', { name: 'Hoy' })).toBeTruthy();
+});
+
+it('muestra la línea de progreso del día', () => {
+  renderHeader(3, []);
+
+  expect(screen.getByLabelText('0 de 3 marcadas')).toBeTruthy();
 });

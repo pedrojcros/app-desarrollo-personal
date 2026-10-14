@@ -2,14 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 
 import type { Habit, HabitMark, Task } from '../entities';
 import type { ViewItem } from '../items';
-import {
-  canMarkDay,
-  formatLongDate,
-  getDayTitle,
-  getMarkedSectionTitle,
-  getTodayItems,
-  summarizeDay,
-} from './today';
+import { canMarkDay, getTodayItems, summarizeDay } from './today';
 
 const today = '2026-10-07';
 
@@ -297,38 +290,11 @@ describe('summarizeDay', () => {
   });
 });
 
-describe('formatLongDate', () => {
-  it('writes the date in Spanish', () => {
-    expect(formatLongDate('2026-10-06')).toBe('Martes, 6 de octubre de 2026');
-    expect(formatLongDate('2026-01-04')).toBe('Domingo, 4 de enero de 2026');
-  });
-});
-
-describe('getDayTitle', () => {
-  it('names today, yesterday and tomorrow', () => {
-    expect(getDayTitle('2026-10-07', today)).toBe('Hoy');
-    expect(getDayTitle('2026-10-06', today)).toBe('Ayer');
-    expect(getDayTitle('2026-10-08', today)).toBe('Mañana');
-  });
-
-  it('uses the weekday name for any other day', () => {
-    expect(getDayTitle('2026-10-14', today)).toBe('Miércoles');
-    expect(getDayTitle('2026-10-04', today)).toBe('Domingo');
-  });
-});
-
 describe('canMarkDay', () => {
   it('allows today and past days but not future days', () => {
     expect(canMarkDay('2026-10-07', today)).toBe(true);
     expect(canMarkDay('2026-10-01', today)).toBe(true);
     expect(canMarkDay('2026-10-08', today)).toBe(false);
-  });
-});
-
-describe('getMarkedSectionTitle', () => {
-  it('says "hoy" only for today', () => {
-    expect(getMarkedSectionTitle('2026-10-07', today)).toBe('Marcadas hoy');
-    expect(getMarkedSectionTitle('2026-10-06', today)).toBe('Marcadas ese día');
   });
 });
 

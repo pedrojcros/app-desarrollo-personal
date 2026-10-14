@@ -14,6 +14,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react-native';
+import { StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { UndoToastProvider } from '@/components/undo-toast';
@@ -215,17 +216,41 @@ afterEach(() => {
 });
 
 describe('Today screen', () => {
-  it('shows the date, the heading and pending items with their meta', async () => {
+  it('shows the pending items with their meta and the progress line', async () => {
     mockTableRows = { habits: [brushHabitRow], tasks: [makeTaskRow({})] };
 
     renderScreen();
 
     expect(await screen.findByText('Lavarme los dientes')).toBeTruthy();
-    expect(screen.getByText('Miércoles, 7 de octubre de 2026')).toBeTruthy();
-    expect(screen.getByText('Hoy')).toBeTruthy();
     expect(screen.getByText('21:00 · Personal · Hábito')).toBeTruthy();
     expect(screen.getByText('Tarea')).toBeTruthy();
     expect(screen.getByLabelText('0 de 2 marcadas')).toBeTruthy();
+  });
+
+  it('has no day navigator and no date', async () => {
+    mockTableRows = { tasks: [makeTaskRow({})] };
+
+    renderScreen();
+
+    await screen.findByText('Leche');
+    expect(screen.queryByLabelText('Día anterior')).toBeNull();
+    expect(screen.queryByLabelText('Día siguiente')).toBeNull();
+    expect(screen.queryByText('Ir a otro día')).toBeNull();
+    expect(screen.queryByText('Volver a hoy')).toBeNull();
+    expect(screen.queryByText('Miércoles, 7 de octubre de 2026')).toBeNull();
+  });
+
+  it('keeps "Hoy" as a heading that only the screen reader gets', async () => {
+    mockTableRows = { tasks: [makeTaskRow({})] };
+
+    renderScreen();
+
+    await screen.findByText('Leche');
+    const heading = screen.getByRole('header', { name: 'Hoy' });
+    const style = StyleSheet.flatten(heading.props.style);
+    expect(style.opacity).toBe(0);
+    expect(style.width).toBe(1);
+    expect(style.height).toBe(1);
   });
 
   it('says it is a free day when nothing is due', async () => {
@@ -338,21 +363,6 @@ describe('Today screen', () => {
   });
 });
 
-const swimHabitRow = {
-  ...brushHabitRow,
-  id: '33333333-3333-4333-8333-333333333333',
-  name: 'Nadar',
-  time_of_day: '17:00:00',
-  habit_rules: [
-    {
-      valid_from: '2026-09-01',
-      frequency: 'weekdays',
-      weekdays: [3],
-      interval_days: null,
-    },
-  ],
-};
-
 function makeMarkedTask(status: string) {
   return makeTaskRow({ status, marked_at: '2026-10-07T08:00:00.000Z' });
 }
@@ -412,81 +422,5 @@ describe('Marked section (RF-09)', () => {
     });
     expect(screen.getByLabelText('Marcar Leche como hecho')).toBeTruthy();
     expect(screen.getByLabelText('0 de 1 marcadas')).toBeTruthy();
-  });
-});
-
-describe('Other days (RF-10)', () => {
-  it('goes to tomorrow, shows its items and cannot mark them (scenario 8)', async () => {
-    mockTableRows = {
-      tasks: [makeTaskRow({ due_date: '2026-10-08' })],
-    };
-    renderScreen();
-    await screen.findByText('Hoy no tienes nada. Día libre.');
-
-    fireEvent.press(screen.getByLabelText('Día siguiente'));
-
-    expect(await screen.findByText('Leche')).toBeTruthy();
-    expect(screen.getByText('Mañana')).toBeTruthy();
-    expect(screen.getByText('Jueves, 8 de octubre de 2026')).toBeTruthy();
-    const blockedMarks = screen.getAllByLabelText('Todavía no se puede marcar');
-    expect(blockedMarks).toHaveLength(2);
-    fireEvent.press(blockedMarks[0]);
-    expect(screen.queryByText('Marcada como hecha')).toBeNull();
-    expect(screen.getByLabelText('0 de 1 marcadas')).toBeTruthy();
-  });
-
-  it('goes to yesterday and lets the user mark', async () => {
-    mockTableRows = {
-      tasks: [makeTaskRow({ due_date: '2026-10-06' })],
-    };
-    renderScreen();
-    await screen.findByText('Hoy no tienes nada. Día libre.');
-
-    fireEvent.press(screen.getByLabelText('Día anterior'));
-    await screen.findByText('Leche');
-    fireEvent.press(screen.getByLabelText('Marcar Leche como hecho'));
-
-    expect(await screen.findByText('Marcadas ese día (1)')).toBeTruthy();
-    expect(screen.getByText('Ayer')).toBeTruthy();
-  });
-
-  it('says it is a free day on any day', async () => {
-    renderScreen();
-    await screen.findByText('Hoy no tienes nada. Día libre.');
-
-    fireEvent.press(screen.getByLabelText('Día siguiente'));
-
-    expect(
-      await screen.findByText('Ese día no tienes nada. Día libre.'),
-    ).toBeTruthy();
-  });
-
-  it('comes back to today with the button', async () => {
-    renderScreen();
-    await screen.findByText('Hoy no tienes nada. Día libre.');
-    expect(screen.queryByText('Volver a hoy')).toBeNull();
-
-    fireEvent.press(screen.getByLabelText('Día anterior'));
-    await screen.findByText('Ayer');
-    fireEvent.press(screen.getByText('Volver a hoy'));
-
-    expect(await screen.findByText('Hoy')).toBeTruthy();
-    expect(screen.queryByText('Volver a hoy')).toBeNull();
-  });
-
-  it('shows swimming at 17:00 next Wednesday', async () => {
-    mockTableRows = { habits: [swimHabitRow] };
-    renderScreen();
-    await screen.findByText('Nadar');
-
-    for (let step = 0; step < 7; step += 1) {
-      fireEvent.press(screen.getByLabelText('Día siguiente'));
-    }
-
-    expect(
-      await screen.findByText('Miércoles, 14 de octubre de 2026'),
-    ).toBeTruthy();
-    expect(await screen.findByText('Nadar')).toBeTruthy();
-    expect(screen.getByText('17:00 · Personal · Hábito')).toBeTruthy();
   });
 });
