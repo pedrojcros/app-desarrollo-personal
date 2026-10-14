@@ -20,25 +20,7 @@ Cuando una decisión se cierra:
 
 ## Abiertas
 
-### DEC-56 — Skills y MCP de móvil que trae el humano (abierta el 2026-10-14, sesión de arquitecto)
-
-El humano trae cuatro candidatas de su búsqueda, y la idea que más repite la comunidad: «Expo Skills y crear la tuya propia». Revisadas en GitHub el 2026-10-14 ([propuesta](propuestas/skills-y-mcp.md#6-candidatas-que-trae-el-humano)). Valores por defecto:
-
-1. **Appllama (`appllama/appllama-skills`, MIT): no.** Son dos skills. `appllama-usage` solo funciona con su MCP alojado (`mcp.appllama.io`), y su plugin lo da de alta solo, al instalarlo, en su `.mcp.json` (prohibición 10). `appllama-app-design-skill` (unos 5.000 tokens) repite lo que ya hacen `expo-native-ui`, `expo-animation` y las de Emil y Jakub, está escrita para iOS (HIG, `xcrun simctl`) y trae su propio bucle de simulador, que choca con Maestro y Orca.
-2. **Vercel: ya la tenemos** (`vercel-react-native-skills`). **Callstack: sigue fuera.** Ocupa 6,4 MB, la cubre la de Vercel, y su `agent-device` choca con Orca.
-3. **Metro MCP (`steve228uk/metro-mcp`, MIT, local): ahora no; queda como *spike* para cuando haga falta.** Lee de la app en marcha la consola, los errores, la red, el árbol de componentes y el estado de Expo Router, algo que hoy solo vemos con `logcat`. Pero trae unas 90 herramientas, y en Codex cada una gasta tokens. Además se instala con `npx -y` sin versión fija, es de una sola persona y repite el control del emulador que ya hacen Orca y Maestro. Se prueba si la retrospectiva de la 1.2 dice que depurar en el emulador cuesta tiempo: en Docker, con versión fija y solo los módulos `console`, `errors`, `network` y `components`.
-4. **Skill propia: sí, y se reabre DEC-55.** Lo que la comunidad llama «la tuya propia» ya lo tenemos en el código (`codigo-legible` y `flujo-git`). Falta para las pantallas: hoy un trabajador solo tiene una línea de `AGENTS.md`, y `expo-native-ui` piensa en iPhone. Se hace **`pantallas-app`**, de unas 600 palabras, **automática**:
-   - componentes de `src/components/ui` y nunca `@expo/ui`;
-   - tokens de `src/theme`;
-   - Android y web a 360 px;
-   - el atrás del sistema;
-   - zonas de toque de 44 puntos y contraste AA;
-   - textos en español;
-   - y cuándo pedir las de Emil y Jakub, que siguen siendo las de criterio.
-
-   Se escribe **al cerrar la 1.1.1**, con lo que corrigieron las revisiones del pulido, que es la mejor fuente, y antes de la 1.2.
-
-**Respuesta:**
+*(Ninguna.)*
 
 ---
 
@@ -99,5 +81,6 @@ El humano trae cuatro candidatas de su búsqueda, y la idea que más repite la c
 | DEC-53 | Limpieza de skills que se estorban | El humano (2026-10-14) aceptó con «ok»: (1) quitar de nuestras copias de `expo-overview`, `expo-native-ui` y `expo-design-system` las órdenes de usar `@expo/ui`, que choca con React Native Reusables (**las skills de Expo se quedan todas**); (2) `frontend-ui-engineering`, a demanda; (3) comprobar si Claude Code deja apagar **solo en este proyecto** las unas 70 skills y plugins sincronizados de la cuenta de claude.ai y apagarlas; en la cuenta, solo con permiso; (4) `find-skills` se queda global, porque el humano la usa en otros proyectos; (5) la copia duplicada de `supabase-postgres-best-practices` se queda; (6) no se rescata nada de `design:*` ni `engineering:*`. **Diseño: las de Emil Kowalski y Jakub Krehel son las definitivas** | Encargo 074; [propuesta](propuestas/skills-y-mcp.md#2-las-skills-instaladas) |
 | DEC-54 | Skills por tipo de encargo, para gastar menos tokens | El humano (2026-10-14): «hay que optimizar eso y decidir las skills que darle a cada agente». Aceptado: **solo cinco automáticas** (`codigo-legible`, `flujo-git`, `test-driven-development`, `systematic-debugging` y `verification-before-completion`); las otras 17, **también las de Expo**, pasan a demanda; la plantilla de encargo trae **perfiles** (dominio, datos, pantalla, diseño, revisión, CI, emulador y solo web). Añadido por el humano: **un trabajador puede leer por su cuenta cualquier skill de `.agents/skills-a-demanda/`** si cree que le hace falta, y lo dice en su informe; instalar una nueva sigue necesitando aprobación | Encargo 074; [plantilla](agentes/plantilla-encargo.md#perfiles-de-skills-dec-54); [propuesta](propuestas/skills-y-mcp.md#5-cuánto-gastan-y-cómo-gastar-menos) |
 | DEC-55 | Skills de diseño e ingeniería propias | El humano propuso hacerlas juntando las de Emil Kowalski y las de Anthropic. Quedó en **no**: las de Emil Kowalski y Jakub Krehel son las definitivas de diseño, sin una skill propia por encima (`diseno-app` descartada), y de ingeniería bastan `codigo-legible`, `flujo-git`, `AGENTS.md` y las de superpowers. Fundir las de terceros encarecería cada uso (DEC-54), perdería sus actualizaciones, y las de Anthropic no tienen licencia publicada | — |
+| DEC-56 | Skills y MCP de móvil que trajo el humano, y skill propia de pantallas (reabre DEC-55) | El humano (2026-10-14) aceptó con «sí, continúa» los valores por defecto: (1) **Appllama, no**: su plugin da de alta un MCP alojado (prohibición 10) y su skill de diseño repite las nuestras pensando en iOS; (2) Vercel ya está y **Callstack sigue fuera**; (3) **Metro MCP, ahora no**: *spike* si la retrospectiva de la 1.2 dice que depurar en el emulador cuesta tiempo, en Docker, con versión fija y solo `console`, `errors`, `network` y `components`; (4) **skill propia `pantallas-app`**, de unas 600 palabras y **automática** (la sexta): componentes de `src/components/ui` y nunca `@expo/ui`, tokens de `src/theme`, Android y web a 360 px, el atrás del sistema, toques de 44 puntos y contraste AA, textos en español, y cuándo pedir las de Emil y Jakub. Se escribe al cerrar la 1.1.1, con lo que corrigieron sus revisiones, y antes de la 1.2. Cambia lo de «sin skill propia» de DEC-55; lo demás de DEC-55 sigue | [propuesta](propuestas/skills-y-mcp.md#6-candidatas-que-trae-el-humano) |
 | DEC-05 | Regla de legibilidad | Se mantiene. Los agentes escriben los nombres del código **siempre en inglés** y legible para humanos. | `AGENTS.md` (Legibilidad) |
 | DEC-06 | Idioma | **Nombres de código y mensajes de error en inglés. Comentarios, commits y documentación en español.** | `AGENTS.md` (Convenciones de código) |

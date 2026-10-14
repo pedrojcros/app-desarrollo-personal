@@ -4,7 +4,7 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
-### 2026-10-14 — Skills y MCP: cinco automáticas, Expo sin `@expo/ui` y no al MCP de memoria (DEC-52 a DEC-55)
+### 2026-10-14 — Skills y MCP: cinco automáticas, Expo sin `@expo/ui` y no al MCP de memoria (DEC-52 a DEC-56)
 
 Sesión de arquitecto. El humano preguntó si conviene el MCP de memoria de datamcp y pidió revisar si hay skills que se solapan o se estorban. Detalle en la [propuesta](propuestas/skills-y-mcp.md).
 
@@ -13,6 +13,8 @@ Sesión de arquitecto. El humano preguntó si conviene el MCP de memoria de data
 - **Tokens:** medido lo que gasta cada grupo de skills. Lo que más cuesta es el cuerpo de las que se activan solas. De ahí salen DEC-54 (solo cinco automáticas y perfiles por encargo) y DEC-55 (una skill propia y corta de diseño, en vez de fundir las de terceros).
 
 El humano aceptó todo con «ok»: las de Expo, a demanda; las de Emil Kowalski y Jakub Krehel, definitivas para diseño, sin skill propia encima; `find-skills`, global, porque la usa en otros proyectos; y, a petición suya, cualquier trabajador puede leer por su cuenta una skill a demanda y lo dice en su informe. Lo aplica el [encargo 074](agentes/encargos/074-skills-por-perfil.md).
+
+Después, el humano trajo cuatro candidatas de su búsqueda (DEC-56): Appllama queda fuera porque su plugin da de alta un MCP alojado; Vercel ya estaba; Callstack sigue fuera; y Metro MCP se aplaza a la retrospectiva. De «Expo Skills y crea la tuya propia», la comunidad tiene razón en lo segundo para las pantallas, así que se reabre DEC-55: habrá una skill propia y corta, `pantallas-app`, escrita al cerrar la 1.1.1 con lo que corrigieron sus revisiones.
 
 ### 2026-10-14 — Cerrado el pulido visual: Hoy limpio, Próximo y Listas (DEC-51)
 
