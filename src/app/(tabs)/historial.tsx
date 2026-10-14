@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { DateField } from '@/components/date-field';
 import { HistoryGrid } from '@/components/history-grid';
 import { HistoryFiltersBar } from '@/components/history-grid/history-filters';
@@ -151,7 +151,10 @@ export default function HistoryScreen() {
     );
   }
   return (
-    <View className="flex-1 gap-4 bg-background p-4">
+    <ScrollView
+      className="flex-1 bg-background"
+      contentContainerClassName="grow gap-4 p-4"
+    >
       <View className="gap-1">
         <Text variant="title" accessibilityRole="header">
           Historial
@@ -188,6 +191,6 @@ export default function HistoryScreen() {
         </View>
       ) : null}
       {renderContent()}
-    </View>
+    </ScrollView>
   );
 }
