@@ -32,7 +32,7 @@ Los colores de categoría son los de las categorías de ejemplo; al crear una ca
 
 - **Listas sin cajitas:** filas separadas por una línea fina; a la derecha, ✓ con el color de la categoría y ✗ con el color de «no hecho». Lo marcado sale de la lista.
 - **Hoy:** la fecha pequeña arriba («Martes, 6 de octubre de 2026»), «Hoy» en grande y, a la derecha, «2 de 8» con **8 cuadritos** (hecho, no hecho y vacío). **Sin anillos de progreso en las listas**: en Hoy solo se marca; el progreso vive en el Historial.
-- **Navegación:** barra de pestañas abajo con los cinco destinos (Hoy, Bandeja, Categorías, Pendientes con su contador e Historial). La activa se resalta con una **pastilla** detrás del icono.
+- **Navegación:** barra de pestañas abajo con los cinco destinos (Hoy, Próximo, Listas, Pendientes con su contador e Historial; DEC-51). Listas junta la Bandeja, arriba, y las categorías. La activa se resalta con una **pastilla** detrás del icono.
 - **Botón +:** redondo, abajo a la derecha, encima de la barra.
 - **Aviso:** «Marcada como hecha» a la izquierda y **Deshacer**, en negrita, a la derecha. Sin punto entre los dos.
 - **Añadir rápido** (DEC-30): al pulsar +, una barra encima del teclado. Arriba, el nombre en grande con el botón de enviar; debajo, Tarea/Hábito y «Más»; luego los atajos de fecha (Sin fecha · Hoy · Mañana · Lunes · calendario); y la categoría, con su sección. Toma la fecha y la categoría de la pantalla donde se abre: desde Hoy, hoy; desde una sección, su categoría y su sección. En Hábito: la frecuencia, cuándo (franja u hora) y la fecha de inicio con los mismos atajos.

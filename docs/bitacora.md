@@ -4,6 +4,17 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-14 — Cerrado el pulido visual: Hoy limpio, Próximo y Listas (DEC-51)
+
+Sesión de arquitecto. El humano había contado al orquestador nueve cosas que no le gustan (filas 2 a 10 de la [propuesta](propuestas/pulido-visual.md#2-lo-que-ve-el-humano)). El arquitecto las comprobó en el código. Dos eran fallos:
+
+- **Historial** no tiene desplazamiento, y la rejilla queda debajo de las fechas y los filtros, sin forma de llegar a ella. Por eso el humano creía que la pantalla estaba a medio hacer.
+- **El desplegable de categoría** flota con un `z-index` que en la web solo vale dentro de su contenedor, y los campos de después lo tapan.
+
+La idea que ordena la ronda: lo que más ocupaba en Hoy era el selector «Ir a otro día». La vista **Próximo** que pedía el humano lo hace mejor, así que Hoy puede quedarse solo con lo de hoy. Para que Próximo quepa sin pasar de cinco pestañas, Bandeja y Categorías se juntan en **Listas**. El humano aceptó los nueve valores por defecto («sí, continúa») y precisó el objetivo de Hoy: ver lo pendiente de hoy y marcarlo cómodamente, sin distracciones.
+
+Queda en RF-41, RN-46 y el escenario 11 de CU-03; RF-10 pasa a estar sustituida. Encargos 065 a 073, sin migraciones ni dependencias, antes de la 1.2.
+
 ### 2026-10-13 — Limpieza de worktrees (DEC-50)
 
 El humano notó el ordenador cargado y preguntó por las carpetas de `~/orca/workspaces/`: eran worktrees de trabajadores y revisores ya fusionados, del 7 al 9 de octubre, que nadie recogía. Lo que más memoria gastaba era otra cosa: Brave y el Supabase local (unos 2 GB), que se paró. Aceptó las tres piezas de DEC-50: un script de limpieza, un paso al cerrar cada sesión y ofrecer parar Supabase.

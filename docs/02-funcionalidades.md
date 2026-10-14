@@ -57,6 +57,7 @@ Registro de funcionalidades (`RF`) y requisitos no funcionales (`RNF`). Es el co
 | RF-38 | Hábitos de peor a mejor | IMPRESCINDIBLE (1.2) | CU-09 | | |
 | RF-39 | Tareas por semana | IMPRESCINDIBLE (1.2) | CU-09 | | |
 | RF-40 | Elegir el periodo | IMPRESCINDIBLE (1.2) | CU-09 | | |
+| RF-41 | Vista Próximo | IMPRESCINDIBLE (1.1.1) | CU-03 | | |
 
 El estado de construcción **no** se apunta aquí, salvo que un encargo pida expresamente marcar una funcionalidad como hecha.
 
@@ -132,7 +133,7 @@ El estado de construcción **no** se apunta aquí, salvo que un encargo pida exp
 - **Prioridad:** DESEABLE
 - **Criterio de aceptación:** CU-03, escenario 8. Además: cuando el usuario abre el próximo miércoles, ve la ocurrencia de «Nadar» a las 17:00.
 - **Notas:** RN-05.
-- **Estado:** hecho en ADP-19 (encargo 033). Hoy tiene navegación entre días; las fechas futuras solo se consultan.
+- **Estado:** hecho en ADP-19 (encargo 033). Hoy tiene navegación entre días; las fechas futuras solo se consultan. **Sustituida por RF-41 (DEC-51):** Hoy deja de navegar entre días; lo futuro se ve en Próximo y lo pasado en Pendientes e Historial.
 
 ### RF-11 — Vista de categoría y Bandeja de entrada
 
@@ -341,6 +342,13 @@ El estado de construcción **no** se apunta aquí, salvo que un encargo pida exp
 - **Prioridad:** IMPRESCINDIBLE (versión 1.2)
 - **Criterio de aceptación:** CU-09, escenario 7.
 - **Notas:** RN-43.
+
+### RF-41 — Vista Próximo
+
+- **Descripción:** el sistema debe mostrar lo que toca en las próximas semanas, desde mañana, agrupado por semana y por día, sin los hábitos que tocan todos los días.
+- **Prioridad:** IMPRESCINDIBLE (versión 1.1.1, DEC-51)
+- **Criterio de aceptación:** CU-03, escenario 11. Además: tocar un elemento abre su ficha, y nada se puede marcar desde Próximo.
+- **Notas:** RN-05, RN-46. Sustituye a la navegación entre días de Hoy (RF-10).
 
 ## Requisitos no funcionales
 
