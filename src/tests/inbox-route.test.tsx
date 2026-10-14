@@ -6,6 +6,7 @@ import { Redirect } from 'expo-router';
 import { CategoryViewScreen } from '@/components/category-view/category-view-screen';
 import { useSession } from '@/data/auth';
 import { ThemeScope } from '@/theme/theme-scope';
+import type { QuickAddDefaults } from '@/domain/quick-add';
 
 import InboxScreen from '../app/bandeja';
 
@@ -14,7 +15,13 @@ jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
 }));
 jest.mock('@/data/use-today', () => ({ useToday: () => '2026-10-09' }));
-jest.mock('@/components/quick-add', () => ({ QuickAddButton: () => null }));
+const mockQuickAddButton = jest.fn(
+  (_props: { defaults: QuickAddDefaults }) => null,
+);
+jest.mock('@/components/quick-add', () => ({
+  QuickAddButton: (props: { defaults: QuickAddDefaults }) =>
+    mockQuickAddButton(props),
+}));
 jest.mock('@/components/category-view/category-view-screen', () => ({
   CategoryViewScreen: jest.fn(() => null),
 }));
@@ -60,5 +67,8 @@ it('shows the Inbox view, the one without a category, to a signed-in user', () =
   expect(Redirect).not.toHaveBeenCalled();
   expect(jest.mocked(CategoryViewScreen).mock.calls[0][0]).toEqual({
     categoryId: null,
+  });
+  expect(mockQuickAddButton.mock.calls[0][0]).toEqual({
+    defaults: expect.objectContaining({ categoryId: null }),
   });
 });
