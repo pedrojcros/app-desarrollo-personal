@@ -72,7 +72,7 @@ it.each([
   renderScreen();
   fireEvent.press(
     screen.getByRole('button', {
-      name: `${item.name}, Miércoles 21, abre la ficha`,
+      name: `${item.name}, Miércoles 21, 17:00, Salud, abre la ficha`,
     }),
   );
   expect(router.push).toHaveBeenCalledWith(path);
