@@ -6,7 +6,7 @@
 |---|---|
 | Tarea del plan | Versión 1.1.1, DEC-51 punto 9 (fila 8 del pulido) |
 | Ticket | `ADP-40` (solo informativo: no lo toques) |
-| Agente | copilot |
+| Agente | codex, `--model gpt-6-luna` (iba a Copilot, pero rechazó dos veces el encargo al arrancar: «Managed account policy is still loading») |
 | Skills | `codigo-legible` (en `.agents/skills/`) |
 | Rama | `ADP-40-historial-desplaza`, desde `origin/develop` |
 | Reservado | `src/app/(tabs)/historial.tsx` y `src/components/history-grid/history-screen.test.tsx`. Nada más |
