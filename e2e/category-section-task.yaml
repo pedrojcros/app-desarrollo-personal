@@ -17,6 +17,6 @@ appId: host.exp.exponent
 - tapOn: 'Categoría: E2E categoria'
 - tapOn: E2E categoria › E2E seccion
 - inputText: E2E tarea de seccion
-- pressKey: ENTER
+- tapOn: Enviar
 - pressKey: BACK
 - assertVisible: E2E tarea de seccion
