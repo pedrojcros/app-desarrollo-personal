@@ -1,7 +1,10 @@
 appId: host.exp.exponent
 ---
 - tapOn: Añadir tarea o hábito
-- inputText: E2E tarea rápida
-- pressKey: ENTER
-- pressKey: BACK
-- assertVisible: E2E tarea rápida
+- inputText: E2E tarea rapida
+- tapOn: Enviar
+- extendedWaitUntil:
+    visible: '¿Qué quieres añadir?'
+    timeout: 10000
+- tapOn: Cerrar añadir rápido
+- assertVisible: E2E tarea rapida

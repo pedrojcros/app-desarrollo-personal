@@ -38,3 +38,4 @@ appId: host.exp.exponent
 - assertNotVisible: E2E borrador tras atras
 - tapOn: Añadir tarea o hábito
 - assertVisible: E2E borrador tras atras
+- tapOn: Cerrar añadir rápido

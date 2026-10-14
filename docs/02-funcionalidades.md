@@ -348,6 +348,7 @@ El estado de construcción **no** se apunta aquí, salvo que un encargo pida exp
 - **Descripción:** el sistema debe mostrar lo que toca en las próximas semanas, desde mañana, agrupado por semana y por día, sin los hábitos que tocan todos los días.
 - **Prioridad:** IMPRESCINDIBLE (versión 1.1.1, DEC-51)
 - **Criterio de aceptación:** CU-03, escenario 11. Además: tocar un elemento abre su ficha, y nada se puede marcar desde Próximo.
+- **Estado:** hecho en ADP-44 (encargo 072), versión 1.1.1.
 - **Notas:** RN-05, RN-46. Sustituye a la navegación entre días de Hoy (RF-10).
 
 ## Requisitos no funcionales
