@@ -11,6 +11,7 @@ import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import type { ReactNode } from 'react';
 import {
   Keyboard,
+  Modal,
   Platform,
   TextInput,
   type KeyboardEventListener,
@@ -251,20 +252,26 @@ it('shows the chosen date formatted instead of as YYYY-MM-DD', () => {
 
 const subscribeKeyboard = Keyboard.addListener.bind(Keyboard);
 let activeHideListeners: Set<KeyboardEventListener>;
+let activeShowListeners: Set<KeyboardEventListener>;
 beforeEach(() => {
   activeHideListeners = new Set();
+  activeShowListeners = new Set();
   jest
     .spyOn(Keyboard, 'addListener')
     .mockImplementation((eventName, listener) => {
       const subscription = subscribeKeyboard(eventName, listener);
-      if (eventName !== 'keyboardDidHide') {
+      if (eventName !== 'keyboardDidHide' && eventName !== 'keyboardDidShow') {
         return subscription;
       }
-      activeHideListeners.add(listener);
+      const listeners =
+        eventName === 'keyboardDidHide'
+          ? activeHideListeners
+          : activeShowListeners;
+      listeners.add(listener);
       // Solo cuentan los oyentes que siguen suscritos, como en el sistema.
       const removeSubscription = subscription.remove.bind(subscription);
       subscription.remove = () => {
-        activeHideListeners.delete(listener);
+        listeners.delete(listener);
         removeSubscription();
       };
       return subscription;
@@ -276,6 +283,12 @@ afterEach(() => {
 function dismissSystemKeyboard() {
   const event = {} as Parameters<KeyboardEventListener>[0];
   for (const listener of [...activeHideListeners]) {
+    act(() => listener(event));
+  }
+}
+function showSystemKeyboard() {
+  const event = {} as Parameters<KeyboardEventListener>[0];
+  for (const listener of [...activeShowListeners]) {
     act(() => listener(event));
   }
 }
@@ -511,5 +524,58 @@ it('closes on a restored web viewport and keeps the name after reopening', async
     } else {
       Reflect.deleteProperty(globalThis, 'document');
     }
+  }
+});
+
+it('focuses the Android name only after the modal is shown and again on reopening', () => {
+  const originalPlatform = Platform.OS;
+  jest.useFakeTimers();
+  Object.defineProperty(Platform, 'OS', { value: 'android' });
+  const focus = jest.spyOn(TextInput.prototype, 'focus');
+  try {
+    openBar();
+    const nameField = screen.getByLabelText('Nombre');
+    expect(focus).not.toHaveBeenCalled();
+    fireEvent(screen.UNSAFE_getByType(Modal), 'show');
+    expect(focus).not.toHaveBeenCalled();
+    act(() => jest.runOnlyPendingTimers());
+    expect(focus).toHaveBeenCalledTimes(1);
+    expect(nameField.props.autoFocus).toBe(false);
+
+    fireEvent.changeText(nameField, 'Leer un capítulo');
+    fireEvent.press(screen.getByLabelText('Cerrar añadir rápido'));
+    fireEvent.press(screen.getByLabelText('Añadir tarea o hábito'));
+    expect(screen.getByLabelText('Nombre')).toHaveDisplayValue(
+      'Leer un capítulo',
+    );
+    expect(focus).toHaveBeenCalledTimes(1);
+    fireEvent(screen.UNSAFE_getByType(Modal), 'show');
+    act(() => jest.runOnlyPendingTimers());
+    expect(focus).toHaveBeenCalledTimes(2);
+  } finally {
+    Object.defineProperty(Platform, 'OS', { value: originalPlatform });
+    jest.useRealTimers();
+  }
+});
+
+it('keeps Android open when the saving hide arrives after the focus request', async () => {
+  const originalPlatform = Platform.OS;
+  const focus = jest.spyOn(TextInput.prototype, 'focus');
+  Object.defineProperty(Platform, 'OS', { value: 'android' });
+  try {
+    openBar();
+    fireEvent.changeText(screen.getByLabelText('Nombre'), 'Comprar pilas');
+    fireEvent.press(screen.getByLabelText('Enviar'));
+    await waitFor(() =>
+      expect(screen.getByLabelText('Nombre')).toHaveDisplayValue(''),
+    );
+    await waitFor(() => expect(focus).toHaveBeenCalled());
+    dismissSystemKeyboard();
+    expect(screen.getByLabelText('Nombre')).toBeVisible();
+    showSystemKeyboard();
+    dismissSystemKeyboard();
+    expect(screen.queryByLabelText('Nombre')).toBeNull();
+  } finally {
+    Object.defineProperty(Platform, 'OS', { value: originalPlatform });
   }
 });

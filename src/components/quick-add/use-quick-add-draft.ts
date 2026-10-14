@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { TextInput } from 'react-native';
+import { Platform, type TextInput } from 'react-native';
 import { describeTaskSaveError } from '@/components/task-form/task-messages';
 import { useCreateTask } from '@/data/tasks';
 import { useCreateHabit, type HabitInput } from '@/data/habits';
@@ -26,13 +26,19 @@ export interface QuickAddDraftStorage {
 interface QuickAddDraftActions {
   close(): void;
   draftStorage: QuickAddDraftStorage;
+  isModalShown: boolean;
   // Avisa de que se está guardando o de que el campo aún no recuperó el foco.
   onSubmittingChange(isSubmitting: boolean): void;
 }
 
 export function useQuickAddDraft(
   defaults: QuickAddDefaults,
-  { close, draftStorage, onSubmittingChange }: QuickAddDraftActions,
+  {
+    close,
+    draftStorage,
+    isModalShown,
+    onSubmittingChange,
+  }: QuickAddDraftActions,
 ) {
   const savedDraft = draftStorage.restored;
   const today = useToday();
@@ -71,13 +77,33 @@ export function useQuickAddDraft(
   }, []);
 
   useEffect(() => {
+    if (Platform.OS !== 'android' || !isModalShown) {
+      return;
+    }
+    // onShow llega antes de que Android quite FLAG_NOT_FOCUSABLE al diálogo.
+    // El siguiente fotograma permite abrir el teclado en la ventana preparada.
+    const focusFrame = requestAnimationFrame(() => nameInput.current?.focus());
+    return () => cancelAnimationFrame(focusFrame);
+  }, [isModalShown]);
+
+  useEffect(() => {
     if (disabled || !focusAfterSave.current) {
       return;
     }
-    // Android debe recibir el foco después de volver a habilitar el campo.
-    nameInput.current?.focus();
     focusAfterSave.current = false;
-    onSubmittingChange(false);
+    if (Platform.OS !== 'android') {
+      nameInput.current?.focus();
+      onSubmittingChange(false);
+      return;
+    }
+    // El blur nativo al deshabilitar el campo puede llegar tarde a JavaScript.
+    // Se libera también el foco de JS antes de pedirlo con el campo habilitado.
+    nameInput.current?.blur();
+    const focusFrame = requestAnimationFrame(() => {
+      onSubmittingChange(false);
+      nameInput.current?.focus();
+    });
+    return () => cancelAnimationFrame(focusFrame);
   }, [disabled, onSubmittingChange]);
 
   const { save: saveDraft, clear: clearDraft } = draftStorage;
