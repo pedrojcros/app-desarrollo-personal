@@ -20,7 +20,25 @@ Cuando una decisión se cierra:
 
 ## Abiertas
 
-*(Ninguna.)*
+### DEC-56 — Skills y MCP de móvil que trae el humano (abierta el 2026-10-14, sesión de arquitecto)
+
+El humano trae cuatro candidatas de su búsqueda, y la idea que más repite la comunidad: «Expo Skills y crear la tuya propia». Revisadas en GitHub el 2026-10-14 ([propuesta](propuestas/skills-y-mcp.md#6-candidatas-que-trae-el-humano)). Valores por defecto:
+
+1. **Appllama (`appllama/appllama-skills`, MIT): no.** Son dos skills. `appllama-usage` solo funciona con su MCP alojado (`mcp.appllama.io`), y su plugin lo da de alta solo, al instalarlo, en su `.mcp.json` (prohibición 10). `appllama-app-design-skill` (unos 5.000 tokens) repite lo que ya hacen `expo-native-ui`, `expo-animation` y las de Emil y Jakub, está escrita para iOS (HIG, `xcrun simctl`) y trae su propio bucle de simulador, que choca con Maestro y Orca.
+2. **Vercel: ya la tenemos** (`vercel-react-native-skills`). **Callstack: sigue fuera.** Ocupa 6,4 MB, la cubre la de Vercel, y su `agent-device` choca con Orca.
+3. **Metro MCP (`steve228uk/metro-mcp`, MIT, local): ahora no; queda como *spike* para cuando haga falta.** Lee de la app en marcha la consola, los errores, la red, el árbol de componentes y el estado de Expo Router, algo que hoy solo vemos con `logcat`. Pero trae unas 90 herramientas, y en Codex cada una gasta tokens. Además se instala con `npx -y` sin versión fija, es de una sola persona y repite el control del emulador que ya hacen Orca y Maestro. Se prueba si la retrospectiva de la 1.2 dice que depurar en el emulador cuesta tiempo: en Docker, con versión fija y solo los módulos `console`, `errors`, `network` y `components`.
+4. **Skill propia: sí, y se reabre DEC-55.** Lo que la comunidad llama «la tuya propia» ya lo tenemos en el código (`codigo-legible` y `flujo-git`). Falta para las pantallas: hoy un trabajador solo tiene una línea de `AGENTS.md`, y `expo-native-ui` piensa en iPhone. Se hace **`pantallas-app`**, de unas 600 palabras, **automática**:
+   - componentes de `src/components/ui` y nunca `@expo/ui`;
+   - tokens de `src/theme`;
+   - Android y web a 360 px;
+   - el atrás del sistema;
+   - zonas de toque de 44 puntos y contraste AA;
+   - textos en español;
+   - y cuándo pedir las de Emil y Jakub, que siguen siendo las de criterio.
+
+   Se escribe **al cerrar la 1.1.1**, con lo que corrigieron las revisiones del pulido, que es la mejor fuente, y antes de la 1.2.
+
+**Respuesta:**
 
 ---
 

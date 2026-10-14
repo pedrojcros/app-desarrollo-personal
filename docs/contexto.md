@@ -76,6 +76,7 @@ Para retomar en una sesión nueva:
 
 - **APK de la versión 1** (aplazado por el humano el 2026-10-14): `eas build --profile preview` cuando quieras instalarla en el móvil (gasta una de las 15 compilaciones gratis del mes). Conviene antes de ejecutar la 1.2: Progreso tiene sentido con unos días de uso real.
 - **Recordatorios (R6):** al instalar el APK de la 1.1, la lista de comprobación del informe de R5 (permiso, aviso en punto, tras reiniciar, ahorro de batería, tocar el aviso).
+- **Contestar DEC-56** (Appllama, Metro MCP y la skill propia `pantallas-app`): «ok» acepta los valores por defecto.
 - **Decir cuándo se ejecuta el pulido** (`/ejecutar-plan`, encargos 065 a 073).
 - Opcional: decir si la barra de la llave, la cartera y la ubicación (fila 6 del pulido) salió en **Chrome** o en **Expo Go**. El arreglo no cambia; sirve para saber si en Chrome puede seguir saliendo.
 - La carpeta vacía `~/orca/workspaces/app-desarrollo-personal/ADP-3-base-de-datos-y-acceso` es de `root`: se borra con `sudo rmdir` en una terminal normal (los dos worktrees con ficheros sueltos se borraron el 2026-10-14, con permiso del humano).
@@ -89,7 +90,7 @@ Para retomar en una sesión nueva:
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-56**.
+  chat. Siguiente número libre: **DEC-57**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 

@@ -102,3 +102,16 @@ No es cosa de la CPU ni de la memoria del ordenador: son ficheros de texto. Lo q
 | Solo web | `frontend-ui-engineering`, `browser-testing-with-devtools`, `performance-optimization` |
 
 `expo-overview` y `expo-project-structure` no entran en ningún perfil. La primera solo reparte hacia las otras de Expo, y los perfiles ya hacen ese trabajo. La segunda es para crear un proyecto nuevo, y el nuestro ya existe.
+
+## 6. Candidatas que trae el humano
+
+Revisadas en GitHub el 2026-10-14 (DEC-56).
+
+| Candidata | Qué es | Veredicto |
+|---|---|---|
+| [Appllama/appllama-skills](https://github.com/Appllama/appllama-skills) (MIT, ~2.800 estrellas) | `appllama-usage`, que usa su MCP alojado de pantallas de apps famosas, y `appllama-app-design-skill` (20 KB más 5 referencias), con HIG de Apple, controles nativos, movimiento y un bucle de grabación en el simulador de iOS | **No.** Su plugin da de alta el MCP `mcp.appllama.io` (prohibición 10). La de diseño repite `expo-native-ui`, `expo-animation` y las de Emil y Jakub, y piensa en iOS |
+| Vercel Agent Skills | `react-native-skills` | **Ya instalada** como `vercel-react-native-skills` |
+| Callstack Agent Skills | `react-native-best-practices`, `agent-device` y otras | **Sigue fuera** (ver «No incluidas» en la ficha) |
+| [steve228uk/metro-mcp](https://github.com/steve228uk/metro-mcp) (MIT, 84 estrellas) | MCP local que se conecta a Metro por el protocolo de Chrome DevTools: consola, errores, red, componentes, estado de navegación, almacenamiento, control del dispositivo, perfilado y grabación de tests de Maestro, unas 90 herramientas | **Ahora no; *spike* aplazado.** Es útil para depurar en el emulador, pero gasta mucho contexto en Codex, va sin versión fija y repite Orca y Maestro |
+
+**«Expo Skills y la tuya propia».** Lo primero ya está. Lo segundo lo tenemos para el código, y falta para las pantallas: `pantallas-app` (DEC-56.4).
