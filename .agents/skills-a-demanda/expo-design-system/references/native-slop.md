@@ -6,13 +6,13 @@ Recurring mistakes in generated React Native apps, with names, observable tells,
 
 | # | Name | The tell (observable) | Native instead |
 |---|---|---|---|
-| 1 | **The Web Modal** | A custom centered dialog for picking or composing that ignores keyboard space and platform dismissal | Native sheet (`presentation: 'formSheet'`, `@expo/ui` BottomSheet) or anchored menu; use native alerts for consequential confirmations |
+| 1 | **The Web Modal** | A custom centered dialog for picking or composing that ignores keyboard space and platform dismissal | Native sheet (`presentation: 'formSheet'`) or anchored menu; use native alerts for consequential confirmations |
 | 2 | **The X-Button Sheet** | A sheet closed only by an "X" in the top corner - no grab handle, no swipe-to-dismiss | Native sheet with detents; drag down to dismiss; Cancel/Done in the header where the platform puts them |
 | 3 | **Emoji Iconography** | 🔥 ⚙️ ✨ ❤️ as tab icons, buttons, or empty-state art | SF Symbols on iOS, Material icons on Android - one icon family per platform (see `expo-native-ui`) |
 | 4 | **The Purple-Gradient Hero** | A decorative gradient intro pushes useful content and the primary task below the fold | Lead task screens with useful content under a navigation title; keep a hero when it serves the requested experience |
 | 5 | **The Floating Pill Tab Bar** | A custom rounded, inset, drop-shadowed tab bar hovering above the home indicator | The platform tab bar (`NativeTabs`) with system-managed placement, materials, and behaviors |
 | 6 | **Inter Everywhere** | An arbitrary downloaded font replaces the app's typography, with missing weights or poor readability | System type (SF / Roboto) by default; preserve brand typography when requested and verify weights, readability, and scaling |
-| 7 | **Everything's a Card** | Every list row and section wrapped in its own white rounded shadowed card; cards nested inside cards | Grouped lists (`@expo/ui` List, iOS inset-grouped, Material sections); grouping via background + hairlines, not boxes |
+| 7 | **Everything's a Card** | Every list row and section wrapped in its own white rounded shadowed card; cards nested inside cards | Grouped lists (iOS inset-grouped, Material sections); grouping via background + hairlines, not boxes |
 | 8 | **Shadowboxing** | Heavy drop shadows (opacity ≥ 0.15, radius ≥ 10) doing hierarchy's job on white-on-white surfaces | 2-3 tokened elevation levels; hierarchy from the type ramp and grouping. iOS is a low-shadow platform |
 | 9 | **Wireframe Borders** | A 1px gray `borderWidth` outlining every container - usually Tailwind's `#E5E7EB` from web muscle memory | Spacing and surface contrast; hairlines only as list separators (`StyleSheet.hairlineWidth`, semantic separator color) |
 | 10 | **alert() Confirmation** | Alerts interrupt routine undoable actions, report success, or replace field validation | Native confirmation alert for uncommon irreversible actions; undo for routine reversible ones. Field errors stay inline; success updates the UI |

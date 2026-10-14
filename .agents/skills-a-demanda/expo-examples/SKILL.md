@@ -87,7 +87,6 @@ When the user already has an app, **add only what the example introduces; never 
 
 ## Related skills
 
-- Native UI components (@expo/ui package) → `expo-ui`
 - Styling and native-feeling screens → `expo-native-ui`
 - Navigation and routing → `expo-router`
 - Authoring a native module → `expo-module`

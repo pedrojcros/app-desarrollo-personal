@@ -5,7 +5,7 @@ Skills (carpetas con un `SKILL.md`) que usan todos los agentes de este repositor
 | Carpeta | Qué hay | Quién la ve |
 |---|---|---|
 | `.agents/skills/` (esta) | Las **automáticas**: los agentes las descubren y las usan solos | Codex y Copilot aquí; Claude, por el enlace `.claude/skills` |
-| [`.agents/skills-a-demanda/`](../skills-a-demanda/README.md) | Las que solo se usan **cuando el encargo las pide por su ruta** | Nadie las descubre solo |
+| [`.agents/skills-a-demanda/`](../skills-a-demanda/README.md) | Las que se piden en el encargo; cualquier trabajador puede leer otra si le hace falta | No se activan solas |
 | [`.agents/LICENSES/`](../LICENSES/) | Licencias de las skills de terceros | — |
 
 ## Reglas
@@ -13,7 +13,7 @@ Skills (carpetas con un `SKILL.md`) que usan todos los agentes de este repositor
 - **Mandan `AGENTS.md` y el encargo.** Si una skill dice otra cosa (ramas, idioma de los commits, dependencias), se sigue `AGENTS.md`.
 - **«Your human partner», «the user» o «ask the user» significan el orquestador** para un trabajador: pregúntale con `orca orchestration ask` (lo explica tu preámbulo de Orca). No te quedes esperando a una persona.
 - **Nunca se envía nada a terceros** desde una skill: ni comentarios a sus autores ni telemetría (prohibición 10 de `AGENTS.md`).
-- Añadir o actualizar una skill necesita aprobación, igual que una dependencia. Al actualizar, se vuelven a copiar del origen, se revisan los cambios y se anota aquí el commit nuevo.
+- Añadir una skill nueva necesita aprobación, igual que una dependencia. Al actualizar, se vuelven a copiar del origen, se revisan los cambios y se anota aquí el commit nuevo.
 
 ## Automáticas: cuándo se usa cada una
 
@@ -26,38 +26,16 @@ El orquestador dice en cada encargo cuáles usar (campo «Skills a usar» de la 
 | `test-driven-development` | obra/superpowers | Al implementar lógica o corregir un fallo: primero el test (los escenarios de los casos de uso) |
 | `systematic-debugging` | obra/superpowers | Cuando falla un test o algo no se comporta como se espera |
 | `verification-before-completion` | obra/superpowers | Antes de decir «hecho»: ejecutar las comprobaciones y enseñar su salida |
-| `incremental-implementation` | addyosmani | Encargos que tocan más de un fichero: pasos pequeños y comprobables |
-| `api-and-interface-design` | addyosmani | Contratos entre piezas: tipos del dominio, firmas, esquema de datos |
-| `source-driven-development` | addyosmani | Antes de usar una API de Expo, React Native o Supabase: comprobarla en la documentación oficial de la versión fijada |
-| `security-and-hardening` | addyosmani | Inicio de sesión, RLS, validación de entradas y secretos |
-| `code-review-and-quality` | addyosmani | Revisar un cambio (orquestador y revisores) |
-| `code-simplification` | addyosmani | Código que funciona pero cuesta leer |
-| `frontend-ui-engineering` | addyosmani | Pantallas y componentes: accesibilidad, estados de carga y error (sobre todo en la versión web) |
-| `supabase-postgres-best-practices` | supabase/agent-skills | Tablas, tipos de columna, migraciones, índices y políticas RLS |
-| `vercel-react-native-skills` | vercel-labs/agent-skills | Buenas prácticas y rendimiento de React Native y Expo |
-| `expo-overview` | expo/skills | Punto de entrada: elige la skill de Expo adecuada |
-| `expo-project-structure` | expo/skills | Estructura de carpetas al crear el proyecto |
-| `expo-router` | expo/skills | Navegación y rutas |
-| `expo-native-ui` | expo/skills | Pantallas con aspecto y controles nativos |
-| `expo-design-system` | expo/skills | Tokens de diseño y componentes reutilizables (sistema visual) |
-| `expo-data-fetching` | expo/skills | Peticiones de datos y estados de carga, error y vacío |
-| `expo-animation` | expo/skills | Animaciones nativas |
-| `android-emulator-qa` | openai/plugins | Probar flujos en el emulador Android. El dispositivo se controla con la skill de Orca `orca-emulator-android` |
 
 ## Plugins
 
-El plugin oficial de **Supabase** está activo para Claude en este proyecto (`.claude/settings.json`, DEC-34): trae la skill `supabase` y su servidor MCP, que pide iniciar sesión en Supabase la primera vez (`/mcp`). No tiene hooks ni telemetría. Codex y Copilot usan la herramienta `supabase` con el token de DEC-33.
+Las skills y plugins sincronizados de la cuenta de claude.ai (`design:*`, `engineering:*`, `productivity:*`, `legal:*`, `marketing:*`, `data:*`, `cowork-plugin-management:*`, `docs`, `docx`, `pptx`, `xlsx`, `pdf` y otros) no son del proyecto y no se usan. Para lo mismo mandan las skills de estas fichas (DEC-53).
 
 ## Origen, licencias y cambios
 
 | Origen | Commit | Licencia | Cambios hechos en nuestra copia |
 |---|---|---|---|
-| [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) | `1401c8b` (2026-10-03) | MIT | Ninguno |
-| [expo/skills](https://github.com/expo/skills) | `d4f4840` (2026-10-05) | MIT | **Quitada la sección final «Submitting Feedback»**, que pedía al agente enviar comentarios a Expo con `npx submit-expo-feedback`, y la mención a `expo-skill-feedback` en `expo-overview` |
-| [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) (`react-native-skills`, aquí `vercel-react-native-skills`) | `063bee9` (2026-08-28) | MIT, según su `SKILL.md` (el repositorio no trae fichero de licencia) | Ninguno, salvo el nombre de la carpeta, que coincide con su `name` |
-| [supabase/agent-skills](https://github.com/supabase/agent-skills) | `c9be0e9` (2026-10-02) | MIT | Ninguno |
 | [obra/superpowers](https://github.com/obra/superpowers) | `8ca22db` (2026-09-25) | MIT | Ninguno |
-| [openai/plugins](https://github.com/openai/plugins) (`android-emulator-qa`) | `5fd93af` (2026-09-28) | Apache-2.0 (`LICENSE.txt` en su carpeta) | Ninguno. Sus dos scripts solo leen el árbol de la interfaz (XML) |
 | Propias (`codigo-legible`, `flujo-git`) | — | — | Resumen práctico de `AGENTS.md` |
 
 Las de `.agents/skills-a-demanda/` tienen su propia ficha.
