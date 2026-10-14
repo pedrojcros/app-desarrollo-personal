@@ -4,6 +4,15 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-14 (noche) — Publicada la 1.1.1
+
+El humano pidió al orquestador que la publicara; los permisos de Claude Code bloquearon que el orquestador tocara `main`, así que lo hizo el humano desde su terminal con los pasos del orquestador.
+
+- **PR #101** (`develop` → `main`) fusionado; etiqueta [`v1.1.1`](https://github.com/pedrojcros/app-desarrollo-personal/releases/tag/v1.1.1) en `3687161`, con su release. El despliegue a producción salió bien; sin migraciones.
+- **Tropiezo:** en fish, `gh pr merge <n>` se lee como una redirección; la etiqueta se creó primero sobre `v1.0.0` y se movió con `-f` tras fusionar. En las órdenes para el humano, el número real del PR, nunca `<n>`.
+- **El test inestable `category-view-screen.test.tsx` («Leche») falló otra vez**, ahora en la CI de `main` (tercera vez). Pasa a encargo pequeño antes de la 1.2.
+- El humano pidió **apagar el ordenador al terminar**.
+
 ### 2026-10-14 (noche) — Cierre de la 1.1.1: Android y Maestro en verde
 
 El cierre lo empezó Codex porque Claude llegó al 97 % de su cuota, y Codex también se quedó sin cuota a mitad. Lo terminó la sesión de Claude:
