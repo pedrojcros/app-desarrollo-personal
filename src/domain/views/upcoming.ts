@@ -52,8 +52,9 @@ export function getUpcomingRange(today: CalendarDate): {
 } {
   const validToday = parseCalendarDate(today);
   const from = addDays(validToday, 1);
-  const mondayOffset = 1 - getIsoWeekday(validToday);
-  const currentWeekStart = addDays(validToday, mondayOffset);
+  const currentWeekStart = getMondayOfWeek(validToday);
+  // 34 días = 4 semanas completas tras la actual (28) más los 6 días hasta
+  // el domingo de la última: el rango termina siempre en domingo.
   const to = addDays(currentWeekStart, 34);
   return { from, to };
 }
@@ -64,15 +65,14 @@ export function getUpcomingWeeks(input: UpcomingInput): UpcomingWeek[] {
   const weekStarts = getWeekStarts(firstWeekStart, range.to);
   const dayItems = getItemsByDate(input, range.from, range.to);
 
+  const currentWeekStart = getMondayOfWeek(input.today);
+
   return weekStarts.map((weekStart) => {
     const days = getDaysForWeek(weekStart, range.from, dayItems);
-    return {
-      weekStart,
-      isCurrentWeek:
-        getIsoWeekday(input.today) !== 7 &&
-        weekStart === addDays(input.today, 1 - getIsoWeekday(input.today)),
-      days,
-    };
+    // Si hoy es domingo, el lunes de su semana no está entre las semanas
+    // mostradas (empiezan mañana), así que no hace falta tratarlo aparte.
+    const isCurrentWeek = weekStart === currentWeekStart;
+    return { weekStart, isCurrentWeek, days };
   });
 }
 
@@ -95,6 +95,13 @@ export function formatWeekTitle(week: UpcomingWeek): string {
   return `Semana del ${startDay} de ${startMonth} al ${endDay} de ${endMonth}`;
 }
 
+function getMondayOfWeek(date: CalendarDate): CalendarDate {
+  const weekday = getIsoWeekday(date);
+  const daysSinceMonday = weekday - 1;
+  return addDays(date, -daysSinceMonday);
+}
+
+/** Con hoy en domingo la semana actual ya no tiene días por delante. */
 function getFirstWeekStart(
   today: CalendarDate,
   from: CalendarDate,
@@ -102,8 +109,7 @@ function getFirstWeekStart(
   if (getIsoWeekday(today) === 7) {
     return from;
   }
-  const daysSinceMonday = getIsoWeekday(today) - 1;
-  return addDays(today, -daysSinceMonday);
+  return getMondayOfWeek(today);
 }
 
 function getWeekStarts(
@@ -132,6 +138,8 @@ function getItemsByDate(
     if (habit.archivedOn !== null) {
       continue;
     }
+    // findRuleInForce necesita las reglas ordenadas por fecha de inicio;
+    // se ordena una copia para no alterar el hábito recibido.
     const ruleVersions = [...habit.ruleVersions];
     ruleVersions.sort((first, second) =>
       first.validFrom.localeCompare(second.validFrom),
@@ -167,6 +175,10 @@ function getItemsByDate(
   return dayItems;
 }
 
+/**
+ * RN-46: «diario» es lo que ocurre cada día (frecuencia diaria, cada 1 día o
+ * todos los días de la semana marcados). Esos hábitos no aparecen en Próximo.
+ */
 function isDailyRule(rule: HabitRuleVersion): boolean {
   if (rule.frequency === 'daily') {
     return true;

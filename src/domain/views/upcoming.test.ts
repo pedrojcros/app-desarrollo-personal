@@ -158,6 +158,63 @@ describe('getUpcomingWeeks', () => {
     ]);
   });
 
+  it('keeps a weekly habit on its weekday across both daylight saving changes', () => {
+    // Madrid cambia la hora el 25 de octubre de 2026 y Los Ángeles el 1 de noviembre.
+    const sundayHabit = makeHabit({
+      ruleVersions: [
+        {
+          validFrom: '2026-09-01',
+          frequency: 'weekdays',
+          weekdays: [7],
+          intervalDays: null,
+        },
+      ],
+    });
+
+    const weeks = getWeeks({ today: '2026-10-20', habits: [sundayHabit] });
+
+    const datesByWeek = weeks.map((week) => week.days.map((day) => day.date));
+    expect(datesByWeek).toEqual([
+      ['2026-10-25'],
+      ['2026-11-01'],
+      ['2026-11-08'],
+      ['2026-11-15'],
+      ['2026-11-22'],
+    ]);
+  });
+
+  it('gives a habit occurrence the status of its mark', () => {
+    const mark: HabitMark = {
+      habitId: 'habit',
+      date: '2026-10-21',
+      status: 'done',
+      markedAt: '2026-10-14T08:00:00.000Z',
+    };
+
+    const items = allItems(
+      getWeeks({ today: '2026-10-14', habits: [makeHabit()], marks: [mark] }),
+    );
+
+    const statuses = items.map((item) => [item.date, item.status]);
+    expect(statuses[0]).toEqual(['2026-10-21', 'done']);
+    expect(items[0].markedAt).toBe('2026-10-14T08:00:00.000Z');
+    expect(statuses[1]).toEqual(['2026-10-28', 'pending']);
+  });
+
+  it('puts the rest of this week under the current week', () => {
+    const fridayTask = makeTask({ dueDate: '2026-10-16' });
+
+    const weeks = getWeeks({ today: '2026-10-14', tasks: [fridayTask] });
+
+    expect(weeks[0].isCurrentWeek).toBe(true);
+    expect(formatWeekTitle(weeks[0])).toBe('Esta semana');
+    expect(weeks[0].days.map((day) => day.date)).toEqual(['2026-10-16']);
+    expect(weeks[0].days[0].items.map((item) => item.name)).toEqual([
+      'Entregar la práctica',
+    ]);
+    expect(weeks.slice(1).some((week) => week.isCurrentWeek)).toBe(false);
+  });
+
   it('uses the rule in force on each date when a habit stops being daily', () => {
     const changingHabit = makeHabit({
       ruleVersions: [
@@ -311,6 +368,16 @@ describe('formatWeekTitle', () => {
         days: [],
       }),
     ).toBe('Semana del 26 de octubre al 1 de noviembre');
+  });
+
+  it('formats a week that crosses a year boundary', () => {
+    expect(
+      formatWeekTitle({
+        weekStart: '2026-12-28',
+        isCurrentWeek: false,
+        days: [],
+      }),
+    ).toBe('Semana del 28 de diciembre al 3 de enero');
   });
 
   it('uses the current week title', () => {
