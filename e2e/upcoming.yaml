@@ -3,7 +3,8 @@ appId: host.exp.exponent
 - runScript: upcoming-week-title.js
 - tapOn: Hoy
 - tapOn: Añadir tarea o hábito
-- clearText
+# El borrador de quick-add-keyboard.yaml sigue guardado: se borra antes de escribir.
+- eraseText: 60
 - inputText: E2E tarea proxima semana
 - tapOn: 'Fecha: Lunes'
 - tapOn: Enviar
