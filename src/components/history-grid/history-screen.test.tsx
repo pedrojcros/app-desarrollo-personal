@@ -1,5 +1,12 @@
 import { beforeEach, expect, it, jest } from '@jest/globals';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from '@testing-library/react-native';
+import { ScrollView } from 'react-native';
 import HistoryScreen from '@/app/(tabs)/historial';
 import { useHistory } from '@/data/history';
 import { ThemeScope } from '@/theme/theme-scope';
@@ -176,6 +183,31 @@ it('keeps complete cached history visible alongside a refresh failure', () => {
     screen.getByRole('button', { name: 'Leche, martes 6 de octubre: hecha' }),
   ).toBeTruthy();
   expect(screen.getByRole('button', { name: 'Reintentar' })).toBeTruthy();
+});
+
+it('scrolls the complete history screen vertically when there are many rows', () => {
+  const manyItems = Array.from({ length: 12 }, (_, index) => ({
+    ...item,
+    target: { kind: 'task' as const, taskId: `task-${index}` },
+    name: `Tarea ${index}`,
+  }));
+  setQuery({ items: manyItems });
+  showScreen();
+
+  const screenScrollView = screen
+    .UNSAFE_getAllByType(ScrollView)
+    .find((scrollView) => scrollView.props.horizontal !== true);
+
+  if (screenScrollView === undefined) {
+    throw new Error('Expected the history screen to scroll vertically');
+  }
+
+  expect(within(screenScrollView).getByText('Historial')).toBeTruthy();
+  expect(
+    within(screenScrollView).getByRole('button', {
+      name: 'Tarea 0, martes 6 de octubre: hecha',
+    }),
+  ).toBeTruthy();
 });
 
 it('opens the status menu for a past cell and saves the selected correction', () => {
