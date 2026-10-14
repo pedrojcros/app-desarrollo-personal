@@ -165,7 +165,7 @@ Los identificadores de modelo de Codex compruébalos en su ayuda o su configurac
 
 **Luna o Sol (DEC-41).** Lo mecánico y grande, con pasos fijados, va a Luna; lo denso (lógica central, SQL, seguridad, correcciones) a Sol; lo pequeño no se parte; lo diminuto, a Copilot.
 
-**Encargos cortos (DEC-39).** Cada trabajador arranca leyendo todo lo que le pides: pide **2 o 3 skills**, las que de verdad necesita, y **secciones concretas** de los documentos en vez de documentos enteros. Cada relanzamiento vuelve a pagar esa lectura: evita los fallos que obligan a relanzar.
+**Encargos cortos (DEC-39).** Cada trabajador arranca leyendo todo lo que le pides: pide **2 o 3 skills** a demanda, las del perfil del encargo ([perfiles](plantilla-encargo.md#perfiles-de-skills-dec-54), DEC-54), y **secciones concretas** de los documentos en vez de documentos enteros. Cada relanzamiento vuelve a pagar esa lectura: evita los fallos que obligan a relanzar.
 
 ### 6. Tope de paralelismo
 
