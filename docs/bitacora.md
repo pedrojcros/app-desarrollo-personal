@@ -4,6 +4,16 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-14 — Skills y MCP: cinco automáticas, Expo sin `@expo/ui` y no al MCP de memoria (DEC-52 a DEC-55)
+
+Sesión de arquitecto. El humano preguntó si conviene el MCP de memoria de datamcp y pidió revisar si hay skills que se solapan o se estorban. Detalle en la [propuesta](propuestas/skills-y-mcp.md).
+
+- **El MCP, no** (recomendación): es un servicio de terceros, choca con las prohibiciones 9 y 10 y repite lo que ya hacen `contexto.md`, la bitácora y las decisiones.
+- **Las skills:** el hallazgo importante es que `expo-overview`, `expo-native-ui` y `expo-design-system` mandan usar `@expo/ui`, una dependencia descartada. Eso afecta al encargo 069, el selector de categoría, así que la limpieza (encargo 074) va antes. Además, cada sesión de Claude, también las de los trabajadores, carga unas 70 skills sincronizadas de la cuenta de claude.ai que nadie había revisado. Algunas pisan las nuestras o llevan el trabajo fuera del repositorio (`TASKS.md`, Claude Docs, Notion).
+- **Tokens:** medido lo que gasta cada grupo de skills. Lo que más cuesta es el cuerpo de las que se activan solas. De ahí salen DEC-54 (solo cinco automáticas y perfiles por encargo) y DEC-55 (una skill propia y corta de diseño, en vez de fundir las de terceros).
+
+El humano aceptó todo con «ok»: las de Expo, a demanda; las de Emil Kowalski y Jakub Krehel, definitivas para diseño, sin skill propia encima; `find-skills`, global, porque la usa en otros proyectos; y, a petición suya, cualquier trabajador puede leer por su cuenta una skill a demanda y lo dice en su informe. Lo aplica el [encargo 074](agentes/encargos/074-skills-por-perfil.md).
+
 ### 2026-10-14 — Cerrado el pulido visual: Hoy limpio, Próximo y Listas (DEC-51)
 
 Sesión de arquitecto. El humano había contado al orquestador nueve cosas que no le gustan (filas 2 a 10 de la [propuesta](propuestas/pulido-visual.md#2-lo-que-ve-el-humano)). El arquitecto las comprobó en el código. Dos eran fallos:

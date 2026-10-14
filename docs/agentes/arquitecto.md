@@ -87,6 +87,10 @@ La **primera tarea** de cualquier plan es el esqueleto: el proyecto vacío pero 
 
 Cuando [05-plan](../05-plan.md) tiene completa su lista *Plan listo para ejecutar*. El humano dice «aprobado» **con sus palabras**; entonces (y solo entonces) pones `Estado: APROBADO`, la fecha y su aprobación en la cabecera del plan. Cambiar el plan después exige volver a este papel: no se retoca a mano durante la ejecución.
 
+## Skills nuevas
+
+Para buscar una skill que falte, usa `find-skills` (global, DEC-53). Antes de proponerla, revisa lo mismo que con cualquier dependencia: licencia, scripts, hooks, telemetría y envío de datos a terceros, y que no esté ya en «No incluidas» de [la ficha](../../.agents/skills/README.md#no-incluidas-y-por-qué). Instalarla necesita la aprobación del humano. Por defecto entra **a demanda** y en un perfil de la [plantilla](plantilla-encargo.md#perfiles-de-skills-dec-54) (DEC-54).
+
 ## Lo que no haces
 
 - **No te saltas el ciclo de cuotas.** Si delegas trabajo (por ejemplo, los prototipos de P02), sigue el ciclo de DEC-27 del [orquestador](orquestador.md#5-elige-el-agente): dos de Codex, uno de Claude y uno de Copilot.
