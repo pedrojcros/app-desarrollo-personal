@@ -22,11 +22,15 @@ export function InboxRow() {
   const today = useToday();
   const inboxView = useCategoryView(null, today);
   const pendingCount = inboxView.data?.items.length;
+  const accessibilityLabel =
+    pendingCount === undefined || pendingCount === 0
+      ? 'Abrir Bandeja de entrada'
+      : `Abrir Bandeja de entrada, ${describePendingCount(pendingCount)}`;
 
   return (
     <Pressable
       role="button"
-      accessibilityLabel="Abrir Bandeja de entrada"
+      accessibilityLabel={accessibilityLabel}
       onPress={() => router.push('/bandeja')}
       className="min-h-14 flex-row items-center gap-3 border-b border-border"
     >
