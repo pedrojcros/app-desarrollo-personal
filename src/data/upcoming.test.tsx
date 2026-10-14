@@ -11,6 +11,7 @@ import { cleanup, renderHook, waitFor } from '@testing-library/react-native';
 import type { PropsWithChildren } from 'react';
 
 import { queryKeys } from './query-keys';
+import * as upcomingDomain from '../domain/views/upcoming';
 import { useUpcomingView } from './upcoming';
 
 type Row = Record<string, unknown>;
@@ -124,6 +125,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  jest.restoreAllMocks();
   cleanup();
   for (const queryClient of queryClients) {
     queryClient.clear();
@@ -132,6 +134,17 @@ afterEach(() => {
 });
 
 describe('useUpcomingView', () => {
+  it('reuses grouped data when today and query data stay the same', async () => {
+    const groupUpcomingItems = jest.spyOn(upcomingDomain, 'groupUpcomingItems');
+    const { result, rerender } = renderUpcoming();
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    const groupingCalls = groupUpcomingItems.mock.calls.length;
+
+    rerender({ date: '2026-10-07' });
+
+    expect(groupUpcomingItems).toHaveBeenCalledTimes(groupingCalls);
+  });
+
   it('groups at read time while the cache keeps a flat ViewData', async () => {
     mockRows.tasks = [
       taskRow({ due_date: '2026-10-08' }),

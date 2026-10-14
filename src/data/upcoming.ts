@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 
 import type { Task } from '../domain/entities';
@@ -89,9 +90,14 @@ export async function fetchUpcomingView(
 export function useUpcomingView(
   today: CalendarDate,
 ): UseQueryResult<UpcomingWeek[], DataResultError> {
+  const selectUpcomingWeeks = useCallback(
+    (data: ViewData) => groupUpcomingItems(data.items, today),
+    [today],
+  );
+
   return useQuery({
     queryKey: queryKeys.upcoming(today),
-    select: (data) => groupUpcomingItems(data.items, today),
+    select: selectUpcomingWeeks,
     queryFn: async () => {
       const result = await fetchUpcomingView(today);
       return unwrapResult(result);

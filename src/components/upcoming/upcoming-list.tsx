@@ -34,11 +34,63 @@ type UpcomingListProps = {
   onOpen: (path: string) => void;
 };
 
+type UpcomingDaySectionProps = Pick<
+  UpcomingListProps,
+  'categories' | 'onOpen'
+> & {
+  day: UpcomingWeek['days'][number];
+};
+
+export function UpcomingDaySection({
+  day,
+  categories,
+  onOpen,
+}: UpcomingDaySectionProps) {
+  return (
+    <View className="pb-2">
+      <Text weight="semibold" accessibilityRole="header" className="pb-1 pt-2">
+        {formatDayTitle(day.date)}
+      </Text>
+      {day.items.map((item) => {
+        const category = categories.find(
+          (candidate) => candidate.id === item.categoryId,
+        );
+        const labelParts = [
+          item.name,
+          formatDayTitle(day.date),
+          item.sortTime,
+          category?.name,
+          'abre la ficha',
+        ];
+        const accessibleLabel = labelParts
+          .filter((part) => part !== null && part !== undefined)
+          .join(', ');
+
+        return (
+          <ListRow
+            key={getMarkTargetKey(item.target)}
+            readOnly
+            title={item.name}
+            meta={describeItemMeta(item, category?.name)}
+            category={category?.color}
+            accessibilityLabel={accessibleLabel}
+            onPress={() => onOpen(getItemDetailPath(item))}
+          />
+        );
+      })}
+    </View>
+  );
+}
+
+type UpcomingWeekSectionProps = Omit<UpcomingListProps, 'weeks'> & {
+  week: UpcomingWeek;
+};
+
 export function UpcomingWeekSection({
   week,
   categories,
   onOpen,
-}: Omit<UpcomingListProps, 'weeks'> & { week: UpcomingWeek }) {
+}: UpcomingWeekSectionProps) {
   return (
     <View className="pb-6">
       <Text variant="headline" accessibilityRole="header" className="pb-3 pt-4">
@@ -47,36 +99,14 @@ export function UpcomingWeekSection({
       {week.days.length === 0 ? (
         <Text className="py-3 text-muted-foreground">Semana libre</Text>
       ) : null}
-      {week.days.map((day) => {
-        const dayTitle = formatDayTitle(day.date);
-        return (
-          <View key={day.date} className="pb-2">
-            <Text
-              weight="semibold"
-              accessibilityRole="header"
-              className="pb-1 pt-2"
-            >
-              {dayTitle}
-            </Text>
-            {day.items.map((item) => {
-              const category = categories.find(
-                (candidate) => candidate.id === item.categoryId,
-              );
-              return (
-                <ListRow
-                  key={getMarkTargetKey(item.target)}
-                  readOnly
-                  title={item.name}
-                  meta={describeItemMeta(item, category?.name)}
-                  category={category?.color}
-                  accessibilityLabel={`${item.name}, ${dayTitle}, abre la ficha`}
-                  onPress={() => onOpen(getItemDetailPath(item))}
-                />
-              );
-            })}
-          </View>
-        );
-      })}
+      {week.days.map((day) => (
+        <UpcomingDaySection
+          key={day.date}
+          day={day}
+          categories={categories}
+          onOpen={onOpen}
+        />
+      ))}
     </View>
   );
 }

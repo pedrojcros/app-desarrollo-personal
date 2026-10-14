@@ -1,7 +1,8 @@
+import { Calendar } from 'lucide-react-native';
 import { expect, it, jest } from '@jest/globals';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { ThemeScope } from '@/theme/theme-scope';
-import { ListRow } from './list-row';
+import { ListRow, type ListRowSecondaryAction } from './list-row';
 
 it('keeps both mark actions in the default variant', () => {
   const markDone = jest.fn();
@@ -41,4 +42,21 @@ it('renders a read-only row without mark callbacks or buttons', () => {
   expect(screen.getAllByRole('button')).toHaveLength(1);
   fireEvent.press(screen.getByLabelText('Nadar, Miércoles 21, abre la ficha'));
   expect(open).toHaveBeenCalledTimes(1);
+});
+
+it('does not allow a secondary action on a read-only row', () => {
+  const secondaryAction: ListRowSecondaryAction = {
+    label: 'Reprogramar',
+    icon: Calendar,
+    onPress: jest.fn(),
+  };
+  // @ts-expect-error La variante de solo lectura no admite acción secundaria.
+  const rowProps: React.ComponentProps<typeof ListRow> = {
+    readOnly: true,
+    title: 'Nadar',
+    meta: '17:00',
+    secondaryAction,
+  };
+
+  expect(rowProps.readOnly).toBe(true);
 });

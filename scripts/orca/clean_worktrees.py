@@ -392,7 +392,7 @@ def main(arguments=None):
         loose_directories = find_loose_directories(snapshot.worktrees, snapshot.root)
         for loose_directory in loose_directories:
             print(f'{loose_directory}: carpeta suelta, no es un worktree')
-    except OSError as error:
+    except (CommandFailure, OSError) as error:
         print(f'No se pudieron listar las carpetas sueltas: {error}')
         failed = True
     deletable_count = 0

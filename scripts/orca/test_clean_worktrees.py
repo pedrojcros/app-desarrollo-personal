@@ -321,6 +321,19 @@ class CleanWorktreesTests(unittest.TestCase):
     def test_loose_directories_skip_worktrees_without_paths(self):
         self.assertEqual(clean_worktrees.find_loose_directories([{}], self.root), [])
 
+    def test_main_reports_failure_to_find_main_worktree(self):
+        snapshot = clean_worktrees.Snapshot([], [], [], self.root)
+        with mock.patch.object(clean_worktrees, 'collect_snapshot', return_value=snapshot):
+            with mock.patch.object(
+                clean_worktrees,
+                'find_main_worktree',
+                side_effect=clean_worktrees.CommandFailure('git worktree failed'),
+            ):
+                code, output = self.run_main()
+
+        self.assertEqual(code, 1)
+        self.assertIn('No se pudieron listar las carpetas sueltas', output)
+
     def test_loose_directories_skip_siblings_of_main_worktree(self):
         projects_path = self.root / 'projects'
         main_path = projects_path / 'app'

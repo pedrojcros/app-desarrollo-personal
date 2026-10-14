@@ -196,7 +196,9 @@ describe('Lists screen', () => {
     renderScreen();
 
     fireEvent.press(
-      screen.getByRole('button', { name: 'Abrir Bandeja de entrada' }),
+      screen.getByRole('button', {
+        name: 'Abrir Bandeja de entrada, 3 pendientes',
+      }),
     );
 
     expect(router.push).toHaveBeenCalledWith('/bandeja');

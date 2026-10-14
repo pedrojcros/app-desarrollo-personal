@@ -38,7 +38,12 @@ type ListRowBaseProps = {
 
 type ListRowProps = ListRowBaseProps &
   (
-    | { readOnly: true; onMarkDone?: never; onMarkNotDone?: never }
+    | {
+        readOnly: true;
+        onMarkDone?: never;
+        onMarkNotDone?: never;
+        secondaryAction?: never;
+      }
     | { readOnly?: false; onMarkDone: () => void; onMarkNotDone: () => void }
   );
 
