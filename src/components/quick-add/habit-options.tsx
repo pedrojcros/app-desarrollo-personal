@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { TextField } from '@/components/ui/text-field';
 import type { Frequency, IsoWeekday, TimeSlot } from '@/domain/types';
+import type { QuickAddSelector } from './quick-add-selector';
 import { UpwardChoice } from './upward-choice';
 
 export interface QuickHabitOptions {
@@ -44,7 +45,7 @@ export function HabitOptions({
   value: QuickHabitOptions;
   onChange(value: QuickHabitOptions): void;
   disabled: boolean;
-  onSelectorOpenChange(selector: string, isOpen: boolean): void;
+  onSelectorOpenChange(selector: QuickAddSelector, isOpen: boolean): void;
 }) {
   function change(changes: Partial<QuickHabitOptions>): void {
     if (changes.moment !== undefined && changes.moment !== 'exact') {

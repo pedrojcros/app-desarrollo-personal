@@ -8,20 +8,24 @@ import { useTheme } from '@/theme/theme-context';
 import { DateShortcuts } from './date-shortcuts';
 import { HabitOptions } from './habit-options';
 import type { QuickAddDefaults } from './quick-add-provider';
-import { useQuickAddDraft, type QuickAddDraft } from './use-quick-add-draft';
+import type { QuickAddSelector } from './quick-add-selector';
+import {
+  useQuickAddDraft,
+  type QuickAddDraftStorage,
+} from './use-quick-add-draft';
 
 export function QuickAddBar({
   defaults,
   close,
-  savedDraft,
-  saveDraft,
+  draftStorage,
   onSelectorOpenChange,
+  onSubmittingChange,
 }: {
   defaults: QuickAddDefaults;
   close(): void;
-  savedDraft?: QuickAddDraft;
-  saveDraft(draft: QuickAddDraft): void;
-  onSelectorOpenChange(selector: string, isOpen: boolean): void;
+  draftStorage: QuickAddDraftStorage;
+  onSelectorOpenChange(selector: QuickAddSelector, isOpen: boolean): void;
+  onSubmittingChange(isSubmitting: boolean): void;
 }) {
   const { colors, fonts } = useTheme();
   const {
@@ -39,7 +43,7 @@ export function QuickAddBar({
       openMore,
     },
     status: { error, disabled },
-  } = useQuickAddDraft(defaults, close, savedDraft, saveDraft);
+  } = useQuickAddDraft(defaults, { close, draftStorage, onSubmittingChange });
   // El preflight de Tailwind pinta de gris el campo vacío en la web y no llega
   // al contraste mínimo; el color en línea lo corrige.
   const nameColor =

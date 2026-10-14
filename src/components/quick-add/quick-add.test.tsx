@@ -8,7 +8,13 @@ import {
   waitFor,
 } from '@testing-library/react-native';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { Keyboard, Platform, type KeyboardEventListener } from 'react-native';
+import type { ReactNode } from 'react';
+import {
+  Keyboard,
+  Platform,
+  TextInput,
+  type KeyboardEventListener,
+} from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { formatFullDate } from '@/components/date-field/format';
 import { ThemeContext } from '@/theme/theme-context';
@@ -30,7 +36,7 @@ jest.mock('@/data/categories', () => ({
 jest.mock('@/data/use-today', () => ({ useToday: () => '2026-10-07' }));
 jest.mock('expo-router', () => ({ useRouter: () => ({ push: mockPush }) }));
 
-function openBar() {
+function renderWithProvider(children: ReactNode) {
   render(
     <SafeAreaProvider
       initialMetrics={{
@@ -48,17 +54,21 @@ function openBar() {
           shape: themeShapes.white,
         }}
       >
-        <QuickAddProvider>
-          <QuickAddButton
-            defaults={{
-              dueDate: '2026-10-07',
-              categoryId: null,
-              sectionId: null,
-            }}
-          />
-        </QuickAddProvider>
+        <QuickAddProvider>{children}</QuickAddProvider>
       </ThemeContext.Provider>
     </SafeAreaProvider>,
+  );
+}
+
+function openBar() {
+  renderWithProvider(
+    <QuickAddButton
+      defaults={{
+        dueDate: '2026-10-07',
+        categoryId: null,
+        sectionId: null,
+      }}
+    />,
   );
   fireEvent.press(screen.getByLabelText('Añadir tarea o hábito'));
 }
@@ -240,23 +250,34 @@ it('shows the chosen date formatted instead of as YYYY-MM-DD', () => {
 });
 
 const subscribeKeyboard = Keyboard.addListener.bind(Keyboard);
-let hideKeyboard: KeyboardEventListener;
+let activeHideListeners: Set<KeyboardEventListener>;
 beforeEach(() => {
-  hideKeyboard = () => {};
+  activeHideListeners = new Set();
   jest
     .spyOn(Keyboard, 'addListener')
     .mockImplementation((eventName, listener) => {
-      if (eventName === 'keyboardDidHide') {
-        hideKeyboard = listener;
+      const subscription = subscribeKeyboard(eventName, listener);
+      if (eventName !== 'keyboardDidHide') {
+        return subscription;
       }
-      return subscribeKeyboard(eventName, listener);
+      activeHideListeners.add(listener);
+      // Solo cuentan los oyentes que siguen suscritos, como en el sistema.
+      const removeSubscription = subscription.remove.bind(subscription);
+      subscription.remove = () => {
+        activeHideListeners.delete(listener);
+        removeSubscription();
+      };
+      return subscription;
     });
 });
 afterEach(() => {
   jest.restoreAllMocks();
 });
 function dismissSystemKeyboard() {
-  act(() => hideKeyboard({} as Parameters<KeyboardEventListener>[0]));
+  const event = {} as Parameters<KeyboardEventListener>[0];
+  for (const listener of [...activeHideListeners]) {
+    act(() => listener(event));
+  }
 }
 it('uses body typography and disables name autofill', () => {
   openBar();
@@ -274,17 +295,124 @@ it('disables interval autofill', () => {
   expect(intervalField.props.autoComplete).toBe('off');
   expect(intervalField.props.importantForAutofill).toBe('no');
 });
-it('closes on system keyboard hide and restores the draft when reopened', () => {
+it('closes on system keyboard hide and restores the typed name and kind when reopened', () => {
   openBar();
   fireEvent.changeText(screen.getByLabelText('Nombre'), 'Leer un capítulo');
-  fireEvent.press(screen.getByLabelText('Fecha: Mañana'));
+  fireEvent.press(screen.getByText('Hábito'));
   dismissSystemKeyboard();
   expect(screen.queryByLabelText('Nombre')).toBeNull();
   fireEvent.press(screen.getByLabelText('Añadir tarea o hábito'));
   expect(screen.getByLabelText('Nombre')).toHaveDisplayValue(
     'Leer un capítulo',
   );
-  expect(screen.getByText(formatFullDate('2026-10-08'))).toBeVisible();
+  expect(screen.getByRole('radio', { name: 'Hábito' })).toBeChecked();
+});
+it('restores the habit options of the draft when reopened', () => {
+  openBar();
+  fireEvent.changeText(screen.getByLabelText('Nombre'), 'Nadar');
+  fireEvent.press(screen.getByText('Hábito'));
+  fireEvent.press(screen.getByLabelText('Frecuencia'));
+  fireEvent.press(screen.getByText('Cada mes'));
+  dismissSystemKeyboard();
+  fireEvent.press(screen.getByLabelText('Añadir tarea o hábito'));
+  expect(screen.getByLabelText('Frecuencia')).toHaveTextContent('Cada mes');
+});
+it('takes the place and dates from the screen that reopens it, not from the draft', async () => {
+  renderWithProvider(
+    <>
+      <QuickAddButton
+        defaults={{ dueDate: '2026-10-07', categoryId: null, sectionId: null }}
+      />
+      <QuickAddButton
+        defaults={{ dueDate: '2026-10-09', categoryId: null, sectionId: null }}
+      />
+    </>,
+  );
+  const [firstScreenButton, secondScreenButton] = screen.getAllByLabelText(
+    'Añadir tarea o hábito',
+  );
+  fireEvent.press(firstScreenButton);
+  fireEvent.changeText(screen.getByLabelText('Nombre'), 'Leer un capítulo');
+  fireEvent.press(screen.getByLabelText('Fecha: Mañana'));
+  dismissSystemKeyboard();
+  fireEvent.press(secondScreenButton);
+  expect(screen.getByLabelText('Nombre')).toHaveDisplayValue(
+    'Leer un capítulo',
+  );
+  expect(screen.getByText(formatFullDate('2026-10-09'))).toBeVisible();
+  fireEvent.press(screen.getByLabelText('Enviar'));
+  await waitFor(() =>
+    expect(mockCreateTask).toHaveBeenCalledWith(
+      expect.objectContaining({ dueDate: '2026-10-09' }),
+    ),
+  );
+});
+it('reopens empty and as a task after a successful send', async () => {
+  openBar();
+  fireEvent.changeText(screen.getByLabelText('Nombre'), 'Nadar');
+  fireEvent.press(screen.getByText('Hábito'));
+  fireEvent.press(screen.getByLabelText('Enviar'));
+  await waitFor(() =>
+    expect(screen.getByLabelText('Nombre')).toHaveDisplayValue(''),
+  );
+  fireEvent.press(screen.getByLabelText('Cerrar añadir rápido'));
+  fireEvent.press(screen.getByLabelText('Añadir tarea o hábito'));
+  expect(screen.getByLabelText('Nombre')).toHaveDisplayValue('');
+  expect(screen.getByRole('radio', { name: 'Tarea' })).toBeChecked();
+});
+it('reopens empty after going to More so the name is not duplicated', () => {
+  openBar();
+  fireEvent.changeText(screen.getByLabelText('Nombre'), 'Comprar pilas');
+  fireEvent.press(screen.getByText('Más'));
+  fireEvent.press(screen.getByLabelText('Añadir tarea o hábito'));
+  expect(screen.getByLabelText('Nombre')).toHaveDisplayValue('');
+});
+it('reopens empty when the typed name was erased before closing', () => {
+  openBar();
+  fireEvent.changeText(screen.getByLabelText('Nombre'), 'Comprar pilas');
+  fireEvent.changeText(screen.getByLabelText('Nombre'), '');
+  dismissSystemKeyboard();
+  fireEvent.press(screen.getByLabelText('Añadir tarea o hábito'));
+  expect(screen.getByLabelText('Nombre')).toHaveDisplayValue('');
+});
+it('stays open when the keyboard hides while saving and keeps the bar for the next one', async () => {
+  let finishSaving: () => void = () => {};
+  mockCreateTask.mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        finishSaving = () => resolve({ id: 'task' });
+      }),
+  );
+  openBar();
+  fireEvent.changeText(screen.getByLabelText('Nombre'), 'Comprar pilas');
+  fireEvent.press(screen.getByLabelText('Enviar'));
+  dismissSystemKeyboard();
+  expect(screen.getByLabelText('Nombre')).toBeVisible();
+  const focus = jest.spyOn(TextInput.prototype, 'focus');
+  await act(async () => finishSaving());
+  await waitFor(() =>
+    expect(screen.getByLabelText('Nombre')).toHaveDisplayValue(''),
+  );
+  expect(focus).toHaveBeenCalled();
+  expect(screen.getByLabelText('Nombre')).toBeVisible();
+});
+it('closes on a keyboard hide once saving has finished and the field has its focus back', async () => {
+  openBar();
+  fireEvent.changeText(screen.getByLabelText('Nombre'), 'Comprar pilas');
+  fireEvent.press(screen.getByLabelText('Enviar'));
+  await waitFor(() =>
+    expect(screen.getByLabelText('Nombre')).toHaveDisplayValue(''),
+  );
+  dismissSystemKeyboard();
+  expect(screen.queryByLabelText('Nombre')).toBeNull();
+});
+it('does not listen to the keyboard while the bar is closed', () => {
+  const dismiss = jest.spyOn(Keyboard, 'dismiss');
+  openBar();
+  fireEvent.press(screen.getByLabelText('Cerrar añadir rápido'));
+  dismiss.mockClear();
+  dismissSystemKeyboard();
+  expect(dismiss).not.toHaveBeenCalled();
 });
 it.each([
   'Calendario',
@@ -346,7 +474,9 @@ it('closes on a restored web viewport and keeps the name after reopening', async
   });
   Object.defineProperty(globalThis, 'document', {
     configurable: true,
-    value: new EventTarget(),
+    value: Object.assign(new EventTarget(), {
+      activeElement: { tagName: 'INPUT' },
+    }),
   });
   function resizeViewport(height: number) {
     act(() => {
