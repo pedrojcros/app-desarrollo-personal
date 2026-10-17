@@ -67,13 +67,14 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 Para retomar en una sesión nueva:
 
-1. **Antes de la 1.2** (la 1.1.1 ya está publicada; la retrospectiva se hace al cerrar la 1.2):
+1. **Próxima sesión de arquitecto: el diseño de la plantilla** para proyectos de pago, en un repositorio aparte (DEC-60). Esta app es su laboratorio: a la plantilla pasan solo las piezas ya probadas aquí.
+2. **Antes de la 1.2** (la 1.1.1 ya está publicada; la retrospectiva se hace al cerrar la 1.2):
    - el arquitecto **reagrupa los encargos 055 a 059 de la 1.2 en módulos y carriles** (DEC-57.7), en [propuestas/progreso](propuestas/progreso.md#3-encargos-para-la-ejecución).
    - el arquitecto escribe el encargo de la skill **`pantallas-app`** (DEC-56), con lo que corrigieron las revisiones del pulido (lista en la [bitácora](bitacora.md), 2026-10-14, «Ejecución de la 1.1.1»).
    - Con permiso del humano: comprobar si Claude Code deja apagar **solo en este proyecto** las skills y plugins sincronizados de claude.ai (DEC-53.3), y apagarlas.
    - **Encargo pequeño para el test inestable** `category-view-screen.test.tsx` («marking no hecho… Leche»): ha fallado tres veces, la última en la CI de `main` al publicar la 1.1.1.
-2. **Después, ejecutar la 1.2 con `/ejecutar-plan`** cuando el humano lo diga. Ojo: su encargo 057 parte de la `historial.tsx` que deja el 068. Lo primero, la épica y todas sus tarjetas en «Por hacer» (DEC-47). Olas 055 a 057, 058 y 059 ([propuesta](propuestas/progreso.md#3-encargos-para-la-ejecución)). Al cerrar, Maestro una sola vez y la primera retrospectiva (DEC-45), que dice también si hace falta el *spike* de Metro MCP (DEC-56).
-3. **Después de esa retrospectiva, con el arquitecto:** el diseño del orquestador por eventos (DEC-45, encargo E) y la versión 2 (Google Calendar).
+3. **Después, ejecutar la 1.2 con `/ejecutar-plan`** cuando el humano lo diga. Ojo: su encargo 057 parte de la `historial.tsx` que deja el 068. Lo primero, la épica y todas sus tarjetas en «Por hacer» (DEC-47). Olas 055 a 057, 058 y 059 ([propuesta](propuestas/progreso.md#3-encargos-para-la-ejecución)). Al cerrar, Maestro una sola vez y la primera retrospectiva (DEC-45), que dice también si hace falta el *spike* de Metro MCP (DEC-56).
+4. **Después de esa retrospectiva, con el arquitecto:** el diseño del orquestador por eventos (DEC-45, encargo E) y la versión 2 (Google Calendar).
 
 
 ## Pendiente del humano
@@ -93,7 +94,7 @@ Para retomar en una sesión nueva:
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-60**.
+  chat. Siguiente número libre: **DEC-61**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
