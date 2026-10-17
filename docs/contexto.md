@@ -94,7 +94,7 @@ Para retomar en una sesión nueva:
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-61**.
+  chat. Siguiente número libre: **DEC-62**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 
