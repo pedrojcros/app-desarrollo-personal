@@ -4,6 +4,16 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-17 — Arquitecto: el orquestador trabaja y dos modos de trabajo
+
+El humano volvió tras unos días, instaló gentle-ai y pidió optimizar el sistema de trabajo, también para la plantilla de otros proyectos.
+
+- **DEC-57:** el orquestador también programa (lo compartido, lo pequeño, la integración y la documentación) y se aplica «divide y vencerás» en dos niveles: módulos pequeños agrupados en carriles por trabajador. Olas grandes, relevo de sesión por contexto y revisor aparte solo para lo arriesgado. Dato de partida: la sesión de orquestador de la 1.1.1 releyó de media 290.000 tokens por paso (76 h, 337 pasos), casi el doble del objetivo.
+- **DEC-58:** dos modos, «estoy» y «me voy». Con el humano delante se le pregunta todo; sin él, el orquestador avanza en modo automático y deja lo crítico (riesgo alto de gentle-ai y nivel 3) en espera. La filosofía de gentle-ai pasa a ser la forma de trabajar por defecto, por debajo de `AGENTS.md`.
+- Aplicado en [orquestador](agentes/orquestador.md). Falta reagrupar los encargos 055 a 059 de la 1.2 en módulos y carriles.
+- **DEC-59:** Orca y gentle-ai, sin Gentle Shell. Usar la suscripción de Claude desde herramientas de terceros va contra las condiciones de Anthropic (página legal de Claude Code).
+- **DEC-60 y DEC-61:** el humano prioriza pulir el flujo para proyectos de pago (la app se sigue desarrollando, no es un laboratorio). La plantilla vive en un repositorio privado aparte, con tres capas: proceso, perfil de stack y proyecto de pago. Diseño en [propuestas/plantilla](propuestas/plantilla.md).
+
 ### 2026-10-14 (noche) — Publicada la 1.1.1
 
 El humano pidió al orquestador que la publicara; los permisos de Claude Code bloquearon que el orquestador tocara `main`, así que lo hizo el humano desde su terminal con los pasos del orquestador.

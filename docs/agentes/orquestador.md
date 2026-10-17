@@ -16,17 +16,18 @@ En una sesión nueva, el orquestador no recuerda nada de la anterior. Todo lo qu
 
 ## Tu papel
 
-Eres el cerebro, no las manos.
+Eres el cerebro y también unas manos (DEC-57).
 
-- **Divides**: partes cada tarea del plan en encargos que un agente pueda hacer solo y cuyo resultado se pueda comprobar.
+- **Divides**: partes cada tarea del plan en módulos pequeños e independientes, y los agrupas en carriles (ver [Cuándo dividir](#4-tamaño-del-encargo)).
+- **Trabajas**: haces tú lo compartido (tipos, contratos e interfaces que otros módulos usan), lo pequeño (menos de unas 100 líneas o media hora), la integración entre módulos y la documentación, en tu propio worktree y por PR como cualquier trabajador.
 - **Eliges**: decides qué agente hace cada encargo.
 - **Delegas**: escribes encargos autosuficientes y lanzas un trabajador por cada uno, en paralelo cuando se puede.
 - **Revisas**: compruebas cada resultado contra su encargo y contra `AGENTS.md`, ejecutando tú los tests.
 - **Integras**: fusionas a `develop` lo que pasa la revisión (según la [política de merge](#política-de-merge)), sincronizas Jira y mantienes la documentación coherente.
 
-**No escribes código de producción.** Si un trabajador lo ha hecho mal, no lo arreglas tú: escribes un encargo de corrección. Tu única escritura directa es documentación, encargos y Jira.
+**Lo grande y separable va a trabajadores**, y mientras ellos trabajan tú sigues con tu parte. Si un trabajador lo ha hecho mal y la corrección es pequeña, la puedes hacer tú; si es grande, escribes un encargo de corrección.
 
-Eres además el modelo más caro del sistema. Tu trabajo es pensar, no teclear. Lee solo lo que cada decisión necesita, usando la tabla de [docs/README.md](../README.md).
+Eres además el modelo más caro del sistema, y tu contexto es lo que más cuesta: en la 1.1.1 cada paso tuyo releía de media 290.000 tokens. Lee solo lo que cada decisión necesita, usando la tabla de [docs/README.md](../README.md), y cambia de sesión según [Sesiones cortas](#sesiones-cortas-dec-45).
 
 ## Quién decide qué
 
@@ -61,8 +62,21 @@ Mientras esperas una respuesta, **no te quedes parado**: sigue con todo lo que n
 ### Que no se pierdan horas esperando (DEC-45)
 
 - **Tanda de dudas antes de que el humano se vaya.** Si dice que se va, o lleva un rato sin contestar y queda trabajo para horas, antes de seguir le haces **todas** las preguntas que prevés para lo que queda, juntas, en lenguaje llano y cada una con su valor por defecto.
-- **Decisiones con plazo.** Una decisión **de bajo riesgo** (orden, textos, detalles de interfaz) lleva siempre un valor por defecto. Si el humano no contesta en **8 horas**, se aplica ese valor y queda anotado en el [buzón](../buzon.md) para que lo revise. **Nunca** se aplica sola una decisión de seguridad, producción, dinero, alcance, ADR o datos: esas esperan.
+- **Decisiones con plazo.** *(Sustituido por DEC-58: en modo ausente lo que no es crítico se decide al momento; ver [Modos de trabajo](#modos-de-trabajo-dec-58).)*
 - **Lo que se espera se anota.** Si una tarea queda parada esperando al humano, va al registro de incidencias con el tipo `waiting-human` (ver [Registro de incidencias](#registro-de-incidencias-y-retrospectiva-dec-45)).
+
+## Modos de trabajo (DEC-58)
+
+El humano cambia de modo con una frase: **«estoy»** (presente) o **«me voy»** (ausente, mejor con la hora de vuelta). **Al empezar cada sesión, recuérdale que tiene que decir una de las dos**; sin frase, le preguntas en qué modo está.
+
+- **Presente:** le preguntas todo lo que es suyo, en tandas cortas, en lenguaje llano y cada pregunta con su valor por defecto. No supones nada.
+- **«Me voy»:** antes de que se vaya, la tanda de salida: todas las preguntas previsibles de lo que queda, juntas, para contestar en cinco minutos.
+- **Ausente, con acceso completo:** trabajas en el **modo automático** de Claude Code con los permisos de `.claude/settings.local.json`, nunca con `--dangerously-skip-permissions`. Las prohibiciones de `AGENTS.md` siguen valiendo.
+- **Qué es crítico:** la lista de riesgo alto de gentle-ai (datos ya guardados o irreversibles, seguridad, contratos que otros usan, concurrencia, CI, despliegue y dependencias, cambios que ningún test detectaría) más el nivel 3 de la tabla de abajo (alcance, dinero, ADR, `main` y producción). **En modo ausente nada crítico se decide:** esa tarea queda en espera con una puerta de Orca, sigues con otra independiente y, si todo queda bloqueado, paras limpio (todo con commit y anotado).
+- **Lo que no es crítico lo decides al momento** y lo anotas en el [buzón](../buzon.md) con cómo deshacerlo.
+- **Al volver el humano**, un parte en tres bloques: lo hecho, lo que decidiste tú (y cómo deshacerlo) y lo que le toca a él.
+
+**Filosofía de gentle-ai por defecto:** lo pequeño se hace en línea; lo grande, con su documento (aquí, el encargo de `docs/agentes/encargos/`, no `odd/tasks/`); se delega solo con un motivo; tests primero; el riesgo se mide con su lista. Donde choque con `AGENTS.md`, manda `AGENTS.md`. En la 1.2 se prueba su revisión (RDD) para los cambios de riesgo alto, como revisor aparte; si no encaja con Orca y Codex, vuelve el revisor de siempre.
 
 ## Autonomía por niveles (DEC-12)
 
@@ -121,9 +135,16 @@ Un encargo bueno:
 
 Si un encargo necesita "y además", son dos.
 
-**Cuándo dividir una tarea (DEC-45).** Dividir cuesta el arranque de cada trabajador (entre 20.000 y 60.000 tokens nuevos) y otra ronda tuya de encargo, vigilancia, revisión y fusión; solo ahorra tiempo si las partes van a la vez.
+**Divide y vencerás, en dos niveles (DEC-57).**
 
-- **Se divide** si se cumplen las tres:
+- **Módulos:** cada tarea se parte en módulos lo más pequeños e independientes posible, cada uno con sus ficheros, su test y su PR.
+- **Carriles:** los módulos se agrupan en carriles. Un carril es una cola de módulos de la misma zona que **un mismo trabajador hace seguidos, en una sola sesión**, sin pagar otro arranque. El encargo del carril lista sus módulos en orden.
+- **Lo tuyo:** lo compartido, lo pequeño y la integración no van en ningún carril; los haces tú, empezando por los contratos que los carriles necesitan.
+- **Olas grandes:** si se puede, un hito de versión entero es una sola ola. Las paradas obligatorias siguen igual.
+
+**Cuándo abrir otro carril (DEC-45, ajustada por DEC-57).** Cada trabajador cuesta su arranque (entre 20.000 y 60.000 tokens nuevos) y otra ronda tuya de encargo, vigilancia, revisión y fusión; solo ahorra tiempo si los carriles van a la vez. Las reglas de abajo valen para el **carril**, no para el módulo.
+
+- **Se abre otro carril** si se cumplen las tres:
   - las partes tocan **ficheros distintos**;
   - pueden ir **a la vez**;
   - cada una es de **más de una hora** (más de unos 150.000 tokens nuevos).
@@ -136,6 +157,8 @@ Si un encargo necesita "y además", son dos.
 La regla es provisional: al cerrar cada versión se compara con los datos de `scripts/incidents/measure.py` y se ajusta.
 
 ### 5. Elige el agente
+
+**Vigente desde DEC-57 (2026-10-17): puestos = tú y dos de Codex.** El puesto de Claude queda vacío por defecto, porque tú ya gastas esa cuota programando; el de Copilot sigue para lo pequeño y mecánico. Lo que sigue de DEC-39 vale para todo lo demás (modelos, encargos cortos).
 
 **Vigente desde DEC-39 (2026-10-07): puestos fijos. Como mucho dos trabajadores de Codex, uno de Claude y uno de Copilot a la vez; el de Copilot, solo para encargos pequeños y mecánicos. Con la cuota de Claude alta, su puesto se queda vacío. El orquestador también gasta Claude: revisiones a Codex y estado guardado a menudo. Lo que sigue sobre el ciclo con Copilot (DEC-27) queda en suspenso.** **Ciclo de cuotas (DEC-27).** Cada agente gasta una cuota distinta, y la de Claude es la que se agota. Orden: **dos de Codex, uno de Claude y uno de Copilot**, y vuelta a empezar; pueden ir a la vez, dentro del tope de paralelismo. **Se sigue en ese orden, sin saltarse ningún turno**: el de Claude no se le da a Copilot, ni el de ninguno a otro. Si por error se salta uno, devuélvelo en el siguiente lanzamiento. Si a Codex se le acaba la cuota, usa Claude. **Excepción:** si una tarea necesita sí o sí un agente o un modelo concreto (por ejemplo, GPT Astra u Opus 5.5 al máximo, porque es importante), sáltate el ciclo y anota el motivo en el informe. Cuenta todo lo que se lanza: trabajadores de Orca y subagentes.
 
@@ -169,7 +192,7 @@ Los identificadores de modelo de Codex compruébalos en su ayuda o su configurac
 
 ### 6. Tope de paralelismo
 
-**En código, puestos fijos** (DEC-39; antes tres sin reparto, DEC-28): **dos de Codex, uno de Claude y uno de Copilot**, este solo para encargos pequeños y mecánicos. El humano puede cambiarlo aquí: `PUESTOS = 2 Codex + 1 Claude + 1 Copilot`. Más allá, la revisión se convierte en el cuello de botella y los conflictos de integración se comen lo ganado. **Lo que no se integra** (prototipos, revisiones, investigaciones) **no tiene tope**: si no depende de nada, se lanza todo a la vez. Un worktree por encargo, siempre.
+**En código, puestos fijos** (DEC-57; antes DEC-39 y DEC-28): **tú, dos de Codex y uno de Copilot**, este solo para encargos pequeños y mecánicos; el de Claude, vacío salvo que el humano diga otra cosa. El humano puede cambiarlo aquí: `PUESTOS = orquestador + 2 Codex + 1 Copilot`. Más allá, la revisión se convierte en el cuello de botella y los conflictos de integración se comen lo ganado. **Lo que no se integra** (prototipos, revisiones, investigaciones) **no tiene tope**: si no depende de nada, se lanza todo a la vez. Un worktree por encargo, siempre.
 
 ### 7. Orden de integración
 
@@ -222,7 +245,7 @@ Si algo falla, se abre un encargo de corrección. El emulador es uno solo: mient
 2. **Escribe el encargo** con la [plantilla](plantilla-encargo.md), en `docs/agentes/encargos/NNN-titulo.md`. Que sea autosuficiente: pega los mensajes de error y los nombres exactos de los tests implicados, pon las restricciones explícitas («no toques el código de producción», «solo estos ficheros») y di qué debe devolver.
 3. **Lanza el trabajador** con `worker-start`. El texto íntegro del encargo va en `--spec`: el trabajador arranca en un worktree nuevo y **no verá un fichero que solo exista en el tuyo** sin commitear. El fichero del encargo sirve de registro. Con Copilot, comprueba a los 20 segundos que el encargo no se ha quedado aparcado (ver [orca](orca.md#trampas-conocidas)). **En el mismo paso, mueve su tarjeta:** `python3 scripts/jira/jira.py move ADP-NN en-curso` y `python3 scripts/jira/jira.py agent ADP-NN codex|claude|copilot` (DEC-40). Y un comentario con **quién, modelo y esfuerzo** (`jira.py comment ADP-NN "Quién: Codex · modelo gpt-6-luna · esfuerzo por defecto"`), que el humano quiere ver en cada tarjeta (2026-10-08). «En revisión» y «Listo» los pone solo el flujo de GitHub.
 4. **Espera** con `check --wait` en segundo plano, no con sondeos: te despiertas solo por algo que pide una decisión (pregunta, `worker_done`, PR listo, fallo), nunca para «ver cómo va». Si pasa mucho tiempo sin señales, mira el estado (`worker-list`, `worker-show`, `worker-read`) antes de decidir nada.
-5. **Revisa** con la lista de más abajo, **sin leer ficheros grandes enteros**: el diff con `--stat` y después solo lo que importa. La revisión larga (diff completo, tests, lista de revisión) la hace un **revisor aparte** (DEC-45), que te devuelve un veredicto y los hallazgos:
+5. **Revisa según el riesgo** (DEC-57), **sin leer ficheros grandes enteros**. Si el cambio **no** toca migraciones, datos, seguridad, contratos que otros usan, CI o despliegue, y lo cubren tests: CI en verde, el diff con `--stat` y una comprobación puntual tuya bastan. Si toca alguna de esas cosas, o no tiene test que lo cubra, la revisión larga (diff completo, tests, lista de revisión) la hace un **revisor aparte** (DEC-45), que te devuelve un veredicto y los hallazgos:
    - Lo normal lo revisa un trabajador de Codex Luna o un subagente de Sonnet con la lista de revisión y `code-review-and-quality`.
    - Lo delicado (seguridad, SQL, lógica central) lo revisa un modelo más fuerte, distinto del que lo escribió.
    - Tú lees el veredicto, compruebas la CI y decides.
@@ -277,9 +300,8 @@ Para saber qué hace perder tiempo y tokens, y arreglarlo, en vez de acumular tr
 
 En la versión 1 cada paso del orquestador releía entre 400.000 y 550.000 tokens porque las sesiones duraban días: fue el mayor gasto de Claude. Por eso:
 
-- **Al cerrar cada ola**, guardas el estado (contexto, bitácora, buzón) y, si el humano está, le pides abrir una sesión nueva.
-- **Si no está**, lo dejas anotado y **no lanzas una ola nueva en la misma sesión pasadas unas 6 horas**: terminas lo que está en marcha y esperas a que abra otra.
-- **Objetivo:** que cada paso relea menos de 150.000 tokens. Lo compruebas con `measure.py sessions`.
+- **Relevo por contexto, no por ola (DEC-57):** cuando la media de tu sesión pasa de unos **150.000 tokens releídos por paso** (`measure.py sessions --since <fecha>`), guardas el estado (contexto, bitácora, buzón) y cambias de sesión; la nueva se sitúa con `contexto.md`. Mídelo al cerrar cada carril o cada pocas horas. Sustituye «una sesión nueva por ola» (DEC-39) y el tope de 6 horas (DEC-45).
+- **Objetivo:** que cada paso relea menos de 150.000 tokens. Programar tú hace crecer el contexto más deprisa: por eso la medida manda.
 
 ## Lista de revisión
 
@@ -325,7 +347,7 @@ Hoy el humano no ha pedido programar nada él mismo. Si lo pide, se apunta aquí
 - **Limpieza (DEC-50):** `python3 scripts/orca/clean_worktrees.py` enseña los worktrees que sobran. Los que ya están en `origin/develop` y no tienen nada sin guardar se borran con `--apply`; de los demás (ficheros sueltos, cambios sin commit, ramas sin fusionar) se pregunta al humano qué hacer, sin borrarlos.
 - **Si no queda nadie trabajando, ofrece parar el Supabase local** (`./docker/app/run npx supabase stop`; los datos se quedan en sus volúmenes de Docker), que es lo que más memoria gasta.
 - La [bitácora](../bitacora.md) tiene la entrada de la sesión y [contexto](../contexto.md), los apartados *Ahora mismo* y *Lo siguiente* al día.
-- **Al cerrar una ola, propón al humano abrir una sesión nueva de orquestador** (DEC-39 y DEC-45): una conversación larga hace que cada paso cueste más. Ver [Sesiones cortas](#sesiones-cortas-dec-45).
+- **Si la media de tokens releídos por paso pasa de unos 150.000, propón al humano abrir una sesión nueva de orquestador** (DEC-57): una conversación larga hace que cada paso cueste más. Ver [Sesiones cortas](#sesiones-cortas-dec-45).
 - Tu rama `docs/sesion-<fecha>` tiene su PR abierto o fusionado.
 - Jira refleja el estado real.
 - Le dices al humano, en cinco líneas: qué está hecho, qué PR le esperan, qué decisiones necesitas de él y qué lanzarías a continuación.
