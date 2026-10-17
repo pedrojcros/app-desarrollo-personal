@@ -34,7 +34,8 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 2. Sitúa al humano: en qué punto estamos y qué toca ahora, según este documento
    hasta el final de *Pendiente del humano*.
 3. Mira [decisiones](decisiones.md) por si hay respuestas nuevas.
-4. **Tu papel lo decide el humano con un comando, no este documento.** Lo leen
+4. **Recuérdale al humano que diga «estoy» o «me voy»** (DEC-58): con él delante se le pregunta todo lo suyo; sin él se avanza y lo crítico espera. Detalle en [Modos de trabajo](agentes/orquestador.md#modos-de-trabajo-dec-58).
+5. **Tu papel lo decide el humano con un comando, no este documento.** Lo leen
    también los trabajadores, y ninguno debe creerse orquestador o arquitecto por
    leerlo. Ver `CLAUDE.md`.
 
@@ -42,8 +43,9 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 ## Ahora mismo
 
-*Actualizado: 2026-10-14 (noche), sesión de orquestador: 1.1.1 publicada en `main`.*
+*Actualizado: 2026-10-17, sesión de arquitecto: DEC-57 y DEC-58.*
 
+- **Nueva forma de trabajar** (2026-10-17): el orquestador también programa y divide en módulos y carriles (DEC-57), y hay dos modos, «estoy» y «me voy», con la filosofía de gentle-ai por defecto (DEC-58). Ver [orquestador](agentes/orquestador.md).
 - **La versión 1 está publicada** (2026-10-09, PR #67, etiqueta [`v1.0.0`](https://github.com/pedrojcros/app-desarrollo-personal/releases/tag/v1.0.0)), con la 1.x y los recordatorios (1.1, R1 a R5), que solo funcionan en la app instalada. Falta el APK y, con él, R6: la comprobación del humano en su móvil (lista en el buzón).
 - **DEC-45 aplicada** (encargos A a D; el E, el orquestador por eventos, queda para diseñarlo con el arquitecto):
   - **registro de incidencias** que rellenan solos el supervisor y el candado (PR #70);
@@ -66,6 +68,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 Para retomar en una sesión nueva:
 
 1. **Antes de la 1.2** (la 1.1.1 ya está publicada; la retrospectiva se hace al cerrar la 1.2):
+   - el arquitecto **reagrupa los encargos 055 a 059 de la 1.2 en módulos y carriles** (DEC-57.7), en [propuestas/progreso](propuestas/progreso.md#3-encargos-para-la-ejecución).
    - el arquitecto escribe el encargo de la skill **`pantallas-app`** (DEC-56), con lo que corrigieron las revisiones del pulido (lista en la [bitácora](bitacora.md), 2026-10-14, «Ejecución de la 1.1.1»).
    - Con permiso del humano: comprobar si Claude Code deja apagar **solo en este proyecto** las skills y plugins sincronizados de claude.ai (DEC-53.3), y apagarlas.
    - **Encargo pequeño para el test inestable** `category-view-screen.test.tsx` («marking no hecho… Leche»): ha fallado tres veces, la última en la CI de `main` al publicar la 1.1.1.
@@ -90,7 +93,7 @@ Para retomar en una sesión nueva:
 
 - **Todo por rama y PR contra `develop`.** A `main` solo pasa el humano, con versiones estables y completas. Ver «Flujo de git» en `AGENTS.md`.
 - **Las decisiones van a [decisiones](decisiones.md)**, nunca se quedan en el
-  chat. Siguiente número libre: **DEC-57**.
+  chat. Siguiente número libre: **DEC-59**.
 - **Cada cambio actualiza su documentación, y este documento, en el mismo
   commit.**
 

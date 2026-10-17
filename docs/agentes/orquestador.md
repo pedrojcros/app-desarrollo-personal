@@ -62,8 +62,21 @@ Mientras esperas una respuesta, **no te quedes parado**: sigue con todo lo que n
 ### Que no se pierdan horas esperando (DEC-45)
 
 - **Tanda de dudas antes de que el humano se vaya.** Si dice que se va, o lleva un rato sin contestar y queda trabajo para horas, antes de seguir le haces **todas** las preguntas que prevés para lo que queda, juntas, en lenguaje llano y cada una con su valor por defecto.
-- **Decisiones con plazo.** Una decisión **de bajo riesgo** (orden, textos, detalles de interfaz) lleva siempre un valor por defecto. Si el humano no contesta en **8 horas**, se aplica ese valor y queda anotado en el [buzón](../buzon.md) para que lo revise. **Nunca** se aplica sola una decisión de seguridad, producción, dinero, alcance, ADR o datos: esas esperan.
+- **Decisiones con plazo.** *(Sustituido por DEC-58: en modo ausente lo que no es crítico se decide al momento; ver [Modos de trabajo](#modos-de-trabajo-dec-58).)*
 - **Lo que se espera se anota.** Si una tarea queda parada esperando al humano, va al registro de incidencias con el tipo `waiting-human` (ver [Registro de incidencias](#registro-de-incidencias-y-retrospectiva-dec-45)).
+
+## Modos de trabajo (DEC-58)
+
+El humano cambia de modo con una frase: **«estoy»** (presente) o **«me voy»** (ausente, mejor con la hora de vuelta). **Al empezar cada sesión, recuérdale que tiene que decir una de las dos**; sin frase, le preguntas en qué modo está.
+
+- **Presente:** le preguntas todo lo que es suyo, en tandas cortas, en lenguaje llano y cada pregunta con su valor por defecto. No supones nada.
+- **«Me voy»:** antes de que se vaya, la tanda de salida: todas las preguntas previsibles de lo que queda, juntas, para contestar en cinco minutos.
+- **Ausente, con acceso completo:** trabajas en el **modo automático** de Claude Code con los permisos de `.claude/settings.local.json`, nunca con `--dangerously-skip-permissions`. Las prohibiciones de `AGENTS.md` siguen valiendo.
+- **Qué es crítico:** la lista de riesgo alto de gentle-ai (datos ya guardados o irreversibles, seguridad, contratos que otros usan, concurrencia, CI, despliegue y dependencias, cambios que ningún test detectaría) más el nivel 3 de la tabla de abajo (alcance, dinero, ADR, `main` y producción). **En modo ausente nada crítico se decide:** esa tarea queda en espera con una puerta de Orca, sigues con otra independiente y, si todo queda bloqueado, paras limpio (todo con commit y anotado).
+- **Lo que no es crítico lo decides al momento** y lo anotas en el [buzón](../buzon.md) con cómo deshacerlo.
+- **Al volver el humano**, un parte en tres bloques: lo hecho, lo que decidiste tú (y cómo deshacerlo) y lo que le toca a él.
+
+**Filosofía de gentle-ai por defecto:** lo pequeño se hace en línea; lo grande, con su documento (aquí, el encargo de `docs/agentes/encargos/`, no `odd/tasks/`); se delega solo con un motivo; tests primero; el riesgo se mide con su lista. Donde choque con `AGENTS.md`, manda `AGENTS.md`. En la 1.2 se prueba su revisión (RDD) para los cambios de riesgo alto, como revisor aparte; si no encaja con Orca y Codex, vuelve el revisor de siempre.
 
 ## Autonomía por niveles (DEC-12)
 
