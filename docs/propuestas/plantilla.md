@@ -6,7 +6,7 @@
 
 El humano quiere que esta app sirva sobre todo para obtener «una plantilla arquitectonica con la q trabajar en proyectos por los cuales voy a cobrar dinero» (DEC-60). La plantilla vive en un **repositorio privado aparte** y recoge la forma de trabajar que se ha probado aquí: papeles, documentos, flujo de git, Orca, gentle-ai, supervisión, medida y CI.
 
-Principio: **esta app es el laboratorio.** A la plantilla solo pasa lo que ya ha funcionado aquí o en un proyecto de cliente, después de su retrospectiva. Lo que está a prueba (por ejemplo DEC-57 y DEC-58, hasta la retrospectiva de la 1.2) entra marcado como «a prueba».
+Principio: **la app se desarrolla igualmente, pero lo prioritario es pulir el flujo de trabajo** hasta que valga para proyectos de pago (el humano: «esta app no es el laboratorio, es una app q quiero desarrollar igualmente, pero priorizando mejorar nuestro flujo de trabajo al máximo»). A la plantilla solo pasa lo que ya ha funcionado aquí o en un proyecto de cliente, después de su retrospectiva. Lo que está a prueba (por ejemplo DEC-57 y DEC-58, hasta la retrospectiva de la 1.2) entra marcado como «a prueba».
 
 ## 2. Las tres capas
 

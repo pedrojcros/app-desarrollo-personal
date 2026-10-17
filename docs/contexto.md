@@ -67,7 +67,7 @@ agentes lo abre porque se lo pide `AGENTS.md`. Nadie tiene que pedírselo.
 
 Para retomar en una sesión nueva:
 
-1. **Próxima sesión de arquitecto: el diseño de la plantilla** para proyectos de pago, en un repositorio aparte (DEC-60). Esta app es su laboratorio: a la plantilla pasan solo las piezas ya probadas aquí.
+1. **Próxima sesión de arquitecto: el diseño de la plantilla** para proyectos de pago, en un repositorio aparte (DEC-60). La app se sigue desarrollando, pero lo prioritario es pulir el flujo de trabajo; a la plantilla pasan solo las piezas ya probadas aquí.
 2. **Antes de la 1.2** (la 1.1.1 ya está publicada; la retrospectiva se hace al cerrar la 1.2):
    - el arquitecto **reagrupa los encargos 055 a 059 de la 1.2 en módulos y carriles** (DEC-57.7), en [propuestas/progreso](propuestas/progreso.md#3-encargos-para-la-ejecución).
    - el arquitecto escribe el encargo de la skill **`pantallas-app`** (DEC-56), con lo que corrigieron las revisiones del pulido (lista en la [bitácora](bitacora.md), 2026-10-14, «Ejecución de la 1.1.1»).
