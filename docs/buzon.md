@@ -15,6 +15,8 @@ Para pedir control sobre una idea, añade al final:
 
 *(Decisiones tomadas o pendientes durante la ejecución, para revisar cuando vuelvas.)*
 
+- 2026-10-17 — **Plantilla `v0.1`** (revísalo cuando quieras): decidí yo (1) citar las decisiones heredadas como `DEC-H12`… para que no choquen con las `DEC-nn` de cada proyecto; (2) llevar a la capa de proceso las skills **generales** a demanda (diseño, revisión, CI, seguridad), que la propuesta no listaba pero piden la plantilla de encargo, `/idea` y el orquestador; (3) marcar el repositorio como *template* («hazlo tú todo»). Se deshace con un PR en la plantilla y, lo tercero, con `gh repo edit --template=false`.
+
 - 2026-10-07 — **Dependencias auxiliares de T01** (revísalo): el trabajador preguntó si podía añadir los paquetes que exigen NativeWind, React Native Reusables, Expo Router y lucide (`tailwindcss-animate`, `class-variance-authority`, `clsx`, `tailwind-merge`, `@rn-primitives/portal`, `react-native-reanimated`, `react-native-worklets`, `react-native-safe-area-context`, `react-native-screens`, `react-dom`, `react-native-web`, `react-native-svg`). Lo autoricé leyendo `AGENTS.md` («las que ellas instalen por su cuenta»). Si no estás de acuerdo, dímelo y se quitan.
 - 2026-10-07 — **Apagar el ordenador:** pediste apagarlo cuando acabe. Lo haré al terminar lo que pueda hacer esta noche, dejando todo guardado y subido.
 

@@ -4,6 +4,15 @@ La traza del proyecto: qué pasó y por qué, **lo más reciente arriba**. El es
 
 Vive aparte de `contexto.md` desde DEC-39: `contexto.md` se carga en cada sesión de Claude y tiene que ser corto.
 
+### 2026-10-17 — Orquestador: plantilla `v0.1` publicada (encargos 079 a 082)
+
+Con `/ejecutar-plan`, en una sola sesión. El orquestador hizo el 079 y el 082 (DEC-57); un Codex hizo el 080 (Luna) y el 081 (Sol) en un carril.
+
+- **080:** la primera entrega tenía cinco fallos (el supervisor se caía sin clave de Jira, valores por defecto de `measure.py` cambiados, `jira.yml` contra `main`, versiones sin fijar); los corrigió en una segunda vuelta en la misma terminal.
+- **Las decisiones de proceso** se escribieron como reglas y se citan como `DEC-H12`… `DEC-H58` para no chocar con las de cada proyecto; DEC-H57 y DEC-H58 van «a prueba».
+- **La CI del repositorio privado no arranca** por la facturación de GitHub Actions: con permiso del humano, se fusionó con comprobaciones locales (tests, gitleaks y actionlint en Docker).
+- **`gh pr merge` dentro de una orden compuesta lo bloquea el modo automático**; suelto, lo cubre la regla de `.claude/settings.local.json`.
+
 ### 2026-10-17 — Arquitecto: el orquestador trabaja y dos modos de trabajo
 
 El humano volvió tras unos días, instaló gentle-ai y pidió optimizar el sistema de trabajo, también para la plantilla de otros proyectos.
